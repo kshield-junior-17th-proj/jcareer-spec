@@ -11,7 +11,7 @@ services:
       - postgres-split-data:/var/lib/postgresql/data
       - ./db-init:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "psql -U jcareer_member_app -d jcareer_member -tAc 'SELECT 1' && psql -U jcareer_company_app -d jcareer_company -tAc 'SELECT 1'"]
+      test: ["CMD-SHELL", "psql -U jcareer_member_app -d jcareer_member -tAc 'SELECT 1' && psql -U jcareer_company_app -d jcareer_company -tAc 'SELECT 1' && psql -U jcareer_outcome_app -d jcareer_outcome -tAc 'SELECT 1'"]
       interval: 5s
       timeout: 3s
       retries: 20
@@ -59,6 +59,9 @@ services:
       LLM_STUB_MODE: ${LLM_STUB_MODE:-success}
       LLM_STUB_TIMEOUT_SECONDS: ${LLM_STUB_TIMEOUT_SECONDS:-3}
       ASIS_RAW_PROMPT_LOG: ${ASIS_RAW_PROMPT_LOG:-true}
+      AWS_EC2_METADATA_DISABLED: "true"
+      AWS_CONTAINER_CREDENTIALS_FULL_URI: ""
+      AWS_CONTAINER_CREDENTIALS_RELATIVE_URI: ""
       ENABLE_FAILURE_INJECTION: "true"
       PROMPT_LOG_PATH: /data/prompt-log.jsonl
     volumes:
@@ -77,6 +80,7 @@ services:
     environment:
       MEMBER_DATABASE_URL: postgresql+psycopg://jcareer_member_app:synthetic-member-db-password@postgres:5432/jcareer_member
       COMPANY_DATABASE_URL: postgresql+psycopg://jcareer_company_app:synthetic-company-db-password@postgres:5432/jcareer_company
+      OUTCOME_DATABASE_URL: postgresql+psycopg://jcareer_outcome_app:synthetic-outcome-db-password@postgres:5432/jcareer_outcome
       REDIS_URL: redis://redis:6379/0
       AGENT_BASE_URL: http://agent:8100
       LLM_GATEWAY_BASE_URL: http://llm-gateway:8200
@@ -90,6 +94,11 @@ services:
       DATASET_PROFILE: demo_not_for_measurement
       OPENDART_DISPATCH_MODE: ${OPENDART_DISPATCH_MODE:-fixture_inline}
       OPENDART_REFRESH_QUEUE_URL: ${OPENDART_REFRESH_QUEUE_URL:-}
+      OPENDART_RESULT_TABLE: ${OPENDART_RESULT_TABLE:-}
+      OPENDART_PENDING_TIMEOUT_SECONDS: ${OPENDART_PENDING_TIMEOUT_SECONDS:-1800}
+      AWS_EC2_METADATA_DISABLED: "true"
+      AWS_CONTAINER_CREDENTIALS_FULL_URI: ""
+      AWS_CONTAINER_CREDENTIALS_RELATIVE_URI: ""
       ENABLE_FAILURE_INJECTION: "true"
       CORS_ORIGINS: http://localhost:3000
     depends_on:

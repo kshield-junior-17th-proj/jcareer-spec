@@ -1,0 +1,76 @@
+schema_version: jcareer-endpoint-image-contract-v1
+data_classification: SYNTHETIC_DEMONSTRATION_ONLY
+decision_authority: HUMAN
+current_execution_state: NOT_BUILT_OR_DEPLOYED
+common_boundaries:
+  baked_credentials: false
+  baked_preview_token: false
+  client_aws_credentials: false
+  public_inbound_required: false
+  consultant_access_requires_separate_approval: true
+  endpoint_measurement_state: NOT_OBSERVED
+windows:
+  requested_assets: [WIN-01, WIN-02, WIN-03]
+  requested_count: 3
+  image_kind: AWS_EC2_IMAGE_BUILDER_AMI
+  operating_system_contract: WINDOWS_SERVER_2022_DESKTOP_SIMULATION
+  windows_11_claimed: false
+  image_state: NOT_BUILT
+  deployment_state: NOT_DEPLOYED
+  build_instance_type: t3.small
+  access_lane: SSM_TUNNELED_RDP_OR_FLEET_MANAGER
+  runtime_inputs:
+    - exact_ami_id_from_approved_build
+    - matching_image_build_ref_and_source_bundle_sha256
+    - operator_controlled_initial_windows_credential_outside_terraform
+    - approved_https_preview_url_without_userinfo_query_or_fragment
+    - approved_preview_url_sha256
+    - approved_preview_bootstrap_token_sha256
+    - preview_bootstrap_token_supplied_locally_as_secure_string
+    - endpoint_ref_and_session_ref
+    - session_expiry
+  included_controls:
+    - Windows Defender interface and real-time monitoring required by build test
+    - Windows Firewall profiles required by build test
+    - version-pinned parent image and IMDSv2-required builder
+    - SSM Agent and Remote Desktop services tested
+    - Microsoft Edge presence and Microsoft signature tested
+    - no application or SaaS credentials in the image
+    - hash-bound session configurator and expiry cleanup script embedded in the image
+    - exact Terraform security group and live zero-ingress rechecked before session setup
+    - one-time RDP clipboard bootstrap delivery; token never sent through SSM
+    - session-specific Edge profile removal and OS shutdown scheduled at cleanup
+  limitations:
+    - This is not a Windows 11 client image.
+    - An Image Builder definition is not an AMI build receipt.
+    - Three running consultant desktops require a separate endpoint deployment plan.
+    - Active clipboard clearing does not prove clipboard-history or cloud-sync erasure.
+    - Reuse requires separately approved credential rotation or endpoint teardown.
+macos:
+  requested_assets: [MAC-01, MAC-02, MAC-03]
+  requested_count: 3
+  image_kind: LICENSED_MACOS_MDM_OR_EC2_MAC_EXCEPTION
+  image_state: NOT_BUILT
+  deployment_state: BLOCKED_BY_CURRENT_LAB_POLICY
+  aws_resources_defined: false
+  supported_source_contract:
+    - fleet/images/macos/prepare-consultant.sh
+    - fleet/images/macos/configure-jcareer-session.sh
+    - fleet/images/macos/remove-jcareer-session.sh
+    - fleet/images/macos/validate-consultant.sh
+  session_contract:
+    - approved credential-free HTTPS URL bound by SHA-256
+    - endpoint reference MAC-01 through MAC-03
+    - expiry between 15 minutes and 8 hours
+    - Safari presence and five-minute expiry cleanup launcher
+    - browser cookie cleanup remains HUMAN_MDM_REQUIRED
+  required_human_decisions:
+    - physical Mac plus approved MDM distribution or EC2 Mac
+    - Apple licensing and organization ownership
+    - Dedicated Host budget and minimum allocation
+    - Region and capacity availability
+    - operator-controlled consultant identity and remote-access method
+  limitations:
+    - Current lab permits only t3.micro or t3.small resources.
+    - No macOS AMI, package, signature, or device observation currently exists.
+    - Best-effort Safari and Slack termination does not prove authentication-cookie removal.

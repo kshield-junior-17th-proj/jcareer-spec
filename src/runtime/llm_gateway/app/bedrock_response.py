@@ -30,7 +30,7 @@ def parse_bedrock_explanations(
             raise ValueError("Bedrock explanation response subject is invalid")
         if subject_ref in mapped:
             raise ValueError("Bedrock explanation response subject is duplicated")
-        if not isinstance(text, str) or not text.strip() or len(text) > 4_000:
+        if not isinstance(text, str) or not text.strip() or len(text) > 1_000:
             raise ValueError("Bedrock explanation response text is invalid")
         mapped[subject_ref] = text.strip()
 

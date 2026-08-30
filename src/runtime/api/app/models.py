@@ -41,6 +41,9 @@ class Company(CompanyBase):
     opendart_pending_request_id: Mapped[str | None] = mapped_column(
         String(36), nullable=True
     )
+    opendart_pending_corp_code: Mapped[str | None] = mapped_column(
+        String(8), nullable=True
+    )
     opendart_pending_requested_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
@@ -92,6 +95,7 @@ class Resume(MemberBase):
     years_experience: Mapped[int] = mapped_column(Integer, default=0)
     skills: Mapped[list[str]] = mapped_column(JSON, default=list)
     certificates: Mapped[list[str]] = mapped_column(JSON, default=list)
+    projects: Mapped[list[dict[str, object]]] = mapped_column(JSON, default=list)
     self_intro: Mapped[str] = mapped_column(Text, default="")
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
 

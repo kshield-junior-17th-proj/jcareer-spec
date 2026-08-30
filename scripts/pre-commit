@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# 로컬 편의 훅. 실제 강제는 CI 가 한다.
+# 설치: cp scripts/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+set -eu
+STAGED=$(git diff --cached --name-only)
+PROT=$(printf '%s\n' "$STAGED" | grep -E '^(docs/current/|context/raw/|context/MANIFEST\.yaml)' || true)
+if [ -n "$PROT" ]; then
+  echo "보호 경로가 스테이징되어 있습니다:"; printf '  %s\n' $PROT
+  echo "이 경로는 사람 소유입니다. PR 에 human-approved-change 라벨과 CODEOWNERS 승인이 필요합니다."
+  echo "의도한 변경이면 --no-verify 로 우회하되, CI 는 라벨 없이 통과하지 않습니다."
+  exit 1
+fi
+# V2-P1-07: `git diff --cached -s` 는 통계만 출력해 mode 를 볼 수 없었다.
+# --raw 는 ":<old-mode> <new-mode> ..." 형식으로 mode 를 준다.
+if git diff --cached --raw | awk '{print $2}' | grep -q '^160000'; then
+  echo "gitlink(160000) 는 커밋할 수 없습니다."; exit 1
+fi
+exit 0

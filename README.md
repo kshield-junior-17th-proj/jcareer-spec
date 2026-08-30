@@ -11,13 +11,18 @@ J-Career는 구직자와 기업을 연결하는 채용 플랫폼입니다. 이 �
 - [MLOps 7단계 모델 검증](https://kshield-junior-17th-proj.github.io/jcareer-spec/mlops/)
 - [AWS 검증 환경](https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/lab/)
 
+![업무망 PC에서 J-Career AWS 기준 설계와 별도 MLOps 검증 경계로 이어지는 핵심 흐름](assets/JCAREER_PLATFORM_ANIMATED.png)
+
+움직이는 점은 설계상 데이터 이동 순서를 설명합니다. AWS에서 관측한 요청이나 배포 상태를
+뜻하지 않습니다. [움직이는 SVG 원본](assets/JCAREER_PLATFORM_ANIMATED.svg)은 별도 링크에서 열 수 있습니다.
+
 ## 구성 한눈에 보기
 
 | 구성 | 역할 | 현재 관리 기준 |
 |---|---|---|
 | [`terraform/asis`](terraform/asis/README.md) | J-Career 서비스·AWS 기준 설계 | 서울 리전 2-AZ, 6개 모듈, Terraform 계획 항목 110개 |
 | [`terraform/serverless-mlops`](terraform/serverless-mlops/README.md) | 합성 데이터 기반 후보 모델 검증 | 기본 잠금 0개, 기반 준비 13개, 한 차례 실행 14개 계획 |
-| [`terraform/lab`](terraform/lab/README.md) | 서비스와 데이터 흐름을 확인하는 AWS 검증 환경 | 기본 계획 13개, 외부 인바운드 0개, SSM 관리 접속 |
+| [`terraform/lab`](terraform/lab/README.md) | 서비스와 데이터 흐름을 확인하는 AWS 검증 환경 | 모드별 13/14/23/24개, 외부 인바운드 0개, SSM 관리 접속 |
 
 ## 기술 상태와 검증 범위
 
@@ -54,7 +59,8 @@ S3에서 읽습니다. Lambda는 후보 모델을 한 차례 학습한 뒤 결�
 - [대화형 아키텍처](terraform/asis/architecture.html): 전체 구성과 경로별 1·2·3 단계 강조
 - [PDF 명세](terraform/asis/JCAREER_ASIS_SYSTEM_SPEC.pdf)
 - [PNG 도면](terraform/asis/JCAREER_ASIS_FLOW.drawio.png)
-- [편집 가능한 draw.io 원본](terraform/asis/JCAREER_ASIS_FLOW.drawio)
+- [쉽게 보는 draw.io 원본](terraform/asis/JCAREER_ASIS_FLOW.drawio)
+- [상세 기술 draw.io 원본](terraform/asis/JCAREER_ASIS_2AZ.drawio)
 
 업무망 PC 180대는 Windows 100대와 macOS 80대로 구분합니다. 이 수량은 사용자 확정 입력이며
 Terraform 자원 수나 동시 사용자 수로 바꾸어 해석하지 않습니다.
@@ -86,70 +92,84 @@ terraform -chdir=terraform/asis plan -refresh=false -lock=false
 AS-IS 코드의 12자리 숫자는 가상 입력값과 AWS가 공개한 서비스 주체 값뿐이며, 조직 계정
 식별자는 포함하지 않습니다.
 
-## 합성 Lab 한 명령 배포
+## AWS 검증 환경 배포
 
-필요 도구는 AWS CLI, Terraform `1.15.9`, Python 3입니다. AWS CLI 로그인 후 저장소 루트에서
-다음 명령을 실행합니다.
+2026-08-30 새 검증 계정에서 HTTPS와 Bedrock을 포함한 24개 생성 계획은 통과했습니다.
+적용은 IAM 역할 생성 권한 부족으로 중단됐고, 부분 생성된 16개 항목은 검토된 삭제 계획으로
+정리했습니다. 현재 Lab 리소스는 0개입니다. Bedrock 직접 합성 호출은 통과했지만 원격
+애플리케이션 전체 경로는 아직 다시 확인하지 못했습니다. 자세한 범위는
+[최근 배포 관찰 기록](terraform/lab/DEPLOYMENT_OBSERVATION_2026-08-30.md)에 있습니다.
+재시도에 필요한 최소 작업과 제한 조건은
+[`IAM 재시도 체크리스트`](terraform/lab/IAM_RETRY_PREREQUISITES_2026-08-30.md)에
+정리했습니다.
+
+필요 도구는 AWS CLI, Terraform `1.15.9`, Python 3입니다. 한 실행기가 plan 검사, AWS 생성,
+SSM 전송, 컨테이너 빌드와 원격 기능 시험을 이어서 처리합니다. 다만 plan과 apply는 일부러
+두 단계로 나눴습니다. 먼저 plan에서 출력된 세 해시를 확인한 뒤, 같은 기능 설정과 같은 임시
+접속 토큰으로 apply해야 합니다.
+
+다음 예시는 CloudFront HTTPS 진입점과 Bedrock 호출 경로까지 여는 구성입니다. 임시 토큰은
+화면에 표시하거나 파일에 저장하지 말고 `SecureString`으로 입력합니다.
 
 ```powershell
+$previewBootstrap = Read-Host '64자리 임시 접속 토큰' -AsSecureString
+
+# 1. plan 작성과 안전 검사 — AWS 자원은 바뀌지 않음
 .\terraform\lab\provisioning\deploy-lab.ps1 `
   -ActivationAcknowledgement JCAREER_SYNTHETIC_LAB_APPROVED `
-  -Apply
+  -EnableAwsHttpsPreview `
+  -HttpsPreviewAcknowledgement JCAREER_SYNTHETIC_HTTPS_PREVIEW_APPROVED `
+  -HttpsPreviewBootstrapToken $previewBootstrap `
+  -EnableBedrockLive `
+  -BedrockAcknowledgement JCAREER_SYNTHETIC_BEDROCK_APPROVED
+
+# 2. 위 plan에서 출력된 세 해시와 같은 SecureString을 사용
+.\terraform\lab\provisioning\deploy-lab.ps1 `
+  -ActivationAcknowledgement JCAREER_SYNTHETIC_LAB_APPROVED `
+  -EnableAwsHttpsPreview `
+  -HttpsPreviewAcknowledgement JCAREER_SYNTHETIC_HTTPS_PREVIEW_APPROVED `
+  -HttpsPreviewBootstrapToken $previewBootstrap `
+  -EnableBedrockLive `
+  -BedrockAcknowledgement JCAREER_SYNTHETIC_BEDROCK_APPROVED `
+  -ProviderAccountSha256 <plan에서 출력된 계정 해시> `
+  -ReviewedSavedPlanSha256 <plan 파일 해시> `
+  -ReviewedPlanSemanticSha256 <plan 내용 해시> `
+  -Apply -OpenPreview
 ```
 
-이 명령은 다음 작업을 순서대로 수행합니다.
-
-1. 소스·회귀 검사
-2. Terraform 초기화·검증
-3. saved plan 생성
-4. 비용·노출·허용 자원 검사
-5. 검사한 saved plan만 적용
-6. SSM을 통한 런타임 전송
-7. 원격 기능·기업 간 접근 차단·DB 경계 검사
-
-`-Apply`를 빼면 AWS를 변경하지 않고 plan까지만 검사합니다. 삭제나 교체가 포함된 plan은 자동
-차단되며 `-target`과 `-auto-approve`는 사용하지 않습니다.
+실행기는 삭제·교체, SSH, 전체 인터넷에 열린 인바운드, 허용 목록 밖의 자원이 plan에 있으면
+중단합니다. apply 단계에서는 새 plan을 만들지 않고 앞에서 검사한 saved plan만 사용합니다.
 
 ## 생성 범위
 
 - 리전: 서울 `ap-northeast-2`
-- EC2: `t3.small` 1대
-- 저장장치: 암호화된 `gp3` 20GiB, 인스턴스 삭제 시 함께 제거
-- 네트워크: 전용 VPC·서브넷·인터넷 출구, 인바운드 규칙 0개
-- 접근: SSH·공개 3000 포트 없이 SSM만 사용
-- 런타임: PostgreSQL, Redis, API, 매칭기, 설명 게이트웨이, 웹 등 6개 컨테이너
-- 데이터: 예약 도메인과 합성 데이터만 사용
-- AI 공급자: 로컬 합성 stub만 사용하며 Bedrock 호출은 차단
-- 비용 제어: 240분 자동 중지와 월 USD 20 관찰 예산
+- 실행 서버: `t3.small` 1대와 암호화된 `gp3` 20GiB
+- HTTPS 경로: CloudFront → VPC origin → private EC2의 3000번 포트
+- 인바운드: CloudFront 관리 주소 범위만 허용, SSH와 `0.0.0.0/0` 규칙 없음
+- 런타임: PostgreSQL, Redis, API, 매칭기, 설명 게이트웨이, 웹의 핵심 6개 서비스
+- 데이터: 예약된 합성 회원·기업·지원 데이터만 사용
+- AI 설명: 별도 승인을 켠 경우 Bedrock broker를 거쳐 지정 모델만 호출
+- 비용 제어: 240분 뒤 EC2 자동 중지와 월 USD 20 관찰 예산
 
-예산은 알림이나 하드캡이 아닙니다. 자동 중지도 자원을 삭제하지 않으므로 사용 후 정리가
-필요합니다.
+자동 중지는 EC2만 멈추며 NAT Gateway와 CloudFront를 삭제하지 않습니다. 예산도 하드캡이
+아니므로 시연 뒤에는 아래 정리 실행기를 사용해야 합니다. OpenDART는 별도 서버리스 상태,
+이미지 검사·게시, SecureString API 키가 모두 준비된 뒤에만 이 환경에 연결됩니다.
 
-## 접속
+## 정리
 
-웹은 EC2 loopback에만 바인딩됩니다. Terraform output으로 대상 인스턴스를 읽은 뒤 SSM 로컬
-터널을 엽니다.
-
-```powershell
-$instanceId = terraform -chdir=terraform/lab output -raw runtime_instance_id
-aws ssm start-session `
-  --region ap-northeast-2 `
-  --target $instanceId `
-  --document-name AWS-StartPortForwardingSession `
-  --parameters '{"portNumber":["3000"],"localPortNumber":["3000"]}'
-```
-
-터널이 열린 동안 `http://127.0.0.1:3000/jobs`로 접속합니다. 공개 URL은 만들지 않습니다.
-
-## 종료
+먼저 삭제 전용 plan을 만들고, 출력된 세 해시를 같은 방식으로 다시 넣습니다.
 
 ```powershell
-$env:TF_VAR_activation_acknowledgement = 'JCAREER_SYNTHETIC_LAB_APPROVED'
-$env:TF_VAR_enable_bedrock_live = 'false'
-terraform -chdir=terraform/lab destroy
+.\terraform\lab\provisioning\destroy-lab.ps1 `
+  -DestroyAcknowledgement JCAREER_SYNTHETIC_LAB_DESTROY_APPROVED
+
+.\terraform\lab\provisioning\destroy-lab.ps1 `
+  -DestroyAcknowledgement JCAREER_SYNTHETIC_LAB_DESTROY_APPROVED `
+  -ProviderAccountSha256 <plan에서 출력된 계정 해시> `
+  -ReviewedSavedPlanSha256 <plan 파일 해시> `
+  -ReviewedPlanSemanticSha256 <plan 내용 해시> `
+  -Apply
 ```
 
-종료 후 `terraform -chdir=terraform/lab state list`가 비어 있는지 확인합니다. state·saved plan·
-`.env`는 Git에 올리지 마십시오.
-
-상세 경계와 수동 단계는 [`terraform/lab/README.md`](terraform/lab/README.md)에 있습니다.
+state, saved plan, 승인 파일, `.env`와 실제 계정 식별자는 Git에 올리지 않습니다. 세부 동작과
+SSM 전용 접속 방법은 [`terraform/lab/README.md`](terraform/lab/README.md)에 있습니다.

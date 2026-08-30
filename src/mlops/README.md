@@ -14,7 +14,7 @@
 
 DB 기반 경로는 다음 필드를 읽는다.
 
-- 회원 DB: 이름, 이메일, 연락처, 생년, 주소, 교육, 희망 직무, 경력, 기술, 자격, 자소서,
+- 회원 DB: 이름, 이메일, 연락처, 생년, 주소, 교육, 희망 직무, 경력, 기술, 자격, 자소서, 프로젝트,
   지원 상태, 최신 `privacy_core` 이벤트
 - 기업 DB: 기업명, 기업 방향, 선언 가치, 공고 제목·본문·요구 기술·최소 경력
 
@@ -26,10 +26,13 @@ DB 기반 경로는 다음 필드를 읽는다.
 - `self_intro_job_overlap`
 - `company_direction_overlap`
 
-이름·이메일은 전체 source lineage 해시에만 반영되고 학습 특징이 아니다. 자소서와 기업·공고 원문은
-DB 옆 exporter 프로세스에서 특징으로 변환한 뒤 dataset·receipt·model artifact에 기록하지 않는다.
+이름·이메일은 전체 source lineage 해시에만 반영되고 학습 특징이 아니다. 자소서, 프로젝트, 기업·공고 원문은
+DB 옆 exporter 프로세스에서 특징으로 변환한 뒤 dataset·receipt·model artifact에 기록하지 않는다. 프로젝트는
+`title`, `role`, `summary`, `outcome`, `technologies`만 토큰 특징에 쓰며, 그 밖의 임의 필드는 특징 계산에서 제외한다.
+프로젝트 변경은 source lineage digest에 반영된다.
 
-`self_intro_job_overlap`과 `company_direction_overlap`은 현재 토큰 겹침 proxy다. Bedrock 임베딩이나
+`self_intro_job_overlap`과 `company_direction_overlap`은 현재 자소서와 위 프로젝트 필드를 합친 토큰 겹침
+proxy다. Bedrock 임베딩이나
 문맥 이해 결과가 아니므로 정성적 적합도를 충분히 측정한다고 주장하지 않는다. 현재 Bedrock 설명
 경로는 별도로 정성 근거를 문장화하지만 점수·순위를 바꾸지 않는다. 임베딩 기반 의미 특징을
 challenger에 추가하는 일은 모델·입력·보유기간을 정한 별도 변경이다.
@@ -72,6 +75,25 @@ SageMaker를 사용하지 않는다.
 기본 경로가 아니다. 이 Terraform 배치는 KMS를 연결하지 않고 S3 `AES256`(SSE-S3)만 사용한다. DynamoDB 상태는 사람
 검토 대기까지만 진행한다. 운영 매처가 S3 모델을 읽거나 자동 승격하는 코드는 없다.
 
+## 사람 검토 기록 단계
+
+같은 Lambda의 `record_human_review` 액션은 기존 실행이 정확히
+`TRAINED_PENDING_HUMAN_REVIEW`일 때만 사람의 `APPROVED` 또는 `REJECTED` 입력을 기록한다.
+합성 approver 참조, 명시적 결정, 여섯 산출물 각각의 S3 key·SHA-256·VersionId 결속이 모두 필요하다.
+학습 업로드는 `IfNoneMatch=*`로 기존 key 덮어쓰기를 거부하고, S3가 돌려준 VersionId까지 DynamoDB
+pending 상태에 고정한다. 검토 입력이 이 결속과 다르면 상태를 바꾸지 않는다.
+
+검토 receipt는 조건부 DynamoDB 갱신 하나에 JSON과 digest로 함께 저장된다. 이미 기록된 결정을
+덮어쓸 수 없고, S3의 데이터셋·모델·평가 산출물도 수정하지 않는다. 기록 상태
+`HUMAN_INPUT_RECORDED` 상태와 별도 `decision=APPROVED|REJECTED`는 사람이 입력한 내용을 나타낼 뿐 모델 품질,
+공정성, 적합성 또는 운영 배포 판정이 아니다. 어느 결정을 기록해도 `runtime_ranking_wired=false`,
+`automatic_model_activation=false`, `release_authorized=false`가 유지된다. 같은 입력의 재시도는 기존
+receipt를 검증해 같은 결과를 반환하고, approver·decision·산출물 결속이 다른 재시도는 거부한다.
+
+여섯 객체는 순차 업로드되므로 중간 실패 시 S3에 부분 객체가 남을 수 있다. 객체 존재나 개수만으로
+성공을 판단하지 않으며, `TRAINED_PENDING_HUMAN_REVIEW`와 완전한 여섯 결속이 기록된 DynamoDB 상태만
+학습 완료 신호로 사용한다. `FAILED_SAFE`의 부분 객체는 성공 산출물이 아니다.
+
 ## AS-IS LLM Gateway와의 경계
 
 현재 AS-IS LLM Gateway는 비식별 기능을 구현하지 않았다. 8개 후보자 필드를 받고 6개 PII 필드명을
@@ -90,7 +112,8 @@ python -m unittest src/mlops/tests/test_synthetic_pipeline.py
 ```
 
 테스트는 원문 canary가 dataset·model·S3 payload에 남지 않는지, 두 DB가 분리되는지, attestation 없이
-실행이 막히는지, RUNNING 뒤 실패가 `FAILED_SAFE`로 기록되는지, 모델이 자동 활성화되지 않는지를 확인한다.
+실행이 막히는지, RUNNING 뒤 실패가 `FAILED_SAFE`로 기록되는지, 모델이 자동 활성화되지 않는지,
+검토 입력이 산출물 해시와 조건부 단일 전이에 묶이는지를 확인한다.
 
 활성화 값·합성 attestation·event 형식·run ID·source mode·필수 환경 설정 검증과 최초 DynamoDB
 `RUNNING` 조건부 쓰기는 try/fail-state 경계보다 앞선다. 따라서 이 pre-state 단계의 거부, 중복 run ID,
@@ -106,6 +129,6 @@ Lambda는 기존 `runtime_db` 직접 조회 경로와 별도로 `feature_snapsho
 - `dataset_manifest.json`
 - `source_read_receipt.json`
 
-호출자는 다른 prefix를 지정할 수 없다. Lambda는 run ID가 허용된 문자로만 구성됐는지 확인하고, 필수 3개 파일의 존재 여부와 크기, 해시, 허용 필드를 검사한다. 같은 prefix 아래에 다른 객체가 더 있는지는 확인하지 않으며 이를 거부하는 기능도 없다. dataset SHA-256 값과 source digest가 맞는지, 합성 데이터와 비식별 특징 규칙을 지켰는지도 검사한다. manifest나 receipt에 허용되지 않은 필드가 추가되면 거부한다. 검증과 학습이 끝나면 원본 특징 스냅샷 3개, challenger 결과 2개, 실행 receipt 1개를 `mlops/runs/{run_id}/`에 저장한다.
+호출자가 다른 prefix를 지정할 수 없으며, 필수 3개 파일의 존재 여부와 크기, 해시, 허용 필드, run ID 안전 문자, source digest, 합성 데이터 및 비식별 특징 계약을 검증한다. manifest나 receipt에 허용되지 않은 필드가 추가되어도 거부한다. 다만 같은 prefix 아래에 다른 객체가 더 있는지는 확인하지 않으며 이를 거부하는 기능도 없다. 검증과 학습이 끝나면 원본 특징 스냅샷 3개, challenger 결과 2개, 실행 receipt 1개를 `mlops/runs/{run_id}/`에 저장한다.
 
 최초 DynamoDB 상태 쓰기는 `attribute_not_exists(run_id)` 조건을 사용하므로 같은 run ID를 다시 실행해 기존 결과를 덮어쓰지 않는다. 최종 상태는 `TRAINED_PENDING_HUMAN_REVIEW`이며 모델 자동 활성화와 현재 추천 순위 연결은 계속 금지된다. `MLOPS_SOURCE_MODE=feature_snapshot`을 Terraform 고정값으로 사용하고, 기존 직접 DB 경로는 코드에서 명시적 `runtime_db`로 유지된다. 오늘 시연 루트는 직접 DB 경로를 배치하지 않는다.

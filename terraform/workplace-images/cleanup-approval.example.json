@@ -1,0 +1,21 @@
+{
+  "schema_version": "jcareer-windows-image-cleanup-approval-v1",
+  "scope": "workplace-windows-image-artifact-cleanup",
+  "decision": "PENDING_HUMAN_DECISION",
+  "approval_ref": "",
+  "reviewer_ref": "",
+  "approved_at": "",
+  "expires_at": "",
+  "backend_config_sha256": "",
+  "build_observation_sha256": "",
+  "secure_inventory_sha256": "",
+  "image_build_ref": "",
+  "expected_ami_count": 0,
+  "expected_snapshot_count": 0,
+  "include_amis": true,
+  "include_snapshots": true,
+  "endpoint_disposition_observation_sha256": "",
+  "endpoint_teardown_receipt_sha256": "",
+  "synthetic_data_only": true,
+  "notes": "Example only. This file does not authorize AMI or snapshot deletion."
+}

@@ -1,0 +1,83 @@
+name: JCareerWindowsWorkplaceBuild
+description: Prepare a credential-free synthetic consultant workplace image.
+schemaVersion: 1.0
+phases:
+  - name: build
+    steps:
+      - name: CreateJCareerWorkspace
+        action: ExecutePowerShell
+        inputs:
+          commands:
+            - |-
+              $ErrorActionPreference = 'Stop'
+              $root = 'C:\ProgramData\JCareerLab'
+              New-Item -ItemType Directory -Path $root -Force | Out-Null
+              @'
+              J-Career synthetic consulting workplace image
+              - No AWS, SaaS, OpenDART, Bedrock, preview, or user credentials are baked here.
+              - A human-approved launch workflow supplies an operator-controlled Windows credential and HTTPS preview URL.
+              - This image is a Windows Server desktop simulation, not a Windows 11 claim.
+              '@ | Set-Content -LiteralPath "$root\README.txt" -Encoding UTF8
+              $manifest = [ordered]@{
+                schema_version = 'jcareer-windows-image-v1'
+                data_classification = 'SYNTHETIC_DEMONSTRATION_ONLY'
+                image_build_state = 'CONFIGURED_NOT_DEPLOYED'
+                credentials_baked = $false
+                preview_url_baked = $false
+                browser_contract = 'MICROSOFT_EDGE_REQUIRED_AT_BUILD'
+              }
+              $manifest | ConvertTo-Json | Set-Content -LiteralPath "$root\image-manifest.json" -Encoding UTF8
+      - name: RequestHostProtections
+        action: ExecutePowerShell
+        inputs:
+          commands:
+            - |-
+              $ErrorActionPreference = 'Stop'
+              Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled True
+              if (-not (Get-Command Set-MpPreference -ErrorAction SilentlyContinue)) {
+                throw 'Microsoft Defender PowerShell interface is unavailable'
+              }
+              Set-MpPreference -DisableRealtimeMonitoring $false
+      - name: AddApprovedSaaSShortcuts
+        action: ExecutePowerShell
+        inputs:
+          commands:
+            - |-
+              $ErrorActionPreference = 'Stop'
+              $desktop = [Environment]::GetFolderPath('CommonDesktopDirectory')
+              "[InternetShortcut]`r`nURL=https://app.slack.com/client`r`n" |
+                Set-Content -LiteralPath (Join-Path $desktop 'Slack - approved account required.url') -Encoding ASCII
+              "[InternetShortcut]`r`nURL=https://opendart.fss.or.kr/`r`n" |
+                Set-Content -LiteralPath (Join-Path $desktop 'OpenDART public site.url') -Encoding ASCII
+      - name: VerifyInteractiveBrowser
+        action: ExecutePowerShell
+        inputs:
+          commands:
+            - |-
+              $ErrorActionPreference = 'Stop'
+              $candidates = @(
+                "$env:ProgramFiles\Microsoft\Edge\Application\msedge.exe",
+                "$${env:ProgramFiles(x86)}\Microsoft\Edge\Application\msedge.exe"
+              )
+              $edge = @($candidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -Unique)
+              if ($edge.Count -lt 1) { throw 'Microsoft Edge is required' }
+              $signature = Get-AuthenticodeSignature -LiteralPath $edge[0]
+              if (
+                $signature.Status -ne 'Valid' -or
+                [string]$signature.SignerCertificate.Subject -notmatch 'O=Microsoft Corporation'
+              ) { throw 'Microsoft Edge signature validation failed' }
+      - name: InstallSessionLifecycleScripts
+        action: ExecutePowerShell
+        inputs:
+          commands:
+            - |-
+              $ErrorActionPreference = 'Stop'
+              $root = 'C:\ProgramData\JCareerLab'
+              [IO.File]::WriteAllBytes(
+                (Join-Path $root 'Configure-JCareerSession.ps1'),
+                [Convert]::FromBase64String('${configure_session_script_b64}')
+              )
+              [IO.File]::WriteAllBytes(
+                (Join-Path $root 'Remove-JCareerSession.ps1'),
+                [Convert]::FromBase64String('${remove_session_script_b64}')
+              )

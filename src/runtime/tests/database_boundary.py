@@ -51,6 +51,7 @@ def main() -> None:
     wait_ready()
     member_tables = table_names("jcareer_member_app", "jcareer_member")
     company_tables = table_names("jcareer_company_app", "jcareer_company")
+    outcome_tables = table_names("jcareer_outcome_app", "jcareer_outcome")
 
     assert member_tables == {
         "applications",
@@ -60,14 +61,26 @@ def main() -> None:
         "users",
     }, member_tables
     assert company_tables == {"companies", "jobs"}, company_tables
+    assert outcome_tables == {
+        "outcome_datasets",
+        "synthetic_document_outcomes",
+    }, outcome_tables
     assert member_tables.isdisjoint(company_tables)
+    assert member_tables.isdisjoint(outcome_tables)
+    assert company_tables.isdisjoint(outcome_tables)
 
-    member_to_company = psql("jcareer_member_app", "jcareer_company", "select 1;")
-    company_to_member = psql("jcareer_company_app", "jcareer_member", "select 1;")
-    assert member_to_company.returncode != 0
-    assert company_to_member.returncode != 0
-    assert "permission denied for database" in member_to_company.stderr.lower()
-    assert "permission denied for database" in company_to_member.stderr.lower()
+    denied_connections = (
+        ("jcareer_member_app", "jcareer_company"),
+        ("jcareer_member_app", "jcareer_outcome"),
+        ("jcareer_company_app", "jcareer_member"),
+        ("jcareer_company_app", "jcareer_outcome"),
+        ("jcareer_outcome_app", "jcareer_member"),
+        ("jcareer_outcome_app", "jcareer_company"),
+    )
+    for role, database in denied_connections:
+        denial = psql(role, database, "select 1;")
+        assert denial.returncode != 0, f"{role} unexpectedly connected to {database}"
+        assert "permission denied for database" in denial.stderr.lower(), denial.stderr
 
     suffix = uuid.uuid4().hex[:10]
     company_name = f"합성 경계기업 {suffix}"
@@ -140,8 +153,8 @@ def main() -> None:
         assert member_residue.returncode == 0 and member_residue.stdout.strip() == "0"
         assert company_residue.returncode == 0 and company_residue.stdout.strip() == "0"
 
-    print("J-Career member/company database boundary: PASS")
-    print("member tables=5, company tables=2, cross-role CONNECT denied, exact logical link verified, synthetic rows cleaned")
+    print("J-Career member/company/outcome database boundary: PASS")
+    print("member tables=5, company tables=2, outcome tables=2, all six cross-role CONNECT attempts denied, exact logical link verified, synthetic rows cleaned")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,32 @@
+{
+  "schema_version": "jcareer-demo-readiness-observation-v1",
+  "synthetic_only": true,
+  "preview": {
+    "url": "",
+    "url_sha256": "",
+    "artifact_digests": {
+      "web": "",
+      "api": "",
+      "agent": "",
+      "llm-gateway": ""
+    }
+  },
+  "windows": {
+    "image_receipt": { "path": "", "sha256": "" },
+    "build_observation": { "path": "", "sha256": "" },
+    "endpoint_apply_receipt": { "path": "", "sha256": "" },
+    "session_record": { "path": "", "sha256": "" },
+    "local_tool_paths": {
+      "aws_cli_v2": "",
+      "terraform": "",
+      "python": "",
+      "session_manager_plugin": "",
+      "rdp_client": ""
+    }
+  },
+  "macos": {
+    "physical_mac_available": false,
+    "mdm_distribution_ready": false,
+    "operator_identity_and_remote_access_defined": false
+  }
+}

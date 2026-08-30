@@ -6,6 +6,7 @@ RUN pip install --no-cache-dir -r ${LAMBDA_TASK_ROOT}/requirements.txt
 COPY generate_synthetic_training.py ${LAMBDA_TASK_ROOT}/
 COPY export_runtime_training.py ${LAMBDA_TASK_ROOT}/
 COPY train_challenger.py ${LAMBDA_TASK_ROOT}/
+COPY review_challenger.py ${LAMBDA_TASK_ROOT}/
 COPY run_runtime_pipeline.py ${LAMBDA_TASK_ROOT}/
 COPY run_snapshot_pipeline.py ${LAMBDA_TASK_ROOT}/
 COPY lambda_handler.py ${LAMBDA_TASK_ROOT}/

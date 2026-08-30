@@ -24,6 +24,9 @@ PNG = ROOT / "terraform" / "serverless-mlops" / "JCAREER_MLOPS_FLOW.drawio.png"
 REPORT = ROOT / "mlops" / "VERIFICATION.json"
 ASIS_PAGE = ROOT / "terraform" / "asis" / "index.html"
 ASIS_ARCHITECTURE = ROOT / "terraform" / "asis" / "architecture.html"
+PLATFORM_SVG = ROOT / "assets" / "JCAREER_PLATFORM_ANIMATED.svg"
+PLATFORM_PNG = ROOT / "assets" / "JCAREER_PLATFORM_ANIMATED.png"
+PLATFORM_SPEC = ROOT / "assets" / "JCAREER_PLATFORM_ANIMATED.spec.json"
 
 EXPECTED_COMMANDS = [
     "python -B scripts/check_serverless_mlops_static.py --root .",
@@ -35,6 +38,8 @@ EXPECTED_COMMANDS = [
     "terraform -chdir=<temporary-source-copy> test -test-directory=tests -no-color",
     "terraform -chdir=<temporary-source-copy> plan -input=false -lock=false -refresh=false (saved plan path outside repository)",
     "node --check mlops/app.js",
+    "node --check assets/motion.js",
+    "node scripts/finalize_animated_arch.mjs --check",
     "node scripts/check_public_ui.mjs",
     "node scripts/render_spec_pdf.mjs mlops/index.html mlops/JCAREER_MLOPS_SYSTEM_SPEC.pdf",
     "python -B scripts/update_public_mlops_evidence.py",
@@ -50,6 +55,8 @@ EXPECTED_NOTES = [
     "All six architecture routes were opened and checked for the selected button, active diagram layer, detail link, and 390px overflow by scripts/check_public_ui.mjs.",
     "Five public pages were checked at 390px and 1440px for overflow, canonical and Open Graph metadata, touch action, and keyboard focus; MLOps aria-controls was also checked.",
     "MLOps stage URL state, invalid-stage fallback, and browser history were checked by scripts/check_public_ui.mjs.",
+    "Eight motion checks covered the carousel, MLOps stage rail, animated architecture, manual motion toggle, and reduced-motion fallback.",
+    "The animated architecture source hash, 15 nodes, 11 edges, 17 motion dots, 1480x820 PNG, and manual visual review were recorded together.",
     "The MLOps PDF was rendered from mlops/index.html and carries that source file's SHA-256 marker.",
     "The recent three-logical-database outcome delta is documented as unmerged and is not included in these PASS results.",
 ]
@@ -145,8 +152,13 @@ def evidence_scope_files() -> list[Path]:
         ROOT / "README.md",
         ROOT / "index.html",
         ROOT / "assets" / "site.css",
+        ROOT / "assets" / "motion.js",
+        ROOT / "assets" / "JCAREER_PLATFORM_ANIMATED.spec.json",
+        ROOT / "assets" / "JCAREER_PLATFORM_ANIMATED.svg",
+        ROOT / "assets" / "JCAREER_PLATFORM_ANIMATED.png",
         ROOT / "scripts" / "browser_support.mjs",
         ROOT / "scripts" / "check_public_ui.mjs",
+        ROOT / "scripts" / "finalize_animated_arch.mjs",
         ROOT / "scripts" / "check_public_mlops.py",
         ROOT / "scripts" / "check_serverless_mlops_static.py",
         ROOT / "scripts" / "render_spec_pdf.mjs",
@@ -170,7 +182,7 @@ def evidence_scope_files() -> list[Path]:
         for base in roots
         if base.exists()
         for path in base.rglob("*")
-        if path.is_file()
+        if path.is_file() and not is_forbidden_artifact(path)
     }
     scoped.update(path for path in explicit if path.is_file())
     scoped.discard(REPORT)
@@ -228,6 +240,8 @@ def check_pdf_source_binding(errors: list[str]) -> None:
     page_objects = len(re.findall(rb"/Type\s*/Page\b", value))
     if page_objects != 10:
         errors.append(f"unexpected MLOps PDF page objects: {page_objects}")
+    if re.search(rb"/URI\s*\(http://127\.0\.0\.1:", value):
+        errors.append("MLOps PDF contains loopback links")
 
 
 def check_evidence_report(errors: list[str]) -> None:
@@ -272,9 +286,9 @@ def check_evidence_report(errors: list[str]) -> None:
         "terraform_validate": "PASS",
         "terraform_mock_stages": "3/3 PASS",
         "disabled_plan_resources": 0,
-        "terraform_boundary_tests": "12/12 PASS",
-        "synthetic_pipeline_tests": "14/14 PASS",
-        "public_ui": "6/6 routes, 8/8 stage states, 5 pages at 390/1440px PASS",
+        "terraform_boundary_tests": "19/19 PASS",
+        "synthetic_pipeline_tests": "22/22 PASS",
+        "public_ui": "6/6 routes, 8/8 stage states, 5 pages at 390/1440px, motion 8/8 PASS",
         "pdf_source_binding": "PASS",
         "public_integrity": "PASS",
     }
@@ -292,6 +306,7 @@ def check_evidence_report(errors: list[str]) -> None:
             "stage_states": 8,
             "viewports_css_px": [390, 1440],
             "page_viewport_checks": 10,
+            "motion_checks": 8,
             "page_checks": [
                 "horizontal_overflow",
                 "canonical_open_graph",
@@ -305,6 +320,13 @@ def check_evidence_report(errors: list[str]) -> None:
                 "detail_link",
                 "horizontal_overflow",
             ],
+            "motion_contracts": [
+                "carousel",
+                "mlops_stage_rail",
+                "animated_architecture",
+                "manual_motion_toggle",
+                "reduced_motion_fallback",
+            ],
             "invalid_flow": "fail-closed",
             "invalid_stage": "fail-closed",
         },
@@ -313,6 +335,19 @@ def check_evidence_report(errors: list[str]) -> None:
             "source": relative_name(PAGE),
             "output": relative_name(PDF),
             "source_sha256": file_sha256(PAGE),
+        },
+        "animated_architecture": {
+            "spec": relative_name(PLATFORM_SPEC),
+            "spec_sha256": file_sha256(PLATFORM_SPEC),
+            "svg": relative_name(PLATFORM_SVG),
+            "svg_sha256": file_sha256(PLATFORM_SVG),
+            "png": relative_name(PLATFORM_PNG),
+            "png_sha256": file_sha256(PLATFORM_PNG),
+            "canvas_css_px": [1480, 820],
+            "nodes": 15,
+            "edges": 11,
+            "motion_dots": 17,
+            "visual_review": "PASS",
         },
     }
     if report.get("evidence") != expected_evidence:
@@ -345,6 +380,9 @@ def check() -> list[str]:
         ROOT / "terraform" / "lab" / "index.html",
         ASIS_PAGE,
         ASIS_ARCHITECTURE,
+        PLATFORM_SVG,
+        PLATFORM_PNG,
+        PLATFORM_SPEC,
         DRAWIO,
         SVG,
         PNG,
@@ -464,7 +502,7 @@ def check() -> list[str]:
         errors.append("broken local links: " + ", ".join(sorted(set(broken))))
 
     required_phrases = (
-        "담당자 검토가 끝나기 전에는 추천 서비스 반영을 차단",
+        "사람 검토가 끝나지 않으면 추천 서비스와 연결하지 않음",
         "합성 데이터 전용 · 담당자 수동 실행 · 검토 전 서비스 반영 차단",
         "PostgreSQL 서비스 1개",
         "점수와 정렬 순위에는 사용하지 않습니다",
@@ -483,7 +521,7 @@ def check() -> list[str]:
         "Terraform 기준 설계 항목",
         "데이터 아키텍처 확장안",
         "논리 데이터베이스 3개",
-        "구조 정의 완료 · API 참고 정보 연계 · 화면 연계 검토 중 · AWS 배포 검증 전",
+        "구조 정의 완료 · API 참고 정보 연계 · 화면 연계 검토 중 · AWS 실행 결과는 별도 상태표에서 관리",
     )
     for phrase in landing_phrases:
         if phrase not in landing_text:
@@ -502,7 +540,7 @@ def check() -> list[str]:
     ):
         errors.append("landing service-to-infrastructure shortcuts are incomplete")
     architecture_image = re.search(
-        r'<img[^>]+src="terraform/asis/JCAREER_ASIS_FLOW\.drawio\.png"[^>]*>',
+        r'<img[^>]+src="assets/JCAREER_PLATFORM_ANIMATED\.svg"[^>]*>',
         landing_text,
     )
     if architecture_image is None or 'loading="lazy"' not in architecture_image.group(0):
@@ -524,9 +562,11 @@ def check() -> list[str]:
                     f"blunt public disclaimer in {relative_name(public_page)}: {phrase}"
                 )
 
+    platform_tree: ET.ElementTree | None = None
     try:
         ET.parse(DRAWIO)
         ET.parse(SVG)
+        platform_tree = ET.parse(PLATFORM_SVG)
     except ET.ParseError as exc:
         errors.append(f"diagram XML parse failed: {exc}")
     try:
@@ -534,6 +574,66 @@ def check() -> list[str]:
             errors.append(f"unexpected PNG size: {png_size(PNG)}")
     except (OSError, ValueError, struct.error) as exc:
         errors.append(f"PNG validation failed: {exc}")
+
+    platform_svg_text = PLATFORM_SVG.read_text(encoding="utf-8")
+    try:
+        platform_spec = json.loads(PLATFORM_SPEC.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        errors.append(f"animated architecture specification is unreadable: {exc}")
+        platform_spec = {}
+    platform_ids = (
+        [element.attrib["id"] for element in platform_tree.iter() if "id" in element.attrib]
+        if platform_tree is not None
+        else []
+    )
+    if len(platform_ids) != len(set(platform_ids)):
+        errors.append("animated architecture contains duplicate SVG IDs")
+    canvas = platform_spec.get("canvas", {})
+    nodes = platform_spec.get("nodes", [])
+    edges = platform_spec.get("edges", [])
+    journeys = platform_spec.get("journeys", [])
+    expected_motion_count = sum(len(journey.get("hops", [])) for journey in journeys)
+    expected_text = [
+        platform_spec.get("title", ""),
+        platform_spec.get("subtitle", ""),
+        platform_spec.get("footer", ""),
+        *(node.get("label", "") for node in nodes),
+        *(node.get("sub", "") for node in nodes),
+        *(group.get("label", "") for group in platform_spec.get("groups", [])),
+    ]
+    svg_visible_text = "".join(platform_tree.getroot().itertext()) if platform_tree else ""
+    spec_ids = {node.get("id") for node in nodes}
+    edge_endpoints_valid = all(
+        edge.get("from") in spec_ids and edge.get("to") in spec_ids for edge in edges
+    )
+    if (
+        canvas != {"w": 1480, "h": 820}
+        or len(nodes) != 15
+        or len(edges) != 11
+        or expected_motion_count != 17
+        or platform_svg_text.count('<path class="flow"') != len(edges)
+        or any(value and value not in svg_visible_text for value in expected_text)
+        or not edge_endpoints_valid
+        or f'data-spec-sha256="{file_sha256(PLATFORM_SPEC)}"'
+        not in platform_svg_text
+    ):
+        errors.append("animated architecture spec-to-SVG contract is out of sync")
+    motion_count = platform_svg_text.count("<animateMotion ")
+    guarded_motion_count = len(
+        re.findall(r'<circle class="motion-dot"[^>]*><animateMotion ', platform_svg_text)
+    )
+    if (
+        motion_count != expected_motion_count
+        or guarded_motion_count != motion_count
+        or "@media (prefers-reduced-motion: reduce){.motion-dot{display:none}}"
+        not in platform_svg_text
+    ):
+        errors.append("animated architecture reduced-motion contract is incomplete")
+    try:
+        if png_size(PLATFORM_PNG) != (1480, 820):
+            errors.append(f"unexpected animated architecture PNG size: {png_size(PLATFORM_PNG)}")
+    except (OSError, ValueError, struct.error) as exc:
+        errors.append(f"animated architecture PNG validation failed: {exc}")
 
     all_files = workspace_files()
     forbidden_artifacts = [path for path in all_files if is_forbidden_artifact(path)]

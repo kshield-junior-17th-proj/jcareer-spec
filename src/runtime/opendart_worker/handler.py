@@ -6,12 +6,17 @@ import re
 import uuid
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Callable, Protocol
+from typing import Callable
 
 from app.opendart import OpenDartClient, OpenDartError, company_names_match
+from app.opendart_results import (
+    OpenDartResultError,
+    build_refresh_result,
+    put_refresh_result,
+)
 
 
-MESSAGE_SCHEMA_VERSION = "jcareer-opendart-refresh-request-v1"
+MESSAGE_SCHEMA_VERSION = "jcareer-opendart-refresh-request-v2"
 CORP_CODE_PATTERN = re.compile(r"^[0-9]{8}$")
 PERMANENT_PROVIDER_ERRORS = {
     "INVALID_CORP_CODE",
@@ -31,28 +36,9 @@ class WorkerError(RuntimeError):
 class RefreshMessage:
     request_id: str
     company_id: str
+    expected_company_name: str
     corp_code: str
     requested_at: datetime
-
-
-class CompanySnapshotRepository(Protocol):
-    def load_company(self, company_id: str) -> dict[str, object] | None: ...
-
-    def complete(
-        self,
-        message: RefreshMessage,
-        *,
-        expected_company_name: str,
-        snapshot: dict[str, object],
-    ) -> bool: ...
-
-    def record_failure(
-        self,
-        message: RefreshMessage,
-        *,
-        category: str,
-        retryable: bool,
-    ) -> None: ...
 
 
 def parse_message(raw_body: str) -> RefreshMessage:
@@ -64,6 +50,7 @@ def parse_message(raw_body: str) -> RefreshMessage:
         "schema_version",
         "request_id",
         "company_id",
+        "expected_company_name",
         "corp_code",
         "requested_at",
     }
@@ -82,120 +69,19 @@ def parse_message(raw_body: str) -> RefreshMessage:
     corp_code = payload.get("corp_code")
     if not isinstance(corp_code, str) or not CORP_CODE_PATTERN.fullmatch(corp_code):
         raise WorkerError("INVALID_MESSAGE", retryable=False)
+    expected_company_name = payload.get("expected_company_name")
+    if not isinstance(expected_company_name, str):
+        raise WorkerError("INVALID_MESSAGE", retryable=False)
+    expected_company_name = " ".join(expected_company_name.split())
+    if not expected_company_name or len(expected_company_name) > 120:
+        raise WorkerError("INVALID_MESSAGE", retryable=False)
     return RefreshMessage(
         request_id=request_id,
         company_id=company_id,
+        expected_company_name=expected_company_name,
         corp_code=corp_code,
         requested_at=requested_at.astimezone(timezone.utc),
     )
-
-
-class PostgresCompanySnapshotRepository:
-    def __init__(self, database_url: str):
-        if not database_url:
-            raise WorkerError("DATABASE_CONFIGURATION", retryable=True)
-        self._database_url = database_url.replace(
-            "postgresql+psycopg://", "postgresql://", 1
-        )
-
-    def _connect(self):
-        try:
-            import psycopg
-            from psycopg.rows import dict_row
-
-            return psycopg.connect(
-                self._database_url,
-                connect_timeout=5,
-                row_factory=dict_row,
-            )
-        except Exception:
-            raise WorkerError("DATABASE_UNAVAILABLE", retryable=True) from None
-
-    def load_company(self, company_id: str) -> dict[str, object] | None:
-        with self._connect() as connection, connection.cursor() as cursor:
-            cursor.execute(
-                """
-                SELECT name, opendart_pending_request_id, opendart_pending_requested_at
-                FROM companies
-                WHERE id = %s
-                """,
-                (company_id,),
-            )
-            return cursor.fetchone()
-
-    def complete(
-        self,
-        message: RefreshMessage,
-        *,
-        expected_company_name: str,
-        snapshot: dict[str, object],
-    ) -> bool:
-        from psycopg.types.json import Jsonb
-
-        synced_at = datetime.now(timezone.utc)
-        snapshot_version = f"opendart-snapshot-{str(snapshot['content_sha256'])[:12]}"
-        with self._connect() as connection, connection.cursor() as cursor:
-            cursor.execute(
-                """
-                UPDATE companies
-                SET opendart_corp_code = %s,
-                    opendart_snapshot = %s,
-                    opendart_sync_state = 'AVAILABLE_LIVE',
-                    opendart_snapshot_version = %s,
-                    opendart_synced_at = %s,
-                    opendart_last_attempt_at = %s,
-                    opendart_pending_request_id = NULL,
-                    opendart_pending_requested_at = NULL
-                WHERE id = %s
-                  AND name = %s
-                  AND opendart_pending_request_id = %s
-                  AND opendart_pending_requested_at <= %s
-                """,
-                (
-                    message.corp_code,
-                    Jsonb(snapshot),
-                    snapshot_version,
-                    synced_at,
-                    synced_at,
-                    message.company_id,
-                    expected_company_name,
-                    message.request_id,
-                    message.requested_at,
-                ),
-            )
-            return cursor.rowcount == 1
-
-    def record_failure(
-        self,
-        message: RefreshMessage,
-        *,
-        category: str,
-        retryable: bool,
-    ) -> None:
-        with self._connect() as connection, connection.cursor() as cursor:
-            cursor.execute(
-                """
-                UPDATE companies
-                SET opendart_sync_state = CASE
-                      WHEN COALESCE(opendart_snapshot::text, '{}') = '{}' THEN 'UNAVAILABLE_NO_SNAPSHOT'
-                      WHEN %s THEN 'REFRESH_RETRY_PENDING'
-                      ELSE 'STALE_LAST_KNOWN_GOOD'
-                    END,
-                    opendart_last_attempt_at = %s,
-                    opendart_pending_request_id = CASE WHEN %s THEN opendart_pending_request_id ELSE NULL END,
-                    opendart_pending_requested_at = CASE WHEN %s THEN opendart_pending_requested_at ELSE NULL END
-                WHERE id = %s
-                  AND opendart_pending_request_id = %s
-                """,
-                (
-                    retryable,
-                    datetime.now(timezone.utc),
-                    retryable,
-                    retryable,
-                    message.company_id,
-                    message.request_id,
-                ),
-            )
 
 
 def read_opendart_api_key() -> str:
@@ -216,28 +102,20 @@ def read_opendart_api_key() -> str:
     return key
 
 
-def process_refresh(
+def process_refresh_to_durable_result(
     message: RefreshMessage,
     *,
-    repository: CompanySnapshotRepository,
     client: OpenDartClient | None = None,
     client_factory: Callable[[], OpenDartClient] | None = None,
+    result_writer: Callable[[dict[str, object]], str] | None = None,
 ) -> str:
-    company = repository.load_company(message.company_id)
-    if not company:
-        raise WorkerError("COMPANY_NOT_FOUND", retryable=False)
-    pending_id = company.get("opendart_pending_request_id")
-    pending_at = company.get("opendart_pending_requested_at")
-    if pending_id != message.request_id:
-        return "STALE_REQUEST_IGNORED"
-    if isinstance(pending_at, datetime):
-        normalised_pending_at = (
-            pending_at.replace(tzinfo=timezone.utc)
-            if pending_at.tzinfo is None
-            else pending_at.astimezone(timezone.utc)
-        )
-        if normalised_pending_at > message.requested_at:
-            return "STALE_REQUEST_IGNORED"
+    """Fetch public facts and record a bounded result without database access.
+
+    The application tier remains the only writer to the company database. This
+    keeps the Lambda outside the VPC, so it can reach OpenDART without a NAT
+    Gateway or exposing PostgreSQL to a serverless security group.
+    """
+
     if client is None:
         if client_factory is None:
             raise WorkerError("CLIENT_CONFIGURATION", retryable=True)
@@ -245,31 +123,51 @@ def process_refresh(
     try:
         snapshot = client.refresh_company(message.corp_code)
     except OpenDartError as error:
-        retryable = error.category not in PERMANENT_PROVIDER_ERRORS
-        repository.record_failure(
-            message, category=error.category, retryable=retryable
-        )
-        if retryable:
+        if error.category not in PERMANENT_PROVIDER_ERRORS:
             raise WorkerError(error.category, retryable=True) from None
-        return "NOT_UPDATED"
-    company_name = str(company.get("name", ""))
-    dart_company = snapshot.get("company")
-    dart_name = (
-        str(dart_company.get("legal_name", ""))
-        if isinstance(dart_company, dict)
-        else ""
-    )
-    if not company_names_match(company_name, dart_name):
-        repository.record_failure(
-            message, category="COMPANY_NAME_MISMATCH", retryable=False
+        payload = build_refresh_result(
+            request_id=message.request_id,
+            company_id=message.company_id,
+            corp_code=message.corp_code,
+            requested_at=message.requested_at,
+            outcome="NOT_UPDATED",
+            snapshot=None,
+            error_category=error.category,
         )
-        return "NOT_UPDATED"
-    updated = repository.complete(
-        message,
-        expected_company_name=company_name,
-        snapshot=snapshot,
-    )
-    return "UPDATED" if updated else "STALE_REQUEST_IGNORED"
+    else:
+        dart_company = snapshot.get("company")
+        dart_name = (
+            str(dart_company.get("legal_name", ""))
+            if isinstance(dart_company, dict)
+            else ""
+        )
+        if not company_names_match(message.expected_company_name, dart_name):
+            payload = build_refresh_result(
+                request_id=message.request_id,
+                company_id=message.company_id,
+                corp_code=message.corp_code,
+                requested_at=message.requested_at,
+                outcome="NOT_UPDATED",
+                snapshot=None,
+                error_category="COMPANY_NAME_MISMATCH",
+            )
+        else:
+            payload = build_refresh_result(
+                request_id=message.request_id,
+                company_id=message.company_id,
+                corp_code=message.corp_code,
+                requested_at=message.requested_at,
+                outcome="UPDATED",
+                snapshot=snapshot,
+                error_category=None,
+            )
+    try:
+        recorded = (result_writer or put_refresh_result)(payload)
+    except OpenDartResultError:
+        raise WorkerError("RESULT_STORE_UNAVAILABLE", retryable=True) from None
+    if recorded == "ALREADY_RECORDED":
+        return "ALREADY_RECORDED"
+    return str(payload["outcome"])
 
 
 def log_worker_outcome(
@@ -303,9 +201,6 @@ def lambda_handler(event: object, _context: object) -> dict[str, list[dict[str, 
         )
         return {"batchItemFailures": [{"itemIdentifier": "invalid-event"}]}
     failures: list[dict[str, str]] = []
-    repository = PostgresCompanySnapshotRepository(
-        os.getenv("COMPANY_DATABASE_URL", "")
-    )
     live_client: OpenDartClient | None = None
 
     def get_live_client() -> OpenDartClient:
@@ -317,14 +212,13 @@ def lambda_handler(event: object, _context: object) -> dict[str, list[dict[str, 
             )
         return live_client
 
-    for record in records:
+    for index, record in enumerate(records):
         message_id = record.get("messageId", "unknown") if isinstance(record, dict) else "unknown"
         body = record.get("body") if isinstance(record, dict) else None
         try:
             message = parse_message(body)
-            outcome = process_refresh(
+            outcome = process_refresh_to_durable_result(
                 message,
-                repository=repository,
                 client_factory=get_live_client,
             )
             log_worker_outcome(message_id=message_id, outcome=outcome)
@@ -338,5 +232,14 @@ def lambda_handler(event: object, _context: object) -> dict[str, list[dict[str, 
                 retryable=error.retryable,
             )
             if error.retryable:
-                failures.append({"itemIdentifier": str(message_id)})
+                # FIFO ordering: after the first retryable failure, report that
+                # record and every unprocessed record in this batch.
+                for remaining in records[index:]:
+                    remaining_id = (
+                        remaining.get("messageId", "unknown")
+                        if isinstance(remaining, dict)
+                        else "unknown"
+                    )
+                    failures.append({"itemIdentifier": str(remaining_id)})
+                break
     return {"batchItemFailures": failures}

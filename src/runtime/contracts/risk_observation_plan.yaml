@@ -13,7 +13,7 @@ runtime_preconditions:
 
 source:
   script_path: src/runtime/tests/two_sided_asis_observations.py
-  script_sha256: 67868168bf59ce47285af38e9c684f8b2d06fae6683c55eadd842f59822e0917
+  script_sha256: 1756f83aba15d7404be13f91edcd82787e270cb99e9b786caa0d2470fa1c0c95
 
 separation:
   functional_smoke: SEPARATE_EVIDENCE_CLASS
@@ -74,7 +74,7 @@ scenarios:
     observation_intent: Record client-supplied policy version and fields absent from the stored collection list.
     source_assertion_markers:
       - 'latest_consent["policy_version"] == "asis-observation-client-value"'
-      - '{"skills", "desired_role", "self_intro"}.isdisjoint'
+      - '{"skills", "desired_role", "projects", "self_intro"}.isdisjoint'
     cleanup_surface: SYNTHETIC_ROWS
     automatic_decision: false
   - scenario_id: OBS-RECRUITER-CACHE-STALE
@@ -131,7 +131,7 @@ scenarios:
     observation_intent: Record the prepared candidate field set, its six name-based PII classifications, and its separation from score inputs.
     source_assertion_markers:
       - 'assert explanation["prompt_fields_prepared"] == prompt_fields'
-      - 'prompt_field_boundary_observed=8-prepared,6-classified-pii,score-effect-none'
+      - 'prompt_field_boundary_observed=9-prepared,6-classified-pii,score-effect-none'
     cleanup_surface: RAW_PROMPT_OBSERVED_NOT_DELETED
     automatic_decision: false
   - scenario_id: OBS-BOLA-DENIAL-TENANT-SHAPE

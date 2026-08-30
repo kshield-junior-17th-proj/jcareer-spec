@@ -86,7 +86,7 @@ def main():
     assert first["score_breakdown"]["formula_version"] == "deterministic-70-20-10-v1"
     assert len(first["score_breakdown"]["factors"]) == 3
     assert "school" in first["score_breakdown"]["excluded_input_fields"]
-    assert len(first["explanation"]["prompt_fields_prepared"]) == 8
+    assert len(first["explanation"]["prompt_fields_prepared"]) == 9
     assert len(first["explanation"]["pii_fields_prepared"]) == 6
     assert first["explanation"]["company_alignment"]["score_effect"] == "NONE"
     assert first["job"]["company_profile"]["source"] in {
@@ -209,6 +209,11 @@ def main():
 
     admin_token, admin = login("admin@jcareer.test")
     assert admin["role"] == "admin"
+    status, operations = request("/api/v1/admin/ai-operations", token=admin_token)
+    assert status == 200, operations
+    assert operations["matcher"]["probe_state"] == "AVAILABLE"
+    assert operations["llm_gateway"]["probe_state"] == "AVAILABLE"
+    assert operations["opendart"]["probe_state"] == "NOT_PROBED"
     status, events = request("/api/v1/admin/audit", token=admin_token)
     assert status == 200 and events
 

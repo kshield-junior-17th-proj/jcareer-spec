@@ -6,7 +6,7 @@ V2 는 gitleaks-action(@v2 태그)을 썼다. 공급망 고정 요구(V2-P0-08)�
 SHA256 을 고정해 gitleaks 를 추가하는 것은 Phase 1 과제로 남긴다.
 값은 절대 출력하지 않는다. 경로와 줄 번호만 보고한다.
 """
-import pathlib, re, sys
+import os, pathlib, re, sys
 
 PATTERNS = [
     ("AWS Access Key",   re.compile(r'\b(?:AKIA|ASIA|AIDA|AROA)[0-9A-Z]{16}\b')),
@@ -27,24 +27,33 @@ SELF = {"scripts/scan_secrets.py", "SENSITIVE_DATA_FINDINGS.md",
 def main():
     root = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else
                         pathlib.Path(__file__).resolve().parent.parent).resolve()
+    if not root.is_dir():
+        print("::error::비밀정보 스캔 대상은 존재하는 디렉터리여야 합니다")
+        return 2
     hits, scanned = [], 0
-    for p in sorted(root.rglob("*")):
-        if not p.is_file() or p.suffix.lower() in SKIP_SUFFIX:
-            continue
-        if any(part in SKIP_DIRS for part in p.parts):
-            continue
-        rel = p.relative_to(root).as_posix()
-        if rel in SELF:
-            continue
-        try:
-            text = p.read_text(encoding="utf-8", errors="strict")
-        except Exception:
-            continue
-        scanned += 1
-        for i, line in enumerate(text.splitlines(), 1):
-            for name, rx in PATTERNS:
-                if rx.search(line):
-                    hits.append((rel, i, name))
+    for directory, child_directories, filenames in os.walk(root, topdown=True, followlinks=False):
+        directory_path = pathlib.Path(directory)
+        child_directories[:] = sorted(
+            name
+            for name in child_directories
+            if name not in SKIP_DIRS and not (directory_path / name).is_symlink()
+        )
+        for filename in sorted(filenames):
+            p = directory_path / filename
+            if p.is_symlink() or p.suffix.lower() in SKIP_SUFFIX:
+                continue
+            rel = p.relative_to(root).as_posix()
+            if rel in SELF:
+                continue
+            try:
+                text = p.read_text(encoding="utf-8", errors="strict")
+            except Exception:
+                continue
+            scanned += 1
+            for i, line in enumerate(text.splitlines(), 1):
+                for name, rx in PATTERNS:
+                    if rx.search(line):
+                        hits.append((rel, i, name))
     print(f"비밀정보 스캔 · 파일 {scanned}개 · 탐지 {len(hits)}건")
     for rel, i, name in hits:
         print(f"::error file={rel},line={i}::{name} 패턴 탐지 [값 미출력]")

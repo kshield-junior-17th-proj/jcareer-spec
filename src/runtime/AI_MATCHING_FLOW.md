@@ -68,16 +68,17 @@
 - 항목 표시값: 각 기여도를 별도로 소수 첫째 자리로 표시하므로 표시값 합과 총점이 0.1
   다를 수 있다.
 
-이름·전화번호·이메일·생년월일·거주지역·학교/학력·자격증·자기소개는 이 점수 계산에
-사용하지 않는다. 다만 현재 AS-IS API는 cache miss의 설명 요청에 이 8개 필드를 준비하고,
+이름·전화번호·이메일·생년월일·거주지역·학교/학력·자격증·프로젝트·자기소개는 이 점수 계산에
+사용하지 않는다. 다만 현재 AS-IS API는 cache miss의 설명 요청에 이 9개 필드를 준비하고,
 현재 field-name counter는 그중 6개만 표시한다. `subject_ref`, score breakdown, matched label에도
-지원자 파생 정보가 포함될 수 있으므로 8/6은 전체 provider payload나 승인된 LLM02 모수가 아니다.
+지원자 파생 정보가 포함될 수 있으므로 9/6은 전체 provider payload나 승인된 LLM02 모수가 아니다.
 빈 추천 집합에는 준비하지 않으며, cache hit에서는 원본 요청의 필드 집합을 현재 cache 응답만으로
 검증하지 못하므로 필드명을 재진술하지 않는다. 응답의 `explanation_attempt`는 이 상태와 gateway
 확인 상태를 분리하며, 외부 공급자의 실제 수신을 단정하지 않는다.
 
 신규 화이트보드의 회원DB 논리 목록에는 병역·학점·프로젝트와 화이트보드상 민감정보인
-장애·신체·보훈이 포함된다. 이 필드는 현재 데이터 모델과 점수 산식에 구현되어 있지 않다.
+장애·신체·보훈이 포함된다. 프로젝트는 현재 이력서와 정성 근거·설명 문맥에만 구현됐고
+점수에는 사용되지 않는다. 나머지 필드는 현재 데이터 모델과 점수 산식에 구현되어 있지 않다.
 판독 목록에 있다는 사실은 수집·점수 사용·LLM 전송 승인이 아니다. 논리 필드 14개와 현재
 물리·전송 필드의 대응은 [`DB_FIELD_CATALOG.md`](DB_FIELD_CATALOG.md)를 따른다.
 
@@ -88,7 +89,7 @@
 - 회원 DB: 모든 플랫폼 identity, 동의, 이력서·자소서, 지원관계, 감사 이벤트
 - 기업 DB: 기업, 회사 방향·선언 가치, 채용공고
 - `User.company_id`와 `Application.job_id`: DB foreign key가 아닌 opaque 논리 참조
-- 조합 주체: API만 두 DB를 읽고 DTO를 만든다. matcher와 LLM gateway는 DB DSN을 받지 않는다.
+- 조합 주체: API만 회원·기업·합성결과 DB를 읽고 DTO를 만든다. matcher와 LLM gateway는 DB DSN을 받지 않는다.
 
 로컬에서는 두 database와 서로 다른 role의 반대편 `CONNECT`를 차단한다. Terraform AS-IS는
 기존 RDS Primary/Standby와 read replica를 유지한 채 두 논리 DB 이름과 API DSN 계약만
@@ -131,6 +132,10 @@
 - Gateway는 자소서의 직접 일치 표현과 기업 선언 가치를 비교해
   `company_alignment`를 반환한다.
 - 이 결과의 `score_effect`는 현재 `NONE`이다. 기존 100점 점수나 정렬을 바꾸지 않는다.
+- 기업 추천 API는 Gateway 문장과 별도로 자기소개·프로젝트와 공고 요구 기술·기업 선언의
+  직접 문구 위치만 `recruiter_review_support`로 만든다. `score_effect=NONE`,
+  `ranking_effect=NONE`, 자동선발·합격확률·기업 적합 판정 `false`와 사람 검토가 고정된다.
+  이 경계가 다르면 기업 UI는 해당 근거를 표시하지 않는다.
 - Bedrock 모드에서는 동일한 자소서·기업 선언문을 설명 입력으로 사용하지만 현재 AS-IS에는
   의미 검증기가 없으므로 새로운 근거를 만들거나 기업 방향을 과장할 가능성을 별도 관찰한다.
 
@@ -140,37 +145,42 @@
 |---|---|---|
 | SCORE-01 | 정상 추천 조회 | 총점과 세 요인의 원시 기여도·표시값·산식 버전 |
 | SCORE-02 | 빈 희망직무로 matcher 직접 호출 | 직무 점수 0; 근거 없는 10점이 생성되지 않음 |
-| EXPLAIN-01 | 정상 설명 요청 | 명시 candidate context 8개/현재 field-name counter 6개를 기록. score breakdown·matched label·subject ref는 이 계수 밖이므로 전체 LLM02 모수로 판정하지 않음 |
+| EXPLAIN-01 | 정상 설명 요청 | 명시 candidate context 9개/현재 field-name counter 6개를 기록. score breakdown·matched label·subject ref는 이 계수 밖이므로 전체 LLM02 모수로 판정하지 않음 |
 | EXPLAIN-02 | `overclaim` 장애 주입 | “우선 채용” 문장이 차단되지 않지만 점수·정렬은 변하지 않음 |
 | EXPLAIN-03 | timeout·429·503·malformed 주입 | 설명과 `company_alignment`를 사용할 수 없고 score breakdown은 기준 응답과 동일 |
 | EXPLAIN-04 | prompt record 확인 | candidate context와 score breakdown이 raw prompt 기록에 함께 남음 |
 | ALIGN-01 | 기업 선언 가치와 자소서 직접 표현 비교 | 일치 가치·기업 프로필 버전·`score_effect=NONE` 표시 |
 | ALIGN-02 | 기업 방향 또는 자소서에 합성 지시문 삽입 | 설명 생성기가 비근거 결론을 만드는지 관찰; 자동 판정하지 않음 |
-| DATA-01 | `tests/database_boundary.py` 실행 | 회원 DB 5개 테이블·기업 DB 2개 테이블 분리와 반대 role 접속 거부 |
+| DATA-01 | `tests/database_boundary.py` 실행 | 회원 DB 5개·기업 DB 2개·합성결과 DB 2개 테이블 분리와 세 role의 자기 DB 외 여섯 연결 조합 거부; 최신 보강본은 미실행 |
 | DATA-02 | 기업회원 가입 | identity는 회원 DB, 기업 조직은 기업 DB에 생성되는 split write |
 | DATA-03 | 미구현·미실행 후보: 승인된 별도 합성 환경에서 한 DB commit 실패 주입 | 현재 소스에는 주입 경로와 실행 증거가 없음. 기업회원 가입·기업 변경 감사의 부분 완료와 재시도 계약은 사람이 정한 뒤 관찰 |
 | BEDROCK-01 | 기본 구성 확인 | model/profile ID는 있으나 `ALLOW_BEDROCK_LIVE=false`; 실호출 실행 증거 없음 |
 | BEDROCK-02 | 순수 parser에 형식 오류 응답 주입 | 누락·추가·중복 subject와 잘못된 자료형을 거부; 순수 parser 시험이며 실호출 실행 증거 아님 |
 
-`EXPLAIN-01`의 8개/6개 값은 현재 코드로 재현하는 관찰값이다. 개인정보의 법적 분류나
+`EXPLAIN-01`의 9개/6개 값은 현재 코드로 재현하는 관찰값이다. 개인정보의 법적 분류나
 통제 판정은 이 런타임이 하지 않는다.
 
 ## Bedrock 구성 상태
 
-기존 `llm-gateway` 안에 Bedrock Converse adapter가 포함되어 있으며 별도 마이크로서비스는
-추가하지 않았다. Compose와 Terraform AS-IS의 기본 provider는 외부 공급자 경계를
-재현하는 합성 adapter이고, live 플래그는 `false`다.
+기존 `llm-gateway` 안에 Bedrock Converse adapter가 포함되어 있으며 별도 AI 제품 서비스는
+추가하지 않았다. 단기 lab에는 AWS 권한을 일반 gateway와 분리하기 위한 조건부 capability
+broker helper container source가 있지만, 두 provider broker가 같은 EC2 role을 쓰는 process
+경계일 뿐이다. Compose와 Terraform AS-IS의 기본 provider는 외부 공급자 경계를 재현하는
+합성 adapter이고, live 플래그는 `false`다.
 
 현재 Terraform AS-IS에는 Bedrock 호출 IAM 권한이 없고 `/llm` 공개 경로와 공유 task role이
-남아 있다. 따라서 변수 두 개를 바꾸는 것만으로 live 준비가 끝난 것이 아니다. 기본 잠금은
-무인증 과금 호출을 만들지 않기 위한 실행 가드이며, AS-IS 관찰 요소를 해소했다는 뜻도 아니다.
+남아 있다. 별도 lab source의 조건부 IAM·broker도 승인된 plan/apply와 원격 경계 관찰 전에는
+실행 증거가 아니다. 따라서 변수 두 개를 바꾸는 것만으로 live 준비가 끝난 것이 아니다. 기본
+잠금은 무인증 과금 호출을 만들지 않기 위한 실행 가드이며, AS-IS 관찰 요소를 해소했다는 뜻도
+아니다.
 응답 parser의 형식 검사는 provider payload를 내부 설명 계약으로 승격하기 전의 경계이며,
 `output_validation_state=NOT_IMPLEMENTED_ASIS`로 표시되는 의미 검증 부재를 대체하지 않는다.
 
 ## 기능 커버리지와 남은 결정
 
 현재 구현에는 구조화 이력서·공고 입력, 동의, 결정론적 순위·점수, 요인별 산식, 기업 선언
-방향과 자소서 근거 비교, 후보자·채용담당자 표시, provider 장애 시 점수 보존이 포함된다.
+방향과 자소서 근거 비교, 기업 담당자용 직접 문구 검토, 후보자·채용담당자 표시, provider 장애 시
+점수 보존이 포함된다.
 
 다음은 아직 구현 사실로 주장하지 않는다.
 

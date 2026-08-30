@@ -202,7 +202,10 @@ async function inspectStage(client) {
         'active: active ? active.dataset.stageTab : null,' +
         'query: new URL(location.href).searchParams.get("stage"),' +
         'current: current,' +
-        'itemCount: items.length' +
+        'itemCount: items.length,' +
+        'progress: document.querySelector(".stage-motion__rail")?.style.getPropertyValue("--stage-progress") || "",' +
+        'position: document.querySelector(".stage-motion__rail")?.style.getPropertyValue("--stage-position") || "",' +
+        'readout: document.querySelector("[data-stage-readout]")?.textContent.trim() || ""' +
       '};' +
     '})()',
   );
@@ -307,6 +310,59 @@ async function runChecks(client, origin) {
   assert(landing.innerWidth === 390, 'Mobile viewport width is not 390 CSS pixels.');
   assert(landing.scrollWidth <= landing.innerWidth, 'Landing page overflows horizontally at 390 CSS pixels.');
 
+  const landingMotion = await evaluate(
+    client,
+    '(function () {' +
+      'const heading = document.querySelector(".hero h1");' +
+      'const style = heading ? getComputedStyle(heading) : null;' +
+      'const lineHeight = style ? parseFloat(style.lineHeight) : 0;' +
+      'return {' +
+        'motion: document.documentElement.dataset.motion,' +
+        'toggleVisible: Boolean(document.querySelector("[data-motion-toggle]:not([hidden])")),' +
+        'gsap: Boolean(window.gsap && window.ScrollTrigger),' +
+        'headingOpacity: style ? Number(style.opacity) : 0,' +
+        'headingLines: heading && lineHeight ? Math.round(heading.getBoundingClientRect().height / lineHeight) : 99,' +
+        'slides: document.querySelectorAll("[data-perspective-slide]").length,' +
+        'activeSlides: document.querySelectorAll("[data-perspective-slide]:not([hidden])").length,' +
+        'readinessItems: document.querySelectorAll("[data-readiness]").length,' +
+        'readinessDone: document.querySelectorAll("[data-readiness=\\"done\\"]").length,' +
+        'diagramSource: document.querySelector("[data-animated-diagram]")?.getAttribute("src") || ""' +
+      '};' +
+    '})()',
+  );
+  assert(landingMotion.motion === 'full' && landingMotion.toggleVisible, 'Landing motion control did not initialise.');
+  assert(landingMotion.gsap, 'Pinned GSAP and ScrollTrigger did not load.');
+  assert(landingMotion.headingOpacity === 1 && landingMotion.headingLines <= 3, 'Landing hero is hidden or wraps beyond three lines.');
+  assert(landingMotion.slides === 3 && landingMotion.activeSlides === 1, 'Perspective carousel did not initialise one of three views.');
+  assert(landingMotion.readinessItems === 7 && landingMotion.readinessDone === 3, 'Demo readiness blockers are incomplete or overstated.');
+  assert(landingMotion.diagramSource.endsWith('.svg'), 'Animated architecture source is not active.');
+
+  await evaluate(client, 'document.querySelector("[data-carousel-next]").click(); true');
+  await waitFor(async () => evaluate(client, 'document.querySelector("[data-carousel-count]").textContent.trim() === "2 / 3"'), 'the perspective carousel transition');
+  const carouselState = await evaluate(client, '(function () { const active = document.querySelector("[data-perspective-slide]:not([hidden])"); return { count: document.querySelectorAll("[data-perspective-slide]:not([hidden])").length, role: document.querySelector("[data-perspective-carousel]")?.getAttribute("role"), perspective: active?.dataset.perspective, query: new URL(location.href).searchParams.get("perspective") }; })()');
+  assert(carouselState.count === 1 && carouselState.role === 'region', 'Perspective carousel semantics are incomplete.');
+  assert(carouselState.perspective === 'recruiter' && carouselState.query === 'recruiter', 'Perspective carousel URL state is not synchronized.');
+
+  await evaluate(client, 'document.querySelector("[data-motion-toggle]").click(); true');
+  await delay(50);
+  const reducedMotion = await evaluate(
+    client,
+    '(function () {' +
+      'const toggle = document.querySelector("[data-motion-toggle]");' +
+      'return {' +
+        'motion: document.documentElement.dataset.motion,' +
+        'pressed: toggle?.getAttribute("aria-pressed"),' +
+        'label: toggle?.getAttribute("aria-label"),' +
+        'source: document.querySelector("[data-animated-diagram]")?.getAttribute("src") || "",' +
+        'marquee: getComputedStyle(document.querySelector(".signal-marquee__track")).animationName' +
+      '};' +
+    '})()',
+  );
+  assert(reducedMotion.motion === 'reduced' && reducedMotion.pressed === 'true' && reducedMotion.label === '움직임 줄이기', 'Motion control state or accessible name is inconsistent.');
+  assert(reducedMotion.source.endsWith('.png') && reducedMotion.marquee === 'none', 'Reduced mode did not stop decorative motion and use the still diagram.');
+  await evaluate(client, 'document.querySelector("[data-motion-toggle]").click(); true');
+  await delay(50);
+
   let checkedRoutes = 0;
   for (const route of EXPECTED_ROUTES) {
     await navigate(client, origin + '/' + route.href);
@@ -370,7 +426,7 @@ async function runChecks(client, origin) {
     deepLink.query === '4' &&
     deepLink.itemCount === 7 &&
     JSON.stringify(deepLink.current) === '["4"]',
-    'Valid MLOps deep link did not select stage 4.',
+    'Valid MLOps deep link did not select stage 4: ' + JSON.stringify(deepLink),
   );
 
   const stageValues = ['all', '1', '2', '3', '4', '5', '6', '7'];
@@ -390,8 +446,10 @@ async function runChecks(client, origin) {
     assert(state.active === stage, 'MLOps stage did not become active: ' + stage);
     if (stage === 'all') {
       assert(state.query === null && state.itemCount === 7 && state.current.length === 0, 'All-stage state did not show the seven-stage overview or clear the URL.');
+      assert(state.progress === '1' && state.position === '100%' && state.readout === '전체 7단계', 'All-stage progress indicator is wrong.');
     } else {
       assert(state.query === stage && state.itemCount === 7 && JSON.stringify(state.current) === '["' + stage + '"]', 'MLOps stage state and URL diverged: ' + stage);
+      assert(Math.abs(Number(state.progress) - Number(stage) / 7) < 0.0001 && state.readout === stage + ' / 7 단계', 'MLOps progress indicator diverged for stage ' + stage + '.');
     }
   }
 
@@ -407,8 +465,27 @@ async function runChecks(client, origin) {
   const popState = await inspectStage(client);
   assert(popState.active === '2' && popState.query === '2' && JSON.stringify(popState.current) === '["2"]', 'Browser history state did not restore MLOps stage 2.');
 
+  await navigate(client, origin + '/terraform/asis/architecture.html?flow=candidate');
+  const animatedFlow = await evaluate(
+    client,
+    '(function () {' +
+      'const line = document.querySelector("[data-flow-layer].is-active .flow-line");' +
+      'return {' +
+        'animation: line ? getComputedStyle(line).animationName : "",' +
+        'toggleVisible: Boolean(document.querySelector("[data-motion-toggle]:not([hidden])"))' +
+      '};' +
+    '})()',
+  );
+  assert(animatedFlow.animation === 'flowMarch' && animatedFlow.toggleVisible, 'Architecture flow motion did not initialise.');
+  await evaluate(client, 'document.querySelector("[data-motion-toggle]").click(); true');
+  await delay(40);
+  const stoppedFlow = await evaluate(client, 'getComputedStyle(document.querySelector("[data-flow-layer].is-active .flow-line")).animationName');
+  assert(stoppedFlow === 'none', 'Architecture motion control did not stop the selected flow.');
+  await evaluate(client, 'document.querySelector("[data-motion-toggle]").click(); true');
+
   return {
     landingRoutes: checkedRoutes,
+    motionChecks: 8,
     pageViewportChecks,
     stageStates: stageValues.length,
     viewport: landing.innerWidth,
@@ -465,7 +542,7 @@ async function main() {
       'landing routes: ' + result.landingRoutes + '/6; MLOps stage states: ' +
       result.stageStates + '/8; invalid stage: fail-closed; viewport: ' +
       result.viewport + 'px; page/viewport checks: ' +
-      result.pageViewportChecks + '/10',
+      result.pageViewportChecks + '/10; motion checks: ' + result.motionChecks + '/8',
     );
   } finally {
     if (client) {

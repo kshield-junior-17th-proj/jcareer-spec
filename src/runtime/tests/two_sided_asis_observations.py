@@ -100,6 +100,7 @@ def observe_internal_service_and_prompt_boundary(cleanup: dict[str, object]) -> 
         "email",
         "name",
         "phone",
+        "projects",
         "school",
         "self_intro",
     ]
@@ -737,7 +738,7 @@ def run_observations(cleanup: dict[str, object]) -> None:
     assert status == 200 and consents, consents
     latest_consent = consents[0]
     assert latest_consent["policy_version"] == "asis-observation-client-value"
-    assert {"skills", "desired_role", "self_intro"}.isdisjoint(
+    assert {"skills", "desired_role", "projects", "self_intro"}.isdisjoint(
         latest_consent["collected_items"]
     )
 
@@ -1267,7 +1268,7 @@ def run_observations(cleanup: dict[str, object]) -> None:
     print("cache_item_schema_observed=missing-score-breakdown-returned")
     print("application_audit_shape=submitted:job-only,status-change:application-and-new-status-only")
     print("internal_service_auth_observed=agent-and-llm-operations-without-caller-token")
-    print("prompt_field_boundary_observed=8-prepared,6-classified-pii,score-effect-none")
+    print("prompt_field_boundary_observed=9-prepared,6-classified-pii,score-effect-none")
     print("authorization_denial_tenant_shape_observed=actor-company,target-object,no-target-company-snapshot")
     print("public_closed_job_detail_observed=baseline-open:1,list-after-close:0,detail-present")
 

@@ -1,7 +1,7 @@
 # J-Career 기존 구성(AS-IS) 서비스 및 시스템 명세
 
 > 문서 상태: 기준 설계 · 기술 검토 진행
-> 기준일: 2026-08-28  
+> 기준일: 2026-08-30
 > 다루는 대상: 기존 자료를 바탕으로 다시 그린 Terraform 구성과 별도 로컬 예시 코드  
 > 문서 목적: 채용 서비스와 AWS 기준 설계, 데이터·보안·운영 검증 범위를 한 문서로 관리
 > 이번 범위 아님: TRACE, JC-RECEIPT, Decision Receipt, Recourse Twin 등 제안 단계 서비스
@@ -35,7 +35,8 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 | 110 | AWS 비접속 계획에서 생성 예정으로 계산된 항목 수 | AWS 배포 결과와는 별도 관리 |
 | 7 | 합성 자료 준비부터 사람 검토 대기까지의 MLOps 단계 수 | 모델이 승인되거나 추천에 반영됐다는 뜻이 아님 |
 | 0 / 13 / 14 | 별도 MLOps Terraform의 기본 잠금 / 보관함 준비 / 한 번 실행 준비 계획 수 | 기준 110개와 합산하지 않음 |
-| 0 | 이 작업에서 J-Career 기준 구성으로 실제 생성한 AWS 리소스 수 | 별도 실험의 과거 이력까지 없다는 뜻은 아님 |
+| 24 | 별도 AWS 검증 Lab의 HTTPS·Bedrock 포함 생성 계획 수 | 기준 110개와 합산하지 않으며 배포 완료 수가 아님 |
+| 0 | 권한 차단 뒤 정리를 마친 현재 AWS 검증 Lab 리소스 수 | 계획이나 과거의 부분 생성까지 없었다는 뜻은 아님 |
 
 ### 0.3 지금 확인된 것과 확인되지 않은 것
 
@@ -43,9 +44,10 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 |---|---|---|
 | 업무망 PC | 전체 180대, Windows 100대, macOS 80대 | 버전, 보안 프로그램, 인증, 실제 접속 경로 |
 | AWS 설계 | 2-AZ, 6개 모듈, 기록된 계획 항목 110개 | 고객사 AWS 배포 결과와 실행 상태 |
+| AWS 검증 Lab | 별도 24개 생성 계획과 Bedrock 직접 합성 호출 통과, 권한 차단 뒤 부분 자원 정리 완료 | 원격 여섯 서비스, HTTPS 인증 경계, Bedrock 전체 애플리케이션 경로 |
 | 기준 애플리케이션 | 배치할 자리와 서비스 이름 | 실행 이미지, 실제 기동, 사용자 통합 시험 |
-| 서비스 구현 범위 | 합성 데이터용 소스, 이전 통합 runner 92/92 기록, 현재 공개 runner 선언 94개 | 현재 94개 전체의 독립 재실행, 최신 이미지 기동, AWS 연결, 실제 사용자 데이터 처리 |
-| MLOps 전용 구성 | 7단계 흐름, 별도 Terraform 단계별 계획 0/13/14, 소스 경계 검사 12건과 합성 파이프라인 시험 14건 | AWS 배포, 이미지 등록, Lambda 실행, 모델 품질·공정성 판단 |
+| 서비스 구현 범위 | 합성 데이터용 소스, 공개 릴리스 검사 6단계(정적 검사 3개·단위시험 묶음 3개) | 실제 사용자 데이터 처리와 장기 운영 관찰 |
+| MLOps 전용 구성 | 7단계 흐름, 별도 Terraform 단계별 계획 0/13/14, 소스 경계 검사 19건과 합성 파이프라인 시험 22건 | AWS 배포, 이미지 등록, Lambda 실행, 모델 품질·공정성 판단 |
 | 컨설턴트 대시보드 | 별도 소스와 제한적인 미리보기 응답 | 사용자별 로그인, 고객사 분리, 운영 감사 기록, 승인된 데이터 반입 |
 | 신규 AI 서비스 | 제안 이름과 아이디어 | 구현, 승인, Terraform 반영, 운영 배포 |
 
@@ -80,11 +82,11 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 | 항목 | 값 |
 |---|---|
 | 문서 번호 | `JC-ASIS-SPEC-001` |
-| 개정 | 3.11 |
-| 기준일 | 2026-08-28 |
+| 개정 | 3.12 |
+| 기준일 | 2026-08-30 |
 | 작성 기준 | 기존 기획, AWS에 접속하지 않는 Terraform 계획, 별도 서비스 구현 범위 |
 | 승인 상태 | 기준 설계 · 기술 검토 진행. `docs/current` 승인 문서 0건 |
-| 배포 상태 | AWS 배포 검증 전. 기준 이미지와 배포 결과는 별도 검증 기록으로 관리 |
+| 배포 상태 | `terraform/asis`는 미적용. 별도 AWS 검증 Lab의 배포·호출 결과는 별도 기록으로 관리 |
 
 | 개정 | 일자 | 변경 내용 |
 |---|---|---|
@@ -98,10 +100,11 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 | 3.5 | 2026-08-28 | 비기술 독자를 위한 30초 요약, 핵심 숫자, 용어 풀이 추가. 상태 문구와 도면 설명을 쉬운 한국어로 개정 |
 | 3.6 | 2026-08-28 | 비기술 독자용 흐름도를 전면 간소화. AWS 이름은 한국어 역할 뒤에 표시하고 상세 IP·검증 이력·ISO 메모는 본문으로 이동 |
 | 3.7 | 2026-08-28 | 전체 인프라 위에서 서비스별 경로를 골라 보는 도면 추가. 기업용 인재 찾기·구직자 첫 화면과 OpenDART 공개정보 복사본을 반영하고, 합성 데이터 전용 오프라인 학습 실험을 현재 추천 서비스와 분리 |
-| 3.8 | 2026-08-28 | MLOps 현재 코드와 승인 전 확장 흐름을 분리해 표시. 전체 보기 1개와 서비스 경로 5개에 번호가 붙은 단계 설명을 추가. 최신 통합 runner 92건을 재검증해 반영 |
+| 3.8 | 2026-08-28 | MLOps 현재 코드와 승인 전 확장 흐름을 분리해 표시. 전체 보기 1개와 서비스 경로 5개에 번호가 붙은 단계 설명을 추가. 당시 통합 runner 92건을 재검증해 반영 |
 | 3.9 | 2026-08-28 | 대외 문서의 첫 화면을 서비스와 기준 설계 중심으로 개편. 내부 감사 표현은 상세 상태표로 옮기고 합성 데이터·배포 검증 경계는 유지 |
 | 3.10 | 2026-08-28 | 첫 화면에 MLOps 7단계와 0/13/14 계획을 독립 영역으로 표시. 최신 서버리스 전용 루트의 데이터·보안·장애 경계와 전용 명세 연결을 반영 |
 | 3.11 | 2026-08-29 | 서비스별 인프라 경로에 기능·보안·MLOps 상세 명세 바로가기를 추가하고 링크 자동 검사를 보강 |
+| 3.12 | 2026-08-30 | AWS 검증 Lab과 AS-IS 모의 기준선을 분리하고, MLOps·대시보드의 최신 검사 수와 쉬운 한국어 상태표를 반영 |
 
 ### 0.7 상태를 읽는 법
 
@@ -188,13 +191,14 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 | 업무망 PC | `USER_CONFIRMED` | `REQ-PC-01`: 총 180대, Windows 100대와 macOS 80대. 관리 방식과 AWS 접속 경로는 확인하지 못함 |
 | 기준 AWS 설계(Terraform) | `MODELLED` | 여섯 모듈로 구성됨. 기록된 AWS 비접속 계획은 생성 예정 110개, 변경 0개, 삭제 0개임. 별도 로컬 변경분을 넣어 다시 계산하지는 않음 |
 | J-Career 고객사 AWS 리소스 | 생성 안 함 | AWS에 접속하지 않는 모의 방식이므로 실제 AWS 상태를 나타내지 않음 |
+| 별도 AWS 검증 Lab | 권한 보완 대기 | HTTPS·Bedrock 포함 24개 생성 계획은 통과. 적용은 IAM 역할 생성 권한 부족으로 중단됐고 부분 생성 16개를 정리해 현재 0개. Bedrock 직접 합성 호출은 통과했으나 전체 경로는 미확인 |
 | 기준 폴더의 애플리케이션 | `PLANNED_UNIMPLEMENTED` | 실행할 소스와 이미지가 없음 |
 | 서비스 구현 코드 | `LOCAL_SYNTHETIC_IMPLEMENTED` | `web`, `api`, `agent`, `llm-gateway`와 PostgreSQL, Redis 소스가 있음. 합성 데이터 검증 범위이며 AWS 배포 결과는 별도 관리 |
 | 로컬 API | `LOCAL_SYNTHETIC_IMPLEMENTED` | 로그인, 동의, 추천, 작업 기록 등을 다루는 FastAPI 소스와 자동 API 문서 소스가 있음 |
 | 기업 공개정보 복사본 | `LOCAL_SYNTHETIC_IMPLEMENTED` | OpenDART 회사 개황·최근 공시를 기업 자료와 분리해 저장하는 코드가 있음. 기본은 합성 예시이며 추천 점수·정렬·기업 인증에 쓰지 않음 |
 | 합성 학습 실험 | `EXPERIMENT_UNWIRED_NOT_APPROVED` | 완전 생성형 오프라인 코드가 있으며 현재 추천 런타임에 연결하지 않음 |
 | MLOps 전용 서버리스 경로 | `MLOPS_PLANNED_NOT_DEPLOYED` | 합성 DB 옆 exporter, S3 입력·결과, Lambda 학습, DynamoDB 상태와 CloudWatch 로그 소스가 있음. 기본 계획 0, 단계별 계획 13/14이며 AWS 배포·호출 결과는 없음 |
-| 로컬 코드 검사 | `STATIC_CHECKED` | 이전 통합 runner 92/92 기록이 있음. 현재 공개 runner 선언은 94개지만 이 저장소만으로 전체 94개를 다시 실행했다고 주장하지 않음 |
+| 로컬 코드 검사 | `STATIC_CHECKED` | 현재 공개 릴리스 검사는 6단계이며 Lab·MLOps·OpenDART 정적 검사와 단위시험 묶음을 실행함 |
 | 로컬 검토 도구(Evidence Desk) | `LOCAL_SYNTHETIC_IMPLEMENTED`, `STATIC_CHECKED` | 민감정보를 지운 내부 검토용 복사본을 읽는 소스가 있음. 네트워크 전송과 브라우저 저장을 막지만, 승인 진위와 고객사별 데이터 분리는 구현하지 않음 |
 | Bedrock 내부 연결 코드 | `IMPLEMENTED_GUARDED_NOT_ACTIVE` | `llm-gateway` 안에 코드가 있으나 기본값은 합성 응답이며 실제 호출은 잠겨 있음. 필요한 AWS 권한도 기준 설계에 없음 |
 | 별도 Bedrock 실험 | `BRANCH_PROTOTYPE_UNDEPLOYED` | API Gateway, Lambda, Guardrail 실험 코드와 단위 검사가 있음. 과거 삭제 완료 이력 2건과 현재 관련 리소스 0개만 다른 세션이 읽기 전용으로 확인함. 성공한 AI 응답은 확인하지 못함 |
@@ -402,7 +406,7 @@ metadata를 검사하지만 승인자 진위나 선언 해시의 정본 여부�
 |---|---|---|---|
 | React/Nginx 화면 | 업무 동적 경로 16개와 `/privacy`, `/terms` 정적 안내 | 로컬 127.0.0.1 바인딩; ECR 게시·ECS 기동 미확인 | `LOCAL_SYNTHETIC_IMPLEMENTED` |
 | FastAPI 업무 API | 가입·인증·동의·이력서·지원·기업 프로필·추천·감사 | 합성 seed 전용; 운영 키·migration·service discovery 미완료 | `LOCAL_SYNTHETIC_IMPLEMENTED` |
-| API 소스·효과 계약 | API 라우트 28개 + agent 별칭 6개 + gateway 별칭 4개, 합계 38개 항목을 33개 작업으로 정리. 같은 작업의 저장·감사·외부 호출 효과를 소스 지문으로 고정 | 소스 구조를 보는 부분 검사다. 실제 분기 실행, 횟수, 원자성, 후속 서비스 수신과 완전한 OpenAPI 계약은 증명하지 않음 | `STATIC_CHECKED` |
+| API 소스·효과 계약 | API 라우트 30개 + agent 별칭 6개 + gateway 별칭 4개, 합계 40개 경로를 35개 처리 함수로 정리. 같은 작업의 저장·감사·외부 호출 효과를 소스 지문으로 고정 | 소스 구조를 보는 부분 검사다. 실제 분기 실행, 횟수, 원자성, 후속 서비스 수신과 완전한 OpenAPI 계약은 증명하지 않음 | `STATIC_CHECKED` |
 | 결정론적 matcher | 기술 70, 경력 20, 희망 직무 10의 버전 고정 산식 | 실제 모델 품질·편향·설명 충실도 평가를 대신하지 않음 | `LOCAL_SYNTHETIC_IMPLEMENTED` |
 | 설명 생성기 | 점수·정렬을 바꾸지 않는 설명과 `company_alignment` 생성 | 의미 grounding과 금칙 결론 검증 없음; alignment의 `score_effect=NONE` | `LOCAL_SYNTHETIC_IMPLEMENTED` |
 | OpenDART 공개정보 보조 기능 | 회사 개황과 최근 1년 공시 최대 5건을 별도 복사본으로 저장하고 출처 시각을 표시 | 기본은 합성 예시를 바로 읽는다. 선택적인 SQS FIFO→Lambda 작업자 소스도 있으나 패키지·키·DB 권한·AWS 자원·실행 증거는 없음. 등록 기업명 불일치·조회 실패 때 기존 정상 복사본을 유지하며 점수 영향은 없음 | 로컬 `LOCAL_SYNTHETIC_IMPLEMENTED`, 작업자 `PROTOTYPE_UNDEPLOYED` |
@@ -467,7 +471,7 @@ SSE-S3이며 별도 KMS 키는 연결하지 않았다.
 판정하지 않으며 자동 승격하지 않는다. AWS 배포, 이미지 등록과 Lambda 실행 결과도 별도 검증
 기록이 생기기 전에는 확인된 사실로 쓰지 않는다.
 
-공개 검증 기록에는 MLOps Terraform 단계 3/3, 경계 시험 12/12, 합성 파이프라인 단위시험 14/14가
+공개 검증 기록에는 MLOps Terraform 단계 3/3, 경계 시험 19/19, 합성 파이프라인 단위시험 22/22가
 PASS로 적혀 있다. 이는 코드와 계획의 정해진 조건만 확인한 결과다. 기준 110개 구성은 그대로 유지하고,
 전용 페이지와 PDF에서 7단계 흐름과 계획 상태를 별도로 제공한다.
 
@@ -660,9 +664,9 @@ ALB listener는 HTTPS 443이고 default action도 `web` target group이다. Targ
 `explanation_mode` query는 합성 장애 주입이 명시적으로 켜진 로컬 시험에서만 사용한다.
 정상 운영 API의 공개 기능으로 승계하지 않는다.
 
-`api_surface.json`은 위 API 28개와 agent 별칭 경로 6개, gateway 별칭 경로 4개를 합친
-38개 라우트 항목을 33개 작업 묶음으로 고정한다. `api_effects.json`은 같은 33개 처리 함수의
-회원·기업 DB, 감사, Redis, 추천 처리, 설명 중계와 입력 기록 효과를 기록하고 도우미 14개와 선택 순서
+`api_surface.json`은 위 API 30개와 agent 별칭 경로 6개, gateway 별칭 경로 4개를 합친
+40개 라우트 항목을 35개 처리 함수로 고정한다. `api_effects.json`은 같은 35개 처리 함수의
+회원·기업 DB, 감사, Redis, 추천 처리, 설명 중계와 입력 기록 효과를 기록하고 도우미 20개와 선택 순서
 9개를 지문으로 대조한다. 두 계약은 `AST_PARTIAL` 소스 목록이다. 실행 분기의 지배 관계,
 효과 발생 횟수, 트랜잭션 원자성, 실제 후속 서비스 수신이나 versioned OpenAPI 전체를
 검증한 결과가 아니다.
@@ -978,9 +982,8 @@ persistence를 막고 `EXTERNAL_PREVIEW` 입력을 거부한다. 같은 파일 �
 - 완전 생성형 로컬 출력은 별도 암호화·접근통제·보존 설정이 없고 명시적 `--overwrite`를 쓰면
   기존 파일을 바꿀 수 있다. 서버리스 경로의 S3 실행 번호 중복 방지는 이 로컬 동작과 구분한다.
 - 실행 중 gateway 컨테이너와 최신 소스 해시가 달라 최신 이미지의 보안 회귀시험 완료를 주장하지 않는다.
-- API 소스·효과 목록과 MLOps 시험 묶음을 포함한 전체 AWS 비접속 회귀 92건은 통과했다. AST·스키마·합성 시험 자료의
-  이전 통합 기록이다. 현재 공개 runner는 94개를 선언하지만 전체를 독립 재실행한 결과로 바꾸지 않는다.
-  두 수치 모두 실행 보안시험이나 통제 효과 판정이 아니다.
+- 공개 릴리스 검사는 Lab·MLOps·OpenDART의 정적 검사 3개와 단위시험 묶음 3개를 차례로 실행한다.
+  단위시험 건수와 검사 단계 수는 서로 다른 숫자이며, 둘 다 실행 보안시험이나 통제 효과 판정을 뜻하지 않는다.
 
 ### 6.3 기존 모습을 보존하려고 추가하지 않은 구성
 
@@ -1170,7 +1173,7 @@ fallback 또는 운영 SLA로 표현하지 않는다.
 | 로컬 6개 container가 health 응답 | 조회 시점의 Compose 환경이 응답함 | 이전 빌드의 합성 경로가 기동한 관찰 | 최신 소스가 모두 빌드·시험됐다는 결론 |
 | gateway source/container hash 불일치 | 실행 이미지가 최신 소스와 다름 | 재빌드·회귀시험 필요 | 최신 Bedrock adapter가 실행 중이라는 결론 |
 | runtime Terraform에 변수·환경 계약 추가 | 기존 resource/module block 추가 없음 | 별도 변경 세트가 배선 계약을 확장 | 110-resource mock plan을 최신 변경으로 재검증했다는 결론 |
-| 이전 소스 정적 회귀 92/92 | 당시 AST, 스키마와 합성 시험 자료의 기대 성공·실패가 일치 | 이전 소스 계약의 정적 회귀 | 현재 공개 runner 94개 전체, 서버 기동, 최신 이미지, AWS 통합·성능 증명 |
+| 공개 릴리스 검사 6단계 | Lab·MLOps·OpenDART 정적 검사와 단위시험 묶음이 통과 | 공개된 소스 계약의 회귀 확인 | 장기 운영 안정성·성능·통제 효과 증명 |
 | Bedrock 실험 단위시험 통과 | mock client 기반 handler 계약 확인 | 입력 제한·오류 mapping의 코드 수준 확인 | AWS 배포, 모델 품질, guardrail 운영 효과 확인 |
 
 ### 7.9 MLOps 자료·학습·승인에 문제가 생긴 경우
@@ -1212,10 +1215,9 @@ fallback 또는 운영 SLA로 표현하지 않는다.
 13. 업무망 PC 수량과 운영체제 구분 외에 단말 관리·인증·접속·수집 체계는 확인되지 않았다.
 14. `docs/current/README.md`가 요구하는 Phase 1 선행조건은 승인 문서로 승격되지 않았다.
     이 재현 모델은 그 절차 상태를 해소하거나 승인을 대신하지 않는다.
-15. 이전 소스 정적 회귀 기록은 MLOps 시험 묶음을 포함해 92/92다. 현재 공개 runner 선언은
-    94개지만 전체 94개를 독립 재실행한 기록으로 승계하지 않는다. AWS, Docker, Bedrock과 서버를
-    실행하지 않았고 과거 설명 중계 컨테이너 지문도 소스와 달라 최신 이미지의 기동·통합 검증은 미완료다.
-16. API 소스·효과 계약은 33개 작업의 AST 지문과 선택 순서를 확인한다. 제어 흐름 지배,
+15. 현재 공개 릴리스 검사는 6단계다. Lab·MLOps·OpenDART마다 정적 검사와 단위시험 묶음을 실행하지만,
+    단말 180대 관찰이나 장기 운영 안정성·성능을 확인하는 시험은 아니다.
+16. API 소스·효과 계약은 35개 처리 함수의 AST 지문과 선택 순서를 확인한다. 제어 흐름 지배,
     효과 실행 횟수, 트랜잭션 원자성과 후속 서비스 수신은 증명하지 않는다.
 17. 신규 기업은 모델 기본값 `approved`로 생성되며 상태 전환과 전역 업무 gate가 없다.
 18. 로컬 Evidence Desk는 무통신 정적 reader다. 승인 발급, 운영 tenant isolation, audit log나
@@ -1310,9 +1312,9 @@ fallback 또는 운영 SLA로 표현하지 않는다.
 | 명시된 candidate API 경로 | `context/raw/C플러스-범위델타-구직자흐름.md#1.5` |
 | 파기와 저장면 계획 | `context/raw/Jcareer-흐름과-기술취약점.md#2.5` |
 | 로컬 네 서비스·두 논리 DB·Redis | 별도 `asis-runtime-mvp/src/runtime/README.md`, `compose.yaml` |
-| 업무 API 28개 경로 선언 | 별도 `asis-runtime-mvp/src/runtime/api/app/main.py` |
-| 전체 API 라우트 항목 38개·작업 33개 | 별도 `asis-runtime-mvp/src/runtime/contracts/api_surface.json`, `scripts/check_api_surface_contract.py` |
-| 33개 처리 함수의 효과와 선택 순서 | 별도 `asis-runtime-mvp/src/runtime/contracts/api_effects.json`, `scripts/check_api_effects_contract.py` |
+| 업무 API 30개 경로 선언 | `src/runtime/api/app/main.py` |
+| 전체 API 라우트 40개·처리 함수 35개 | `src/runtime/contracts/api_surface.json`, `scripts/check_api_surface_contract.py` |
+| 35개 처리 함수의 효과와 선택 순서 | `src/runtime/contracts/api_effects.json`, `scripts/check_api_effects_contract.py` |
 | OpenDART 공개정보 보조 기능 | 별도 `asis-runtime-mvp/src/runtime/api/app/opendart.py`, `api/app/opendart_dispatch.py`, `api/app/main.py`, `opendart_worker/handler.py`, `web/src/App.jsx`, `tests/opendart_*_contract.py` |
 | 합성 MLOps 로컬 학습·평가 | `src/mlops/README.md`, `generate_synthetic_training.py`, `run_runtime_pipeline.py`, `tests/test_synthetic_pipeline.py`; 운영 추천 연결 없음 |
 | 합성 MLOps 서버리스 경로 | `terraform/serverless-mlops/README.md`, `main.tf`, `tests/stages.tftest.hcl`, `src/mlops/lambda_handler.py`; 기준 110개와 별도인 0/13/14 계획, AWS 배포 결과는 없음 |
@@ -1336,6 +1338,7 @@ fallback 또는 운영 SLA로 표현하지 않는다.
 - 배포용 PDF 명세: [`JCAREER_ASIS_SYSTEM_SPEC.pdf`](JCAREER_ASIS_SYSTEM_SPEC.pdf)
 - 편집 원본: [`JCAREER_ASIS_FLOW.drawio`](JCAREER_ASIS_FLOW.drawio)
 - PNG: [`JCAREER_ASIS_FLOW.drawio.png`](JCAREER_ASIS_FLOW.drawio.png)
+- 상세 기술 원본: [`JCAREER_ASIS_2AZ.drawio`](JCAREER_ASIS_2AZ.drawio)
 - 상호작용 도면 설명: [`architecture.html`](architecture.html). 전체 보기 1개와 구직자 추천,
   기업용 인재 찾기, AI 설명, MLOps 학습·평가, 기록·탐지의 서비스·보조 경로 5개가 있다. 항목을
   누르면 관련 구간과 번호가 붙은 3단계 설명, 확인 수준, 해당 상세 명세 바로가기가 함께 바뀐다.
@@ -1352,9 +1355,12 @@ fallback 또는 운영 SLA로 표현하지 않는다.
 > 아래 PASS는 해당 행에 적힌 검사만 통과했다는 뜻이다. AWS 배포나 실제 서비스 운영을
 > 통과했다는 뜻은 아니다.
 
-2026-08-27~29에 원본 대조, 로컬 정적 검사, 문서 렌더링 검사를 수행했다. AWS 변경·배포와
-`terraform apply`는 수행하지 않았다. AIMS와 Bedrock의 현재 상태는 별도 동료 세션의 읽기
-전용 관찰을 출처 그대로 구분했으며, 아래 PASS는 각 행에 적힌 범위만 뜻한다.
+2026-08-27~30에 원본 대조, 로컬 정적 검사, 문서 렌더링 검사를 수행했다.
+기준 설계인 `terraform/asis`에는 AWS 변경이나 `terraform apply`를 수행하지 않았다.
+별도 검증용 `terraform/lab`에서는 24개 생성 계획과 Bedrock 직접 호출을 확인했지만,
+IAM 역할 생성 권한이 없어 적용이 중단됐다. 그 과정에서 만들어진 16개 항목은 같은 저장
+계획으로 지워 현재 Lab 상태를 0개로 되돌렸다. 따라서 애플리케이션 전체 경로가 배포됐거나
+서비스가 운영 중이라는 뜻이 아니다. 아래 PASS는 각 행에 적힌 범위만 뜻한다.
 
 | 검사 | 결과 |
 |---|---|
@@ -1365,14 +1371,16 @@ fallback 또는 운영 SLA로 표현하지 않는다.
 | 기대 GAP 대조 | 미완료 — 17건 중 PASS 5, FAIL 5, 문서 판정 7. FAIL은 `GAP-TRAIL-01`, `GAP-LOG-01`, `GAP-RDS-01`, `GAP-S3-01`, `GAP-CACHE-01`; 빈 scanner `rule_id`와 조건 범위 충돌을 해소하지 않음 |
 | 스캐너 결과 분류 | `PROVISIONAL` — 중복 정규화 후 117건을 보존했으나 사람 판정 전이며 통과로 읽지 않음 |
 | 인용 anchor | PASS — strict mode 55개, broken 0개 |
-| 로컬 합성 런타임 소스 | PASS(이전 소스 정적 범위) — 다른 세션에서 당시 `tests/run_all_tests.sh` 92/92, FAIL 0을 확인했다. 현재 공개 runner 선언은 94개이며 이 저장소만으로 전체를 다시 실행했다고 주장하지 않는다. API/agent/gateway 라우트 항목 28/6/4개와 70·20·10 점수식, `score_effect=NONE`은 별도 정적 대조했다. AWS·Docker·Bedrock·서버·Terraform plan/apply는 미실행 |
-| MLOps 합성 파이프라인 | PASS(단위시험 범위) — `python -m unittest src/mlops/tests/test_synthetic_pipeline.py`를 실행해 14/14, FAIL 0을 확인했다. 합성 SQLite와 테스트 대역 S3·DynamoDB로 원문 잔류, 중복 실행과 실패 경계를 확인한 결과이며 AWS 자원·모델 품질 판정은 포함하지 않음 |
-| MLOps 전용 Terraform | PASS(코드·계획 범위) — 전용 루트 경계 시험 12/12, mock 단계 시험 3/3과 `disabled 0`, `bootstrap 13`, `runtime 14` 계획을 확인했다. 기준 110개와 별도이며 AWS API, apply/destroy, 이미지 등록과 Lambda 실행은 하지 않음 |
-| API 소스·효과 계약 | PASS(정적 범위) — `api_surface.json` 라우트 항목 38/38과 작업 묶음 33개, 효과 회귀 17/17, 처리 함수 33개·도우미 14개·선택 순서 9개 확인. `AST_PARTIAL`이며 제어 흐름 지배·실행 횟수·원자성·실제 후속 서비스 수신을 증명하지 않음 |
-| 로컬 Evidence Desk | PASS(정적 범위) — validator·view-model 23건과 무통신·무브라우저저장·무자동판정 경계가 전체 runner에 포함. 승인 입력이 없어 snapshot 로드 화면과 실제 접근성은 관찰하지 않음 |
+| 공개 합성 런타임 소스 | PASS(정적·단위시험 범위) — 현재 공개 릴리스 검사 6단계가 통과했다. API/agent/gateway 라우트 30/6/4개와 70·20·10 점수식, `score_effect=NONE`을 정적 대조했다. 단말·성능·장기 운영 결과는 포함하지 않는다. |
+| AWS 검증 계정 Bedrock 직접 호출 | PASS(직접 호출 범위) — APAC Nova Lite에 합성 문장 한 건을 보내 입력 39·출력 53토큰 응답을 확인했다. 응답 본문과 계정 식별자는 기록하지 않았다. API→gateway→broker 전체 경로의 성공을 뜻하지 않는다. |
+| AWS 검증 Lab 재배포 | BLOCKED 후 정리 완료 — 24개 생성 계획은 통과했으나 IAM 역할 생성 권한 부족으로 적용이 중단됐다. 부분 생성된 16개 항목만 지우는 저장 계획을 적용해 현재 Lab 상태를 0개로 되돌렸다. |
+| MLOps 합성 파이프라인 | PASS(단위시험 범위) — `python -m unittest src/mlops/tests/test_synthetic_pipeline.py`를 실행해 22/22, FAIL 0을 확인했다. 합성 SQLite와 테스트 대역 S3·DynamoDB로 원문 잔류, 중복 실행과 실패 경계를 확인한 결과이며 AWS 자원·모델 품질 판정은 포함하지 않음 |
+| MLOps 전용 Terraform | PASS(코드·계획 범위) — 전용 루트 경계 시험 19/19, mock 단계 시험 3/3과 `disabled 0`, `bootstrap 13`, `runtime 14` 계획을 확인했다. 기준 110개와 별도이며 AWS API, apply/destroy, 이미지 등록과 Lambda 실행은 하지 않음 |
+| API 소스·효과 계약 | PASS(정적 범위) — `api_surface.json` 라우트 40개와 처리 함수 35개, 효과 회귀 17/17, 도우미 20개·선택 순서 9개 확인. `AST_PARTIAL`이며 제어 흐름 지배·실행 횟수·원자성·실제 후속 서비스 수신을 증명하지 않음 |
+| 로컬 Evidence Desk | PASS(정적 범위) — validator·view-model·artifact 결속 시험 28건과 무통신·무브라우저저장·무자동판정 경계를 확인했다. 승인된 복사본 반입이나 운영 배포를 확인한 결과는 아님 |
 | 별도 Bedrock 실험 브랜치 | PASS(단위시험 범위) — mock client 기반 7/7 통과. 실제 Bedrock 호출, AWS 배포, 기준 API 통합을 검증한 결과가 아님 |
 | Orca 교차 세션 대조 | PASS — 런타임 Run, TRACE 기획, Terraform 독립 검증, AIMS Desk UX 세션을 분리 조회. TRACE·JC-RECEIPT는 제안 상태이고 신규 AS-IS 서비스가 아니며, 확인된 변화는 기존 API/gateway/cache와 두 대시보드의 소스 계약임을 재확인 |
-| Claude/Codex/Orca 검토 | 초기 AWS 경계와 문서 무결성 지적을 반영했다. v3.4 교차 검토의 목록 구조, 수량 근거, Bedrock 이력, AIMS 상태 지적을 보완한 뒤 `APPROVE`를 받았다. v3.5에서는 비기술 독자용 요약과 용어 풀이를 추가했다. v3.6~3.7에서는 독립 Codex 두 명이 한글 가독성과 범위·정확성을 나누어 검토했고 지적을 고친 뒤 `PASS`를 받았다. v3.10에서는 별도 검토자가 구형 MLOps 설명과 최신 0/13/14 서버리스 루트의 충돌을 찾아 데이터·보안·운영·장애 경계를 다시 맞췄다 |
+| Claude/Codex/Orca 검토 | 독립 검토 의견을 문서 보완에 반영했다. 목록 구조, 수량 근거, Bedrock 관찰 범위, MLOps 경계와 쉬운 한국어 표현을 교차 확인했다. 공개 승인 여부와 통제 충족 여부는 사람이 별도로 결정한다. |
 | draw.io XML 구조 | PASS — XML 형식, ID 중복, 연결선 양 끝, 그룹 구조를 자동 검사 |
 | PNG 크기 및 시각 검토 | PASS — 2400×1400, 왼쪽에서 오른쪽으로 이어지는 6단계 기준 흐름과 승인 전 MLOps 안내 영역의 분리 상태를 눈으로 확인 |
 | HTML 구조 및 로컬 링크 | PASS — HTML 2개, 내부 anchor·로컬 산출물 링크 broken 0, duplicate ID 0 |

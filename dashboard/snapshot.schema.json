@@ -1,0 +1,372 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jcareer.invalid/schemas/consulting-snapshot-v1.json",
+  "title": "J-Career consulting snapshot v1",
+  "description": "Human-approved, redacted, single-tenant facts for a read-only consulting surface. This schema does not calculate assessment outcomes.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "snapshot_id",
+    "title",
+    "tenant",
+    "audience",
+    "approval",
+    "redaction",
+    "provenance",
+    "scope",
+    "observations"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "jcareer-consulting-snapshot/v1"
+    },
+    "snapshot_id": {
+      "type": "string",
+      "pattern": "^snap-[a-z0-9][a-z0-9-]{5,63}$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "tenant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenant_ref", "display_label"],
+      "properties": {
+        "tenant_ref": {
+          "$ref": "#/$defs/tenantRef"
+        },
+        "display_label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        }
+      }
+    },
+    "audience": {
+      "enum": ["INTERNAL_REVIEW"]
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "approved_by_ref", "approved_at", "source_ref"],
+      "properties": {
+        "state": {
+          "enum": ["APPROVED_FOR_INTERNAL_REVIEW"]
+        },
+        "approved_by_ref": {
+          "type": "string",
+          "pattern": "^reviewer-[a-z0-9][a-z0-9-]{2,47}$"
+        },
+        "approved_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source_ref": {
+          "$ref": "#/$defs/logicalReference"
+        }
+      }
+    },
+    "redaction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "contains_direct_identifiers",
+        "method_version",
+        "reviewed_by_ref"
+      ],
+      "properties": {
+        "state": {
+          "const": "REDACTED"
+        },
+        "contains_direct_identifiers": {
+          "const": false
+        },
+        "method_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "reviewed_by_ref": {
+          "type": "string",
+          "pattern": "^reviewer-[a-z0-9][a-z0-9-]{2,47}$"
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["generated_at", "generator_version", "source_artifacts"],
+      "properties": {
+        "generated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "generator_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "source_commit": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{7,64}$"
+        },
+        "source_artifacts": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 100,
+          "items": {
+            "$ref": "#/$defs/sourceArtifact"
+          }
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["environment", "deployment_state", "customer_sides"],
+      "properties": {
+        "environment": {
+          "const": "AS_IS_SYNTHETIC"
+        },
+        "deployment_state": {
+          "enum": [
+            "MODEL_ONLY",
+            "LOCAL_RUNTIME_OBSERVED",
+            "LAB_RUNTIME_OBSERVED",
+            "NOT_DECLARED"
+          ]
+        },
+        "customer_sides": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "enum": ["candidate", "company"]
+          }
+        }
+      }
+    },
+    "observations": {
+      "type": "array",
+      "maxItems": 500,
+      "items": {
+        "$ref": "#/$defs/observation"
+      }
+    }
+  },
+  "$defs": {
+    "tenantRef": {
+      "type": "string",
+      "pattern": "^tenant-[a-z0-9][a-z0-9-]{2,47}$"
+    },
+    "logicalArtifactRef": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240,
+      "pattern": "^(?!\\.{1,2}(?:/|$))(?!.*\\/\\.{1,2}(?:/|$))[^/\\\\:#][^\\\\:#]*(?:/[^/\\\\:#][^\\\\:#]*)*$"
+    },
+    "logicalReference": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240,
+      "pattern": "^(?!\\.{1,2}(?:/|$))(?!.*\\/\\.{1,2}(?:/|$))[^/\\\\:#][^\\\\:#]*(?:/[^/\\\\:#][^\\\\:#]*)*(?:#[^#\\r\\n]+)?$"
+    },
+    "sourceArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenant_ref", "artifact_ref", "kind", "sha256", "captured_at"],
+      "properties": {
+        "tenant_ref": {
+          "$ref": "#/$defs/tenantRef"
+        },
+        "artifact_ref": {
+          "$ref": "#/$defs/logicalArtifactRef"
+        },
+        "kind": {
+          "enum": ["assessment", "measurement", "scanner", "runtime", "plan", "document"]
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "captured_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "measuredFact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "value"],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "value": {
+          "type": ["string", "number", "boolean"]
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        }
+      }
+    },
+    "humanDecision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner", "display_text", "decided_by_ref", "decided_at", "source_ref"],
+      "properties": {
+        "owner": {
+          "const": "HUMAN"
+        },
+        "display_text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "decided_by_ref": {
+          "type": "string",
+          "pattern": "^reviewer-[a-z0-9][a-z0-9-]{2,47}$"
+        },
+        "decided_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source_ref": {
+          "$ref": "#/$defs/logicalReference"
+        }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tenant_ref",
+        "observation_id",
+        "domain",
+        "customer_side",
+        "title",
+        "statement",
+        "collection_state",
+        "source_refs",
+        "evidence_refs",
+        "measured_facts"
+      ],
+      "properties": {
+        "tenant_ref": {
+          "$ref": "#/$defs/tenantRef"
+        },
+        "observation_id": {
+          "type": "string",
+          "pattern": "^obs-[a-z0-9][a-z0-9-]{2,63}$"
+        },
+        "domain": {
+          "enum": [
+            "customer-journey",
+            "data-boundary",
+            "access-and-audit",
+            "ai-score-and-explanation",
+            "retention-and-deletion",
+            "infrastructure-model",
+            "provider-boundary"
+          ]
+        },
+        "customer_side": {
+          "enum": ["candidate", "company", "platform"]
+        },
+        "customer_sides": {
+          "description": "Optional multi-customer routing metadata. customer_side remains the legacy primary projection and must be included. Platform observations use customer_side only.",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "enum": ["candidate", "company"]
+          }
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1200
+        },
+        "collection_state": {
+          "enum": [
+            "RECORDED",
+            "NOT_MEASURED",
+            "NOT_IMPLEMENTED",
+            "UNVERIFIED",
+            "INPUT_MISSING"
+          ]
+        },
+        "source_refs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/logicalReference"
+          }
+        },
+        "evidence_refs": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/logicalReference"
+          }
+        },
+        "measured_facts": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {
+            "$ref": "#/$defs/measuredFact"
+          }
+        },
+        "human_decision": {
+          "$ref": "#/$defs/humanDecision"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["customer_sides"],
+            "properties": {"customer_side": {"const": "platform"}}
+          },
+          "then": false
+        },
+        {
+          "if": {
+            "required": ["customer_sides"],
+            "properties": {"customer_side": {"const": "candidate"}}
+          },
+          "then": {
+            "properties": {"customer_sides": {"contains": {"const": "candidate"}}}
+          }
+        },
+        {
+          "if": {
+            "required": ["customer_sides"],
+            "properties": {"customer_side": {"const": "company"}}
+          },
+          "then": {
+            "properties": {"customer_sides": {"contains": {"const": "company"}}}
+          }
+        }
+      ]
+    }
+  }
+}

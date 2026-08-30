@@ -82,7 +82,24 @@ def public_snapshot(snapshot: object) -> dict[str, object] | None:
 
     if not isinstance(snapshot, dict):
         return None
+    supplied_hash = snapshot.get("content_sha256")
+    unhashed_snapshot = {
+        key: value for key, value in snapshot.items() if key != "content_sha256"
+    }
+    if (
+        not isinstance(supplied_hash, str)
+        or not re.fullmatch(r"[0-9a-f]{64}", supplied_hash)
+        or supplied_hash != _canonical_hash(unhashed_snapshot)
+    ):
+        return None
     if snapshot.get("schema_version") != SNAPSHOT_SCHEMA_VERSION:
+        return None
+    source_kind = snapshot.get("source_kind")
+    synthetic = snapshot.get("synthetic")
+    if not (
+        (source_kind == "synthetic_fixture" and synthetic is True)
+        or (source_kind == "live_open_api" and synthetic is False)
+    ):
         return None
     company = snapshot.get("company")
     disclosures = snapshot.get("disclosures")
@@ -119,9 +136,6 @@ def public_snapshot(snapshot: object) -> dict[str, object] | None:
                     "remarks": _clean_text(row.get("remarks"), maximum=120),
                 }
             )
-    source_kind = snapshot.get("source_kind")
-    if source_kind not in {"synthetic_fixture", "live_open_api"}:
-        source_kind = "unknown"
     disclosure_state = disclosures.get("state")
     if disclosure_state not in {"AVAILABLE", "NO_DATA", "UNAVAILABLE"}:
         disclosure_state = "UNAVAILABLE"
@@ -143,7 +157,7 @@ def public_snapshot(snapshot: object) -> dict[str, object] | None:
         "schema_version": SNAPSHOT_SCHEMA_VERSION,
         "provider": "OpenDART",
         "source_kind": source_kind,
-        "synthetic": snapshot.get("synthetic") is True,
+        "synthetic": synthetic,
         "retrieved_at": _clean_text(snapshot.get("retrieved_at"), maximum=40),
         "company": projected_company,
         "disclosures": {

@@ -5,11 +5,14 @@ import json
 import os
 import sys
 import tempfile
+from contextlib import contextmanager
+from datetime import datetime, timezone
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "src/runtime/api"))
+FIXED_TIME = datetime(2026, 8, 29, 1, 2, 3, tzinfo=timezone.utc)
 
 
 def recursive_keys(value: object) -> set[str]:
@@ -32,6 +35,7 @@ def main() -> None:
         root = Path(temporary)
         os.environ["MEMBER_DATABASE_URL"] = f"sqlite:///{root / 'member.db'}"
         os.environ["COMPANY_DATABASE_URL"] = f"sqlite:///{root / 'company.db'}"
+        os.environ["OUTCOME_DATABASE_URL"] = f"sqlite:///{root / 'outcome.db'}"
         os.environ["AUTO_SEED"] = "true"
         os.environ["OPENDART_MODE"] = "fixture"
         os.environ.pop("OPENDART_API_KEY", None)
@@ -39,8 +43,20 @@ def main() -> None:
         from fastapi.testclient import TestClient
 
         from app import main as api_main
+        from app.opendart import _canonical_hash
+        from app.opendart_results import OpenDartResultExpired, build_refresh_result
 
-        with TestClient(api_main.app) as client:
+        @contextmanager
+        def managed_client():
+            try:
+                with TestClient(api_main.app) as active_client:
+                    yield active_client
+            finally:
+                api_main.member_engine.dispose()
+                api_main.company_engine.dispose()
+                api_main.outcome_engine.dispose()
+
+        with managed_client() as client:
             def login(email: str) -> str:
                 result = client.post(
                     "/api/v1/auth/login",
@@ -118,12 +134,136 @@ def main() -> None:
                 json={"corp_code": "90000001"},
             )
             api_main.enqueue_refresh = original_enqueue
-            os.environ["OPENDART_DISPATCH_MODE"] = "fixture_inline"
             assert queued.status_code == 202, queued.text
             assert queued.json()["refresh"]["state"] == "QUEUED"
             assert queued.json()["company_profile"]["opendart"]["state"] == "REFRESH_QUEUED"
             assert len(queued_messages) == 1
             assert "api_key" not in json.dumps(queued_messages[0]).lower()
+            checks += 1
+
+            duplicate = client.post(
+                "/api/v1/recruiter/company-profile/opendart/refresh",
+                headers=recruiter_headers,
+                json={"corp_code": "90000001"},
+            )
+            assert duplicate.status_code == 202, duplicate.text
+            assert duplicate.json()["refresh"]["state"] == "ALREADY_PENDING"
+            assert duplicate.json()["refresh"]["request_id"] == queued_messages[0]["request_id"]
+            assert len(queued_messages) == 1
+            checks += 1
+
+            original_get_result = api_main.get_refresh_result
+            original_delete_result = api_main.delete_refresh_result
+            api_main.get_refresh_result = lambda _request_id: None
+            pending = client.post(
+                "/api/v1/recruiter/company-profile/opendart/collect",
+                headers=recruiter_headers,
+            )
+            assert pending.status_code == 202, pending.text
+            assert pending.json()["refresh"]["state"] == "PENDING"
+            checks += 1
+
+            with api_main.company_engine.begin() as connection:
+                connection.exec_driver_sql(
+                    "UPDATE companies SET opendart_pending_requested_at = ? WHERE id = ?",
+                    (datetime(2000, 1, 1, tzinfo=timezone.utc), queued_messages[0]["company_id"]),
+                )
+            timed_out = client.post(
+                "/api/v1/recruiter/company-profile/opendart/collect",
+                headers=recruiter_headers,
+            )
+            assert timed_out.status_code == 200, timed_out.text
+            assert timed_out.json()["refresh"]["state"] == "RESULT_TIMEOUT"
+            assert timed_out.json()["company_profile"]["opendart"]["pending_request_id"] is None
+            checks += 1
+
+            api_main.enqueue_refresh = fake_enqueue
+            requeued_after_timeout = client.post(
+                "/api/v1/recruiter/company-profile/opendart/refresh",
+                headers=recruiter_headers,
+                json={"corp_code": "90000001"},
+            )
+            api_main.enqueue_refresh = original_enqueue
+            assert requeued_after_timeout.status_code == 202, requeued_after_timeout.text
+            assert requeued_after_timeout.json()["refresh"]["state"] == "QUEUED"
+            assert len(queued_messages) == 2
+            checks += 1
+
+            expired_deleted: list[tuple[str, str]] = []
+
+            def fake_expired_result(_request_id: str) -> None:
+                raise OpenDartResultExpired("synthetic expired result")
+
+            api_main.get_refresh_result = fake_expired_result
+            api_main.delete_refresh_result = (
+                lambda request_id, company_id: expired_deleted.append(
+                    (request_id, company_id)
+                )
+            )
+            expired = client.post(
+                "/api/v1/recruiter/company-profile/opendart/collect",
+                headers=recruiter_headers,
+            )
+            assert expired.status_code == 200, expired.text
+            assert expired.json()["refresh"]["state"] == "RESULT_EXPIRED"
+            assert expired.json()["company_profile"]["opendart"]["pending_request_id"] is None
+            assert expired_deleted == [
+                (queued_messages[-1]["request_id"], queued_messages[-1]["company_id"])
+            ]
+            checks += 1
+
+            api_main.get_refresh_result = original_get_result
+            api_main.delete_refresh_result = original_delete_result
+            api_main.enqueue_refresh = fake_enqueue
+            requeued = client.post(
+                "/api/v1/recruiter/company-profile/opendart/refresh",
+                headers=recruiter_headers,
+                json={"corp_code": "90000001"},
+            )
+            api_main.enqueue_refresh = original_enqueue
+            assert requeued.status_code == 202, requeued.text
+            assert requeued.json()["refresh"]["state"] == "QUEUED"
+            assert len(queued_messages) == 3
+            checks += 1
+
+            external_snapshot = dict(refreshed_profile["opendart"]["snapshot"])
+            external_snapshot["source_kind"] = "live_open_api"
+            external_snapshot["synthetic"] = False
+            external_snapshot["content_sha256"] = _canonical_hash(
+                {
+                    key: value
+                    for key, value in external_snapshot.items()
+                    if key != "content_sha256"
+                }
+            )
+            result_payload = build_refresh_result(
+                request_id=queued_messages[-1]["request_id"],
+                company_id=queued_messages[-1]["company_id"],
+                corp_code=queued_messages[-1]["corp_code"],
+                requested_at=FIXED_TIME,
+                completed_at=FIXED_TIME,
+                outcome="UPDATED",
+                snapshot=external_snapshot,
+                error_category=None,
+            )
+            deleted: list[tuple[str, str]] = []
+            api_main.get_refresh_result = lambda _request_id: result_payload
+            api_main.delete_refresh_result = (
+                lambda request_id, company_id: deleted.append((request_id, company_id))
+            )
+            collected = client.post(
+                "/api/v1/recruiter/company-profile/opendart/collect",
+                headers=recruiter_headers,
+            )
+            api_main.get_refresh_result = original_get_result
+            api_main.delete_refresh_result = original_delete_result
+            os.environ["OPENDART_DISPATCH_MODE"] = "fixture_inline"
+            assert collected.status_code == 200, collected.text
+            assert collected.json()["refresh"]["state"] == "UPDATED_EXTERNAL_SNAPSHOT"
+            assert collected.json()["company_profile"]["opendart"]["state"] == "AVAILABLE_LIVE"
+            assert deleted == [
+                (queued_messages[-1]["request_id"], queued_messages[-1]["company_id"])
+            ]
             checks += 1
 
             forbidden = client.post(
@@ -182,9 +322,6 @@ def main() -> None:
             assert public_after_failure["state"] == "STALE_LAST_KNOWN_GOOD"
             assert public_after_failure["snapshot"]["company"]["legal_name"]
             checks += 1
-
-        api_main.member_engine.dispose()
-        api_main.company_engine.dispose()
 
     print(f"OpenDART API boundary contract: PASS ({checks}/{checks})")
 

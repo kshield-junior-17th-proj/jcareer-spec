@@ -29,8 +29,53 @@ variable "enable_bedrock_live" {
   default     = false
 
   validation {
-    condition     = var.enable_bedrock_live == false
-    error_message = "컨테이너 전용 AWS 자격증명 경계가 승인·구현되기 전에는 Bedrock live를 계획할 수 없다."
+    condition = (
+      var.enable_bedrock_live == false ||
+      var.bedrock_live_acknowledgement == "JCAREER_SYNTHETIC_BEDROCK_APPROVED"
+    )
+    error_message = "Bedrock live에는 capability broker 경계를 전제로 한 별도 승인 문구가 필요하다."
+  }
+}
+
+variable "bedrock_live_acknowledgement" {
+  description = "합성 입력만 사용하는 Bedrock capability-broker 경로를 별도로 승인하는 문구."
+  type        = string
+  default     = "disabled"
+
+  validation {
+    condition = contains([
+      "disabled",
+      "JCAREER_SYNTHETIC_BEDROCK_APPROVED",
+    ], var.bedrock_live_acknowledgement)
+    error_message = "bedrock_live_acknowledgement는 disabled 또는 지정 승인 문구여야 한다."
+  }
+}
+
+variable "enable_opendart_live" {
+  description = "별도 승인·배포된 OpenDART serverless root를 capability broker로 연결할지 여부."
+  type        = bool
+  default     = false
+
+  validation {
+    condition = (
+      var.enable_opendart_live == false ||
+      var.opendart_live_acknowledgement == "JCAREER_SYNTHETIC_OPENDART_LIVE_APPROVED"
+    )
+    error_message = "OpenDART live에는 별도 serverless 배포 증적과 승인 문구가 필요하다."
+  }
+}
+
+variable "opendart_live_acknowledgement" {
+  description = "기존 OpenDART runtime-stage 배포를 합성 lab에 연결하는 별도 승인 문구."
+  type        = string
+  default     = "disabled"
+
+  validation {
+    condition = contains([
+      "disabled",
+      "JCAREER_SYNTHETIC_OPENDART_LIVE_APPROVED",
+    ], var.opendart_live_acknowledgement)
+    error_message = "opendart_live_acknowledgement는 disabled 또는 지정 승인 문구여야 한다."
   }
 }
 
@@ -86,5 +131,51 @@ variable "bedrock_model_id" {
   validation {
     condition     = var.bedrock_model_id == "apac.amazon.nova-lite-v1:0"
     error_message = "현재 lab은 검토한 APAC Nova Lite profile만 허용한다."
+  }
+}
+
+variable "enable_aws_https_preview" {
+  description = "CloudFront HTTPS를 통한 단기 합성 프리뷰 활성화 여부. 기본값은 false다."
+  type        = bool
+  default     = false
+
+  validation {
+    condition = (
+      var.enable_aws_https_preview == false ||
+      (
+        var.https_preview_acknowledgement == "JCAREER_SYNTHETIC_HTTPS_PREVIEW_APPROVED" &&
+        can(regex("^[0-9a-f]{64}$", var.preview_access_token_sha256))
+      )
+    )
+    error_message = "AWS HTTPS 프리뷰에는 별도 승인문구와 256-bit 임시 토큰이 필요하다."
+  }
+}
+
+variable "https_preview_acknowledgement" {
+  description = "단기 AWS HTTPS 프리뷰를 별도로 승인하는 명시적 문구."
+  type        = string
+  default     = "disabled"
+
+  validation {
+    condition = contains([
+      "disabled",
+      "JCAREER_SYNTHETIC_HTTPS_PREVIEW_APPROVED",
+    ], var.https_preview_acknowledgement)
+    error_message = "https_preview_acknowledgement는 disabled 또는 승인 문구만 허용한다."
+  }
+}
+
+variable "preview_access_token_sha256" {
+  description = "단기 토큰의 SHA-256 digest. 원문 토큰은 Terraform에 전달하지 않는다."
+  type        = string
+  default     = ""
+  sensitive   = true
+
+  validation {
+    condition = (
+      var.preview_access_token_sha256 == "" ||
+      can(regex("^[0-9a-f]{64}$", var.preview_access_token_sha256))
+    )
+    error_message = "preview_access_token_sha256은 비어 있거나 64자리 소문자 16진수여야 한다."
   }
 }

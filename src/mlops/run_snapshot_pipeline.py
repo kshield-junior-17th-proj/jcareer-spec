@@ -16,9 +16,12 @@ from pathlib import Path
 
 from export_runtime_training import (
     COMPANY_SOURCE_FIELDS,
+    COMPANY_SOURCE_CONTRACT,
     DIRECT_OR_FREE_TEXT_FIELDS_NOT_PERSISTED,
+    FEATURE_SCHEMA_VERSION,
     FIELDNAMES,
     MEMBER_SOURCE_FIELDS,
+    PROJECT_TEXT_FIELDS,
     RECEIPT_SCHEMA_VERSION,
     SCHEMA_VERSION,
     SYNTHETIC_ATTESTATION,
@@ -45,12 +48,15 @@ RUNTIME_REFERENCE_PATTERNS = {
 }
 MANIFEST_KEYS = {
     "schema_version",
+    "feature_schema_version",
     "synthetic_only",
     "synthetic_attestation",
     "member_data_used",
     "company_customer_data_used",
+    "company_source_contract",
     "purpose",
     "source_runtime_db_wired",
+    "company_source_contract",
     "ranking_runtime_wired",
     "runtime_wired",
     "row_count",
@@ -69,6 +75,7 @@ MANIFEST_KEYS = {
 }
 RECEIPT_KEYS = {
     "schema_version",
+    "feature_schema_version",
     "synthetic_only",
     "synthetic_attestation",
     "source_runtime_db_wired",
@@ -80,6 +87,8 @@ RECEIPT_KEYS = {
     "raw_source_values_persisted",
     "name_and_email_role",
     "self_intro_role",
+    "project_text_role",
+    "project_fields_used",
     "privacy_core_role",
     "training_feature_allowlist",
     "limitations",
@@ -124,12 +133,15 @@ def validate_feature_snapshot(dataset_directory: Path) -> dict[str, object]:
 
     required_manifest = {
         "schema_version": SCHEMA_VERSION,
+        "feature_schema_version": FEATURE_SCHEMA_VERSION,
         "synthetic_only": True,
         "synthetic_attestation": SYNTHETIC_ATTESTATION,
         "member_data_used": True,
         "company_customer_data_used": True,
+        "company_source_contract": COMPANY_SOURCE_CONTRACT,
         "purpose": "synthetic_runtime_challenger_training_demonstration",
         "source_runtime_db_wired": True,
+        "company_source_contract": COMPANY_SOURCE_CONTRACT,
         "ranking_runtime_wired": False,
         "runtime_wired": False,
         "dataset_file": "ranking_dataset.csv",
@@ -155,6 +167,7 @@ def validate_feature_snapshot(dataset_directory: Path) -> dict[str, object]:
 
     required_receipt = {
         "schema_version": RECEIPT_SCHEMA_VERSION,
+        "feature_schema_version": FEATURE_SCHEMA_VERSION,
         "synthetic_only": True,
         "synthetic_attestation": SYNTHETIC_ATTESTATION,
         "source_runtime_db_wired": True,
@@ -163,11 +176,17 @@ def validate_feature_snapshot(dataset_directory: Path) -> dict[str, object]:
         "raw_source_values_persisted": False,
         "name_and_email_role": "lineage_digest_input_only_not_model_features",
         "self_intro_role": "read_then_derived_to_overlap_features_raw_text_not_persisted",
+        "project_text_role": "reviewed_fields_read_then_derived_to_overlap_features_raw_text_not_persisted",
+        "project_fields_used": PROJECT_TEXT_FIELDS,
         "privacy_core_role": "synthetic_lifecycle_filter_not_model_training_consent",
         "training_feature_allowlist": TRAINING_FEATURES,
         "limitations": [
             "application status is a proxy and can reproduce historical recruiter behavior",
             "synthetic runtime data does not establish production model quality",
+            "token-overlap features can be gamed by copying job or company terms",
+            "rows from multiple synthetic company tenants are pooled only for a platform-wide demo",
+            "synthetic document passed/not_passed outcomes are not used as training labels",
+            "seed identity/profile markers do not cryptographically bind in-place job text",
             "no automatic release, compliance conclusion, or fairness conclusion is produced",
         ],
         "human_interpretation_required": True,

@@ -24,9 +24,13 @@ from sqlalchemy.engine import make_url
 from generate_synthetic_training import safe_output_directory, stable_split, write_artifact
 
 
-SCHEMA_VERSION = "jcareer-synthetic-runtime-ranking-dataset-v1"
-RECEIPT_SCHEMA_VERSION = "jcareer-synthetic-runtime-source-read-receipt-v1"
+SCHEMA_VERSION = "jcareer-synthetic-runtime-ranking-dataset-v2"
+RECEIPT_SCHEMA_VERSION = "jcareer-synthetic-runtime-source-read-receipt-v2"
+FEATURE_SCHEMA_VERSION = "jcareer-document-feature-snapshot-v1"
 SYNTHETIC_ATTESTATION = "JCAREER_SYNTHETIC_ONLY"
+RUNTIME_SEED = 20260826
+EXPECTED_SEED_COMPANY_PROFILE_VERSION = f"company-profile-seed-{RUNTIME_SEED}"
+COMPANY_SOURCE_CONTRACT = "runtime_seed_20260826_company_profile_marker"
 TRAINING_FEATURES = [
     "skill_overlap",
     "experience_fit",
@@ -47,7 +51,8 @@ FIELDNAMES = [
 POSITIVE_STATUSES = {"reviewing", "interview", "offered"}
 NEGATIVE_STATUSES = {"rejected"}
 EXCLUDED_UNRESOLVED_STATUSES = {"applied"}
-TOKEN_PATTERN = re.compile(r"[0-9a-zA-Z가-힣+#.]+")
+TOKEN_PATTERN = re.compile(r"[\w#+.]+", re.UNICODE)
+PROJECT_TEXT_FIELDS = ["title", "role", "summary", "outcome", "technologies"]
 MEMBER_SOURCE_FIELDS = [
     "user.id",
     "user.email",
@@ -63,6 +68,7 @@ MEMBER_SOURCE_FIELDS = [
     "resume.years_experience",
     "resume.skills",
     "resume.certificates",
+    "resume.projects",
     "resume.self_intro",
     "application.id",
     "application.job_id",
@@ -102,6 +108,7 @@ DIRECT_OR_FREE_TEXT_FIELDS_NOT_PERSISTED = [
     "education",
     "certificates",
     "self_intro_raw",
+    "projects_raw",
     "company_name",
     "company_direction_statement_raw",
     "job_summary_raw",
@@ -165,8 +172,8 @@ def _database_target(database_url: str) -> tuple[object, ...]:
 def _tokens(value: object) -> set[str]:
     return {
         token.casefold()
-        for token in TOKEN_PATTERN.findall(str(value))
-        if len(token) > 1 or token.isdigit()
+        for token in TOKEN_PATTERN.findall(str(value or ""))
+        if token.strip("_.")
     }
 
 
@@ -177,6 +184,27 @@ def _list_tokens(values: Iterable[object]) -> set[str]:
     return tokens
 
 
+def _project_documents(value: object) -> list[str]:
+    """Flatten only reviewed project fields; ignore arbitrary mapping keys."""
+
+    documents: list[str] = []
+    if not isinstance(value, list):
+        return documents
+    for project in value:
+        if not isinstance(project, dict):
+            continue
+        for field in ("title", "role", "summary", "outcome"):
+            text_value = project.get(field)
+            if isinstance(text_value, str) and text_value.strip():
+                documents.append(text_value.strip())
+        technologies = project.get("technologies", [])
+        if isinstance(technologies, list):
+            documents.extend(
+                str(item).strip() for item in technologies if str(item).strip()
+            )
+    return documents
+
+
 def _coverage(left: set[str], right: set[str]) -> float:
     if not right:
         return 0.0
@@ -184,7 +212,7 @@ def _coverage(left: set[str], right: set[str]) -> float:
 
 
 def _normalised_skill(value: object) -> str:
-    return "".join(character for character in str(value).casefold() if character.isalnum() or character in "+#")
+    return "".join(character for character in str(value).casefold() if character.isalnum() or character in "+#.")
 
 
 def _feature_values(member: dict[str, object], job: dict[str, object]) -> dict[str, float]:
@@ -207,15 +235,17 @@ def _feature_values(member: dict[str, object], job: dict[str, object]) -> dict[s
     job_title_tokens = _tokens(job["title"])
     role_overlap = _coverage(desired_role_tokens, job_title_tokens)
 
-    intro_tokens = _tokens(member["self_intro"])
+    document_tokens = _tokens(member["self_intro"]) | _list_tokens(
+        _project_documents(member["projects"])
+    )
     job_tokens = _tokens(job["title"]) | _tokens(job["summary"]) | _list_tokens(job["required_skills"])
     direction_tokens = _tokens(job["direction_statement"]) | _list_tokens(job["declared_values"])
     return {
         "skill_overlap": skill_overlap,
         "experience_fit": experience_fit,
         "role_overlap": role_overlap,
-        "self_intro_job_overlap": _coverage(intro_tokens, job_tokens),
-        "company_direction_overlap": _coverage(intro_tokens, direction_tokens),
+        "self_intro_job_overlap": _coverage(document_tokens, job_tokens),
+        "company_direction_overlap": _coverage(document_tokens, direction_tokens),
     }
 
 
@@ -235,7 +265,7 @@ def _read_member_source(database_url: str) -> tuple[dict[str, dict[str, object]]
         SELECT u.id, u.email, u.display_name, u.role, u.active, u.withdrawn_at,
                r.phone, r.birth_date, r.address_region, r.education,
                r.desired_role, r.years_experience, r.skills, r.certificates,
-               r.self_intro
+               r.projects, r.self_intro
           FROM users u
           JOIN resumes r ON r.user_id = u.id
          WHERE u.role = 'candidate'
@@ -272,6 +302,7 @@ def _read_member_source(database_url: str) -> tuple[dict[str, dict[str, object]]
         member = dict(raw)
         member["skills"] = list(_json_value(member.get("skills"), []))
         member["certificates"] = list(_json_value(member.get("certificates"), []))
+        member["projects"] = list(_json_value(member.get("projects"), []))
         member["latest_privacy_core_action"] = (
             latest_consent.get(str(member["id"]), {}).get("action")
         )
@@ -309,6 +340,18 @@ def _assert_synthetic_member(member: dict[str, object]) -> None:
         raise ValueError("synthetic source check rejected a candidate phone marker")
 
 
+def _assert_synthetic_company_job_source(raw_jobs: list[dict[str, object]]) -> None:
+    observed_job_ids: set[str] = set()
+    for row in raw_jobs:
+        job_id = str(row.get("id") or "")
+        company_id = str(row.get("company_id") or "")
+        if not job_id or not company_id or job_id in observed_job_ids:
+            raise ValueError("synthetic source check rejected a company/job source identity")
+        if str(row.get("profile_version") or "") != EXPECTED_SEED_COMPANY_PROFILE_VERSION:
+            raise ValueError("synthetic source check rejected a company profile marker")
+        observed_job_ids.add(job_id)
+
+
 def _csv_bytes(rows: list[dict[str, object]]) -> bytes:
     buffer = io.StringIO(newline="")
     writer = csv.DictWriter(buffer, fieldnames=FIELDNAMES, lineterminator="\n")
@@ -334,6 +377,14 @@ def export_runtime_dataset(
     jobs, raw_jobs = _read_company_source(company_database_url)
     if not members or not applications or not jobs:
         raise ValueError("synthetic runtime sources must contain members, applications, and jobs")
+    # The lineage digest covers every candidate/resume source record, including
+    # rows later excluded by lifecycle or application-status filters.  Validate
+    # the entire read set before deriving or persisting any digest.
+    for member in members.values():
+        _assert_synthetic_member(member)
+    _assert_synthetic_company_job_source(raw_jobs)
+    if any(str(consent.get("user_id")) not in members for consent in consents):
+        raise ValueError("synthetic source check rejected an unresolved consent subject")
 
     rows: list[dict[str, object]] = []
     excluded_status_counts: dict[str, int] = {}
@@ -353,7 +404,6 @@ def export_runtime_dataset(
             continue
         if member.get("latest_privacy_core_action") != "grant":
             continue
-        _assert_synthetic_member(member)
         status = str(application.get("status") or "")
         if status in POSITIVE_STATUSES:
             label = 1
@@ -385,6 +435,8 @@ def export_runtime_dataset(
         eligible_candidate_ids.add(str(member["id"]))
         company_ids.add(str(job["company_id"]))
 
+    if any(dangling_reference_counts.values()):
+        raise ValueError("synthetic source check rejected unresolved application references")
     if not rows:
         raise ValueError("no resolved synthetic application rows are available")
     if not any(row["split"] == "train" for row in rows) or not any(row["split"] == "test" for row in rows):
@@ -406,12 +458,15 @@ def export_runtime_dataset(
     receipt_path = output_directory / "source_read_receipt.json"
     manifest = {
         "schema_version": SCHEMA_VERSION,
+        "feature_schema_version": FEATURE_SCHEMA_VERSION,
         "synthetic_only": True,
         "synthetic_attestation": SYNTHETIC_ATTESTATION,
         "member_data_used": True,
         "company_customer_data_used": True,
+        "company_source_contract": COMPANY_SOURCE_CONTRACT,
         "purpose": "synthetic_runtime_challenger_training_demonstration",
         "source_runtime_db_wired": True,
+        "company_source_contract": COMPANY_SOURCE_CONTRACT,
         "ranking_runtime_wired": False,
         "runtime_wired": False,
         "row_count": len(rows),
@@ -436,6 +491,7 @@ def export_runtime_dataset(
     }
     receipt = {
         "schema_version": RECEIPT_SCHEMA_VERSION,
+        "feature_schema_version": FEATURE_SCHEMA_VERSION,
         "synthetic_only": True,
         "synthetic_attestation": SYNTHETIC_ATTESTATION,
         "source_runtime_db_wired": True,
@@ -453,11 +509,17 @@ def export_runtime_dataset(
         "raw_source_values_persisted": False,
         "name_and_email_role": "lineage_digest_input_only_not_model_features",
         "self_intro_role": "read_then_derived_to_overlap_features_raw_text_not_persisted",
+        "project_text_role": "reviewed_fields_read_then_derived_to_overlap_features_raw_text_not_persisted",
+        "project_fields_used": PROJECT_TEXT_FIELDS,
         "privacy_core_role": "synthetic_lifecycle_filter_not_model_training_consent",
         "training_feature_allowlist": TRAINING_FEATURES,
         "limitations": [
             "application status is a proxy and can reproduce historical recruiter behavior",
             "synthetic runtime data does not establish production model quality",
+            "token-overlap features can be gamed by copying job or company terms",
+            "rows from multiple synthetic company tenants are pooled only for a platform-wide demo",
+            "synthetic document passed/not_passed outcomes are not used as training labels",
+            "seed identity/profile markers do not cryptographically bind in-place job text",
             "no automatic release, compliance conclusion, or fairness conclusion is produced",
         ],
         "human_interpretation_required": True,

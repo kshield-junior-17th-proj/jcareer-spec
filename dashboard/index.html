@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <meta name="color-scheme" content="light" />
+    <title>J-Career Evidence Desk</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">본문 바로가기</a>
+
+    <div class="boundary-strip" role="note">
+      <span>Snapshot-only surface</span>
+      <span>Direct client AWS query: none</span>
+      <span>Assessment logic: none</span>
+    </div>
+
+    <header class="site-header">
+      <a class="brand" href="./" aria-label="J-Career Evidence Desk 처음으로">
+        <span class="brand-mark" aria-hidden="true">J</span>
+        <span>
+          <strong>J-Career</strong>
+          <small>Evidence Desk</small>
+        </span>
+      </a>
+      <p>AS-IS 합성 플랫폼 · 컨설턴트 읽기 화면</p>
+    </header>
+
+    <main id="main-content" tabindex="-1">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">Evidence before interpretation</p>
+          <h1 id="hero-title">판정하지 않고,<br /><em>근거까지 거슬러</em> 읽습니다.</h1>
+          <p class="hero-description">
+            지원자와 기업 고객의 관찰 사실을 snapshot 생성 시점, 비식별 메타,
+            승인 메타, 원본 참조 순서로 따라갑니다.
+          </p>
+        </div>
+        <aside class="boundary-ledger" aria-label="화면 경계">
+          <p class="ledger-heading">이 화면이 하지 않는 일</p>
+          <ul>
+            <li><span>01</span>클라이언트 AWS 또는 런타임 API 조회</li>
+            <li><span>02</span>충족·미충족과 적합성 자동 판정</li>
+            <li><span>03</span>여러 tenant snapshot 동시 결합</li>
+            <li><span>04</span>브라우저 저장소에 입력 데이터 보관</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="ingestion" aria-labelledby="ingestion-title">
+        <div class="ingestion-copy">
+          <p class="eyebrow">Local ingestion</p>
+          <h2 id="ingestion-title">승인 메타가 있는 비식별 snapshot 열기</h2>
+          <p>
+            파일은 이 브라우저 탭의 메모리에서만 읽습니다. 기술 검사는 사람의
+            비식별 검토나 공개 승인을 대신하지 않습니다.
+          </p>
+        </div>
+        <div class="ingestion-actions">
+          <label class="file-trigger">
+            <span>JSON snapshot 선택</span>
+            <small>최대 2MB · v1 계약</small>
+            <input class="visually-hidden" id="snapshot-file" type="file" accept="application/json,.json" />
+          </label>
+          <button class="clear-button" id="clear-snapshot" type="button" disabled>화면 비우기</button>
+        </div>
+        <div id="ingestion-status" class="ingestion-status" aria-live="polite"></div>
+      </section>
+
+      <section id="snapshot-root" class="snapshot-root" tabindex="-1" aria-label="snapshot 표시 영역"></section>
+    </main>
+
+    <footer class="site-footer">
+      <div>
+        <strong>J-Career Evidence Desk</strong>
+        <p>승인된 검토용 복사본을 기기 안에서만 표시하는 정적 화면</p>
+      </div>
+      <p>운영 전 준비 항목 · 사용자별 로그인 · 고객사 분리 · 감사 기록 · 승인 반입</p>
+    </footer>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>

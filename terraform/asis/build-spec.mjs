@@ -156,7 +156,7 @@ const architectureFlows = {
       { label: '서비스 접속' },
       { label: '인터넷 주소 안내' },
       { label: '웹 콘텐츠 전달' },
-      { label: '웹 공격 차단' },
+      { label: '웹 요청 검사' },
       { label: '앱 요청 분배' },
       { label: '앱·저장소·기록 설계' }
     ],
@@ -256,6 +256,10 @@ const commonHead = `
   <meta property="og:image:alt" content="J-Career 채용 서비스와 AWS 구성의 전체 흐름도">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image:alt" content="J-Career 채용 서비스와 AWS 구성의 전체 흐름도">
+  <link rel="preconnect" href="https://api.fontshare.com">
+  <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&amp;display=swap">
 `;
 
 const commonCss = `
@@ -276,7 +280,7 @@ const commonCss = `
     --red: #a53a32;
     --blue: #315f83;
     --shadow: 0 18px 52px rgba(49, 55, 58, .12);
-    --sans: "Pretendard Variable", Pretendard, "Noto Sans KR", "Segoe UI", AppleSDGothicNeo, sans-serif;
+    --sans: "Cabinet Grotesk", "Pretendard Variable", Pretendard, "Noto Sans KR", "Segoe UI", AppleSDGothicNeo, sans-serif;
     --mono: "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
   }
   * { box-sizing: border-box; }
@@ -320,10 +324,11 @@ const commonCss = `
   .toc a:hover, .toc a[aria-current="true"] { color: var(--accent); background: rgba(255,255,255,.48); transform: translateX(3px); }
   .toc-3 a { padding-left: 19px; color: var(--muted); }
   .toc__actions { display: grid; gap: 8px; margin-top: 18px; }
-  .button { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: 9px 12px; border: 1px solid var(--ink); color: var(--ink); background: transparent; font: 700 .76rem/1.2 var(--sans); text-decoration: none; cursor: pointer; transition: transform .18s, color .18s, background .18s; }
+  .button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 9px 12px; border: 1px solid var(--ink); color: var(--ink); background: transparent; font: 700 .76rem/1.2 var(--sans); text-decoration: none; cursor: pointer; transition: transform .18s, color .18s, background .18s; }
   .button:hover { color: #fff; background: var(--ink); transform: translateY(-2px); }
   .button:active { transform: translateY(0); }
   .button.button--accent { color: #fff; background: var(--accent); border-color: var(--accent); }
+  .button.button--accent[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); box-shadow: inset 0 -4px 0 var(--accent); }
   .document { min-width: 0; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); }
   .executive { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(270px, .65fr); gap: 28px; padding: clamp(28px, 5vw, 60px); background: linear-gradient(120deg, #fffdf8 0 72%, #f1e9dc 72%); border-bottom: 1px solid var(--line); }
   .section-label { margin: 0 0 12px; color: var(--accent); font: 700 11px/1.2 var(--mono); letter-spacing: .09em; text-transform: uppercase; }
@@ -436,7 +441,7 @@ const commonCss = `
     .content > h2 { margin-top: 3.5rem; }
     .executive { background: var(--surface); }
   }
-  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition-duration: .01ms !important; } }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; } }
   @media print {
     @page { size: A4; margin: 14mm 13mm 15mm; }
     body { background: #fff; color: #111; font-size: 9.2pt; line-height: 1.55; }
@@ -509,9 +514,9 @@ ${commonHead}
         </div>
         <dl class="doc-control">
           <div><dt>문서 번호</dt><dd>JC-ASIS-SPEC-001</dd></div>
-          <div><dt>기준일</dt><dd>2026-08-28</dd></div>
+          <div><dt>기준일</dt><dd>2026-08-30</dd></div>
           <div><dt>문서 상태</dt><dd>기준 설계 · 기술 검토 진행</dd></div>
-          <div><dt>배포 단계</dt><dd>AWS 배포 검증 전</dd></div>
+          <div><dt>배포 단계</dt><dd>AS-IS 미적용 · 검증 Lab 별도</dd></div>
           <div><dt>MLOps</dt><dd>별도 7단계 · 계획 0 / 13 / 14</dd></div>
           <div><dt>별도 검토</dt><dd>TRACE, JC-RECEIPT 등 제안 단계 서비스</dd></div>
         </dl>
@@ -597,7 +602,7 @@ ${commonHead}
       </section>
 
       <article class="content">${body}</article>
-      <footer class="footer"><p><strong>JC-ASIS-SPEC-001</strong> · 기준일 2026-08-28</p><p>J-Career 서비스·인프라 기준 설계 · 배포 검증 별도 관리</p></footer>
+      <footer class="footer"><p><strong>JC-ASIS-SPEC-001</strong> · 기준일 2026-08-30</p><p>J-Career 서비스·인프라 기준 설계 · 배포 검증 별도 관리</p></footer>
     </main>
   </div>
   <script>
@@ -630,6 +635,11 @@ ${commonCss}
     .plate { width: min(1520px, calc(100% - 48px)); margin: 38px auto 80px; }
     .plate__nav { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 18px; }
     .plate__nav a { color: var(--ink); font-weight: 700; }
+    .motion-toggle-doc { min-height: 44px; display: inline-flex; align-items: center; gap: 7px; padding: 8px 10px; border: 1px solid rgba(255,255,255,.42); color: #fff; background: transparent; cursor: pointer; font-family: var(--sans); font-size: 11px; font-weight: 700; line-height: 1.2; letter-spacing: 0; transition: color .18s, background .18s, border-color .18s, transform .18s; }
+    .motion-toggle-doc::before { width: 17px; height: 7px; border-radius: 999px; background: #f2a469; box-shadow: 7px 0 0 -2px rgba(242,164,105,.26); content: ""; animation: motionSignal 1.6s ease-in-out infinite; }
+    .motion-toggle-doc:hover { color: var(--ink); background: #fff; border-color: #fff; }
+    .motion-toggle-doc:active { transform: translateY(1px); }
+    .motion-toggle-doc[aria-pressed="true"]::before { background: #9ba8af; box-shadow: none; animation: none; }
     .architecture-workspace { display: grid; grid-template-columns: minmax(370px, .62fr) minmax(0, 1.38fr); gap: 18px; align-items: start; }
     .flow-explorer { margin: 0; padding: 30px; background: var(--ink); color: white; border-top: 5px solid var(--accent); box-shadow: var(--shadow); }
     .flow-explorer__head { display: grid; grid-template-columns: 1fr; gap: 12px; align-items: end; }
@@ -642,7 +652,7 @@ ${commonCss}
     .flow-button strong { font-size: .88rem; line-height: 1.25; }
     .flow-button small { color: #aebbc4; font-size: .68rem; line-height: 1.25; }
     .flow-button[aria-pressed="true"] small { color: #65717a; }
-    .flow-detail { margin-top: 12px; padding: 22px; display: grid; grid-template-columns: 1fr; gap: 20px; background: #fff; color: var(--ink); border-left: 4px solid var(--accent); }
+    .flow-detail { margin-top: 12px; padding: 22px; display: grid; grid-template-columns: 1fr; gap: 20px; background: #fff; color: var(--ink); border-left: 4px solid var(--accent); view-transition-name: flow-detail; }
     .flow-detail__status { margin-bottom: 10px; }
     .flow-detail h3 { margin: 0; font-size: 1.35rem; letter-spacing: -.025em; }
     .flow-detail__summary { margin: 9px 0 0; color: var(--ink-2); font-size: .84rem; line-height: 1.65; text-wrap: pretty; }
@@ -664,10 +674,10 @@ ${commonCss}
     .flow-overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
     .flow-layer { opacity: 0; transition: opacity .25s ease; }
     .flow-layer.is-active { opacity: 1; }
-    .flow-line { fill: none; stroke: #e87928; stroke-width: 16; stroke-linecap: round; stroke-linejoin: round; opacity: .82; filter: drop-shadow(0 2px 2px rgba(32,43,53,.28)); stroke-dasharray: none; }
+    .flow-line { fill: none; stroke: #e87928; stroke-width: 16; stroke-linecap: round; stroke-linejoin: round; opacity: .82; filter: drop-shadow(0 2px 2px rgba(32,43,53,.28)); stroke-dasharray: 34 18; animation: flowMarch 1.05s linear infinite; }
     .flow-line.local { stroke: #0d7f9b; stroke-dasharray: 18 16; }
     .flow-line.missing { stroke: #bd22bf; stroke-dasharray: 7 18; }
-    .flow-line.record { stroke: #8a5a00; stroke-dasharray: none; }
+    .flow-line.record { stroke: #8a5a00; stroke-dasharray: 34 18; }
     .flow-node { fill: rgba(255,255,255,.22); stroke: #e87928; stroke-width: 10; }
     .flow-node.local { stroke: #0d7f9b; }
     .flow-node.missing { stroke: #bd22bf; stroke-dasharray: 12 9; }
@@ -677,7 +687,7 @@ ${commonCss}
     .flow-marker.missing { fill: #8c2e8f; }
     .flow-marker.record { fill: #765313; }
     .flow-marker-text { fill: #fff; font: 800 22px/1 var(--sans); text-anchor: middle; dominant-baseline: central; }
-    .flow-step-marker { filter: drop-shadow(0 2px 3px rgba(32,43,53,.34)); }
+    .flow-step-marker { filter: drop-shadow(0 2px 3px rgba(32,43,53,.34)); transform-box: fill-box; transform-origin: center; }
     .flow-callout { fill: #fff; stroke: #0d7f9b; stroke-width: 4; }
     .flow-callout.missing { stroke: #bd22bf; stroke-dasharray: 12 9; }
     .flow-callout-text { fill: var(--ink); font: 800 24px/1.2 var(--sans); text-anchor: middle; }
@@ -696,6 +706,17 @@ ${commonCss}
     .plate__source > h2:first-of-type { margin-top: 0; }
     .plate__source h3 { margin-top: 28px; }
     .plate__source table { font-size: .84rem; }
+    .scroll-progress { position: fixed; inset: 0 0 auto; z-index: 60; height: 3px; pointer-events: none; }
+    .scroll-progress span { display: block; width: 100%; height: 100%; background: #e87928; transform: scaleX(0); transform-origin: left center; }
+    @keyframes flowMarch { to { stroke-dashoffset: -52; } }
+    @keyframes motionSignal { 50% { transform: translateX(5px); opacity: .58; } }
+    ::view-transition-old(flow-detail) { animation: .18s ease both flowOld; }
+    ::view-transition-new(flow-detail) { animation: .34s cubic-bezier(.2,.75,.2,1) both flowNew; }
+    @keyframes flowOld { to { opacity: 0; transform: translateY(-8px); } }
+    @keyframes flowNew { from { opacity: 0; transform: translateY(10px); } }
+    html[data-motion="reduced"] .flow-line, html[data-motion="reduced"] .motion-toggle-doc::before, html.document-hidden .flow-line { animation: none; }
+    html[data-motion="reduced"] .scroll-progress { display: none; }
+    html[data-motion="reduced"] *, html[data-motion="reduced"] *::before, html[data-motion="reduced"] *::after { animation: none !important; transition-duration: .01ms !important; }
     @media (max-width: 1200px) { .architecture-workspace { grid-template-columns: 1fr; } .flow-explorer__head { grid-template-columns: minmax(0, 1fr) minmax(260px, .46fr); gap: 36px; } .flow-selector { grid-template-columns: repeat(3, minmax(0, 1fr)); } .flow-detail { grid-template-columns: minmax(250px, .65fr) minmax(0, 1.35fr); gap: 30px; } .flow-detail__boundary { grid-column: 1 / -1; } }
     @media (max-width: 1060px) { .flow-selector { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
     @media (max-width: 880px) { .plate__nav, .flow-explorer__head { align-items: flex-start; grid-template-columns: 1fr; } .plate__nav { flex-direction: column; } .flow-detail { grid-template-columns: 1fr; } }
@@ -708,7 +729,7 @@ ${commonCss}
   <a class="skip" href="#diagram">도면으로 건너뛰기</a>
   <header class="masthead">
     <div class="masthead__inner">
-      <div class="utility"><a href="index.html">← 기술 명세</a><nav class="utility__links"><a href="../../mlops/">MLOps 7단계</a><a href="JCAREER_ASIS_FLOW.drawio">DRAW.IO</a><a href="JCAREER_ASIS_FLOW.drawio.png">PNG</a><a href="JCAREER_ASIS_SYSTEM_SPEC.pdf">PDF</a><a href="validation-report.json">검증 JSON</a></nav></div>
+      <div class="utility"><a href="index.html">← 기술 명세</a><nav class="utility__links" aria-label="산출물"><a href="../../mlops/">MLOps 7단계</a><a href="JCAREER_ASIS_FLOW.drawio">DRAW.IO</a><a href="JCAREER_ASIS_FLOW.drawio.png">PNG</a><a href="JCAREER_ASIS_SYSTEM_SPEC.pdf">PDF</a><a href="validation-report.json">검증 JSON</a><button class="motion-toggle-doc" type="button" data-motion-toggle aria-pressed="false" hidden><span data-motion-label>움직임 줄이기</span></button></nav></div>
       <div class="doc-hero">
         <div><p class="kicker">JC-ASIS-ARCH-001 · 서비스별 경로 탐색</p><h1>J-Career AWS<br>인프라 흐름도</h1><p class="hero-copy">업무망 PC에서 채용 서비스와 데이터 저장소, 보안·관측 구성으로 이어지는 흐름을 한 장에 담았습니다. 서비스 버튼을 누르면 관련 경로와 1·2·3 단계 설명이 함께 바뀝니다.</p></div>
         <dl class="doc-control"><div><dt>도면 성격</dt><dd>서비스·인프라 기준 설계</dd></div><div><dt>업무망</dt><dd>180대 · Windows 100 / macOS 80</dd></div><div><dt>AWS 설계</dt><dd>2-AZ · 6개 모듈 · 계획 110개</dd></div><div><dt>MLOps</dt><dd>별도 7단계 · 계획 0 / 13 / 14</dd></div><div><dt>검증 단계</dt><dd>AWS 배포 결과 별도 관리</dd></div></dl>
@@ -716,7 +737,7 @@ ${commonCss}
     </div>
   </header>
   <main class="plate" id="diagram">
-    <div class="plate__nav"><p>업무망 수량은 <span class="status confirmed" title="내부 상태 코드: USER_CONFIRMED">사용자 확인</span> 값이며, AWS 구성은 <span class="status modelled" title="내부 상태 코드: MODELLED">기준 설계 반영</span> 항목입니다. 배포 결과는 검증 기록에서 별도로 관리합니다.</p><div><button class="button button--accent" id="diagram-zoom" type="button" aria-pressed="false">도면 크게 보기</button> <a class="button" href="JCAREER_ASIS_FLOW.drawio">편집 원본</a> <a class="button" href="JCAREER_ASIS_FLOW.drawio.png">PNG 원본</a></div></div>
+    <div class="plate__nav"><p>업무망 수량은 <span class="status confirmed" title="내부 상태 코드: USER_CONFIRMED">사용자 확인</span> 값이며, AWS 구성은 <span class="status modelled" title="내부 상태 코드: MODELLED">기준 설계 반영</span> 항목입니다. 배포 결과는 검증 기록에서 별도로 관리합니다.</p><div><button class="button button--accent" id="diagram-zoom" type="button" aria-pressed="false">원본 크기로 보기</button> <a class="button" href="JCAREER_ASIS_FLOW.drawio">편집 원본</a> <a class="button" href="JCAREER_ASIS_FLOW.drawio.png">PNG 원본</a></div></div>
     <div class="architecture-workspace">
     <section class="flow-explorer" aria-labelledby="flow-explorer-title">
       <div class="flow-explorer__head">
@@ -743,7 +764,7 @@ ${commonCss}
       <p class="flow-explorer__exclusion">MLOps는 합성 데이터 기반 모델 검증과 사람 검토 단계를 보여 줍니다. 기준 110개와 분리한 별도 계획이며 합산하지 않습니다. 제안 단계 신규 서비스는 현재 선택 경로에서 제외했습니다.</p>
     </section>
     <figure class="plate__frame" id="diagram-frame" aria-describedby="flow-boundary">
-      <div class="diagram-stage">
+      <div class="diagram-stage" data-scale-reveal>
         <a href="JCAREER_ASIS_FLOW.drawio.png" aria-label="AWS 인프라 흐름도 PNG 원본 열기"><img src="JCAREER_ASIS_FLOW.drawio.png" width="2400" height="1400" fetchpriority="high" decoding="async" alt="업무망 PC 180대, 사용자 요청 6단계, 가용 영역 두 곳, 데이터 저장소, 기록·탐지와 승인 전 MLOps 확장 경계를 표시한 J-Career 기존 설계 흐름도"></a>
         <svg class="flow-overlay" viewBox="0 0 2400 1400" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
           <g class="flow-layer is-active" data-flow-layer="overview">
@@ -786,13 +807,16 @@ ${svgStepMarkers('operations', 'record')}
     </div>
     <section class="plate__section plate__source" data-flow-source-sha256="${flowSourceHash}">${flowBody}</section>
   </main>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js" integrity="sha384-XmJ9SoHtVOHoQUcKvFAzVXwdkKo1Ie3bhmSoIAkcdsHGaIrVJIkmozyq0FJeb/Ly" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js" integrity="sha384-wl5TeDVvOWt30Pbf8aSo2ZrzsOjddu3avOBvHe+p+OhJt9gP6w9YXmDkN5DK2/dF" crossorigin="anonymous"></script>
+  <script src="../../assets/motion.js"></script>
   <script>
     const zoomButton = document.querySelector('#diagram-zoom');
     const diagramFrame = document.querySelector('#diagram-frame');
     zoomButton?.addEventListener('click', () => {
       const expanded = diagramFrame.classList.toggle('is-zoomed');
       zoomButton.setAttribute('aria-pressed', String(expanded));
-      zoomButton.textContent = expanded ? '화면에 맞추기' : '도면 크게 보기';
+      zoomButton.textContent = '원본 크기로 보기';
     });
     const flowDefinitions = ${JSON.stringify(architectureFlows)};
     const flowButtons = [...document.querySelectorAll('[data-flow-button]')];
@@ -806,27 +830,31 @@ ${svgStepMarkers('operations', 'record')}
     const showFlow = (requestedKey, updateAddress = true) => {
       const key = Object.hasOwn(flowDefinitions, requestedKey) ? requestedKey : 'overview';
       const definition = flowDefinitions[key];
-      flowButtons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.flowButton === key)));
-      flowLayers.forEach((layer) => layer.classList.toggle('is-active', layer.dataset.flowLayer === key));
-      flowStatus.textContent = definition.status;
-      flowStatus.className = 'flow-detail__status status ' + definition.tone;
-      flowTitle.textContent = definition.title;
-      flowSummary.textContent = definition.summary;
-      flowSteps.setAttribute('aria-label', definition.title + ' 단계별 경로');
-      flowSteps.replaceChildren(...definition.stages.map((stage, index) => {
-        const item = document.createElement('li');
-        const number = document.createElement('span');
-        number.className = 'flow-step__number';
-        number.setAttribute('aria-hidden', 'true');
-        number.textContent = String(index + 1);
-        const label = document.createElement('span');
-        label.textContent = stage.label;
-        item.append(number, label);
-        return item;
-      }));
-      flowBoundary.textContent = definition.boundary;
-      flowDetailLink.href = definition.detailHref;
-      flowDetailLink.textContent = definition.detailLabel;
+      const updateFlow = () => {
+        flowButtons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.flowButton === key)));
+        flowLayers.forEach((layer) => layer.classList.toggle('is-active', layer.dataset.flowLayer === key));
+        flowStatus.textContent = definition.status;
+        flowStatus.className = 'flow-detail__status status ' + definition.tone;
+        flowTitle.textContent = definition.title;
+        flowSummary.textContent = definition.summary;
+        flowSteps.setAttribute('aria-label', definition.title + ' 단계별 경로');
+        flowSteps.replaceChildren(...definition.stages.map((stage, index) => {
+          const item = document.createElement('li');
+          const number = document.createElement('span');
+          number.className = 'flow-step__number';
+          number.setAttribute('aria-hidden', 'true');
+          number.textContent = String(index + 1);
+          const label = document.createElement('span');
+          label.textContent = stage.label;
+          item.append(number, label);
+          return item;
+        }));
+        flowBoundary.textContent = definition.boundary;
+        flowDetailLink.href = definition.detailHref;
+        flowDetailLink.textContent = definition.detailLabel;
+      };
+      if (updateAddress && window.JCareerMotion) window.JCareerMotion.transition(updateFlow);
+      else updateFlow();
       if (updateAddress || requestedKey !== key) {
         const address = new URL(window.location.href);
         if (key === 'overview') address.searchParams.delete('flow');

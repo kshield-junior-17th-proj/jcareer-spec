@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 from .models import Application, AuditEvent, Company, ConsentEvent, Job, Resume, User
 from .opendart import OpenDartClient
+from .outcome_store import seed_synthetic_outcome_dataset
 from .security import hash_password
 
 
@@ -171,6 +172,20 @@ SKILL_POOLS = [
 ]
 
 
+def seed_outcome_snapshot(db: Session) -> dict[str, object]:
+    """Populate the isolated synthetic outcome DB from current synthetic fixtures."""
+
+    applications = db.scalars(select(Application).order_by(Application.id)).all()
+    resumes = db.scalars(select(Resume).order_by(Resume.user_id)).all()
+    jobs = db.scalars(select(Job).order_by(Job.id)).all()
+    return seed_synthetic_outcome_dataset(
+        db,
+        applications,
+        {resume.user_id: resume for resume in resumes},
+        {job.id: job for job in jobs},
+    )
+
+
 def seed_demo(db: Session) -> None:
     """Create deterministic UI fixtures, explicitly not a FAIR-01 measurement dataset."""
 
@@ -203,6 +218,17 @@ def seed_demo(db: Session) -> None:
                 "복잡한 채용 API를 신뢰할 수 있고 안정된 구조로 풀어내며 "
                 "협업과 자동화를 중시하는 합성 백엔드 개발자입니다."
             )
+        if demo_resume and not demo_resume.projects:
+            demo_resume.projects = [
+                {
+                    "title": "합성 채용 API 안정화 프로젝트",
+                    "role": "백엔드 API와 데이터 흐름 설계",
+                    "technologies": ["Python", "FastAPI", "PostgreSQL", "Docker"],
+                    "summary": "Python과 FastAPI로 채용 API를 구현하고 반복 배포를 자동화했습니다.",
+                    "outcome": "합성 부하 시나리오에서 오류 원인을 재현하고 협업 검토 절차를 정리했습니다.",
+                }
+            ]
+        seed_outcome_snapshot(db)
         db.commit()
         return
 
@@ -266,6 +292,15 @@ def seed_demo(db: Session) -> None:
         years_experience=4,
         skills=["Python", "FastAPI", "PostgreSQL", "Docker", "AWS"],
         certificates=["합성 자격증 A"],
+        projects=[
+            {
+                "title": "합성 채용 API 안정화 프로젝트",
+                "role": "백엔드 API와 데이터 흐름 설계",
+                "technologies": ["Python", "FastAPI", "PostgreSQL", "Docker"],
+                "summary": "Python과 FastAPI로 채용 API를 구현하고 반복 배포를 자동화했습니다.",
+                "outcome": "합성 부하 시나리오에서 오류 원인을 재현하고 협업 검토 절차를 정리했습니다.",
+            }
+        ],
         self_intro=(
             "복잡한 채용 API를 신뢰할 수 있고 안정된 구조로 풀어내며 "
             "협업과 자동화를 중시하는 합성 백엔드 개발자입니다."
@@ -287,6 +322,7 @@ def seed_demo(db: Session) -> None:
                 "education",
                 "career",
                 "certificates",
+                "projects",
             ],
             purposes=["member_management", "job_service", "ai_recommendation"],
         )
@@ -317,6 +353,17 @@ def seed_demo(db: Session) -> None:
             years_experience=1 + (index % 9),
             skills=selected,
             certificates=[] if index % 2 else ["합성 기술 자격"],
+            projects=[
+                {
+                    "title": f"합성 직무 프로젝트 {index:03d}",
+                    "role": "구현 및 검토",
+                    "technologies": selected[:3],
+                    "summary": (
+                        f"{selected[0]}와 {selected[1]}를 사용해 합성 채용 업무 흐름을 구현했습니다."
+                    ),
+                    "outcome": "합성 검증 시나리오와 결과 기록을 남겼습니다.",
+                }
+            ],
             self_intro=f"합성 시나리오 지원자 {index:03d}의 구조화 이력서입니다.",
         )
         db.add(user)
@@ -336,6 +383,7 @@ def seed_demo(db: Session) -> None:
                     "education",
                     "career",
                     "certificates",
+                    "projects",
                 ],
                 purposes=["member_management", "job_service", "ai_recommendation"],
             )
@@ -390,6 +438,9 @@ def seed_demo(db: Session) -> None:
                 status="reviewing" if job is jobs[0] else "applied",
             )
         )
+
+    db.flush()
+    seed_outcome_snapshot(db)
 
     db.add(
         AuditEvent(

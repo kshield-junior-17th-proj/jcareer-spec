@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="J-Career의 합성 데이터 기반 AI 모델 학습, 검증, 사람 검토 절차와 AWS 구성요소를 설명합니다.">
-  <meta name="theme-color" content="#ffffff">
+  <meta name="theme-color" content="#172129">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ko_KR">
   <meta property="og:title" content="J-Career MLOps 모델 검증 체계">
@@ -15,6 +15,10 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image:alt" content="J-Career MLOps 7단계 모델 검증 흐름도">
   <link rel="canonical" href="https://kshield-junior-17th-proj.github.io/jcareer-spec/mlops/">
+  <link rel="preconnect" href="https://api.fontshare.com">
+  <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&amp;display=swap">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2318212b'/%3E%3Cpath d='M18 13h11v25c0 10-5 14-16 13v-9c4 0 5-1 5-5V13zm17 0h17v9h-7v29H35V13z' fill='%23ff7a1a'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="../assets/site.css">
   <title>J-Career MLOps 모델 검증 체계</title>
@@ -24,24 +28,34 @@
   <header class="site-header">
     <nav class="nav" aria-label="주요 메뉴">
       <a class="brand" href="../">J-Career 아키텍처</a>
-      <div class="nav-links">
-        <a href="../terraform/asis/">AWS 아키텍처</a>
-        <a href="./" aria-current="page">MLOps</a>
-        <a href="../terraform/lab/">AWS 검증 환경</a>
+      <div class="nav-actions">
+        <div class="nav-links">
+          <a href="../terraform/asis/">AWS 아키텍처</a>
+          <a href="./" aria-current="page">MLOps</a>
+          <a href="../terraform/lab/">AWS 검증 환경</a>
+        </div>
+        <button class="motion-toggle" type="button" data-motion-toggle aria-pressed="false" hidden><span data-motion-label>움직임 줄이기</span></button>
       </div>
     </nav>
   </header>
 
   <main id="content">
     <section class="hero">
+      <img class="hero-blueprint" src="../terraform/serverless-mlops/JCAREER_MLOPS_FLOW.svg" width="2400" height="1400" fetchpriority="high" alt="" aria-hidden="true">
       <div class="shell">
         <p class="eyebrow">MLOps 모델 검증 체계 · 합성 데이터</p>
-        <h1>AI 모델을 안전하게<br>검증하는 7단계</h1>
-        <p class="hero-copy">합성 지원 데이터를 다섯 가지 비교 수치로 바꿔 후보 모델을 한 차례 학습합니다. 담당자 검토가 끝나기 전에는 추천 서비스 반영을 차단하는 MLOps 절차입니다.</p>
+        <h1>AI 모델을 반영하기 전에<br>검토하는 7단계</h1>
+        <p class="hero-copy">합성 지원 데이터를 다섯 가지 비교 수치로 바꿔 후보 모델을 한 차례 학습합니다. 사람 검토 대기에서 멈추며 현재 추천 서비스에는 연결하지 않는 MLOps 절차입니다.</p>
         <div class="hero-actions">
           <a class="button" href="#flow">7단계 검증 흐름</a>
           <a class="button button--line" href="#specification">기술 명세</a>
-          <a class="button button--line" href="JCAREER_MLOPS_SYSTEM_SPEC.pdf">PDF 명세</a>
+          <a class="button button--line" href="./JCAREER_MLOPS_SYSTEM_SPEC.pdf">PDF 명세서</a>
+        </div>
+        <div class="signal-marquee" aria-hidden="true">
+          <div class="signal-marquee__track">
+            <span>합성 자료</span><span>비교 수치 5개</span><span>파일 보관</span><span>수동 시작</span><span>검사·학습</span><span>결과 기록</span><span>사람 검토</span>
+            <span>합성 자료</span><span>비교 수치 5개</span><span>파일 보관</span><span>수동 시작</span><span>검사·학습</span><span>결과 기록</span><span>사람 검토</span>
+          </div>
         </div>
       </div>
     </section>
@@ -92,6 +106,14 @@
           <button class="stage-tab" type="button" data-stage-tab="7" aria-pressed="false" aria-controls="stage-list">7 사람 검토</button>
         </div>
 
+        <div class="stage-motion" aria-label="선택한 MLOps 단계 위치">
+          <div class="stage-motion__rail" aria-hidden="true">
+            <span class="stage-motion__progress" data-stage-progress></span>
+            <span class="stage-motion__runner" data-stage-runner></span>
+          </div>
+          <p class="stage-motion__readout" data-stage-readout aria-live="polite">전체 7단계</p>
+        </div>
+
         <div class="stage-list" id="stage-list" aria-label="MLOps 7단계 설명">
           <article class="stage-item" data-stage="1"><span class="stage-number">01</span><h3>합성 데이터 읽기</h3><p>검증용 회원·기업 데이터만 읽습니다.</p></article>
           <article class="stage-item" data-stage="2"><span class="stage-number">02</span><h3>비교 수치 5개 만들기</h3><p>기술, 경력, 직무와 문서의 단어 겹침을 수치로 바꿉니다.</p></article>
@@ -99,13 +121,13 @@
           <article class="stage-item" data-stage="4"><span class="stage-number">04</span><h3>담당자가 시작하기</h3><p>자동 일정과 공개 호출 주소는 없습니다.</p></article>
           <article class="stage-item" data-stage="5"><span class="stage-number">05</span><h3>파일 검사 후 학습하기</h3><p>파일이 바뀌지 않았는지 확인한 뒤 후보 모델을 만듭니다.</p></article>
           <article class="stage-item" data-stage="6"><span class="stage-number">06</span><h3>결과와 상태 남기기</h3><p>결과 파일 6개와 실행 상태를 따로 기록합니다.</p></article>
-          <article class="stage-item" data-stage="7"><span class="stage-number">07</span><h3>담당자 검토 대기</h3><p>검토 결과가 승인될 때까지 서비스 반영을 보류합니다.</p></article>
+          <article class="stage-item" data-stage="7"><span class="stage-number">07</span><h3>담당자 검토 대기</h3><p>검토 대기 상태를 남기며 자동으로 서비스에 반영하지 않습니다.</p></article>
         </div>
 
         <div class="diagram-toolbar">
-          <button class="diagram-toggle" type="button" data-diagram-toggle aria-pressed="false">글자 크게 보기</button>
+          <button class="diagram-toggle" type="button" data-diagram-toggle aria-pressed="false">원본 크기로 보기</button>
         </div>
-        <figure class="architecture-frame architecture-frame--zoom" data-diagram style="margin: 0">
+        <figure class="architecture-frame architecture-frame--zoom" data-diagram data-scale-reveal>
           <a href="../terraform/serverless-mlops/JCAREER_MLOPS_FLOW.drawio.png">
             <img src="../terraform/serverless-mlops/JCAREER_MLOPS_FLOW.drawio.png" width="2400" height="1400" loading="lazy" alt="합성 데이터를 다섯 가지 비교 수치로 바꾸고 담당자가 학습을 시작한 뒤 사람 검토 대기 상태로 마치는 일곱 단계 흐름">
           </a>
@@ -120,7 +142,7 @@
           <div><p class="section-label">데이터 아키텍처 연계</p><h2>분석 참고 데이터와<br>학습 입력을 분리합니다</h2></div>
           <div>
             <p class="section-intro">PostgreSQL 서비스 1개 안에 회원, 기업, 분석 참고용 논리 데이터베이스를 나눕니다. Redis는 별도 캐시 서비스이며 합성 문서 평가 결과는 세 번째 데이터베이스에 보관합니다.</p>
-            <p class="status-note">구조 정의 완료 · API 참고 정보 연계 · 화면 연계 검토 중 · AWS 배포 검증 전</p>
+            <p class="status-note">구조 정의 완료 · API 참고 정보 연계 · 화면 연계 검토 중 · AWS 실행 결과는 별도 상태표에서 관리</p>
           </div>
         </div>
 
@@ -261,8 +283,8 @@
               <tr><td>Terraform 형식·구문</td><td>PASS</td><td><code>fmt -check</code>, <code>validate</code></td></tr>
               <tr><td>AWS 비접속 단계별 계획</td><td>3/3 PASS</td><td><code>disabled 0</code>, <code>bootstrap 13</code>, <code>runtime 14</code></td></tr>
               <tr><td>기본 잠금 계획</td><td>PASS · 관리 자원 0</td><td><code>-refresh=false</code>, 기존 state 없음</td></tr>
-              <tr><td>위험 설정 차단 시험</td><td>12/12 PASS</td><td>허용 주소, 삭제·금지 서비스, 실행 도구</td></tr>
-              <tr><td>합성 데이터 처리 시험</td><td>14/14 PASS</td><td>테스트 대역 S3·DynamoDB, 원문 잔류·중복·실패 조건</td></tr>
+              <tr><td>위험 설정 차단 시험</td><td>19/19 PASS</td><td>허용 주소, 삭제·금지 서비스, 실행 도구</td></tr>
+              <tr><td>합성 데이터 처리 시험</td><td>22/22 PASS</td><td>테스트 대역 S3·DynamoDB, 원문 잔류·중복·실패 조건</td></tr>
               <tr><td>공개 파일 일치 검사</td><td>PASS</td><td>7단계, 링크, 그림 원본, 2400×1400 PNG, 파일 지문 일치</td></tr>
               <tr><td>공개 전 안전 검사</td><td>PASS</td><td>임시 실행 파일 0, 비밀키·실제 계정 번호처럼 보이는 값 0</td></tr>
             </tbody>
@@ -302,6 +324,9 @@
       <span>합성 데이터 · 담당자 검토 · 추적 가능한 결과</span>
     </div>
   </footer>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js" integrity="sha384-XmJ9SoHtVOHoQUcKvFAzVXwdkKo1Ie3bhmSoIAkcdsHGaIrVJIkmozyq0FJeb/Ly" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js" integrity="sha384-wl5TeDVvOWt30Pbf8aSo2ZrzsOjddu3avOBvHe+p+OhJt9gP6w9YXmDkN5DK2/dF" crossorigin="anonymous"></script>
+  <script src="../assets/motion.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

@@ -51,7 +51,7 @@
 | 7 | `member.gpa` | 학점 | 없음 | 없음 | `NOT_IMPLEMENTED` |
 | 8 | `member.self_intro` | 자소서 | `Resume.self_intro` | 점수 미사용 · `candidate_context.self_intro` · 현재 계수 제외 | `IMPLEMENTED_NOT_CLASSIFIED_BY_COUNTER` |
 | 9 | `member.career` | 경력 | `Resume.years_experience` 집계값만 존재 | matcher 사용 · `score_breakdown`과 label을 통해 설명 payload에 파생 표현 포함 가능 | `PARTIAL_AGGREGATE_OUTSIDE_COUNTER` |
-| 10 | `member.projects` | 프로젝트 | 없음 | 없음 | `NOT_IMPLEMENTED` |
+| 10 | `member.projects` | 프로젝트 | `Resume.projects` 구조화 배열 | 점수 미사용 · `candidate_context.projects` · 직접 문구 근거 대조에만 사용 | `IMPLEMENTED_NOT_CLASSIFIED_BY_COUNTER` |
 | 11 | `member.email` | 이메일 | `User.email` | 점수 미사용 · `candidate_context.email` · 현재 계수 포함 | `IMPLEMENTED` |
 | 12 | `member.disability` | 장애 | 없음 | 없음 | `NOT_IMPLEMENTED_SOURCE_LABEL_SENSITIVE` |
 | 13 | `member.physical` | 신체 | 없음 | 없음 | `NOT_IMPLEMENTED_SOURCE_LABEL_SENSITIVE` |
@@ -90,7 +90,7 @@
 |---|---|
 | `users` | `id`, `email`, `password_hash`, `display_name`, `role`, `company_id`, `active`, `withdrawn_at`, `created_at` |
 | `consent_events` | `id`, `user_id`, `consent_type`, `action`, `policy_version`, `collected_items`, `purposes`, `legal_basis`, `occurred_at` |
-| `resumes` | `id`, `user_id`, `phone`, `birth_date`, `address_region`, `education`, `desired_role`, `years_experience`, `skills`, `certificates`, `self_intro`, `updated_at` |
+| `resumes` | `id`, `user_id`, `phone`, `birth_date`, `address_region`, `education`, `desired_role`, `years_experience`, `skills`, `certificates`, `projects`, `self_intro`, `updated_at` |
 | `applications` | `id`, `job_id`, `candidate_id`, `status`, `applied_at`, `updated_at` |
 | `audit_events` | `id`, `event_type`, `actor_user_id`, `actor_role`, `company_id`, `target_type`, `target_ref`, `purpose`, `action`, `result`, `correlation_id`, `retention_class`, `detail`, `occurred_at` |
 
@@ -100,6 +100,17 @@
 |---|---|
 | `companies` | `id`, `name`, `address`, `direction_statement`, `declared_values`, `profile_version`, `opendart_corp_code`, `opendart_snapshot`, `opendart_sync_state`, `opendart_snapshot_version`, `opendart_synced_at`, `opendart_last_attempt_at`, `status`, `created_at` |
 | `jobs` | `id`, `company_id`, `title`, `summary`, `location`, `employment_type`, `required_skills`, `min_experience`, `status`, `created_at`, `updated_at` |
+
+### 3.3 `jcareer_outcome`
+
+| 테이블 | 현재 column |
+|---|---|
+| `outcome_datasets` | `dataset_version`, `synthetic`, `label_semantics`, `generation_method`, `source_profile`, `runtime_effect`, `ranking_effect`, `approved_for_model_training`, `created_at` |
+| `synthetic_document_outcomes` | `id`, `dataset_version`, `application_ref`, `candidate_ref`, `job_id`, `company_id`, `feature_schema_version`, `feature_snapshot`, `evidence_tags`, `document_result`, `result_source`, `observed_at`, `created_at` |
+
+합성결과 DB는 원문 이름·이메일·자소서·프로젝트 내용을 저장하지 않고 가명 참조와 허용된
+수치 특징·통제된 evidence tag만 저장하도록 선언돼 있다. 이는 실제 데이터 비식별 적정성이나
+학습 승인을 판정한 것이 아니며, 현재 `runtime_effect`·`ranking_effect`는 `NONE`이다.
 
 이 물리 inventory에는 인증·감사·외부 snapshot 메타데이터가 포함되므로 화이트보드의 업무 필드
 23개와 단순 총개수 비교를 하지 않는다.
@@ -114,21 +125,25 @@
 - `years_experience`
 - `desired_role`
 
-이름·전화번호·이메일·생년월일·주소·학교/학력·자격증·자소서는 점수에서 제외된다.
+이름·전화번호·이메일·생년월일·주소·학교/학력·자격증·프로젝트·자소서는 점수에서 제외된다.
 화이트보드에 새로 나타난 장애·신체·보훈도 현재 모델과 점수 입력에 없다.
 
 ### 4.2 설명 요청의 명시 context
 
 | context | 현재 key 수 | key |
 |---|---:|---|
-| `candidate_context` | **8** | `name`, `phone`, `email`, `birthdate`, `address`, `school`, `certificates`, `self_intro` |
+| `candidate_context` | **9** | `name`, `phone`, `email`, `birthdate`, `address`, `school`, `certificates`, `projects`, `self_intro` |
 | `company_context` | **6** | `company_name`, `direction_statement`, `declared_values`, `profile_version`, `job_title`, `job_summary` |
 
-Gateway의 현재 `PII_FIELD_NAMES`는 candidate context 8개 중
+Gateway의 현재 `PII_FIELD_NAMES`는 candidate context 9개 중
 `name`, `phone`, `email`, `birthdate`, `address`, `school` **6개만** 표시한다. 이는 코드의 계수
-규칙이지, 나머지 두 필드가 개인정보가 아니라는 판정이 아니다.
+규칙이지, 나머지 세 필드가 개인정보가 아니라는 판정이 아니다.
 
-### 4.3 현재 8/6 계수 밖의 candidate-derived material
+현재 핵심동의의 `collected_items` catalog에는 `projects`가 없다. 프로젝트가 이력서와 설명
+문맥에 존재한다는 사실만으로 기존 동의 항목에 포함됐다고 보지 않으며, 명칭·목적·보관·외부
+전달 매핑은 사람이 결정해야 한다.
+
+### 4.3 현재 9/6 계수 밖의 candidate-derived material
 
 `ExplanationItem`은 두 context 외에도 다음 값을 provider용 항목과 raw prompt material에 넣는다.
 
@@ -137,7 +152,7 @@ Gateway의 현재 `PII_FIELD_NAMES`는 candidate context 8개 중
 - `matched_feature_ids`, `matched_feature_labels`: 일치 기술, 경력, 희망 직무 표현이 포함될 수 있음
 
 현재 `prompt_fields_prepared`와 `pii_fields_prepared`는 `candidate_context`의 최상위 key만 센다.
-따라서 **8개 준비/6개 분류**는 전체 provider payload의 candidate-derived field 수가 아니다.
+따라서 **9개 준비/6개 분류**는 전체 provider payload의 candidate-derived field 수가 아니다.
 
 ## 5. LLM02 측정 모수 계약
 
@@ -147,7 +162,7 @@ Gateway의 현재 `PII_FIELD_NAMES`는 candidate context 8개 중
 |---|---:|---|
 | `WB_MEMBER_LOGICAL_FIELD_COUNT` | **14** | 화이트보드 회원DB 최소 논리 필드 수 |
 | `WB_COMPANY_LOGICAL_FIELD_COUNT` | **9** | 화이트보드 기업DB 최소 논리 필드 수 |
-| `RUNTIME_CANDIDATE_CONTEXT_KEY_COUNT` | **8** | 현재 API가 설명 context에 준비하는 지원자 key 수 |
+| `RUNTIME_CANDIDATE_CONTEXT_KEY_COUNT` | **9** | 현재 API가 설명 context에 준비하는 지원자 key 수 |
 | `RUNTIME_COMPANY_CONTEXT_KEY_COUNT` | **6** | 현재 API가 설명 context에 준비하는 기업 key 수 |
 | `RUNTIME_COUNTER_FLAGGED_KEY_COUNT` | **6** | 현재 gateway field-name counter가 표시하는 수 |
 | `FULL_CANDIDATE_DERIVED_PROVIDER_FIELD_COUNT` | `DECISION_PENDING` | context 밖의 ID·score breakdown·label과 의미 매핑을 포함한 전체 수 |

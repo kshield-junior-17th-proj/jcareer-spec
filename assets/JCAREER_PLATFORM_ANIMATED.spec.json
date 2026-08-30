@@ -1,0 +1,54 @@
+{
+  "title": "J-Career 서비스·AWS 핵심 흐름",
+  "subtitle": "이해를 돕는 설계 흐름 재생 · AS-IS 2-AZ·6개 모듈·계획 110개 · MLOps 별도 계획 0/13/14",
+  "footer": "움직이는 점은 데이터 이동 순서를 설명합니다. AWS에서 관측한 요청이나 배포 상태를 뜻하지 않습니다.",
+  "canvas": {"w": 1480, "h": 820},
+  "nodes": [
+    {"id": "office", "x": 72, "y": 400, "icon": "tile:generic", "label": "업무망 PC 180대", "sub": "Windows 100 · macOS 80"},
+    {"id": "route", "x": 280, "y": 400, "icon": "route53", "label": "주소 안내", "sub": "Route 53"},
+    {"id": "front", "x": 460, "y": 400, "icon": "cloudfront", "label": "웹 전달", "sub": "CloudFront"},
+    {"id": "waf", "x": 640, "y": 400, "icon": "waf", "label": "웹 요청 검사", "sub": "CloudFront 연결 WAF"},
+    {"id": "alb", "x": 820, "y": 400, "icon": "elb", "label": "요청 분배", "sub": "ALB"},
+    {"id": "apps", "x": 1010, "y": 400, "icon": "ecs", "label": "채용 앱 4종", "sub": "ECS Fargate 기준"},
+    {"id": "data", "x": 1240, "y": 400, "icon": "rds", "label": "데이터 저장소", "sub": "RDS · Redis 기준"},
+
+    {"id": "mls3", "x": 820, "y": 190, "icon": "s3", "label": "합성 입력 보관", "sub": "S3 · 준비 단계 설계"},
+    {"id": "trainer", "x": 1010, "y": 190, "icon": "lambda", "label": "검사·학습", "sub": "Lambda · 수동 1회"},
+    {"id": "runstate", "x": 1240, "y": 190, "icon": "dynamodb", "label": "결과·실행 기록", "sub": "S3 · DynamoDB"},
+
+    {"id": "vpcscope", "x": 700, "y": 560, "icon": "vpc", "label": "VPC 전체 흐름", "sub": "수락·거부 트래픽"},
+    {"id": "guard", "x": 610, "y": 650, "icon": "guardduty", "label": "위협 탐지", "sub": "GuardDuty 기준"},
+    {"id": "flows", "x": 820, "y": 650, "icon": "flowlogs", "label": "네트워크 흐름 기록", "sub": "VPC Flow Logs"},
+    {"id": "logs", "x": 1010, "y": 650, "icon": "cloudwatch", "label": "앱·흐름 로그", "sub": "CloudWatch Logs"},
+    {"id": "trail", "x": 1240, "y": 650, "icon": "tile:generic", "label": "AWS 작업 기록", "sub": "CloudTrail → S3"}
+  ],
+  "groups": [
+    {"kind": "region", "x": 185, "y": 92, "w": 1230, "h": 650, "label": "AWS 서비스 기준 설계 · 전역 서비스와 서울 리전", "lx": 205, "ly": 116},
+    {"kind": "event", "x": 748, "y": 118, "w": 620, "h": 165, "label": "별도 MLOps 계획 · 기본 0 / 준비 13 / 실행 14 · 승인 전 반영 차단", "lx": 770, "ly": 140},
+    {"kind": "subnet", "x": 760, "y": 326, "w": 570, "h": 160, "label": "요청 처리 경로 · 서울 리전 2-AZ 기준", "lx": 778, "ly": 348}
+  ],
+  "edges": [
+    {"from": "office", "fs": "r", "to": "route", "ts": "l", "flow": "request"},
+    {"from": "route", "fs": "r", "to": "front", "ts": "l", "flow": "request"},
+    {"from": "front", "fs": "r", "to": "waf", "ts": "l", "flow": "request"},
+    {"from": "waf", "fs": "r", "to": "alb", "ts": "l", "flow": "request"},
+    {"from": "alb", "fs": "r", "to": "apps", "ts": "l", "flow": "request"},
+    {"from": "apps", "fs": "r", "to": "data", "ts": "l", "flow": "request"},
+
+    {"from": "mls3", "fs": "r", "to": "trainer", "ts": "l", "flow": "ambient"},
+    {"from": "trainer", "fs": "r", "to": "runstate", "ts": "l", "flow": "ambient"},
+
+    {"from": "vpcscope", "fs": "r", "to": "flows", "ts": "t", "flow": "garden", "mids": [[820, 560]]},
+    {"from": "apps", "fs": "b", "to": "logs", "ts": "t", "flow": "tool"},
+    {"from": "flows", "fs": "r", "to": "logs", "ts": "l", "flow": "garden"}
+  ],
+  "journeys": [
+    {"flow": "request", "dur": 3.2, "hops": [["office", "route"], ["route", "front"], ["front", "waf"], ["waf", "alb"], ["alb", "apps"], ["apps", "data"]]},
+    {"flow": "reply", "dur": 3.4, "reverse": true, "hops": [["apps", "data"], ["alb", "apps"], ["waf", "alb"], ["front", "waf"], ["route", "front"], ["office", "route"]]},
+    {"flow": "ambient", "dur": 2.8, "hops": [["mls3", "trainer"], ["trainer", "runstate"]]},
+    {"flow": "garden", "dur": 2.5, "hops": [["vpcscope", "flows"], ["flows", "logs"]]},
+    {"flow": "tool", "dur": 2.4, "hops": [["apps", "logs"]]}
+  ],
+  "steps": [["office", "route", 1], ["route", "front", 2], ["front", "waf", 3], ["waf", "alb", 4], ["alb", "apps", 5], ["apps", "data", 6]],
+  "legend": []
+}

@@ -1,0 +1,43 @@
+services:
+  bedrock-broker:
+    build:
+      context: ./aws_broker
+      args:
+        RUNTIME_UID: "11002"
+        RUNTIME_GID: "11002"
+    network_mode: host
+    environment:
+      BROKER_MODE: bedrock
+      BROKER_REGION: ap-northeast-2
+      BROKER_SOCKET_PATH: /run/jcareer-bedrock/broker.sock
+      BROKER_EXPECTED_PEER_UID: "11002"
+      BEDROCK_MODEL_ID: apac.amazon.nova-lite-v1:0
+      AWS_EC2_METADATA_DISABLED: "false"
+    volumes:
+      - /var/run/jcareer-bedrock:/run/jcareer-bedrock
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1770,uid=11002,gid=11002
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 128m
+    pids_limit: 64
+    healthcheck:
+      test: ["CMD-SHELL", "test -S /run/jcareer-bedrock/broker.sock"]
+      interval: 5s
+      timeout: 2s
+      retries: 20
+    restart: unless-stopped
+
+  llm-gateway:
+    environment:
+      LLM_PROVIDER: bedrock
+      ALLOW_BEDROCK_LIVE: "true"
+      BEDROCK_AWS_BROKER_SOCKET: /run/jcareer-bedrock/broker.sock
+      AWS_EC2_METADATA_DISABLED: "true"
+    volumes:
+      - /var/run/jcareer-bedrock:/run/jcareer-bedrock:ro
+    depends_on:
+      bedrock-broker:
+        condition: service_healthy

@@ -67,11 +67,11 @@ python tests/two_sided_asis_observations.py
 잡는다. legacy `required_calls`는 handler AST의 선택된 symbol 존재 목록이며 분기 실행 증거가 아니다.
 완전한 DB read/write graph는 아니다. OpenAPI security scheme, 완전한 response schema,
 dependency/downstream의 전체 오류 조건은 아직 제품 wire 계약으로 고정하지 않았다.
-`contracts/api_effects.json`은 33개 handler 전부의 양 DB·감사·Redis·agent·gateway·prompt-log
+`contracts/api_effects.json`은 35개 handler 전부의 세 DB·감사·Redis·agent·gateway·prompt-log·SQS·DynamoDB 결과함
 효과와 주요 분기를 별도로 선언하고 함수 지문과 선택된 lexical 순서를 검사한다. 이 역시 완전한
 CFG 또는 실행 trace가 아니다.
-`contracts/api_wire_shapes.json`은 같은 33개 handler의 직접 `return` 표현식과 handler 본문에
-직접 적힌 literal `HTTPException`만 source에서 추출해 38개 route의 성공 status와 나란히 둔다.
+`contracts/api_wire_shapes.json`은 같은 35개 handler의 직접 `return` 표현식과 handler 본문에
+직접 적힌 literal `HTTPException`만 source에서 추출해 40개 route의 성공 status와 나란히 둔다.
 literal object의 최상위 key만 기록하며 helper·local name·cache 반환을 펼치지 않는다. 빈 오류
 목록은 dependency·helper·downstream·FastAPI/Pydantic 422·500 오류가 없다는 뜻이 아니고,
 응답 model이나 제품 wire schema가 강제된다는 증거도 아니다.
@@ -133,30 +133,39 @@ docker compose down --volumes
 | `api` | FastAPI 업무·인증·감사 API | 8000 |
 | `agent` | 결정론적 matcher | 8100 |
 | `llm-gateway` | 로컬 합성 provider stub, 기본 비활성 Bedrock adapter, prompt log | 8200 |
-| RDS PostgreSQL | PostgreSQL 16 컨테이너, 회원·기업 논리 DB | 내부 5432 |
+| RDS PostgreSQL | PostgreSQL 16 컨테이너, 회원·기업·합성결과 논리 DB | 내부 5432 |
 | ElastiCache Redis | Redis 7 컨테이너, 추천 캐시 24시간 | 내부 6379 |
 
 서비스 발견은 Compose DNS 이름 `api`, `agent`, `llm-gateway`, `postgres`, `redis`로 한다.
 이는 현재 `terraform/asis`에 없는 런타임 계약이며, 그대로 ECS가 동작한다는 의미가 아니다.
 
-## 회원 DB와 기업 DB 경계
+## 회원·기업·합성결과 DB 경계
 
 사용자가 제공한 `기업db_회원db.jpg`를 참고해 같은 PostgreSQL 서버 안에 두 개의 별도
-database와 전용 role을 둔다. 이는 물리 RDS 두 대나 독립 장애 경계를 뜻하지 않는다.
+업무 database와 별도 합성결과 database, 각각의 전용 role을 둔다. 이는 물리 RDS 세 대나
+독립 장애 경계를 뜻하지 않는다.
 
 | 논리 DB | 소유 데이터 |
 |---|---|
 | `jcareer_member` | 통합 로그인 identity, 동의, 이력서, 지원관계, 감사 이벤트 |
 | `jcareer_company` | 기업, 기업 방향·핵심가치 프로필, 채용공고 |
+| `jcareer_outcome` | 합성 dataset 메타데이터와 가명화된 합성 서류결과 관찰; 점수·순위 효과 없음 |
 
 기업 담당자도 플랫폼 계정이므로 인증 identity는 회원 DB에 두고, `company_id`로 기업 DB의
 고객 조직을 논리 참조한다. 이는 현재 구현 가정이다. 기업 담당자의 인증정보까지 기업 DB로
 옮기는 별도 identity realm은 아직 승인된 요구사항이 아니다.
 
-두 DB 사이에는 foreign key나 ORM relationship이 없다. 로컬 init은 반대 DB에 대한 role의
-`CONNECT` 권한을 회수한다. 다만 API 프로세스는 업무 조합을 위해 두 DSN을 모두 가지며,
-같은 RDS·보안그룹·백업·읽기 복제본을 공유한다. 교차 DB 쓰기는 원자적이지 않고 현재
+세 DB 사이에는 foreign key나 ORM relationship이 없다. 로컬 init은 다른 DB에 대한 공개
+`CONNECT` 권한을 회수한다. 다만 API 프로세스는 업무 조합을 위해 세 DSN을 모두 가지며,
+같은 PostgreSQL 서버·장애 경계를 공유한다. 교차 DB 쓰기는 원자적이지 않고 현재
 개발용 `create_all`·자동 seed는 배포용 migration 방식이 아니다.
+
+`tests/database_boundary.py`는 세 전용 role에서 자기 DB를 제외한 여섯 연결 조합과 세
+테이블 집합의 분리를 모두 검사하도록 정의돼 있다. 이 보강본은 AWS teardown 뒤 Docker를
+다시 기동하지 않았으므로 현재 실행 증거가 아니라 다음 격리 통합시험 항목이다.
+
+`terraform/asis`는 회원·기업 DB 소유 경계까지만 모델링하고 합성결과 DB URL·role·bootstrap은
+아직 배선하지 않는다. 런타임의 세 번째 DB 존재를 Terraform AS-IS 배포 증거로 읽지 않는다.
 
 ## 구현된 P0 경로
 
@@ -189,6 +198,11 @@ database와 전용 role을 둔다. 이는 물리 RDS 두 대나 독립 장애 �
   목록을 좁히고, 최대 3명의 기존 score breakdown을 나란히 보는 임시 비교를 제공한다. 화면
   필터는 서버 순서를 바꾸거나 점수를 다시 계산하지 않는다. 비교 선택은 브라우저 메모리에만
   있고 서버에 저장하지 않으며, 전체 인재 검색·shortlist·채용 판정 기능이 아니다.
+- 같은 기업 추천 카드는 자기소개·프로젝트와 공고 요구 기술·기업 선언에서 직접 겹친 문구만
+  `recruiter_review_support`로 나눠 표시한다. 이는 문자열 위치를 보여 주는 합성 검토 자료이며
+  점수·추천 순서·자동 선발·합격 가능성·기업 적합도에 영향을 주지 않는다. 무영향·사람 검토
+  계약이 확인되지 않으면 UI는 근거를 표시하지 않는다. 기업 추천 cache는 지원자 집합·이력서
+  version을 키에 넣지 않으므로 cache hit의 근거는 생성 당시 자료이고 현재 원문 재확인이 필요하다.
 - 동의 이벤트의 `policy_version`은 server-side 동의문 catalog나 hash에서 선택되지 않고 client가
   보낸 문자열을 기록한다. 기록된 수집 항목에는 `skills`, `desired_role`, `self_intro`가 없지만
   현재 추천·설명 경로는 이 필드를 처리한다. `birth_date`↔`birthdate`, `career`↔`years_experience`,
@@ -206,14 +220,16 @@ database와 전용 role을 둔다. 이는 물리 RDS 두 대나 독립 장애 �
   기여도·표시값을 반환한다. 화면은 이를 그대로 표시하며 브라우저에서 점수를 재계산하지
   않는다. 상세 계약과 시연 항목은 `AI_MATCHING_FLOW.md`에 있다.
 - Bedrock Converse adapter는 기존 `llm-gateway` 안에 포함되지만 기본 provider는 합성
-  stub이고 `ALLOW_BEDROCK_LIVE=false`다. 별도 서비스는 추가하지 않았다.
+  stub이고 `ALLOW_BEDROCK_LIVE=false`다. 단기 lab에는 권한을 일반 gateway에서 떼는 조건부
+  capability-broker helper source가 있으나 별도 AI 제품 서비스가 아니며, 두 provider broker는
+  같은 EC2 role을 공유한다. 실제 broker 기동이나 provider 응답 증거는 없다.
 - 기업 담당자는 회사 방향과 핵심가치를 버전이 붙은 프로필로 입력할 수 있다. 설명 경로는
-  자소서의 직접 일치 표현을 별도 `company_alignment`로 반환하며 현재 점수에는 합산하지
-  않는다.
+  자소서·프로젝트의 직접 일치 표현을 별도 `company_alignment`로 반환하며 현재 점수에는 합산하지
+  않는다. 기업용 원문 근거는 이 생성 설명과도 분리된 결정론적 직접 문구 대조다.
 - 설명 경로가 받은 합성 원문은 별도 `prompt-logs` 볼륨에 기록된다. 일반 애플리케이션
   로그에는 원문과 토큰을 쓰지 않는다.
 - cache miss의 현재 설명 요청에는 시나리오상 준비되는 여섯 필드(`name`, `phone`, `email`,
-  `birthdate`, `address`, `school`)와 `certificates`, `self_intro`가 포함된다. Gateway는 여섯
+  `birthdate`, `address`, `school`)와 `certificates`, `projects`, `self_intro`가 포함된다. Gateway는 여섯
   필드와 전체 준비 필드명을 구분해 `PREPARED`로 기록하지만, 값이 실제 개인정보인지 자동
   판정하지 않는다. 현재 요청의 실패 응답도 준비 필드를 반환하되 gateway나 외부 공급자의 실제
   수신은 주장하지 않는다. 빈 추천 집합은 필드를 준비하지 않는다. cache hit는 원본 요청에서
@@ -222,12 +238,18 @@ database와 전용 role을 둔다. 이는 물리 RDS 두 대나 독립 장애 �
 - 추천 캐시는 Redis에 24시간 저장한다.
 - 후보자 추천 캐시 키는 이력서 갱신 시점과 열린 공고의 식별자·회사 프로필 버전·제목·본문·
   지역·고용형태·요구 기술·최소 경력·상태·갱신 시점을 canonical hash로 묶는다. 이 재료가
-  바뀌면 새 키를 사용한다. 양쪽 cache key는 provider·설명 계약·Bedrock client region·model
+  바뀌면 새 키를 사용한다. 후보자 cache key는 합성결과 dataset version과 현재 합성 관찰의
+  원문 없는 특징·태그·생성결과 집합 revision을 포함해 관찰 내용이 달라진 cache를 재사용하지 않는다.
+  합성결과 DB 조회는 별도 session으로 격리한다. 사용할 수 없으면 점수·순서를 유지하고
+  `UNAVAILABLE_OBSERVATION_STORE`·효과 `NONE`을 반환하며 해당 응답은 cache에 쓰지 않는다.
+  양쪽 cache key는 provider·설명 계약·Bedrock client region·model
   reference의 구성 지문도 포함해 구성이 바뀐 과거 설명을 재사용하지 않는다. 이 지문은 실제
   공급자 호출이나 처리 위치의 증거가 아니다. 반면 기업 추천 캐시는 지원자 집합·이력서 version을 키에 포함하지
   않아, 그 stale 동작은 별도 AS-IS 관찰 시나리오로 남아 있다.
   cache envelope에는 동의·정책 snapshot, tenant/customer side, 생성 시각, system prompt revision,
   inference 설정, live flag 또는 content MAC도 결속되지 않는다.
+- `projects`는 현재 핵심동의 `collected_items` catalog에 없으므로, 기존 동의 항목에 자동으로
+  포함됐다고 주장하지 않는다. 명칭·목적·보관·외부전달 매핑은 사람 결정으로 남긴다.
 - 회원 탈퇴는 주 데이터베이스 처리를 수행하지만 화면에서 모든 저장면의 완전 삭제를
   주장하지 않는다. 합성 canary 시험에서는 주 DB의 이력서·지원관계 제거 뒤에도 이미
   생성된 추천 캐시와 raw prompt 기록이 즉시 함께 제거되지 않는 동작을 관찰했다.

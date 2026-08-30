@@ -47,6 +47,11 @@ def main() -> None:
     candidate_token, _ = login("candidate@jcareer.test")
     recruiter_token, recruiter = login("recruiter@jcareer.test")
 
+    status, body = request("/api/v1/admin/ai-operations")
+    expect(status, 401, body, "anonymous AI operations API access")
+    status, body = request("/api/v1/admin/ai-operations", token=candidate_token)
+    expect(status, 403, body, "candidate crossing into admin AI operations API")
+
     status, body = request(
         "/api/v1/candidates/me/consents",
         method="POST",
@@ -71,6 +76,8 @@ def main() -> None:
     expect(status, 403, body, "recruiter crossing into candidate API")
     status, body = request("/api/v1/admin/audit", token=recruiter_token)
     expect(status, 403, body, "recruiter crossing into admin API")
+    status, body = request("/api/v1/admin/ai-operations", token=recruiter_token)
+    expect(status, 403, body, "recruiter crossing into admin AI operations API")
 
     status, jobs = request("/api/v1/jobs")
     expect(status, 200, jobs, "public jobs")
@@ -275,11 +282,25 @@ def main() -> None:
     assert stage_counts(interview_overview)["interview"] == stage_counts(applied_overview)["interview"] + 1
 
     admin_token, _ = login("admin@jcareer.test")
+    status, operations = request("/api/v1/admin/ai-operations", token=admin_token)
+    expect(status, 200, operations, "admin AI operations read")
+    assert operations["matcher"]["probe_state"] == "AVAILABLE"
+    assert operations["llm_gateway"]["probe_state"] == "AVAILABLE"
+    assert operations["opendart"]["probe_state"] == "NOT_PROBED"
+    assert operations["outcome_observation"]["probe_state"] == "NOT_PROBED"
+    assert operations["mlops"]["probe_state"] == "NOT_PROBED"
+    assert "base_url" not in json.dumps(operations).lower()
     status, events = request("/api/v1/admin/audit", token=admin_token)
     expect(status, 200, events, "admin audit read")
     rendered_events = json.dumps(events, ensure_ascii=False)
     assert synthetic_email not in rendered_events
     assert "010-0000-" not in rendered_events
+    status, operation_views = request(
+        "/api/v1/admin/audit?event_type=ai_operations_snapshot_viewed&limit=500",
+        token=admin_token,
+    )
+    expect(status, 200, operation_views, "AI operations read audit")
+    assert operation_views, "admin AI operations reads must be recorded"
     status, audit_views = request(
         "/api/v1/admin/audit?event_type=audit_log_viewed&limit=500",
         token=admin_token,

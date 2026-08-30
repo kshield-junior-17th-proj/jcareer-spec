@@ -11,7 +11,7 @@ from typing import Literal
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, ConfigDict, Field
 
-from .bedrock_response import parse_bedrock_explanations
+from .aws_broker_client import BedrockBrokerError, generate_explanations
 
 
 logger = logging.getLogger("jcareer.llm_gateway")
@@ -93,6 +93,16 @@ class ScoreBreakdown(BaseModel):
     excluded_input_fields: list[str]
 
 
+class ProjectContext(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    title: str = Field(min_length=2, max_length=120)
+    role: str = Field(min_length=2, max_length=200)
+    technologies: list[str] = Field(default_factory=list, max_length=20)
+    summary: str = Field(min_length=10, max_length=2000)
+    outcome: str = Field(default="", max_length=800)
+
+
 class CandidateContext(BaseModel):
     """Bound the AS-IS provider payload without changing which fields it exposes."""
 
@@ -105,6 +115,7 @@ class CandidateContext(BaseModel):
     address: str = Field(max_length=120)
     school: str = Field(max_length=180)
     certificates: list[str] = Field(default_factory=list, max_length=30)
+    projects: list[ProjectContext] = Field(default_factory=list, max_length=10)
     self_intro: str = Field(default="", max_length=5000)
 
 
@@ -193,7 +204,17 @@ def _company_alignment(item: ExplanationItem) -> dict[str, object]:
         for value in company_context.get("declared_values", [])
         if str(value).strip()
     ]
-    self_intro = str(candidate_context.get("self_intro", "")).strip()
+    candidate_material = [str(candidate_context.get("self_intro", "")).strip()]
+    for project in candidate_context.get("projects", []):
+        if not isinstance(project, dict):
+            continue
+        candidate_material.extend(
+            str(project.get(field, "")).strip()
+            for field in ("title", "role", "summary", "outcome")
+        )
+        technologies = project.get("technologies", [])
+        if isinstance(technologies, list):
+            candidate_material.extend(str(value).strip() for value in technologies)
     if not direction or not values:
         return {
             "state": "COMPANY_PROFILE_UNAVAILABLE",
@@ -201,16 +222,16 @@ def _company_alignment(item: ExplanationItem) -> dict[str, object]:
             "direction_statement": direction,
             "declared_values": values,
             "matched_declared_values": [],
-            "basis": "company-declared-profile-and-self-introduction",
+            "basis": "company-declared-profile-and-candidate-materials",
             "score_effect": "NONE",
             "human_review_required": True,
         }
 
-    normalised_intro = _normalise_text(self_intro)
+    normalised_material = _normalise_text(" ".join(candidate_material))
     matched = [
         value
         for value in values
-        if _normalise_text(value) and _normalise_text(value) in normalised_intro
+        if _normalise_text(value) and _normalise_text(value) in normalised_material
     ]
     return {
         "state": (
@@ -222,7 +243,7 @@ def _company_alignment(item: ExplanationItem) -> dict[str, object]:
         "direction_statement": direction,
         "declared_values": values,
         "matched_declared_values": matched,
-        "basis": "company-declared-profile-and-self-introduction",
+        "basis": "company-declared-profile-and-candidate-materials",
         "score_effect": "NONE",
         "human_review_required": True,
     }
@@ -243,9 +264,9 @@ def _explanation(item: ExplanationItem) -> str:
         alignment = _company_alignment(item)
         matched_values = alignment["matched_declared_values"]
         alignment_text = (
-            f" 자소서에서 기업 선언 가치 {', '.join(matched_values)}와 직접 겹치는 표현을 확인했습니다."
+            f" 자소서·프로젝트에서 기업 선언 가치 {', '.join(matched_values)}와 직접 겹치는 표현을 확인했습니다."
             if matched_values
-            else " 자소서와 기업 선언 가치 사이의 직접 일치 표현은 확인되지 않았습니다."
+            else " 자소서·프로젝트와 기업 선언 가치 사이의 직접 일치 표현은 확인되지 않았습니다."
         )
         return (
             f"총 {item.score:g}점은 반올림 전 기여도를 합산해 산정했고, "
@@ -265,10 +286,6 @@ def _explanation(item: ExplanationItem) -> str:
 
 
 def _bedrock_explanations(items: list[ExplanationItem]) -> dict[str, str]:
-    import boto3
-    from botocore.config import Config
-    from botocore.exceptions import BotoCoreError, ClientError
-
     prompt_items = [
         {
             "subject_ref": item.subject_ref,
@@ -284,62 +301,13 @@ def _bedrock_explanations(items: list[ExplanationItem]) -> dict[str, str]:
         }
         for item in items
     ]
-    system_text = (
-        "당신은 채용 점수를 계산하지 않는 한국어 설명 생성기다. "
-        "입력의 결정론적 점수와 요인별 기여도를 바꾸거나 새 근거를 만들지 말라. "
-        "기업 방향은 company_context의 기업 선언문만 사용하고, 자소서 근거는 candidate_context의 self_intro에서만 찾아라. "
-        "각 subject_ref마다 두 문장 이하의 설명만 작성하라. "
-        "합격, 탈락, 채용 결정은 내리지 말라. "
-        "반드시 JSON 객체 {\"items\":[{\"subject_ref\":\"...\",\"text\":\"...\"}]}만 출력하라."
-    )
-    client = boto3.client(
-        "bedrock-runtime",
-        region_name=BEDROCK_REGION,
-        config=Config(
-            connect_timeout=2,
-            read_timeout=12,
-            retries={"max_attempts": 1, "mode": "standard"},
-        ),
-    )
     try:
-        response = client.converse(
-            modelId=BEDROCK_MODEL_ID,
-            system=[{"text": system_text}],
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "text": json.dumps(
-                                {
-                                    "contract_version": EXPLANATION_CONTRACT_VERSION,
-                                    "items": prompt_items,
-                                },
-                                ensure_ascii=False,
-                                sort_keys=True,
-                            )
-                        }
-                    ],
-                }
-            ],
-            inferenceConfig={"maxTokens": 1200, "temperature": 0.0, "topP": 0.1},
+        return generate_explanations(
+            contract_version=EXPLANATION_CONTRACT_VERSION,
+            items=prompt_items,
         )
-    except (BotoCoreError, ClientError) as exc:
+    except BedrockBrokerError as exc:
         raise RuntimeError("Bedrock explanation request failed") from exc
-
-    content = response.get("output", {}).get("message", {}).get("content", [])
-    rendered = "".join(
-        str(block.get("text", "")) for block in content if isinstance(block, dict)
-    ).strip()
-    if rendered.startswith("```"):
-        rendered = rendered.removeprefix("```json").removeprefix("```")
-        rendered = rendered.removesuffix("```").strip()
-    expected = {item.subject_ref for item in items}
-    try:
-        mapped = parse_bedrock_explanations(rendered, expected)
-    except ValueError as exc:
-        raise RuntimeError("Bedrock explanation response schema is invalid") from exc
-    return mapped
 
 
 @app.get("/llm/health")

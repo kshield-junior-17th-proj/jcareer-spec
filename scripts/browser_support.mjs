@@ -60,11 +60,24 @@ export function findChrome() {
   });
 }
 
-export async function startStaticServer() {
+export async function startStaticServer({ contentOverrides = new Map() } = {}) {
   const server = createServer(async (request, response) => {
     try {
       const requestUrl = new URL(request.url || '/', 'http://127.0.0.1');
       const decodedPath = decodeURIComponent(requestUrl.pathname);
+      const requestName = decodedPath.replace(/^\/+/, '').split(path.sep).join('/');
+      const overridden = contentOverrides.get(requestName);
+      if (overridden !== undefined) {
+        const value = Buffer.isBuffer(overridden) ? overridden : Buffer.from(overridden);
+        response.writeHead(200, {
+          'Cache-Control': 'no-store',
+          'Connection': 'close',
+          'Content-Length': value.length,
+          'Content-Type': MIME_TYPES.get(path.extname(requestName).toLowerCase()) || 'application/octet-stream',
+        });
+        response.end(request.method === 'HEAD' ? undefined : value);
+        return;
+      }
       let target = resolveRepoPath('.' + decodedPath);
       const targetStat = await stat(target);
       if (targetStat.isDirectory()) {

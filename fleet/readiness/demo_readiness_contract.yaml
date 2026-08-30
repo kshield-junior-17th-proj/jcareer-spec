@@ -1,0 +1,47 @@
+schema_version: jcareer-demo-readiness-contract-v1
+data_classification: SYNTHETIC_DEMONSTRATION_ONLY
+decision_authority: HUMAN
+execution_mode: LOCAL_FILESYSTEM_READ_ONLY
+allowed_result_states:
+  - NOT_READY
+  - READY_FOR_HUMAN_RUN
+forbidden_operations:
+  - aws_cli_invocation
+  - docker_invocation
+  - terraform_invocation
+  - git_invocation
+  - network_call
+  - cloud_mutation
+  - local_mutation
+application:
+  required_service_ids: [web, api, agent, llm-gateway]
+  preview_url_rules:
+    scheme: https
+    userinfo: forbidden
+    query: forbidden
+    fragment: forbidden
+    digest_algorithm: sha256
+windows:
+  required_endpoint_refs: [WIN-01, WIN-02, WIN-03]
+  required_record_schemas:
+    image_receipt: jcareer-windows-image-receipt-v2
+    build_observation: jcareer-windows-image-build-observation-v1
+    endpoint_apply_receipt: jcareer-redacted-terraform-apply-receipt-v1
+    session_record: jcareer-windows-endpoint-session-approval-v1
+  required_local_tool_ids:
+    - aws_cli_v2
+    - terraform
+    - python
+    - session_manager_plugin
+    - rdp_client
+macos:
+  required_declarations:
+    - physical_mac_available
+    - mdm_distribution_ready
+    - operator_identity_and_remote_access_defined
+result_limitations:
+  - supplied_record_shape_and_hash_only
+  - no_approval_or_human_decision_determination
+  - no_live_cloud_or_endpoint_observation
+  - no_macos_device_or_mdm_observation
+  - no_tool_version_or_execution_validation

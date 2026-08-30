@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from typing import Callable
 
 
-MESSAGE_SCHEMA_VERSION = "jcareer-opendart-refresh-request-v1"
+MESSAGE_SCHEMA_VERSION = "jcareer-opendart-refresh-request-v2"
 
 
 class OpenDartDispatchError(RuntimeError):
@@ -18,15 +18,20 @@ class OpenDartDispatchError(RuntimeError):
 def build_refresh_message(
     *,
     company_id: str,
+    expected_company_name: str,
     corp_code: str,
     requested_at: datetime | None = None,
     request_id: str | None = None,
 ) -> dict[str, str]:
     moment = (requested_at or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    bounded_company_name = " ".join(expected_company_name.split())[:120]
+    if not bounded_company_name:
+        raise OpenDartDispatchError("OpenDART company identity is missing")
     return {
         "schema_version": MESSAGE_SCHEMA_VERSION,
         "request_id": request_id or str(uuid.uuid4()),
         "company_id": company_id,
+        "expected_company_name": bounded_company_name,
         "corp_code": corp_code,
         "requested_at": moment.isoformat(),
     }
@@ -37,7 +42,12 @@ def enqueue_refresh(
     *,
     sender_factory: Callable[[], object] | None = None,
 ) -> dict[str, str]:
-    queue_url = os.getenv("OPENDART_REFRESH_QUEUE_URL", "").strip()
+    broker_socket = os.getenv("OPENDART_AWS_BROKER_SOCKET", "").strip()
+    queue_url = (
+        "broker://configured-opendart-refresh"
+        if broker_socket
+        else os.getenv("OPENDART_REFRESH_QUEUE_URL", "").strip()
+    )
     if not queue_url:
         raise OpenDartDispatchError("OpenDART serverless queue 설정을 확인해 주세요")
     canonical = json.dumps(
@@ -51,11 +61,16 @@ def enqueue_refresh(
     ).hexdigest()
     try:
         if sender_factory is None:
-            import boto3
+            if broker_socket:
+                from .aws_broker_client import OpenDartBrokerSqsClient
 
-            sender = boto3.client(
-                "sqs", region_name=os.getenv("AWS_REGION", "ap-northeast-2")
-            )
+                sender = OpenDartBrokerSqsClient()
+            else:
+                import boto3
+
+                sender = boto3.client(
+                    "sqs", region_name=os.getenv("AWS_REGION", "ap-northeast-2")
+                )
         else:
             sender = sender_factory()
         result = sender.send_message(

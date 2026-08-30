@@ -157,7 +157,7 @@ def main() -> None:
     rendered = explanation["items"][0]
     assert rendered["output_validation_state"] == "NOT_IMPLEMENTED_ASIS"
     assert rendered["generation_mode"] == "synthetic-overclaim-injection"
-    assert len(rendered["prompt_fields_prepared"]) == 8
+    assert len(rendered["prompt_fields_prepared"]) == 9
     assert len(rendered["pii_fields_prepared"]) == 6
     assert rendered["company_alignment"]["matched_declared_values"] == ["신뢰", "협업", "자동화"]
     assert rendered["company_alignment"]["score_effect"] == "NONE"
@@ -165,7 +165,7 @@ def main() -> None:
     assert "score" not in rendered, "the explanation provider cannot overwrite the matcher score"
 
     print("J-Career score/explanation contract: PASS")
-    print("Observed AS-IS scenario: 8 fields prepared, 6 classified as PII, overclaim not blocked.")
+    print("Observed AS-IS scenario: 9 fields prepared, 6 classified as PII, overclaim not blocked.")
     print("Company alignment is evidence-only and does not change the 100-point score.")
 
 

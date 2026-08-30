@@ -10,7 +10,7 @@
       "Bedrock은 선택적 설명만 생성하고 점수를 변경하지 않는다.",
       "회원DB와 기업DB를 논리 분리하고 현재 전송 key를 계수하되 승인된 최소화 allowlist는 아직 적용하지 않는다.",
       "이용자 데이터 학습은 기본 비활성이며 현재 전용 동의가 없다.",
-      "MLOps 시연은 회원·기업 고객 데이터를 쓰지 않는 오프라인 합성 흐름이다."
+      "MLOps 시연은 실제 이용자·실제 기업 데이터를 쓰지 않고 합성 회원DB·기업DB snapshot만 쓰는 오프라인 흐름이다."
     ]
   },
   "source": {
@@ -400,7 +400,7 @@
     "data_transfer": {
       "member_database_boundary": "LOGICALLY_SEPARATE_SOURCE_IMPLEMENTED",
       "company_database_boundary": "LOGICALLY_SEPARATE_SOURCE_IMPLEMENTED",
-      "candidate_context_key_count": 8,
+      "candidate_context_key_count": 9,
       "company_context_key_count": 6,
       "counter_flagged_key_count": 6,
       "full_candidate_derived_provider_field_count": "HUMAN_DECISION_PENDING",

@@ -15,6 +15,7 @@ import {
 } from "react-router-dom";
 import { api, jsonBody } from "./api.js";
 import { CandidateHomePage, CandidateJobComparison } from "./candidate-workspace.jsx";
+import { isValidRecruiterEvidenceClaim } from "./recruiter-evidence.js";
 
 const AuthContext = createContext(null);
 const UnsavedContext = createContext(null);
@@ -52,7 +53,7 @@ function routeTitle(pathname) {
   if (/^\/recruiter\/jobs\/[^/]+\/pipeline$/.test(pathname)) return "지원자 파이프라인";
   if (/^\/recruiter\/jobs\/[^/]+\/recommendations$/.test(pathname)) return "지원자 조건 일치 순위";
   if (pathname === "/recruiter/jobs") return "채용 관리";
-  if (pathname === "/admin/audit") return "감사 이벤트";
+  if (pathname === "/admin/audit") return "AI 운영·감사";
   if (pathname === "/privacy") return "개인정보 처리방침";
   if (pathname === "/terms") return "이용약관";
   return "페이지를 찾을 수 없습니다";
@@ -276,7 +277,7 @@ function Shell({ children }) {
           ["채용 관리", "/recruiter/jobs"]
         ]
       : user?.role === "admin"
-        ? [["감사 이벤트", "/admin/audit"]]
+        ? [["AI 운영·감사", "/admin/audit"]]
         : [];
 
   const signOut = () => {
@@ -544,7 +545,9 @@ function ProfileSource({ source }) {
 const openDartStateLabels = {
   AVAILABLE_SYNTHETIC_FIXTURE: "합성 예시 저장됨",
   AVAILABLE_LIVE: "외부 조회의 최근 저장본",
+  REFRESH_DISPATCH_PENDING: "외부 조회 등록 중",
   REFRESH_QUEUED: "갱신 요청 대기 중",
+  REFRESH_RETRY_PENDING: "외부 조회 재시도 대기 중",
   STALE_LAST_KNOWN_GOOD: "직전 저장본 유지 중",
   UNAVAILABLE_NO_SNAPSHOT: "조회 가능한 저장본 없음",
   UNAVAILABLE_INVALID_SNAPSHOT: "저장본 형식 확인 필요",
@@ -1023,7 +1026,7 @@ function ConsentPage() {
         <div className="consent-card required">
           <label className="check-row"><input name="privacy_core" type="checkbox" checked={required} disabled={coreRecorded || consentStateLoading || Boolean(consentStateError)} onChange={(e) => setRequired(e.target.checked)} /><span><strong>[필수] 이용약관 및 개인정보 수집·이용</strong><small>{consentStateLoading ? "기존 동의 확인 중" : coreRecorded ? `기록 완료 · 정책 버전 ${corePolicyVersion || "확인 필요"}` : "정책 버전 2026-05"}</small></span></label>
           <div className="consent-detail">
-            <p><strong>수집 항목</strong> 성명, 이메일, 연락처, 생년월일, 주소, 학력, 경력, 자격증</p>
+            <p><strong>수집 항목</strong> 성명, 이메일, 연락처, 생년월일, 주소, 학력, 경력, 자격증, 프로젝트</p>
             <p><strong>이용 목적</strong> 회원관리, 채용정보 제공, AI 추천 서비스 제공</p>
             <p><strong>보유 기간</strong> 회원 탈퇴 시까지</p>
           </div>
@@ -1041,7 +1044,8 @@ function ConsentPage() {
   );
 }
 
-const blankResume = { phone: "", birth_date: "", address_region: "", education: "", desired_role: "", years_experience: 0, skills: "", certificates: "", self_intro: "" };
+const blankProject = { title: "", role: "", technologies: "", summary: "", outcome: "" };
+const blankResume = { phone: "", birth_date: "", address_region: "", education: "", desired_role: "", years_experience: 0, skills: "", certificates: "", projects: [], self_intro: "" };
 
 function resumeFormFromResponse(data = {}) {
   return {
@@ -1053,6 +1057,13 @@ function resumeFormFromResponse(data = {}) {
     years_experience: Number(data.years_experience ?? 0),
     skills: Array.isArray(data.skills) ? data.skills.join(", ") : "",
     certificates: Array.isArray(data.certificates) ? data.certificates.join(", ") : "",
+    projects: Array.isArray(data.projects) ? data.projects.map((project) => ({
+      title: project?.title || "",
+      role: project?.role || "",
+      technologies: Array.isArray(project?.technologies) ? project.technologies.join(", ") : "",
+      summary: project?.summary || "",
+      outcome: project?.outcome || ""
+    })) : [],
     self_intro: data.self_intro || ""
   };
 }
@@ -1102,9 +1113,15 @@ function ResumePage() {
   const dirty = !loading && !loadError && JSON.stringify(form) !== baselineRef.current;
   useUnsavedChanges(dirty, "저장하지 않은 이력서 변경 내용이 있습니다. 다른 화면으로 이동할까요?");
   const update = (field) => (event) => setForm({ ...form, [field]: event.target.value });
+  const updateProject = (index, field) => (event) => setForm((current) => ({
+    ...current,
+    projects: current.projects.map((project, projectIndex) => projectIndex === index ? { ...project, [field]: event.target.value } : project)
+  }));
+  const addProject = () => setForm((current) => current.projects.length >= 10 ? current : ({ ...current, projects: [...current.projects, { ...blankProject }] }));
+  const removeProject = (index) => setForm((current) => ({ ...current, projects: current.projects.filter((_, projectIndex) => projectIndex !== index) }));
   const submit = async (event) => {
     event.preventDefault(); setBusy(true); setError(null); setMessage("");
-    const payload = { ...form, years_experience: Number(form.years_experience), birth_date: form.birth_date || null, skills: form.skills.split(",").map((v) => v.trim()).filter(Boolean), certificates: form.certificates.split(",").map((v) => v.trim()).filter(Boolean) };
+    const payload = { ...form, years_experience: Number(form.years_experience), birth_date: form.birth_date || null, skills: form.skills.split(",").map((v) => v.trim()).filter(Boolean), certificates: form.certificates.split(",").map((v) => v.trim()).filter(Boolean), projects: form.projects.map((project) => ({ ...project, technologies: project.technologies.split(",").map((value) => value.trim()).filter(Boolean) })) };
     delete payload.id; delete payload.user_id; delete payload.updated_at; delete payload.display_name; delete payload.email;
     try {
       const saved = await api("/api/v1/candidates/me/resume", { method: "POST", body: jsonBody(payload) });
@@ -1134,6 +1151,19 @@ function ResumePage() {
           <label><span>학력</span><input name="education" autoComplete="organization" value={form.education} onChange={update("education")} placeholder="합성 교육기관 · 전공" required /></label>
           <label><span>자격증</span><input name="certificates" autoComplete="off" value={form.certificates} onChange={update("certificates")} placeholder="합성 자격증 A" /></label>
         </div></fieldset>
+        <fieldset className="project-fieldset"><legend>프로젝트 근거</legend>
+          <div className="project-fieldset-heading"><p>프로젝트의 역할·기술·수행 내용은 공고와 직접 겹치는 원문 근거를 찾는 데만 사용됩니다. 현재 추천 점수에는 반영되지 않습니다.</p><button className="button quiet small" type="button" onClick={addProject} disabled={form.projects.length >= 10}>프로젝트 추가</button></div>
+          {form.projects.length ? <div className="project-editor-list">{form.projects.map((project, index) => <article className="project-editor" key={`project-${index}`}>
+            <div className="project-editor-title"><strong>프로젝트 {index + 1}</strong><button type="button" className="text-button" onClick={() => removeProject(index)} aria-label={`프로젝트 ${index + 1} 삭제`}>삭제</button></div>
+            <div className="form-grid two">
+              <label><span>프로젝트명</span><input name={`project_title_${index}`} value={project.title} onChange={updateProject(index, "title")} maxLength="120" placeholder="합성 데이터 파이프라인 개선" required /></label>
+              <label><span>내 역할</span><input name={`project_role_${index}`} value={project.role} onChange={updateProject(index, "role")} maxLength="200" placeholder="API 설계 및 구현" required /></label>
+              <label className="wide-field"><span>사용 기술</span><input name={`project_technologies_${index}`} value={project.technologies} onChange={updateProject(index, "technologies")} placeholder="Python, SQL, AWS" /><small>쉼표로 구분하며, 공고의 요구 기술과 직접 대조합니다.</small></label>
+              <label className="wide-field"><span>수행 내용</span><textarea name={`project_summary_${index}`} rows="4" value={project.summary} onChange={updateProject(index, "summary")} minLength="10" maxLength="2000" placeholder="실제 개인정보나 고객사명이 아닌 합성 프로젝트 내용을 입력하세요." required /></label>
+              <label className="wide-field"><span>결과·배운 점</span><textarea name={`project_outcome_${index}`} rows="3" value={project.outcome} onChange={updateProject(index, "outcome")} maxLength="800" placeholder="수치가 있다면 산출 기준도 함께 적어 주세요." /></label>
+            </div>
+          </article>)}</div> : <p className="project-empty">등록된 프로젝트가 없습니다. 근거를 추가해도 점수나 순위는 바뀌지 않습니다.</p>}
+        </fieldset>
         <fieldset><legend>자기소개</legend><label><span>경험과 강점</span><textarea name="self_intro" rows="7" value={form.self_intro} onChange={update("self_intro")} placeholder="실제 개인정보가 아닌 합성 문장을 입력하세요." /></label></fieldset>
         <ErrorNotice error={error} /><ConsentRecovery error={error} onContinue={() => setResumeDraft({ ...form })} /><SuccessNotice>{message}</SuccessNotice>
         <div className="form-actions"><button className="button" disabled={busy}>{busy ? "저장 중…" : "이력서 저장"}</button></div>
@@ -1217,6 +1247,127 @@ function RecommendationLoadStatus({ data, noun }) {
   return <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">{noun} {items.length}건의 조건 일치 결과가 준비되었습니다.{explanationSummary}</p>;
 }
 
+const decisionEvidenceSourceLabels = {
+  SELF_INTRO: "내 자기소개",
+  PROJECT_TITLE: "내 프로젝트 제목",
+  PROJECT_ROLE: "내 프로젝트 역할",
+  PROJECT_SUMMARY: "내 프로젝트 설명",
+  PROJECT_OUTCOME: "내 프로젝트 결과",
+  PROJECT_TECHNOLOGY: "내 프로젝트 기술",
+  JOB_SUMMARY: "채용공고 설명",
+  REQUIRED_SKILL: "채용공고 요구 기술",
+  DIRECTION_STATEMENT: "기업이 입력한 방향",
+  DECLARED_VALUE: "기업이 입력한 가치"
+};
+
+const recruiterEvidenceSourceLabels = {
+  ...decisionEvidenceSourceLabels,
+  SELF_INTRO: "지원자 자기소개",
+  PROJECT_TITLE: "지원자 프로젝트 제목",
+  PROJECT_ROLE: "지원자 프로젝트 역할",
+  PROJECT_SUMMARY: "지원자 프로젝트 설명",
+  PROJECT_OUTCOME: "지원자 프로젝트 결과",
+  PROJECT_TECHNOLOGY: "지원자 프로젝트 기술"
+};
+
+const syntheticSampleBandLabels = {
+  UNAVAILABLE: "조회 불가",
+  LT_5: "5건 미만",
+  "5_TO_9": "5~9건",
+  "10_TO_24": "10~24건",
+  "25_TO_49": "25~49건",
+  "50_PLUS": "50건 이상"
+};
+
+const historicalObservationCopy = {
+  AVAILABLE_SYNTHETIC_DEMO_ONLY: {
+    label: "합성 예시 관찰 가능",
+    body: "같은 기업·공고 범위의 합성 기록에서 문구 태그가 겹쳤는지만 보여줍니다."
+  },
+  INSUFFICIENT_SYNTHETIC_COHORT: {
+    label: "합성 예시 표본 구간이 작음",
+    body: "비교할 상태 구성이 부족해 겹친 태그를 표시하지 않습니다. 지원자 자료에 대한 판단이 아닙니다."
+  },
+  UNAVAILABLE_OBSERVATION_STORE: {
+    label: "합성 예시 관찰을 불러오지 못함",
+    body: "점수와 추천 순서는 그대로이며, 과거 관찰 자료는 이번 요청에 사용되지 않았습니다."
+  }
+};
+
+function noEffectCopy(value) {
+  return value === "NONE" ? "반영 없음" : "상태 확인 필요";
+}
+
+function CandidateDecisionSupport({ decisionSupport, subjectLabel = "" }) {
+  if (!decisionSupport) {
+    return <section className="candidate-decision-support unavailable" role="note"><strong>의사결정 보조 자료를 불러오지 못했습니다.</strong><span>위 구조화 점수만 표시하며, 누락된 자료를 추정하지 않습니다.</span></section>;
+  }
+  const quantitative = decisionSupport.quantitative_evidence || {};
+  const qualitative = decisionSupport.qualitative_evidence || {};
+  const historical = decisionSupport.historical_observation || {};
+  const claims = Array.isArray(qualitative.claims) ? qualitative.claims : [];
+  const sharedTags = Array.isArray(historical.shared_evidence_tags) ? historical.shared_evidence_tags : [];
+  const bands = historical.sample_count_bands || {};
+  const historyCopy = historicalObservationCopy[historical.state] || {
+    label: "합성 예시 관찰 상태 확인 필요",
+    body: "현재 응답만으로 과거 관찰 자료의 상태를 해석하지 않습니다."
+  };
+  const hasQuantitativeValue = quantitative.value !== null && quantitative.value !== undefined && Number.isFinite(Number(quantitative.value));
+  const quantitativeMaximum = Number.isFinite(Number(quantitative.max_value)) ? Number(quantitative.max_value) : 100;
+  const qualitativeHasNoEffect = qualitative.score_effect === "NONE" && qualitative.ranking_effect === "NONE";
+  const sampleBands = [
+    ["전체 합성 기록", bands.total],
+    ["합성 상태 · 통과", bands.passed],
+    ["합성 상태 · 비통과", bands.not_passed],
+    ["합성 상태 · 대기", bands.pending]
+  ];
+  const effectRows = [
+    ["현재 추천 응답", "runtime effect", historical.runtime_effect],
+    ["추천 순서", "ranking effect", historical.ranking_effect],
+    ["모델 반영", "model effect", historical.model_effect]
+  ];
+  const allObservationEffectsNone = effectRows.every(([, , value]) => value === "NONE");
+  const trainingUseNotApproved = historical.approved_for_model_training === false;
+
+  return (
+    <section className="candidate-decision-support" aria-label="합성 데모 의사결정 보조 자료">
+      <header className="decision-support-heading">
+        <div><span className="demo-only-badge">합성 데모 전용</span><h3>정량·정성 근거와 과거 관찰</h3></div>
+        <p>공고를 비교할 때 확인할 자료를 나눠 보여줍니다.{subjectLabel && <span className="sr-only"> · {subjectLabel}</span>}</p>
+      </header>
+      <div className="decision-support-grid">
+        <article className="decision-support-panel quantitative-panel">
+          <div className="decision-support-panel-heading"><span>01 · 정량 근거</span><strong>구조화 조건 일치</strong></div>
+          <div className="decision-support-score"><strong>{hasQuantitativeValue ? Number(quantitative.value).toFixed(1) : "—"}</strong><span>/ {quantitativeMaximum}점</span></div>
+          <p>기술·경력·희망 직무의 항목별 계산은 위의 ‘점수 계산 근거 보기’에서 확인할 수 있습니다.</p>
+        </article>
+        <article className="decision-support-panel qualitative-panel">
+          <div className="decision-support-panel-heading"><span>02 · 정성 자료</span><strong>문구 그대로 대조</strong></div>
+          <div className="decision-support-state"><span>{claims.length ? `직접 겹친 문구 ${claims.length}개` : "직접 겹친 문구 없음"}</span><small>{qualitativeHasNoEffect ? "점수·추천 순서 반영 없음" : "반영 상태 확인 필요"}</small></div>
+          {claims.length ? <ul className="literal-evidence-list">{claims.map((claim, index) => <li key={claim.claim_id || `${claim.matched_term}-${index}`}>
+            <strong>{claim.matched_term || "문구 확인 필요"}</strong>
+            <div><span>{decisionEvidenceSourceLabels[claim.candidate_source_type] || "내 자료"}</span><q>{claim.candidate_excerpt || "표시할 문구 없음"}</q></div>
+            <div><span>{decisionEvidenceSourceLabels[claim.employer_source_type] || "공고·기업 자료"}</span><q>{claim.employer_excerpt || "표시할 문구 없음"}</q></div>
+          </li>)}</ul> : <p className="decision-support-empty">문자열이 직접 겹치지 않았다는 뜻이며, 원문 의미가 다르다는 뜻은 아닙니다.</p>}
+        </article>
+        <article className="decision-support-panel historical-panel">
+          <div className="decision-support-panel-heading"><span>03 · 과거 관찰</span><strong>{historyCopy.label}</strong></div>
+          <p>{historyCopy.body}</p>
+          <dl className="sample-band-grid">{sampleBands.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{syntheticSampleBandLabels[value] || "확인 필요"}</dd></div>)}</dl>
+          <div className="shared-tag-observation"><strong>합성 ‘통과’ 상태 기록과 겹친 태그</strong>{sharedTags.length ? <div>{sharedTags.map((tag) => <span key={tag}>{tag}</span>)}</div> : <p>표시할 겹침 태그가 없습니다. 이를 긍정·부정 신호로 해석하지 않습니다.</p>}</div>
+          <small>응답 계약상 기업·공고별로 분리된 합성 관찰이며, 다른 기업 자료를 합쳐 계산하지 않습니다.</small>
+        </article>
+        <article className="decision-support-panel effect-panel">
+          <div className="decision-support-panel-heading"><span>04 · 영향 경계</span><strong>관찰 자료의 사용 위치</strong></div>
+          <dl>{effectRows.map(([label, codeLabel, value]) => <div key={codeLabel}><dt>{label}<small>{codeLabel}</small></dt><dd><strong>{noEffectCopy(value)}</strong><code>{value === "NONE" ? "NONE" : "확인 필요"}</code></dd></div>)}</dl>
+          <p>{allObservationEffectsNone ? "이 합성 관찰은 현재 점수 계산, 추천 순서, 모델에 반영되지 않습니다." : "관찰 자료의 영향 상태가 예상 계약과 달라 사람이 확인해야 합니다."} {trainingUseNotApproved ? "모델 학습용으로 승인된 자료도 아닙니다." : "모델 학습 사용 상태는 사람이 확인해야 합니다."}</p>
+        </article>
+      </div>
+      <footer className="decision-support-human-boundary"><strong>사람이 원문을 확인합니다.</strong><span>이 화면은 공고 비교를 돕는 합성 데모 자료입니다. 지원 여부와 문구의 의미는 지원자가 직접 검토하며, 채용 결과를 예측하거나 자동으로 정하지 않습니다.</span></footer>
+    </section>
+  );
+}
+
 function CandidateRecommendationsPage() {
   const beginRequest = useRequestEpoch();
   const [data, setData] = useState(null); const [error, setError] = useState(null); const [loading, setLoading] = useState(true);
@@ -1259,10 +1410,12 @@ function CandidateRecommendationsPage() {
       const subjectLabel = `조건 일치 결과 ${index + 1}, ${item.job.company_name} ${item.job.title}`;
       const selected = comparisonIds.includes(item.job.id);
       const selectionDisabled = !selected && comparisonIds.length >= 3;
+      const decisionBreakdown = item.decision_support?.quantitative_evidence?.score_breakdown || item.score_breakdown;
       return <article className={`recommendation-card candidate-recommendation${selected ? " is-selected" : ""}`} key={item.job.id}>
         <div className="candidate-match-tools"><span>추천 순서 {String(index + 1).padStart(2, "0")}</span><label className="candidate-compare"><input type="checkbox" checked={selected} disabled={selectionDisabled} onChange={() => toggleComparison(item.job.id)} /><span>{selected ? "비교에 담김" : selectionDisabled ? "최대 3개" : "근거 비교"}</span></label></div>
         <div className="recommendation-top"><div><span className="company-label">{item.job.company_name}</span><h2><Link to={`/jobs/${item.job.id}`}>{item.job.title}</Link></h2><p>{item.job.location} · 경력 {item.job.min_experience}년 이상</p></div><Score value={item.score} /></div>
-        <ScoreDisclosure breakdown={item.score_breakdown} explanation={item.explanation} explanationAttempt={data.explanation_attempt} audience="candidate" subjectLabel={subjectLabel} />
+        <ScoreDisclosure breakdown={decisionBreakdown} explanation={item.explanation} explanationAttempt={data.explanation_attempt} audience="candidate" subjectLabel={subjectLabel} />
+        <CandidateDecisionSupport decisionSupport={item.decision_support} subjectLabel={subjectLabel} />
         <CompanyAlignment alignment={item.explanation?.company_alignment} profileSource={item.job.company_profile?.source} />
         <SignalRail features={item.matched_feature_labels} />
         <Explanation explanation={item.explanation} subjectLabel={subjectLabel} />
@@ -1446,6 +1599,8 @@ function OpenDartProfileEditor({ profile, onUpdated }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const [message, setMessage] = useState("");
+  const mounted = useRef(true);
+  useEffect(() => () => { mounted.current = false; }, []);
   useEffect(() => { setCorpCode(profile?.opendart?.corp_code || ""); }, [profile?.opendart?.corp_code]);
   const submit = async (event) => {
     event.preventDefault();
@@ -1456,7 +1611,35 @@ function OpenDartProfileEditor({ profile, onUpdated }) {
         body: jsonBody({ corp_code: corpCode })
       });
       onUpdated(result.company_profile);
-      setMessage(result.refresh?.state === "QUEUED" ? "OpenDART 공개정보 갱신 요청을 대기열에 등록했습니다." : "OpenDART 공개정보의 합성 예시를 새로 저장했습니다.");
+      const queuedStates = new Set(["QUEUED", "ALREADY_PENDING", "QUEUE_RESULT_SUPERSEDED"]);
+      if (!queuedStates.has(result.refresh?.state)) {
+        setMessage("OpenDART 공개정보의 합성 예시를 새로 저장했습니다.");
+        return;
+      }
+      setMessage(result.refresh?.state === "ALREADY_PENDING"
+        ? "이미 등록된 외부 공개정보 조회 결과를 확인하는 중입니다."
+        : "외부 공개정보 조회를 등록했습니다. 결과를 확인하는 중입니다.");
+      for (let attempt = 0; attempt < 15; attempt += 1) {
+        await new Promise((resolve) => window.setTimeout(resolve, 2000));
+        if (!mounted.current) return;
+        const collected = await api("/api/v1/recruiter/company-profile/opendart/collect", {
+          method: "POST",
+          timeoutMs: 10_000
+        });
+        onUpdated(collected.company_profile);
+        if (collected.refresh?.state === "PENDING") continue;
+        if (collected.refresh?.state === "UPDATED_EXTERNAL_SNAPSHOT") {
+          setMessage("외부 공개정보의 최근 복사본을 저장했습니다. 점수에는 반영되지 않습니다.");
+        } else if (["RESULT_TIMEOUT", "RESULT_EXPIRED"].includes(collected.refresh?.state)) {
+          setMessage("외부 조회가 정해진 시간 안에 끝나지 않아 대기를 해제했습니다. 직전 복사본은 유지됩니다.");
+        } else if (collected.refresh?.state === "RESULT_SUPERSEDED") {
+          setMessage("더 최근 조회 요청이 있어 이전 결과를 반영하지 않았습니다.");
+        } else {
+          setMessage("외부 공개정보를 새로 저장하지 못해 직전 복사본을 유지했습니다.");
+        }
+        return;
+      }
+      setMessage("외부 조회가 아직 대기 중입니다. 잠시 뒤 다시 새로고침해 주세요.");
     } catch (caught) {
       setError(caught);
       api("/api/v1/recruiter/company-profile").then(onUpdated).catch(() => {});
@@ -1799,6 +1982,80 @@ function CandidateComparison({ items, onRemove, onClear }) {
   );
 }
 
+function RecruiterEvidenceReview({ reviewSupport, subjectLabel = "" }) {
+  if (!reviewSupport) {
+    return <section className="recruiter-evidence-review unavailable" role="note"><strong>기업 검토용 원문 근거를 불러오지 못했습니다.</strong><span>누락된 근거를 추정하지 않습니다. 지원자의 자기소개와 프로젝트 원문을 직접 확인해 주세요.{subjectLabel && <span className="sr-only"> · {subjectLabel}</span>}</span></section>;
+  }
+
+  const boundary = reviewSupport.review_boundary || {};
+  const qualitative = reviewSupport.qualitative_evidence || {};
+  const claimsAreArray = Array.isArray(qualitative.claims);
+  const claims = claimsAreArray ? qualitative.claims : [];
+  const boundaryIsNonEvaluative = reviewSupport.contract_version === "recruiter-evidence-review-v1"
+    && boundary.owner === "recruiter"
+    && boundary.purpose === "candidate_source_material_review"
+    && boundary.is_candidate_quality_decision === false
+    && boundary.is_hiring_probability === false
+    && boundary.is_company_fit_decision === false
+    && boundary.automatic_hiring_decision === false
+    && reviewSupport.human_review_required === true;
+  const effectsAreNone = reviewSupport.score_effect === "NONE"
+    && reviewSupport.ranking_effect === "NONE"
+    && qualitative.score_effect === "NONE"
+    && qualitative.ranking_effect === "NONE";
+  const sourceVersions = qualitative.source_versions || {};
+  const provenance = reviewSupport.provenance || {};
+  const sourceVersionKeysAreExact = sourceVersions !== null
+    && typeof sourceVersions === "object"
+    && !Array.isArray(sourceVersions)
+    && Object.keys(sourceVersions).sort().join("|") === "company_profile_version|job_version|resume_version";
+  const provenanceKeysAreExact = provenance !== null
+    && typeof provenance === "object"
+    && !Array.isArray(provenance)
+    && Object.keys(provenance).sort().join("|") === "candidate_resume_version|company_public_profile_version|evidence_contract_version|job_version";
+  const qualitativeContractIsValid = qualitative.contract_version === "candidate-qualitative-evidence-v1"
+    && qualitative.method === "literal-source-span-v1"
+    && qualitative.human_review_required === true
+    && claimsAreArray
+    && claims.length <= 8
+    && qualitative.state === (claims.length ? "AVAILABLE" : "NO_DIRECT_TEXT_EVIDENCE")
+    && claims.every(isValidRecruiterEvidenceClaim);
+  const provenanceIsBound = sourceVersionKeysAreExact
+    && provenanceKeysAreExact
+    && typeof sourceVersions.resume_version === "string"
+    && sourceVersions.resume_version.length > 0
+    && typeof sourceVersions.job_version === "string"
+    && sourceVersions.job_version.length > 0
+    && typeof sourceVersions.company_profile_version === "string"
+    && sourceVersions.company_profile_version.length > 0
+    && provenance.candidate_resume_version === sourceVersions.resume_version
+    && provenance.job_version === sourceVersions.job_version
+    && provenance.company_public_profile_version === sourceVersions.company_profile_version
+    && provenance.evidence_contract_version === qualitative.contract_version;
+
+  if (!boundaryIsNonEvaluative || !effectsAreNone || !qualitativeContractIsValid || !provenanceIsBound) {
+    return <section className="recruiter-evidence-review unavailable" role="alert"><strong>원문 근거 표시 계약을 확인해야 합니다.</strong><span>점수·순위 무영향 또는 사람 검토 경계가 확인되지 않아 근거를 표시하지 않습니다.{subjectLabel && <span className="sr-only"> · {subjectLabel}</span>}</span></section>;
+  }
+
+  return (
+    <section className="recruiter-evidence-review" aria-label="기업 검토용 합성 원문 근거">
+      <header className="recruiter-evidence-heading">
+        <div><span className="demo-only-badge">합성 데모 전용</span><h3>기업 검토용 원문 근거</h3></div>
+        <p>지원자 자료와 공고·기업 선언에서 같은 문구가 있는 위치만 보여줍니다.{subjectLabel && <span className="sr-only"> · {subjectLabel}</span>}</p>
+      </header>
+      <div className="recruiter-evidence-body">
+        <div className="recruiter-evidence-state"><strong>{claims.length ? `직접 겹친 문구 ${claims.length}개` : "직접 겹친 문구 없음"}</strong><span>점수·추천 순서 반영 없음</span></div>
+        {claims.length ? <ul className="literal-evidence-list">{claims.map((claim, index) => <li key={claim.claim_id || `${claim.matched_term}-${index}`}>
+          <strong>{claim.matched_term || "문구 확인 필요"}</strong>
+          <div><span>{recruiterEvidenceSourceLabels[claim.candidate_source_type] || "지원자 자료"}</span><q>{claim.candidate_excerpt || "표시할 문구 없음"}</q></div>
+          <div><span>{recruiterEvidenceSourceLabels[claim.employer_source_type] || "공고·기업 자료"}</span><q>{claim.employer_excerpt || "표시할 문구 없음"}</q></div>
+        </li>)}</ul> : <p className="decision-support-empty">문자열이 직접 겹치지 않았다는 뜻입니다. 지원자의 역량이나 원문 의미가 다르다는 판단이 아닙니다.</p>}
+      </div>
+      <footer className="recruiter-evidence-boundary"><strong>담당자가 원문을 직접 검토합니다.</strong><span>이 자료는 지원자 간 우열, 합격 가능성 또는 기업 적합도를 판정하지 않습니다. 캐시 응답이면 생성 당시 자료이므로 현재 이력서·프로젝트·공고 원문과 다시 대조해야 합니다.</span></footer>
+    </section>
+  );
+}
+
 function RecruiterRecommendationsPage() {
   const { id } = useParams(); const beginRequest = useRequestEpoch();
   const [data, setData] = useState(null); const [error, setError] = useState(null); const [loading, setLoading] = useState(true);
@@ -1921,6 +2178,7 @@ function RecruiterRecommendationsPage() {
                     </div>
                     <div className="recommendation-top"><div><span className="company-label">{item.candidate.desired_role}</span><h2>{item.candidate.display_name}</h2><p>경력 {item.candidate.years_experience}년 · 프로필 거주지역 {item.candidate.address_region} (점수 미사용)</p></div><Score value={item.score} /></div>
                     <ScoreDisclosure breakdown={item.score_breakdown} explanation={item.explanation} explanationAttempt={data.explanation_attempt} audience="recruiter" subjectLabel={subjectLabel} />
+                    <RecruiterEvidenceReview reviewSupport={item.recruiter_review_support} subjectLabel={subjectLabel} />
                     <CompanyAlignment alignment={item.explanation?.company_alignment} profileSource={data.job?.company_profile?.source} />
                     <SignalRail features={item.matched_feature_labels} />
                     <Explanation explanation={item.explanation} subjectLabel={subjectLabel} />
@@ -1938,11 +2196,172 @@ function RecruiterRecommendationsPage() {
   );
 }
 
+const aiProviderLabels = {
+  "local-synthetic-stub": "로컬 합성 응답",
+  bedrock: "Bedrock 어댑터 구성 보고됨",
+  UNRECOGNIZED_CONFIGURATION: "인식되지 않은 구성",
+  NOT_OBSERVED: "관찰되지 않음"
+};
+
+const openDartModeLabels = {
+  disabled: "외부 조회 꺼짐",
+  fixture: "합성 예시 모드",
+  live: "외부 조회 구성",
+  UNRECOGNIZED_CONFIGURATION: "인식되지 않은 구성"
+};
+
+const openDartDispatchLabels = {
+  fixture_inline: "API 내부 합성 처리",
+  serverless_queue: "서버리스 작업 요청 구성",
+  UNRECOGNIZED_CONFIGURATION: "인식되지 않은 구성"
+};
+
+function observedBoolean(value, trueLabel, falseLabel) {
+  if (value === true) return trueLabel;
+  if (value === false) return falseLabel;
+  return "관찰되지 않음";
+}
+
+function operationEffect(value) {
+  return value === "NONE" ? "영향 없음 · NONE" : "상태 확인 필요";
+}
+
+function probeStateLabel(value) {
+  if (value === "AVAILABLE") return "내부 health 응답 관찰됨";
+  if (value === "UNAVAILABLE") return "UNAVAILABLE · 내부 응답 미확인";
+  if (value === "NOT_PROBED") return "실행 확인 안 함 · 소스/구성만";
+  return "상태 확인 필요";
+}
+
+function observedAtLabel(value) {
+  if (!value) return "관찰시각 없음";
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return "관찰시각 형식 확인 필요";
+  return new Intl.DateTimeFormat("ko-KR", { dateStyle: "medium", timeStyle: "medium" }).format(parsed);
+}
+
+function AiServiceOperationsPanel({ operations, receivedAt, loading, error, onRetry }) {
+  const staleAfterSeconds = Number(operations?.stale_after_seconds || 0);
+  const receivedAtMillis = Number(receivedAt);
+  const [staleClock, setStaleClock] = useState(() => Date.now());
+  useEffect(() => {
+    setStaleClock(Date.now());
+    if (!operations || !Number.isFinite(receivedAtMillis) || staleAfterSeconds <= 0) return undefined;
+    const delay = Math.max(0, receivedAtMillis + staleAfterSeconds * 1000 - Date.now() + 25);
+    const staleTimer = setTimeout(() => setStaleClock(Date.now()), delay);
+    return () => clearTimeout(staleTimer);
+  }, [operations?.captured_at, receivedAtMillis, staleAfterSeconds]);
+  if (loading && !operations) return <section className="ai-operations-shell" aria-busy="true"><p className="sr-only" role="status" aria-live="polite">AI 구성과 내부 health 관찰을 읽는 중입니다.</p><Loading label="AI 구성과 내부 health 관찰을 읽는 중" /></section>;
+  if (error && !operations) return <section className="ai-operations-shell" aria-busy="false"><p className="sr-only" role="status" aria-live="polite">AI 구성 스냅샷을 읽지 못했습니다.</p><ErrorNotice error={error} onRetry={onRetry} /></section>;
+  if (!operations) return null;
+  const matcher = operations.matcher || {};
+  const gateway = operations.llm_gateway || {};
+  const opendart = operations.opendart || {};
+  const observation = operations.outcome_observation || {};
+  const mlops = operations.mlops || {};
+  const capturedAtMillis = new Date(operations.captured_at || "").getTime();
+  const snapshotIsStale = Number.isNaN(capturedAtMillis) || !Number.isFinite(receivedAtMillis) || (staleAfterSeconds > 0 && staleClock - receivedAtMillis >= staleAfterSeconds * 1000);
+  const liveAnnouncement = loading
+    ? "AI 구성 스냅샷을 새로 읽는 중입니다."
+    : error
+      ? "새 스냅샷을 읽지 못해 직전 응답을 유지합니다."
+      : `AI 구성 스냅샷을 갱신했습니다. 관찰시각 ${observedAtLabel(operations.captured_at)}`;
+  return (
+    <section className="ai-operations-shell" aria-labelledby="ai-operations-heading" aria-busy={loading}>
+      <p className="sr-only" role="status" aria-live="polite">{liveAnnouncement}</p>
+      <header className="ai-operations-heading">
+        <div><span>Configuration, source &amp; bounded health</span><h2 id="ai-operations-heading">AI 구성·소스 연결 스냅샷</h2></div>
+        <button type="button" className="button quiet small" disabled={loading} onClick={onRetry}>{loading ? "스냅샷 읽는 중…" : "스냅샷 새로 읽기"}</button>
+      </header>
+      <p className="ai-operations-boundary"><strong>내부 health와 소스·구성의 범위를 구분한 합성 데모 스냅샷입니다.</strong> health 응답은 프로세스가 응답했다는 관찰일 뿐, 추천·Bedrock·OpenDART 실행 성공이나 AWS 배포를 증명하지 않습니다.</p>
+      <div className="ai-operations-meta"><span>스냅샷 관찰시각 <time dateTime={operations.captured_at}>{observedAtLabel(operations.captured_at)}</time></span><span>stale 경계: 브라우저 수신 후 {staleAfterSeconds || "확인 필요"}초</span></div>
+      {(error || snapshotIsStale) && <p className="ai-operations-stale" role="status">{error ? "새 스냅샷을 읽지 못해 직전 응답을 유지합니다. 이 값은 stale 상태로 취급합니다." : "마지막 관찰이 stale 경계를 지났습니다. 새로 읽기 전에는 현재 상태로 해석하지 마세요."}</p>}
+      <div className="ai-operations-grid">
+        <article>
+          <div className="ai-operation-title"><span>01</span><div><small>Scoring</small><h3>결정론 Matcher</h3></div></div>
+          <dl>
+            <div><dt>내부 실행 확인</dt><dd>{probeStateLabel(matcher.probe_state)}</dd></div>
+            <div><dt>관찰시각</dt><dd>{observedAtLabel(matcher.observed_at)}</dd></div>
+            <div><dt>계산 방식</dt><dd>{matcher.mode === "DETERMINISTIC_RULE_MATCHER" ? "결정론 규칙 계산" : "확인 필요"}</dd></div>
+            <div><dt>health 보고 버전</dt><dd><code>{matcher.matcher_version || "관찰되지 않음"}</code></dd></div>
+            <div><dt>산식 버전</dt><dd><code>{matcher.formula_version || "확인 필요"}</code></dd></div>
+            <div><dt>외부 모델 점수 사용</dt><dd>{observedBoolean(matcher.external_model_used_for_score, "사용", "사용하지 않음")}</dd></div>
+          </dl>
+          <p>내부 health 문서만 읽습니다. 실제 추천 계산 요청과 결과 정확성은 시험하지 않습니다.</p>
+        </article>
+        <article>
+          <div className="ai-operation-title"><span>02</span><div><small>Explanation</small><h3>LLM Gateway</h3></div></div>
+          <dl>
+            <div><dt>내부 실행 확인</dt><dd>{probeStateLabel(gateway.probe_state)}</dd></div>
+            <div><dt>관찰시각</dt><dd>{observedAtLabel(gateway.observed_at)}</dd></div>
+            <div><dt>Provider</dt><dd>{aiProviderLabels[gateway.provider] || "확인 필요"}</dd></div>
+            <div><dt>Gateway live 보고</dt><dd>{observedBoolean(gateway.bedrock_live_enabled, "true 보고", "false 보고")}</dd></div>
+            <div><dt>점수·순서 영향</dt><dd>{operationEffect(gateway.score_effect)} / {operationEffect(gateway.ranking_effect)}</dd></div>
+          </dl>
+          <p>Gateway 자신의 health 응답을 제한된 값으로 표시합니다. Bedrock 외부 요청은 실행 확인하지 않습니다.</p>
+        </article>
+        <article>
+          <div className="ai-operation-title"><span>03</span><div><small>Company data</small><h3>OpenDART</h3></div></div>
+          <dl>
+            <div><dt>실행 확인</dt><dd>{probeStateLabel(opendart.probe_state)}</dd></div>
+            <div><dt>조회 모드</dt><dd>{openDartModeLabels[opendart.mode] || "확인 필요"}</dd></div>
+            <div><dt>작업 전달</dt><dd>{openDartDispatchLabels[opendart.dispatch_mode] || "확인 필요"}</dd></div>
+            <div><dt>점수 영향</dt><dd>{operationEffect(opendart.score_effect)}</dd></div>
+            <div><dt>추천 순서 영향</dt><dd>{operationEffect(opendart.ranking_effect)}</dd></div>
+          </dl>
+          <p>API 프로세스의 소스·구성만 표시합니다. worker, queue와 외부 조회 결과는 probe하지 않습니다.</p>
+        </article>
+        <article>
+          <div className="ai-operation-title"><span>04</span><div><small>Outcome observation</small><h3>합성 과거 관찰</h3></div></div>
+          <dl>
+            <div><dt>실행 확인</dt><dd>{probeStateLabel(observation.probe_state)}</dd></div>
+            <div><dt>추천 응답 연결</dt><dd>{observedBoolean(observation.response_wired, "표시용 소스 연결", "연결 안 됨")}</dd></div>
+            <div><dt>현재 응답 영향</dt><dd>{operationEffect(observation.runtime_effect)}</dd></div>
+            <div><dt>추천 순서 영향</dt><dd>{operationEffect(observation.ranking_effect)}</dd></div>
+            <div><dt>모델 영향</dt><dd>{operationEffect(observation.model_effect)}</dd></div>
+          </dl>
+          <p>합성 기록을 설명 응답에 연결한 소스 사실만 표시하며 저장소 조회 성공은 확인하지 않습니다.</p>
+        </article>
+        <article className="ai-operation-wide">
+          <div className="ai-operation-title"><span>05</span><div><small>MLOps boundary</small><h3>서버리스 MLOps 연결</h3></div></div>
+          <dl>
+            <div><dt>실행 확인</dt><dd>{probeStateLabel(mlops.probe_state)}</dd></div>
+            <div><dt>추천 런타임 연결</dt><dd>{observedBoolean(mlops.runtime_wired, "연결됨", "연결 안 됨")}</dd></div>
+            <div><dt>추천 순서 연결</dt><dd>{observedBoolean(mlops.ranking_runtime_wired, "연결됨", "연결 안 됨")}</dd></div>
+            <div><dt>자동 모델 활성화</dt><dd>{observedBoolean(mlops.automatic_model_activation, "구성됨", "구성 안 됨")}</dd></div>
+            <div><dt>실행 증거</dt><dd>{mlops.execution_evidence === "NOT_CAPTURED_BY_THIS_ENDPOINT" ? "이 화면에서 수집하지 않음" : "확인 필요"}</dd></div>
+          </dl>
+          <p>별도 일회성 서버리스 소스 경계만 있으며 현재 추천 런타임과 추천 순서에는 연결되지 않았습니다.</p>
+        </article>
+      </div>
+      <footer><strong>사람 검토 필요</strong><span>외부 서비스 실호출 증거와 AWS 배포 증거는 이 응답에 없습니다. 내부 health, 소스 구성, 실제 업무 요청 성공을 구분해 사람이 별도 실행 기록을 확인해야 합니다.</span></footer>
+    </section>
+  );
+}
+
 function AdminAuditPage() {
-  const [events, setEvents] = useState(null); const [filter, setFilter] = useState(""); const [error, setError] = useState(null);
-  const load = async (event) => { event?.preventDefault(); setEvents(null); setError(null); try { setEvents(await api(`/api/v1/admin/audit${filter ? `?event_type=${encodeURIComponent(filter)}` : ""}`)); } catch (caught) { setError(caught); } };
-  useEffect(() => { load(); }, []);
-  return <section className="content wide"><PageHeader eyebrow="Operations" title="감사 이벤트" description="사용자 행동과 업무 이벤트의 메타데이터를 확인합니다. 추천 적합성 판정은 이 화면에서 하지 않습니다." /><form className="audit-filter" onSubmit={load}><label><span>이벤트 유형</span><input name="event_type" autoComplete="off" value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="예: candidate_view" /></label><button className="button quiet">필터 적용</button></form><ErrorNotice error={error} />{!events && !error ? <Loading /> : events?.length ? <div className="audit-table" role="table" aria-label="감사 이벤트 목록" tabIndex="0"><div className="audit-head" role="row"><span role="columnheader">시간</span><span role="columnheader">이벤트</span><span role="columnheader">행위자</span><span role="columnheader">대상</span><span role="columnheader">결과</span><span role="columnheader">Correlation</span></div>{events.map((event) => <div className="audit-row" role="row" key={event.id}><time role="cell" dateTime={event.occurred_at}>{new Intl.DateTimeFormat("ko-KR", { dateStyle: "short", timeStyle: "short" }).format(new Date(event.occurred_at))}</time><strong role="cell">{event.event_type}</strong><span role="cell">{event.actor_role}</span><span className="mono" role="cell">{event.target_type}<small>{event.target_ref}</small></span><span role="cell">{event.result}</span><code role="cell">{event.correlation_id.slice(0, 8)}</code></div>)}</div> : events ? <EmptyState title="조건에 맞는 이벤트가 없습니다" body="필터를 지우거나 다른 이벤트 유형을 입력해 보세요." /> : null}</section>;
+  const [events, setEvents] = useState(null);
+  const [filter, setFilter] = useState("");
+  const [eventsError, setEventsError] = useState(null);
+  const [operations, setOperations] = useState(null);
+  const [operationsReceivedAt, setOperationsReceivedAt] = useState(null);
+  const [operationsError, setOperationsError] = useState(null);
+  const [operationsLoading, setOperationsLoading] = useState(true);
+  const loadEvents = async (event) => {
+    event?.preventDefault(); setEvents(null); setEventsError(null);
+    try { setEvents(await api(`/api/v1/admin/audit${filter ? `?event_type=${encodeURIComponent(filter)}` : ""}`)); } catch (caught) { setEventsError(caught); }
+  };
+  const loadOperations = async () => {
+    setOperationsLoading(true); setOperationsError(null);
+    try {
+      const snapshot = await api("/api/v1/admin/ai-operations");
+      if (!snapshot?.matcher || !snapshot?.llm_gateway) throw new Error("AI 구성 스냅샷이 응답에 없습니다.");
+      setOperationsReceivedAt(Date.now());
+      setOperations(snapshot);
+    } catch (caught) { setOperationsError(caught); } finally { setOperationsLoading(false); }
+  };
+  useEffect(() => { loadEvents(); loadOperations(); }, []);
+  return <section className="content wide"><PageHeader eyebrow="Operations" title="AI 운영과 감사" description="AI 구성·연결 사실과 사용자 행동 감사 이벤트를 분리해 확인합니다." /><AiServiceOperationsPanel operations={operations} receivedAt={operationsReceivedAt} loading={operationsLoading} error={operationsError} onRetry={loadOperations} /><section className="audit-events-section" aria-labelledby="audit-events-heading"><div className="audit-section-heading"><div><span>Audit events</span><h2 id="audit-events-heading">감사 이벤트</h2></div></div><form className="audit-filter" onSubmit={loadEvents}><label><span>이벤트 유형</span><input name="event_type" autoComplete="off" value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="예: candidate_view" /></label><button className="button quiet">필터 적용</button></form><ErrorNotice error={eventsError} />{!events && !eventsError ? <Loading /> : events?.length ? <div className="audit-table" role="table" aria-label="감사 이벤트 목록" tabIndex="0"><div className="audit-head" role="row"><span role="columnheader">시간</span><span role="columnheader">이벤트</span><span role="columnheader">행위자</span><span role="columnheader">대상</span><span role="columnheader">결과</span><span role="columnheader">Correlation</span></div>{events.map((event) => <div className="audit-row" role="row" key={event.id}><time role="cell" dateTime={event.occurred_at}>{new Intl.DateTimeFormat("ko-KR", { dateStyle: "short", timeStyle: "short" }).format(new Date(event.occurred_at))}</time><strong role="cell">{event.event_type}</strong><span role="cell">{event.actor_role}</span><span className="mono" role="cell">{event.target_type}<small>{event.target_ref}</small></span><span role="cell">{event.result}</span><code role="cell">{event.correlation_id.slice(0, 8)}</code></div>)}</div> : events ? <EmptyState title="조건에 맞는 이벤트가 없습니다" body="필터를 지우거나 다른 이벤트 유형을 입력해 보세요." /> : null}</section></section>;
 }
 
 function LegalPage({ type }) {

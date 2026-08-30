@@ -42,6 +42,7 @@ def main() -> None:
         {"items": [{"subject_ref": 1, "text": "설명"}]},
         {"items": [{"subject_ref": "subject-1", "text": 1}]},
         {"items": [{"subject_ref": "subject-1", "text": ""}]},
+        {"items": [{"subject_ref": "subject-1", "text": "가" * 1_001}]},
         {"items": [{"subject_ref": "other", "text": "설명"}]},
         {"items": [{"subject_ref": "subject-1", "text": "설명", "extra": True}]},
     ):

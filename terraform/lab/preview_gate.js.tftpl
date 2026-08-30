@@ -1,0 +1,56 @@
+function handler(event) {
+  var crypto = require("crypto");
+  var request = event.request;
+  var accessTokenSha256 = ${access_token_sha256_json};
+  var cookieName = "jcareer_preview_access";
+  var bootstrapName = "jcareer_preview";
+  var bootstrap = request.querystring && request.querystring[bootstrapName];
+
+  function tokenMatches(value) {
+    return (
+      typeof value === "string" &&
+      /^[0-9a-f]{64}$/.test(value) &&
+      crypto.createHash("sha256").update(value).digest("hex") === accessTokenSha256
+    );
+  }
+
+  if (bootstrap && tokenMatches(bootstrap.value)) {
+    return {
+      statusCode: 302,
+      statusDescription: "Found",
+      headers: {
+        "cache-control": { value: "no-store" },
+        "referrer-policy": { value: "no-referrer" },
+        "location": { value: "/jobs" }
+      },
+      cookies: {
+        "jcareer_preview_access": {
+          value: bootstrap.value,
+          attributes: "Secure; HttpOnly; SameSite=Strict; Path=/; Max-Age=${max_age_seconds}"
+        }
+      }
+    };
+  }
+
+  var previewCookie = request.cookies && request.cookies[cookieName];
+  if (!previewCookie || !tokenMatches(previewCookie.value)) {
+    return {
+      statusCode: 403,
+      statusDescription: "Forbidden",
+      headers: {
+        "cache-control": { value: "no-store" },
+        "referrer-policy": { value: "no-referrer" },
+        "content-type": { value: "text/plain; charset=utf-8" }
+      },
+      body: "J-Career synthetic preview access is required."
+    };
+  }
+
+  delete request.cookies[cookieName];
+  request.headers["x-jcareer-viewer-key"] = {
+    value: crypto.createHash("sha256").update(event.viewer.ip).digest("hex")
+  };
+  request.headers["x-jcareer-forwarded-proto"] = { value: "https" };
+  request.headers["x-jcareer-edge-request-id"] = { value: event.context.requestId };
+  return request;
+}

@@ -3,47 +3,48 @@
   "contract_id": "jcareer-asis-api-wire-shapes-v1",
   "contract_status": "SOURCE_RETURN_AND_DIRECT_EXCEPTION_CATALOG_NOT_RUNTIME_EVIDENCE",
   "scope": {
-    "operation_coverage": "ALL_33_HANDLER_OPERATION_GROUPS",
-    "route_entry_coverage": "INHERITED_38_ROUTE_ENTRIES_NOT_RECOUNTED",
+    "operation_coverage": "ALL_35_HANDLER_OPERATION_GROUPS",
+    "route_entry_coverage": "INHERITED_40_ROUTE_ENTRIES_NOT_RECOUNTED",
     "return_semantics": "DIRECT_HANDLER_RETURN_EXPRESSIONS_ONLY",
     "error_semantics": "DIRECT_HANDLER_LITERAL_HTTPEXCEPTION_CALLS_ONLY",
-    "nested_schema": "NOT_ENUMERATED_OR_ENFORCED",
+    "nested_schema": "ADMIN_AI_OPERATIONS_STRICT_PYDANTIC_RESPONSE_MODELS",
     "dependency_helper_framework_errors": "NOT_ENUMERATED",
-    "response_model_enforcement": "NOT_PRESENT_ON_DECLARED_ROUTES",
+    "response_model_enforcement": "PRESENT_ON_PUBLIC_RUNTIME_AND_ADMIN_AI_OPERATIONS",
     "runtime_verification": "NOT_CURRENT",
     "aws_or_bedrock_execution": "NOT_CLAIMED",
     "compliance_or_risk_decision": "HUMAN_ONLY"
   },
   "limitations": [
     "This catalog is derived from handler AST and route decorators; it is not an HTTP capture or execution trace.",
-    "Top-level literal keys are source observations, not an exact or enforced response schema.",
+    "Top-level literal keys are source observations; the selected public-runtime and admin AI-operations routes separately use declared Pydantic response models.",
     "Helper-call, local-name, and list-item references are not expanded into nested schemas.",
     "A cached object is labeled only as a validated subset and is not promoted to an exact response shape.",
     "Only HTTPException calls written directly in each handler body are listed.",
     "An empty direct_http_exceptions array does not mean the operation cannot fail.",
     "Dependency, helper, downstream, FastAPI or Pydantic 422, unhandled 500, headers, and serialization behavior are not enumerated.",
     "Direct detail literals are implementation strings and are not declared product-stable API error codes.",
-    "The 38 decorated routes include aliases for 33 handler operation groups and are not recounted as handlers.",
+    "The 40 decorated routes include aliases for 35 handler operation groups and are not recounted as handlers.",
     "The malformed synthetic gateway response remains a source return variant and is not evidence that the branch was executed.",
-    "Bedrock labels and conditional source branches do not prove a provider call, AWS deployment, or provider receipt.",
+    "Bedrock labels and the conditional fixed Unix-socket broker source branch do not prove a provider call, AWS deployment, or provider receipt.",
+    "The OpenDART refresh handler ignores the enqueue helper return object and collapses broker or direct-SQS dispatch failures into its direct 503 path; this catalog does not expand those helper internals.",
     "No entry is a compliance, conformity, suitability, security, or residual-risk determination."
   ],
   "upstream_contracts": [
     {
       "path": "src/runtime/contracts/api_surface.json",
       "contract_id": "jcareer-asis-api-surface-v1",
-      "sha256": "3405d52e2ba6604cd4ddaba97db37a4be2865d742bc290801fc61a286ffa26b8"
+      "sha256": "cd3da6e1c0ebcd9de0aa03ce651844845f23a3078c9616c328e31ac4f71ef963"
     },
     {
       "path": "src/runtime/contracts/api_effects.json",
       "contract_id": "jcareer-asis-source-effects-v1",
-      "sha256": "72652b268cae4e4f696f4f2da73c331fbb4a2c2e38741b0194c84229dba57ae1"
+      "sha256": "13ac328bafb4ad39b8d4d6ad657880d6fda90b93eed6672ba038da6f7372a1e9"
     }
   ],
   "operations": [
     {
       "operation_ref": "api:health",
-      "source_function_sha256": "5cb678306bebe6dfb54528282396ba8a3e7779f216e2cc470a3e8b832bd00c57",
+      "source_function_sha256": "7f858669fc0135cd43430bfd6ea2e077719e91066b3c0474ead6315c632383c0",
       "route_success_statuses": [
         200
       ],
@@ -68,29 +69,20 @@
     },
     {
       "operation_ref": "api:runtime_info",
-      "source_function_sha256": "56bdf34203d50c4eae65bddf4f1b9da2fa0a763831ceaee57cabace9b59031e1",
+      "source_function_sha256": "323fdad3ea68fa37092f88c81327e82234bbbbfc3448d8ac9127598951473490",
       "route_success_statuses": [
         200
       ],
       "direct_return_variants": [
         {
-          "expression_kind": "DICT_LITERAL",
-          "reference": null,
-          "top_level_literal_keys": [
-            "service",
-            "live_client_service",
-            "dataset_profile",
-            "explanation_provider",
-            "score_contract_version",
-            "database_boundaries",
-            "trace_enabled",
-            "failure_injection_enabled"
-          ],
+          "expression_kind": "CALL",
+          "reference": "PublicRuntimeResponse",
+          "top_level_literal_keys": [],
           "mapping_unpack_references": [],
           "list_item_expression_kind": null,
           "list_item_reference": null,
           "list_item_top_level_literal_keys": [],
-          "shape_state": "EMITTED_TOP_LEVEL_KEYS_SOURCE_ONLY"
+          "shape_state": "HELPER_RETURN_NOT_EXPANDED"
         }
       ],
       "direct_http_exceptions": []
@@ -486,7 +478,7 @@
     },
     {
       "operation_ref": "api:candidate_recommendations",
-      "source_function_sha256": "c3a108f5f27f5ccfdb163dc9aa491fdfda09cc4160a49191a809295ce194ef83",
+      "source_function_sha256": "da59d700a6ac6f56c98869c421e3c154d29be11b74c70e17070a3218b937f0ea",
       "route_success_statuses": [
         200
       ],
@@ -635,11 +627,24 @@
     },
     {
       "operation_ref": "api:refresh_recruiter_company_opendart",
-      "source_function_sha256": "e931adaf325172f8dcc9b1867a4a4d8750800374622ea30e5d228d0960d23b8e",
+      "source_function_sha256": "ea5f5f7f4129342fc2831d9ba54f363db590b67efebd617e69f98766301268d1",
       "route_success_statuses": [
         202
       ],
       "direct_return_variants": [
+        {
+          "expression_kind": "DICT_LITERAL",
+          "reference": null,
+          "top_level_literal_keys": [
+            "refresh",
+            "company_profile"
+          ],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "EMITTED_TOP_LEVEL_KEYS_SOURCE_ONLY"
+        },
         {
           "expression_kind": "DICT_LITERAL",
           "reference": null,
@@ -701,6 +706,128 @@
           "detail_kind": "EXPRESSION",
           "detail_literal": null,
           "detail_expression": "str(error)",
+          "occurrences": 1
+        }
+      ]
+    },
+    {
+      "operation_ref": "api:collect_recruiter_company_opendart",
+      "source_function_sha256": "32f476e33012a3f1c5d80cf73f6bfa173eae77a84de49f1f86ad8b4a7c21061c",
+      "route_success_statuses": [
+        200
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "DICT_LITERAL",
+          "reference": null,
+          "top_level_literal_keys": [
+            "refresh",
+            "company_profile"
+          ],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "EMITTED_TOP_LEVEL_KEYS_SOURCE_ONLY"
+        },
+        {
+          "expression_kind": "DICT_LITERAL",
+          "reference": null,
+          "top_level_literal_keys": [
+            "refresh",
+            "company_profile"
+          ],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "EMITTED_TOP_LEVEL_KEYS_SOURCE_ONLY"
+        },
+        {
+          "expression_kind": "DICT_LITERAL",
+          "reference": null,
+          "top_level_literal_keys": [
+            "refresh",
+            "company_profile"
+          ],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "EMITTED_TOP_LEVEL_KEYS_SOURCE_ONLY"
+        },
+        {
+          "expression_kind": "CALL",
+          "reference": "JSONResponse",
+          "top_level_literal_keys": [],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "HELPER_RETURN_NOT_EXPANDED"
+        },
+        {
+          "expression_kind": "DICT_LITERAL",
+          "reference": null,
+          "top_level_literal_keys": [
+            "refresh",
+            "company_profile"
+          ],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "EMITTED_TOP_LEVEL_KEYS_SOURCE_ONLY"
+        }
+      ],
+      "direct_http_exceptions": [
+        {
+          "status": 409,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "OpenDART 외부 조회 결과 회수 모드가 비활성화되어 있습니다",
+          "detail_expression": null,
+          "occurrences": 1
+        },
+        {
+          "status": 503,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "OpenDART 외부 조회 결과를 확인하지 못했습니다",
+          "detail_expression": null,
+          "occurrences": 1
+        },
+        {
+          "status": 503,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "OpenDART 대기 시간 설정을 확인할 수 없습니다",
+          "detail_expression": null,
+          "occurrences": 2
+        },
+        {
+          "status": 409,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "OpenDART 외부 조회 결과의 요청 연결을 확인할 수 없습니다",
+          "detail_expression": null,
+          "occurrences": 1
+        },
+        {
+          "status": 409,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "OpenDART 외부 조회 저장본의 경계를 확인할 수 없습니다",
+          "detail_expression": null,
+          "occurrences": 1
+        },
+        {
+          "status": 409,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "OpenDART 외부 조회 완료 시각을 확인할 수 없습니다",
+          "detail_expression": null,
+          "occurrences": 1
+        },
+        {
+          "status": 409,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "OpenDART 외부 조회 결과 상태를 확인할 수 없습니다",
+          "detail_expression": null,
           "occurrences": 1
         }
       ]
@@ -815,7 +942,7 @@
     },
     {
       "operation_ref": "api:recruiter_recommendations",
-      "source_function_sha256": "ba78c73834936043d7ba96b6090b628f837d35c9fddd1f5f0b93bec45776de67",
+      "source_function_sha256": "5c2a4ad1e4a1527770661e666735228cd5105e4f018dda2167e1ab8dde7725cb",
       "route_success_statuses": [
         200
       ],
@@ -833,6 +960,26 @@
         {
           "expression_kind": "NAME_REFERENCE",
           "reference": "response",
+          "top_level_literal_keys": [],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "LOCAL_NAME_REFERENCE_NOT_EXPANDED"
+        }
+      ],
+      "direct_http_exceptions": []
+    },
+    {
+      "operation_ref": "api:admin_ai_operations",
+      "source_function_sha256": "3e8fc14b755c577d6c9a20633d64915b40935732e753d8f06b2309798578abe5",
+      "route_success_statuses": [
+        200
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "NAME_REFERENCE",
+          "reference": "snapshot",
           "top_level_literal_keys": [],
           "mapping_unpack_references": [],
           "list_item_expression_kind": null,

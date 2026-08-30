@@ -1,0 +1,14 @@
+{
+  "schema_version": "jcareer-deployment-approval-v3",
+  "scope": "serverless-opendart",
+  "decision": "PENDING_HUMAN_DECISION",
+  "approval_ref": "",
+  "reviewer_ref": "",
+  "approved_at": "",
+  "expires_at": "",
+  "saved_plan_sha256": "",
+  "backend_config_sha256": "",
+  "provider_account_sha256": "",
+  "lambda_image_sha256": "",
+  "notes": "Example only. This file does not authorize deployment."
+}

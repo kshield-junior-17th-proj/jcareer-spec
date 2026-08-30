@@ -4,6 +4,10 @@ locals {
     jk_layer   = "lab"
     jk_purpose = "synthetic-runtime-validation"
   }
+
+  cloudfront_caching_disabled_policy_id    = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad"
+  cloudfront_all_viewer_except_host_policy = "b689b0a8-53d0-40ab-baf2-68738e2966ac"
+  cloudfront_security_headers_policy_id    = "67f7725c-6f97-4210-82d7-5512b31e9d03"
 }
 
 data "aws_ssm_parameter" "al2023_ami" {
@@ -34,6 +38,17 @@ resource "aws_subnet" "public" {
   tags = merge(local.common_tags, { Name = "${var.name_prefix}-public" })
 }
 
+resource "aws_subnet" "private_preview" {
+  count = var.enable_aws_https_preview ? 1 : 0
+
+  vpc_id                  = aws_vpc.lab.id
+  cidr_block              = "10.91.0.64/26"
+  availability_zone       = "ap-northeast-2a"
+  map_public_ip_on_launch = false
+
+  tags = merge(local.common_tags, { Name = "${var.name_prefix}-private-preview" })
+}
+
 resource "aws_internet_gateway" "lab" {
   vpc_id = aws_vpc.lab.id
 
@@ -57,6 +72,48 @@ resource "aws_route_table_association" "public" {
   route_table_id = aws_route_table.public.id
 }
 
+resource "aws_eip" "preview_nat" {
+  count = var.enable_aws_https_preview ? 1 : 0
+
+  domain = "vpc"
+
+  tags = merge(local.common_tags, { Name = "${var.name_prefix}-preview-nat" })
+
+  depends_on = [aws_internet_gateway.lab]
+}
+
+resource "aws_nat_gateway" "preview" {
+  count = var.enable_aws_https_preview ? 1 : 0
+
+  allocation_id = aws_eip.preview_nat[0].id
+  subnet_id     = aws_subnet.public.id
+
+  tags = merge(local.common_tags, { Name = "${var.name_prefix}-preview-nat" })
+}
+
+resource "aws_route_table" "private_preview" {
+  count = var.enable_aws_https_preview ? 1 : 0
+
+  vpc_id = aws_vpc.lab.id
+
+  tags = merge(local.common_tags, { Name = "${var.name_prefix}-private-preview" })
+}
+
+resource "aws_route" "private_preview_internet" {
+  count = var.enable_aws_https_preview ? 1 : 0
+
+  route_table_id         = aws_route_table.private_preview[0].id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.preview[0].id
+}
+
+resource "aws_route_table_association" "private_preview" {
+  count = var.enable_aws_https_preview ? 1 : 0
+
+  subnet_id      = aws_subnet.private_preview[0].id
+  route_table_id = aws_route_table.private_preview[0].id
+}
+
 resource "aws_security_group" "runtime" {
   name        = "${var.name_prefix}-runtime"
   description = "J-Career synthetic lab; no inbound rules, operator access through SSM tunnel"
@@ -72,6 +129,34 @@ resource "aws_vpc_security_group_egress_rule" "internet" {
   ip_protocol       = "-1"
 
   tags = merge(local.common_tags, { Name = "${var.name_prefix}-egress" })
+}
+
+data "aws_security_group" "cloudfront_vpc_origin_service" {
+  count = var.enable_aws_https_preview ? 1 : 0
+
+  vpc_id = aws_vpc.lab.id
+
+  filter {
+    name   = "group-name"
+    values = ["CloudFront-VPCOrigins-Service-SG"]
+  }
+
+  depends_on = [aws_cloudfront_vpc_origin.preview]
+}
+
+resource "aws_vpc_security_group_ingress_rule" "cloudfront_preview" {
+  count = var.enable_aws_https_preview ? 1 : 0
+
+  security_group_id = aws_security_group.runtime.id
+  description       = "This VPC origin service SG to synthetic web entrypoint only"
+  referenced_security_group_id = (
+    data.aws_security_group.cloudfront_vpc_origin_service[0].id
+  )
+  from_port   = 3000
+  to_port     = 3000
+  ip_protocol = "tcp"
+
+  tags = merge(local.common_tags, { Name = "${var.name_prefix}-cloudfront-ingress" })
 }
 
 data "aws_iam_policy_document" "ec2_assume" {
@@ -123,11 +208,13 @@ resource "aws_iam_instance_profile" "runtime" {
 }
 
 resource "aws_instance" "runtime" {
-  ami                         = data.aws_ssm_parameter.al2023_ami.value
-  instance_type               = var.instance_type
-  subnet_id                   = aws_subnet.public.id
+  ami           = data.aws_ssm_parameter.al2023_ami.value
+  instance_type = var.instance_type
+  subnet_id = var.enable_aws_https_preview ? (
+    aws_subnet.private_preview[0].id
+  ) : aws_subnet.public.id
   vpc_security_group_ids      = [aws_security_group.runtime.id]
-  associate_public_ip_address = true
+  associate_public_ip_address = var.enable_aws_https_preview ? false : true
   iam_instance_profile        = aws_iam_instance_profile.runtime.name
   monitoring                  = false
 
@@ -158,22 +245,143 @@ resource "aws_instance" "runtime" {
   }
 
   lifecycle {
+    # Runtime releases are delivered through the reviewed SSM path. Preserve a
+    # healthy short-lived host when the bootstrap template changes; a newly
+    # created instance still receives the current template.
+    ignore_changes = [user_data]
+
     precondition {
-      condition     = var.enable_bedrock_live == false
-      error_message = "Bedrock live는 컨테이너 전용 자격증명 경계가 승인·구현될 때까지 차단한다."
+      condition = (
+        var.enable_bedrock_live == false ||
+        var.bedrock_live_acknowledgement == "JCAREER_SYNTHETIC_BEDROCK_APPROVED"
+      )
+      error_message = "Bedrock live에는 분리된 capability broker 경계와 별도 승인 문구가 필요하다."
+    }
+
+    precondition {
+      condition = (
+        var.enable_opendart_live == false ||
+        var.opendart_live_acknowledgement == "JCAREER_SYNTHETIC_OPENDART_LIVE_APPROVED"
+      )
+      error_message = "OpenDART live에는 승인된 runtime-stage 배포와 별도 연결 승인 문구가 필요하다."
     }
   }
 
   tags = merge(local.common_tags, {
-    Name            = "${var.name_prefix}-runtime"
-    jk_bedrock_live = tostring(var.enable_bedrock_live)
+    Name             = "${var.name_prefix}-runtime"
+    jk_bedrock_live  = tostring(var.enable_bedrock_live)
+    jk_opendart_live = tostring(var.enable_opendart_live)
+    jk_https_preview = tostring(var.enable_aws_https_preview)
   })
 
   depends_on = [
     aws_iam_role_policy_attachment.ssm,
     aws_iam_role_policy.bedrock,
+    aws_vpc_security_group_egress_rule.internet,
     aws_route.internet,
+    aws_route_table_association.public,
+    aws_route.private_preview_internet,
+    aws_route_table_association.private_preview,
   ]
+}
+
+resource "aws_cloudfront_vpc_origin" "preview" {
+  count = var.enable_aws_https_preview ? 1 : 0
+
+  vpc_origin_endpoint_config {
+    arn                    = aws_instance.runtime.arn
+    http_port              = 3000
+    https_port             = 443
+    name                   = "${var.name_prefix}-vpc-origin"
+    origin_protocol_policy = "http-only"
+
+    origin_ssl_protocols {
+      items    = ["TLSv1.2"]
+      quantity = 1
+    }
+  }
+
+  tags = merge(local.common_tags, { Name = "${var.name_prefix}-vpc-origin" })
+
+}
+
+resource "aws_cloudfront_function" "preview_gate" {
+  count = var.enable_aws_https_preview ? 1 : 0
+
+  name    = "${var.name_prefix}-preview-gate"
+  comment = "Short-lived synthetic preview cookie gate"
+  runtime = "cloudfront-js-2.0"
+  publish = true
+  code = templatefile("${path.module}/preview_gate.js.tftpl", {
+    access_token_sha256_json = jsonencode(var.preview_access_token_sha256)
+    max_age_seconds          = var.auto_stop_minutes * 60
+  })
+
+  tags = merge(local.common_tags, { Name = "${var.name_prefix}-preview-gate" })
+}
+
+resource "aws_cloudfront_distribution" "preview" {
+  count = var.enable_aws_https_preview ? 1 : 0
+
+  enabled             = true
+  is_ipv6_enabled     = false
+  comment             = "J-Career short-lived synthetic HTTPS preview"
+  default_root_object = ""
+  price_class         = "PriceClass_200"
+  http_version        = "http2and3"
+  wait_for_deployment = true
+  retain_on_delete    = false
+
+  origin {
+    domain_name = aws_instance.runtime.private_dns
+    origin_id   = "jcareer-runtime-vpc-origin"
+
+    vpc_origin_config {
+      vpc_origin_id = aws_cloudfront_vpc_origin.preview[0].id
+    }
+  }
+
+  default_cache_behavior {
+    target_origin_id       = "jcareer-runtime-vpc-origin"
+    viewer_protocol_policy = "redirect-to-https"
+    allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods         = ["GET", "HEAD", "OPTIONS"]
+    compress               = false
+
+    cache_policy_id            = local.cloudfront_caching_disabled_policy_id
+    origin_request_policy_id   = local.cloudfront_all_viewer_except_host_policy
+    response_headers_policy_id = local.cloudfront_security_headers_policy_id
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.preview_gate[0].arn
+    }
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
+
+  viewer_certificate {
+    cloudfront_default_certificate = true
+    minimum_protocol_version       = "TLSv1.2_2021"
+  }
+
+  lifecycle {
+    precondition {
+      condition = (
+        var.https_preview_acknowledgement == "JCAREER_SYNTHETIC_HTTPS_PREVIEW_APPROVED" &&
+        can(regex("^[0-9a-f]{64}$", var.preview_access_token_sha256))
+      )
+      error_message = "CloudFront 프리뷰는 별도 사람 승인과 단기 토큰 없이는 생성할 수 없다."
+    }
+  }
+
+  tags = merge(local.common_tags, { Name = "${var.name_prefix}-https-preview" })
+
+  depends_on = [aws_vpc_security_group_ingress_rule.cloudfront_preview]
 }
 
 resource "aws_budgets_budget" "lab" {

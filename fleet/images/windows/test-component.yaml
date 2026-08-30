@@ -1,0 +1,68 @@
+name: JCareerWindowsWorkplaceTest
+description: Verify minimum services without asserting a deployed endpoint posture.
+schemaVersion: 1.0
+phases:
+  - name: test
+    steps:
+      - name: VerifyImageContract
+        action: ExecutePowerShell
+        inputs:
+          commands:
+            - |-
+              $ErrorActionPreference = 'Stop'
+              $manifest = 'C:\ProgramData\JCareerLab\image-manifest.json'
+              if (-not (Test-Path -LiteralPath $manifest)) { throw 'image manifest missing' }
+              $state = Get-Content -LiteralPath $manifest -Raw | ConvertFrom-Json
+              if ($state.credentials_baked -ne $false) { throw 'credential boundary failed' }
+              if ($state.preview_url_baked -ne $false) { throw 'preview boundary failed' }
+      - name: VerifyHostServices
+        action: ExecutePowerShell
+        inputs:
+          commands:
+            - |-
+              $ErrorActionPreference = 'Stop'
+              $profiles = Get-NetFirewallProfile
+              if ($profiles.Enabled -contains $false) { throw 'Windows Firewall profile disabled' }
+              foreach ($serviceName in @('AmazonSSMAgent', 'TermService')) {
+                $service = Get-Service -Name $serviceName -ErrorAction Stop
+                if ($service.Status -ne 'Running') { throw "$serviceName is not running" }
+              }
+              $terminalServer = Get-ItemProperty -LiteralPath 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server' -ErrorAction Stop
+              if ([int]$terminalServer.fDenyTSConnections -ne 0) {
+                throw 'Remote Desktop policy does not allow connections'
+              }
+              $rdpListener = @(Get-NetTCPConnection -State Listen -LocalPort 3389 -ErrorAction SilentlyContinue)
+              if ($rdpListener.Count -lt 1) { throw 'Remote Desktop TCP listener is unavailable' }
+              $rdpPortFilters = @(
+                Get-NetFirewallPortFilter -PolicyStore ActiveStore |
+                  Where-Object { [string]$_.Protocol -eq 'TCP' -and [string]$_.LocalPort -eq '3389' }
+              )
+              $enabledRdpRules = @(
+                $rdpPortFilters |
+                  Get-NetFirewallRule -ErrorAction SilentlyContinue |
+                  Where-Object { $_.Enabled -eq 'True' -and $_.Direction -eq 'Inbound' }
+              )
+              if ($enabledRdpRules.Count -lt 1) { throw 'Remote Desktop firewall rule is unavailable' }
+              if (-not (Get-Command Get-MpComputerStatus -ErrorAction SilentlyContinue)) {
+                throw 'Microsoft Defender status interface is unavailable'
+              }
+              $defender = Get-MpComputerStatus
+              if (-not $defender.RealTimeProtectionEnabled) { throw 'Defender real-time protection is not enabled' }
+      - name: VerifyInteractiveBrowser
+        action: ExecutePowerShell
+        inputs:
+          commands:
+            - |-
+              $ErrorActionPreference = 'Stop'
+              $candidates = @(
+                "$env:ProgramFiles\Microsoft\Edge\Application\msedge.exe",
+                "${env:ProgramFiles(x86)}\Microsoft\Edge\Application\msedge.exe"
+              )
+              $edge = @($candidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -Unique)
+              if ($edge.Count -lt 1) { throw 'Microsoft Edge is required' }
+              $signature = Get-AuthenticodeSignature -LiteralPath $edge[0]
+              if (
+                $signature.Status -ne 'Valid' -or
+                $null -eq $signature.SignerCertificate -or
+                [string]$signature.SignerCertificate.Subject -notmatch '(^|,\s*)O=Microsoft Corporation(,|$)'
+              ) { throw 'Microsoft Edge signature validation failed' }

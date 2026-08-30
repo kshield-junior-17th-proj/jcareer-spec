@@ -175,6 +175,15 @@ def main() -> None:
 
     admin_token, admin = login("admin@jcareer.test")
     assert admin["role"] == "admin", admin
+    status, operations = request(
+        PUBLIC_BASE, "/api/v1/admin/ai-operations", token=admin_token
+    )
+    assert status == 200, operations
+    assert operations["matcher"]["probe_state"] == "AVAILABLE", operations
+    assert operations["llm_gateway"]["probe_state"] == "AVAILABLE", operations
+    assert operations["llm_gateway"]["provider"] == EXPECTED_PROVIDER, operations
+    assert operations["llm_gateway"]["bedrock_live_enabled"] is EXPECTED_BEDROCK_LIVE
+    assert operations["opendart"]["probe_state"] == "NOT_PROBED", operations
     status, audit = request(PUBLIC_BASE, "/api/v1/admin/audit", token=admin_token)
     assert status == 200 and audit, audit
 

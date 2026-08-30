@@ -15,6 +15,9 @@ MEMBER_DATABASE_URL = os.getenv(
 COMPANY_DATABASE_URL = os.getenv(
     "COMPANY_DATABASE_URL", "sqlite:///./jcareer-company-runtime.db"
 )
+OUTCOME_DATABASE_URL = os.getenv(
+    "OUTCOME_DATABASE_URL", "sqlite:///./jcareer-outcome-runtime.db"
+)
 
 
 def database_target(database_url: str) -> tuple[str, str, int | None, str]:
@@ -36,8 +39,16 @@ def database_target(database_url: str) -> tuple[str, str, int | None, str]:
     )
 
 
-if database_target(MEMBER_DATABASE_URL) == database_target(COMPANY_DATABASE_URL):
-    raise RuntimeError("MEMBER_DATABASE_URL and COMPANY_DATABASE_URL must be different")
+database_targets = {
+    database_target(MEMBER_DATABASE_URL),
+    database_target(COMPANY_DATABASE_URL),
+    database_target(OUTCOME_DATABASE_URL),
+}
+if len(database_targets) != 3:
+    raise RuntimeError(
+        "MEMBER_DATABASE_URL, COMPANY_DATABASE_URL, and OUTCOME_DATABASE_URL "
+        "must resolve to three different databases"
+    )
 
 
 def _engine(database_url: str):
@@ -49,6 +60,7 @@ def _engine(database_url: str):
 
 member_engine = _engine(MEMBER_DATABASE_URL)
 company_engine = _engine(COMPANY_DATABASE_URL)
+outcome_engine = _engine(OUTCOME_DATABASE_URL)
 
 
 class MemberBase(DeclarativeBase):
@@ -59,6 +71,10 @@ class CompanyBase(DeclarativeBase):
     pass
 
 
+class OutcomeBase(DeclarativeBase):
+    pass
+
+
 # One unit-of-work facade routes each mapped class to its owning database. There
 # are deliberately no ORM relationships or database foreign keys across the two
 # stores. A commit that touches both stores is not atomic. That AS-IS boundary is
@@ -66,7 +82,7 @@ class CompanyBase(DeclarativeBase):
 # is not claimed by this source.
 SessionLocal = sessionmaker(
     bind=member_engine,
-    binds={CompanyBase: company_engine},
+    binds={CompanyBase: company_engine, OutcomeBase: outcome_engine},
     autoflush=False,
     expire_on_commit=False,
 )
@@ -79,10 +95,21 @@ def ensure_runtime_schema() -> None:
     deployment migration workflow that remains outside this runtime's scope.
     """
 
-    columns = {
+    resume_columns = {
+        column["name"] for column in inspect(member_engine).get_columns("resumes")
+    }
+    member_additions = {
+        "projects": "JSON NOT NULL DEFAULT '[]'",
+    }
+    with member_engine.begin() as connection:
+        for name, definition in member_additions.items():
+            if name not in resume_columns:
+                connection.execute(text(f"ALTER TABLE resumes ADD COLUMN {name} {definition}"))
+
+    company_columns = {
         column["name"] for column in inspect(company_engine).get_columns("companies")
     }
-    additions = {
+    company_additions = {
         "direction_statement": "TEXT NOT NULL DEFAULT ''",
         "declared_values": "JSON NOT NULL DEFAULT '[]'",
         "profile_version": "VARCHAR(80) NOT NULL DEFAULT 'company-profile-unset'",
@@ -95,11 +122,12 @@ def ensure_runtime_schema() -> None:
         "opendart_synced_at": "TIMESTAMP",
         "opendart_last_attempt_at": "TIMESTAMP",
         "opendart_pending_request_id": "VARCHAR(36)",
+        "opendart_pending_corp_code": "VARCHAR(8)",
         "opendart_pending_requested_at": "TIMESTAMP",
     }
     with company_engine.begin() as connection:
-        for name, definition in additions.items():
-            if name not in columns:
+        for name, definition in company_additions.items():
+            if name not in company_columns:
                 connection.execute(text(f"ALTER TABLE companies ADD COLUMN {name} {definition}"))
 
 

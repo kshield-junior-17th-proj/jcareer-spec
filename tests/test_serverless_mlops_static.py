@@ -61,11 +61,73 @@ class ServerlessMLOpsStaticTests(unittest.TestCase):
         )
         self.assertTrue(any("timeout" in error for error in CHECKER.audit_sources(mutated)))
 
+    def test_sse_s3_rejects_unwired_kms_options(self) -> None:
+        mutated = dict(self.sources)
+        mutated["main"] += "\nbucket_key_enabled = true\n"
+        self.assertTrue(
+            any("S3 Bucket Key" in error for error in CHECKER.audit_sources(mutated))
+        )
+        mutated = dict(self.sources)
+        mutated["lambda_handler"] += '\nMLOPS_ARTIFACT_KMS_KEY_ID = "unwired"\n'
+        self.assertTrue(
+            any("unwired SSE-KMS" in error for error in CHECKER.audit_sources(mutated))
+        )
+
     def test_operator_stop_command_is_rejected(self) -> None:
         mutated = dict(self.sources)
         mutated["operator"] += "\naws ec2 stop-instances --instance-ids bad\n"
         self.assertTrue(
             any("never stop" in error for error in CHECKER.audit_sources(mutated))
+        )
+
+    def test_operator_provider_account_hash_binding_is_required(self) -> None:
+        mutated = dict(self.sources)
+        mutated["operator"] = mutated["operator"].replace(
+            "Get-StringSha256 -Value $account",
+            "$account",
+            1,
+        )
+        self.assertTrue(
+            any(
+                "provider account SHA-256" in error
+                for error in CHECKER.audit_sources(mutated)
+            )
+        )
+
+    def test_operator_absolute_tool_resolution_is_required(self) -> None:
+        mutated = dict(self.sources)
+        mutated["operator"] = mutated["operator"].replace(
+            "$script:ToolPaths.aws ssm get-command-invocation",
+            "aws ssm get-command-invocation",
+            1,
+        )
+        errors = CHECKER.audit_sources(mutated)
+        self.assertTrue(any("shadowable tool" in error for error in errors))
+
+    def test_operator_saved_plan_lock_and_hash_binding_are_required(self) -> None:
+        mutated = dict(self.sources)
+        mutated["operator"] = mutated["operator"].replace(
+            "$bootstrapContext.PlanPath",
+            "$bootstrapPlan",
+        )
+        self.assertTrue(
+            any(
+                "read-locked and hash-bound" in error
+                for error in CHECKER.audit_sources(mutated)
+            )
+        )
+
+        mutated = dict(self.sources)
+        mutated["operator"] = mutated["operator"].replace(
+            "Protect-PlanJson ($planOutput",
+            "($planOutput",
+            1,
+        )
+        self.assertTrue(
+            any(
+                "read-locked and hash-bound" in error
+                for error in CHECKER.audit_sources(mutated)
+            )
         )
 
     def test_lambda_snapshot_module_is_required(self) -> None:
@@ -75,6 +137,92 @@ class ServerlessMLOpsStaticTests(unittest.TestCase):
         )
         self.assertTrue(
             any("snapshot pipeline" in error for error in CHECKER.audit_sources(mutated))
+        )
+
+    def test_lambda_human_review_module_and_conditional_transition_are_required(self) -> None:
+        mutated = dict(self.sources)
+        mutated["lambda_dockerfile"] = mutated["lambda_dockerfile"].replace(
+            "COPY review_challenger.py", "# removed", 1
+        )
+        self.assertTrue(
+            any("human-review module" in error for error in CHECKER.audit_sources(mutated))
+        )
+
+        mutated = dict(self.sources)
+        mutated["lambda_handler"] = mutated["lambda_handler"].replace(
+            "attribute_not_exists(review_receipt_sha256)",
+            "attribute_exists(review_receipt_sha256)",
+            1,
+        )
+        self.assertTrue(
+            any("conditional single-record" in error for error in CHECKER.audit_sources(mutated))
+        )
+
+    def test_result_version_binding_and_review_invariants_are_required(self) -> None:
+        mutated = dict(self.sources)
+        mutated["lambda_handler"] = mutated["lambda_handler"].replace(
+            '"IfNoneMatch": "*"', '"IfNoneMatch": "ignored"', 1
+        )
+        self.assertTrue(
+            any("create-only" in error for error in CHECKER.audit_sources(mutated))
+        )
+
+        mutated = dict(self.sources)
+        mutated["lambda_handler"] = mutated["lambda_handler"].replace(
+            "automatic_model_activation = :false",
+            "automatic_model_activation = :synthetic_true",
+        )
+        self.assertTrue(
+            any("every synthetic non-activation" in error for error in CHECKER.audit_sources(mutated))
+        )
+
+    def test_training_completion_and_full_synthetic_preflight_are_required(self) -> None:
+        mutated = dict(self.sources)
+        mutated["lambda_handler"] = mutated["lambda_handler"].replace(
+            "#state = :running_state AND human_input_state = :not_recorded",
+            "#state = :pending_state AND human_input_state = :not_recorded",
+        )
+        self.assertTrue(
+            any(
+                "conditionally transition" in error
+                for error in CHECKER.audit_sources(mutated)
+            )
+        )
+
+        mutated = dict(self.sources)
+        mutated["exporter_source"] = mutated["exporter_source"].replace(
+            "for member in members.values():",
+            "for member in ():",
+            1,
+        )
+        self.assertTrue(
+            any(
+                "complete member/reference read set" in error
+                for error in CHECKER.audit_sources(mutated)
+            )
+        )
+
+        mutated = dict(self.sources)
+        mutated["exporter_source"] = mutated["exporter_source"].replace(
+            "_assert_synthetic_company_job_source(raw_jobs)",
+            "pass  # company source not checked",
+            1,
+        )
+        self.assertTrue(
+            any(
+                "complete member/reference read set" in error
+                for error in CHECKER.audit_sources(mutated)
+            )
+        )
+
+        mutated = dict(self.sources)
+        mutated["review_source"] = mutated["review_source"].replace(
+            'RECORDED_REVIEW_STATE = "HUMAN_INPUT_RECORDED"',
+            'RECORDED_REVIEW_STATE = "APPROVED"',
+            1,
+        )
+        self.assertTrue(
+            any("without release authorization" in error for error in CHECKER.audit_sources(mutated))
         )
 
     def test_plan_rejects_unapproved_resource(self) -> None:

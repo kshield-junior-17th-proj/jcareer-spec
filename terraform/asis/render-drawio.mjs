@@ -3,7 +3,17 @@ import os from 'node:os';
 import path from 'node:path';
 
 const root = path.dirname(new URL(import.meta.url).pathname.replace(/^\/(?:([A-Za-z]):)/, '$1:'));
-const xml = fs.readFileSync(path.join(root, 'JCAREER_ASIS_FLOW.drawio'), 'utf8');
+const repoRoot = path.resolve(root, '..', '..');
+const sourceArgument = process.argv.find((argument) => argument.startsWith('--source='));
+const relativeSource = sourceArgument
+  ? sourceArgument.slice('--source='.length)
+  : 'terraform/asis/JCAREER_ASIS_FLOW.drawio';
+const sourcePath = path.resolve(repoRoot, relativeSource);
+const relative = path.relative(repoRoot, sourcePath);
+if (relative.startsWith('..') || path.isAbsolute(relative) || path.extname(sourcePath) !== '.drawio') {
+  throw new Error('Draw.io source must remain inside the repository.');
+}
+const xml = fs.readFileSync(sourcePath, 'utf8');
 const config = JSON.stringify({
   highlight: 'none',
   nav: false,

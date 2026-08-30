@@ -1,0 +1,112 @@
+# 보안성 검토용 합성 endpoint review pack — Windows 3 + macOS 3
+#
+# 이 파일은 존재하지 않는 단말의 검토 슬롯 선언이다.
+# 실물 조달·이미지·AWS 자원은 없고 어떤 posture 값도 아직 관찰되지 않았다.
+# 상태값은 관찰 상태일 뿐이며 통제 판정이 아니다. 판정은 사람이 별도 파일에서 정한다.
+
+schema_version: jcareer-fleet-endpoint-review-v1
+pack_status: NOT_EXECUTED
+synthetic_only: true
+devices_exist: false
+procurement_status: NOT_PROCURED
+terraform_managed: false
+aws_managed: false
+
+asset_id_namespace: jcareer-fleet-endpoint-review-v1
+asset_id_recipe: sha256(namespace + "|" + profile_id) hexdigest 상위 12자리 대문자
+upstream_contract_ref: src/runtime/contracts/endpoint_test_sample.yaml
+scenario_source_refs:
+  - fleet/README.md#시나리오-inventory--구축하지-않는다
+  - context/raw/SCENARIO_FACTS-가상고객사J사.md#9.3
+
+fleet_inventory:
+  boundary: scenario-document-only
+  windows: 100
+  macos: 80
+
+review_sample:
+  representative_of_fleet: false
+  windows: 3
+  macos: 3
+
+posture_items:
+  - os
+  - browser
+  - edr
+  - vpn
+
+# 시나리오 문서가 선언한 값이다. 측정값이 아니며 아래 devices 의 관찰 슬롯과 섞지 않는다.
+scenario_declared_posture:
+  statement_kind: DOCUMENT_DECLARED_NOT_MEASURED
+  windows:
+    os: AD_JOINED
+    browser: NOT_DECLARED
+    edr: NOT_ADOPTED
+    vpn: MFA_VPN_DECLARED
+  macos:
+    os: NOT_AD_JOINED_LOCAL_ACCOUNT
+    browser: NOT_DECLARED
+    edr: NOT_ADOPTED
+    vpn: MFA_VPN_DECLARED
+
+devices:
+  - profile_id: WIN-01
+    asset_id: JC-EP-WIN-542091DC6225
+    os_family: windows
+    synthetic_persona: candidate
+    allowed_flow_ids: [candidate-journey]
+    posture:
+      os: {observation_state: NOT_OBSERVED, recorded_value: null, method_ref: null}
+      browser: {observation_state: NOT_OBSERVED, recorded_value: null, method_ref: null}
+      edr: {observation_state: NOT_OBSERVED, recorded_value: null, method_ref: null}
+      vpn: {observation_state: NOT_OBSERVED, recorded_value: null, method_ref: null}
+  - profile_id: WIN-02
+    asset_id: JC-EP-WIN-3215639865F3
+    os_family: windows
+    synthetic_persona: recruiter
+    allowed_flow_ids: [recruiter-journey]
+    posture:
+      os: {observation_state: NOT_OBSERVED, recorded_value: null, method_ref: null}
+      browser: {observation_state: NOT_OBSERVED, recorded_value: null, method_ref: null}
+      edr: {observation_state: NOT_OBSERVED, recorded_value: null, method_ref: null}
+      vpn: {observation_state: NOT_OBSERVED, recorded_value: null, method_ref: null}
+  - profile_id: WIN-03
+    asset_id: JC-EP-WIN-9E36EE01E8CA
+    os_family: windows
+    synthetic_persona: administrator
+    allowed_flow_ids: [admin-audit-read]
+    posture:
+      os: {observation_state: NOT_OBSERVED, recorded_value: null, method_ref: null}
+      browser: {observation_state: NOT_OBSERVED, recorded_value: null, method_ref: null}
+      edr: {observation_state: NOT_OBSERVED, recorded_value: null, method_ref: null}
+      vpn: {observation_state: NOT_OBSERVED, recorded_value: null, method_ref: null}
+  - profile_id: MAC-01
+    asset_id: JC-EP-MAC-1476861A2E2C
+    os_family: macos
+    synthetic_persona: candidate
+    allowed_flow_ids: [candidate-journey]
+    posture:
+      os: {observation_state: NOT_OBSERVED, recorded_value: null, method_ref: null}
+      browser: {observation_state: NOT_OBSERVED, recorded_value: null, method_ref: null}
+      edr: {observation_state: NOT_OBSERVED, recorded_value: null, method_ref: null}
+      vpn: {observation_state: NOT_OBSERVED, recorded_value: null, method_ref: null}
+  - profile_id: MAC-02
+    asset_id: JC-EP-MAC-6F1B42196499
+    os_family: macos
+    synthetic_persona: recruiter
+    allowed_flow_ids: [recruiter-journey]
+    posture:
+      os: {observation_state: NOT_OBSERVED, recorded_value: null, method_ref: null}
+      browser: {observation_state: NOT_OBSERVED, recorded_value: null, method_ref: null}
+      edr: {observation_state: NOT_OBSERVED, recorded_value: null, method_ref: null}
+      vpn: {observation_state: NOT_OBSERVED, recorded_value: null, method_ref: null}
+  - profile_id: MAC-03
+    asset_id: JC-EP-MAC-F2ACFD9242C4
+    os_family: macos
+    synthetic_persona: administrator
+    allowed_flow_ids: [admin-audit-read]
+    posture:
+      os: {observation_state: NOT_OBSERVED, recorded_value: null, method_ref: null}
+      browser: {observation_state: NOT_OBSERVED, recorded_value: null, method_ref: null}
+      edr: {observation_state: NOT_OBSERVED, recorded_value: null, method_ref: null}
+      vpn: {observation_state: NOT_OBSERVED, recorded_value: null, method_ref: null}

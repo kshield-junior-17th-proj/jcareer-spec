@@ -3,7 +3,7 @@
   "contract_id": "jcareer-asis-source-effects-v1",
   "contract_status": "SOURCE_EFFECT_INVENTORY_NOT_EXECUTION_EVIDENCE",
   "scope": {
-    "operation_coverage": "ALL_33_DECLARED_HANDLERS",
+    "operation_coverage": "ALL_35_DECLARED_HANDLERS",
     "runtime_verification": "NOT_CURRENT",
     "effect_semantics": "SOURCE_REVIEW_DECLARATION",
     "source_binding": "FUNCTION_AST_SHA256_AND_SELECTED_ORDERED_MARKERS",
@@ -16,6 +16,7 @@
     "Function fingerprints detect AST drift but do not prove branch reachability, dominance, cardinality, commit atomicity, or downstream receipt.",
     "Selected marker order is lexical source order, not a complete control-flow graph proof.",
     "Authentication and helper effects are declared transitively and bound to helper fingerprints; the checker does not infer a complete call graph.",
+    "The OpenDART enqueue helper can use the fixed Unix-socket capability broker or a direct SQS SDK fallback, while the Bedrock helper calls its fixed Unix-socket broker; downstream tags record intended effects, not which process held AWS credentials or provider delivery receipts.",
     "The contract does not define complete response schemas, dependency errors, or product policy.",
     "No tag or branch note is a compliance, conformity, suitability, or residual-risk determination."
   ],
@@ -25,8 +26,10 @@
       "audit",
       "bedrock",
       "company_db",
+      "dynamodb",
       "llm_gateway",
       "member_db",
+      "outcome_db",
       "process",
       "prompt_log",
       "redis",
@@ -50,7 +53,8 @@
       "update"
     ],
     "member_models": ["Application", "AuditEvent", "ConsentEvent", "Resume", "User"],
-    "company_models": ["Company", "Job"]
+    "company_models": ["Company", "Job"],
+    "outcome_models": ["OutcomeDataset", "SyntheticDocumentOutcome"]
   },
   "helper_bindings": [
     {
@@ -76,6 +80,12 @@
       "source": "src/runtime/api/app/main.py",
       "source_function_sha256": "cd5794b22747afdbb2747d2e2648e051a8d522378337ed2b3cb54623402749e0",
       "effect_tags": ["member_db:read:latest_privacy_core_consent"]
+    },
+    {
+      "helper_ref": "api:build_recruiter_review_support",
+      "source": "src/runtime/api/app/main.py",
+      "source_function_sha256": "1eab970f1e69f9a17a0583b63585c0fa1bf4334a75b73878a91e7776ae26d93f",
+      "effect_tags": ["process:compute:recruiter_literal_evidence"]
     },
     {
       "helper_ref": "api:recruiter_company",
@@ -118,15 +128,52 @@
       "effect_tags": ["llm_gateway:call:explanations_nonempty"]
     },
     {
+      "helper_ref": "api:_probe_internal_health",
+      "source": "src/runtime/api/app/main.py",
+      "source_function_sha256": "fb9d9089ace4274f88908acaf2207269262642f75751e33dcbc3a95f74984b8e",
+      "effect_tags": ["agent:call:health_probe", "llm_gateway:call:health_probe"]
+    },
+    {
+      "helper_ref": "api:ai_service_operations_snapshot",
+      "source": "src/runtime/api/app/main.py",
+      "source_function_sha256": "273ddcdcf40b5be30ed9dff2fb8a2222be65e2293387c5084d2c03b8e5532d66",
+      "effect_tags": [
+        "agent:call:health_probe_transitive",
+        "llm_gateway:call:health_probe_transitive",
+        "process:compute:allowlisted_ai_operations_snapshot"
+      ]
+    },
+    {
+      "helper_ref": "api:candidate_historical_observation",
+      "source": "src/runtime/api/app/outcome_store.py",
+      "source_function_sha256": "41b5456e0d547f380eeec207a8bb06d117baa927c4d3f2227c4cac5d88207419",
+      "effect_tags": ["outcome_db:read:tenant_job_scoped_synthetic_outcomes"]
+    },
+    {
+      "helper_ref": "api:outcome_observation_revision",
+      "source": "src/runtime/api/app/outcome_store.py",
+      "source_function_sha256": "71ad1982ec896deb9bb293026669c859a4dcdd5827b6079217e613c6f533fbf3",
+      "effect_tags": ["outcome_db:read:active_synthetic_material"]
+    },
+    {
+      "helper_ref": "api:unavailable_historical_observation",
+      "source": "src/runtime/api/app/main.py",
+      "source_function_sha256": "f41c8804fed3d9cfd44730945d0a72ace055a5cf072743668172ae523e0e88ed",
+      "effect_tags": ["process:compute:outcome_unavailable_envelope"]
+    },
+    {
       "helper_ref": "api:enqueue_refresh",
       "source": "src/runtime/api/app/opendart_dispatch.py",
-      "source_function_sha256": "8cd0ed5d55f95472c7b901b903ca43664c6d71a5abebca067249104be6b3958b",
-      "effect_tags": ["sqs:send:opendart_refresh_request"]
+      "source_function_sha256": "5fafeacaca8e705fad8b1a55030af0f0ca75480a9d67c14fbda408af1f4aaf73",
+      "effect_tags": [
+        "process:call:opendart_capability_broker_conditional",
+        "sqs:send:opendart_refresh_request_via_broker_or_direct"
+      ]
     },
     {
       "helper_ref": "agent:calculate_score",
       "source": "src/runtime/agent/app/main.py",
-      "source_function_sha256": "2c7075b1edc39fdf133b105e8ce27dd85ef52c709603ebf46b9618f5d38b2636",
+      "source_function_sha256": "995c52a0d4913e6391089b8f5d262e54a09cfa58981e8da7fcc4b0e4636f7ae3",
       "effect_tags": ["process:compute:deterministic_score_70_20_10"]
     },
     {
@@ -138,22 +185,25 @@
     {
       "helper_ref": "llm-gateway:_bedrock_explanations",
       "source": "src/runtime/llm_gateway/app/main.py",
-      "source_function_sha256": "33f341db71e0741db1b6c265e9493d509ed6e889630c68a6304651428000909a",
-      "effect_tags": ["bedrock:call:converse_conditional_live_only"]
+      "source_function_sha256": "2d1720c9d55a6401c075bef22c58bc628505abc0649bb09a2dc92c91a824a8cd",
+      "effect_tags": [
+        "bedrock:call:converse_via_broker_conditional_live_only",
+        "process:call:bedrock_capability_broker_conditional_live_only"
+      ]
     }
   ],
   "operations": [
     {
       "operation_ref": "api:health",
-      "source_function_sha256": "5cb678306bebe6dfb54528282396ba8a3e7779f216e2cc470a3e8b832bd00c57",
-      "effect_tags": ["company_db:read:connectivity", "member_db:read:connectivity"],
-      "branches": {"success": "Probe each logical database directly, then return source-declared status."}
+      "source_function_sha256": "7f858669fc0135cd43430bfd6ea2e077719e91066b3c0474ead6315c632383c0",
+      "effect_tags": ["company_db:read:connectivity", "member_db:read:connectivity", "outcome_db:read:connectivity", "process:compute:allowlisted_dataset_profile"],
+      "branches": {"success": "Probe all three logical databases directly, then return source-declared status with an allowlisted dataset profile."}
     },
     {
       "operation_ref": "api:runtime_info",
-      "source_function_sha256": "56bdf34203d50c4eae65bddf4f1b9da2fa0a763831ceaee57cabace9b59031e1",
-      "effect_tags": [],
-      "branches": {"success": "Return process configuration and static source-boundary metadata."}
+      "source_function_sha256": "323fdad3ea68fa37092f88c81327e82234bbbbfc3448d8ac9127598951473490",
+      "effect_tags": ["process:compute:allowlisted_public_runtime_projection"],
+      "branches": {"success": "Return the compatibility runtime fields with allowlisted dataset and explanation-provider values; detailed AI operations are not included."}
     },
     {
       "operation_ref": "api:signup",
@@ -318,7 +368,7 @@
     },
     {
       "operation_ref": "api:candidate_recommendations",
-      "source_function_sha256": "c3a108f5f27f5ccfdb163dc9aa491fdfda09cc4160a49191a809295ce194ef83",
+      "source_function_sha256": "da59d700a6ac6f56c98869c421e3c154d29be11b74c70e17070a3218b937f0ea",
       "effect_tags": [
         "agent:call:match_jobs_on_cache_miss",
         "company_db:read:open_jobs_and_company_before_cache",
@@ -326,16 +376,20 @@
         "member_db:read:latest_privacy_core_consent",
         "member_db:read:resume_self",
         "member_db:read:user_auth",
+        "outcome_db:read:active_synthetic_material_before_cache",
+        "outcome_db:read:tenant_job_scoped_synthetic_outcomes_on_cache_miss",
+        "process:compute:outcome_unavailable_envelope_conditional",
         "prompt_log:append:indirect_nonempty_gateway_request",
         "redis:get:candidate_recommendations",
         "redis:setex:candidate_recommendations_available_86400"
       ],
       "branches": {
-        "cache_hit": "Consent, Resume and open Jobs are read before cache; hit skips agent and gateway.",
-        "cache_miss_nonempty_available": "Matcher and gateway run; AVAILABLE explanation is cached.",
-        "cache_miss_empty": "Matcher runs, explanation helper short-circuits without gateway HTTP, response is cached.",
+        "cache_hit": "Consent, Resume, open Jobs and the active non-source-text outcome revision are read before cache; hit skips agent, gateway and per-job outcome reads.",
+        "cache_miss_nonempty_available": "Matcher and gateway run; each matched job reads a tenant/job-scoped synthetic outcome observation before the AVAILABLE response is cached only when the optional outcome store stayed available.",
+        "cache_miss_empty": "Matcher runs, explanation helper short-circuits without gateway HTTP, no per-job outcome observation is read, and the response is cached only when the revision read succeeded.",
         "cache_miss_explanation_unavailable": "Scores remain, legacy unavailable status is returned, cache write is skipped.",
-        "matcher_failure": "Matcher HTTP or contract failure returns 503 before gateway.",
+        "outcome_store_unavailable": "A separate outcome-session failure returns a fixed no-effect observation envelope, retains matcher scores and order, and skips cache write.",
+        "matcher_failure": "Matcher HTTP or contract failure returns 503 before gateway or outcome reads.",
         "redis_read_failure": "Cache helper treats read failure as miss.",
         "redis_write_failure": "Cache helper ignores write failure and returns computed response.",
         "consent_missing": "Consent gate returns 409 before Resume, Jobs and cache.",
@@ -405,22 +459,48 @@
     },
     {
       "operation_ref": "api:refresh_recruiter_company_opendart",
-      "source_function_sha256": "e931adaf325172f8dcc9b1867a4a4d8750800374622ea30e5d228d0960d23b8e",
+      "source_function_sha256": "ea5f5f7f4129342fc2831d9ba54f363db590b67efebd617e69f98766301268d1",
       "effect_tags": [
         "audit:insert:company_opendart_refresh",
         "company_db:read:linked_company",
         "company_db:update:opendart_snapshot_or_queue_state",
         "member_db:read:user_auth",
+        "process:call:opendart_capability_broker_conditional",
         "process:compute:synthetic_opendart_snapshot_conditional",
-        "sqs:send:opendart_refresh_request_conditional",
-        "transaction:commit:member+company_non_atomic_conditional"
+        "sqs:send:opendart_refresh_request_conditional_via_broker_or_direct",
+        "transaction:commit:member+company_non_atomic_conditional",
+        "transaction:rollback:member+company_noop_on_existing_pending"
       ],
       "branches": {
-        "serverless_queued": "Build a minimal request, commit its pending marker, send it to SQS, and conditionally persist the queued state with audit events; the API does not call OpenDART.",
+        "serverless_queued": "Build a minimal request, commit its pending marker, then enqueue through the configured Unix-socket capability broker or the direct SQS SDK fallback and conditionally persist the queued state with audit events; the API does not call OpenDART.",
+        "already_pending": "A compare-and-set rejects duplicate dispatch, rolls back the no-op transaction and returns the existing request reference.",
         "queue_unavailable": "Retain the last known snapshot, append a safe failure audit, commit state and return 503.",
         "fixture_updated": "In explicit fixture_inline mode, compute a synthetic snapshot locally, persist it and append an audit event.",
         "fixture_rejected": "Retain the last known snapshot, append a categorized failure audit, commit state and return 404, 409, 422, or 503.",
         "dispatch_disabled": "An unsupported dispatch mode returns 409 before any snapshot refresh."
+      }
+    },
+    {
+      "operation_ref": "api:collect_recruiter_company_opendart",
+      "source_function_sha256": "32f476e33012a3f1c5d80cf73f6bfa173eae77a84de49f1f86ad8b4a7c21061c",
+      "effect_tags": [
+        "audit:insert:company_opendart_refresh_conditional",
+        "company_db:read:linked_company_and_pending_request",
+        "company_db:update:verified_opendart_snapshot_or_failure_state",
+        "dynamodb:delete:consumed_result_post_commit",
+        "dynamodb:get:request_bound_result",
+        "member_db:read:user_auth",
+        "transaction:commit:member+company_non_atomic_conditional"
+      ],
+      "branches": {
+        "no_pending_request": "Return the current Company profile without a result-store read.",
+        "result_pending": "Read the request-bound result store and return 202 without changing Company data.",
+        "result_timeout": "Conditionally release only the same expired pending request after the bounded wait and retain any last-known-good snapshot.",
+        "result_expired": "Reject an item past its application-enforced expiry, conditionally clear only the same pending request, and request deletion.",
+        "result_superseded": "A failed compare-and-set preserves the newer pending request and discards only the older durable result.",
+        "updated": "Validate request, tenant, corp code, live source, no-score boundary and company name; update the Company snapshot, append audit, commit, then request bounded result deletion.",
+        "not_updated": "Retain the previous snapshot when present, store a non-updated state, append audit, commit, then request bounded result deletion.",
+        "result_rejected": "Reject unavailable, malformed or cross-bound result material before Company update."
       }
     },
     {
@@ -490,7 +570,7 @@
     },
     {
       "operation_ref": "api:recruiter_recommendations",
-      "source_function_sha256": "ba78c73834936043d7ba96b6090b628f837d35c9fddd1f5f0b93bec45776de67",
+      "source_function_sha256": "5c2a4ad1e4a1527770661e666735228cd5105e4f018dda2167e1ab8dde7725cb",
       "effect_tags": [
         "agent:call:match_candidates_on_cache_miss",
         "audit:insert:authorization_denied_conditional",
@@ -498,6 +578,7 @@
         "llm_gateway:call:explanations_nonempty_on_cache_miss",
         "member_db:read:active_applicants_and_resumes_on_cache_miss",
         "member_db:read:user_auth",
+        "process:compute:recruiter_literal_evidence",
         "prompt_log:append:indirect_nonempty_gateway_request",
         "redis:get:recruiter_recommendations",
         "redis:setex:recruiter_recommendations_available_86400",
@@ -505,7 +586,7 @@
       ],
       "branches": {
         "cache_hit": "Tenant Job is checked before cache; hit skips current applicant, consent, agent, gateway and allowed-path audit checks.",
-        "cache_miss_nonempty_available": "Read active applicants, run matcher and gateway, cache AVAILABLE response.",
+        "cache_miss_nonempty_available": "Read active applicants, run matcher and gateway, build no-effect literal source-review evidence, then cache the AVAILABLE response.",
         "cache_miss_empty": "Run matcher with empty candidates; explanation helper skips gateway HTTP and response is cached.",
         "cache_miss_explanation_unavailable": "Scores remain, legacy unavailable status is returned, cache write is skipped.",
         "matcher_failure": "After applicant query, matcher failure returns 503 before gateway.",
@@ -513,6 +594,22 @@
         "failure_mode_disabled": "Failure-mode gate returns 404 before cache.",
         "redis_read_failure": "Cache helper treats read failure as miss and continues applicant query.",
         "redis_write_failure": "Cache helper ignores write failure and returns computed response."
+      }
+    },
+    {
+      "operation_ref": "api:admin_ai_operations",
+      "source_function_sha256": "3e8fc14b755c577d6c9a20633d64915b40935732e753d8f06b2309798578abe5",
+      "effect_tags": [
+        "agent:call:health_probe_transitive",
+        "audit:insert:ai_operations_snapshot_viewed",
+        "llm_gateway:call:health_probe_transitive",
+        "member_db:read:user_auth",
+        "process:compute:allowlisted_ai_operations_snapshot",
+        "transaction:commit:member"
+      ],
+      "branches": {
+        "success": "Require the current admin role, bound both internal health probes, project only allowlisted status values, append the read audit event, commit, and return the strict response.",
+        "internal_unavailable": "Return HTTP 200 with the affected probe_state UNAVAILABLE; transport and exception details are omitted."
       }
     },
     {
@@ -554,8 +651,9 @@
       "operation_ref": "llm-gateway:explanations",
       "source_function_sha256": "fdc75bbdf274282bf67f23f98e2108413df676e4a22ac6758602a8b8d27905e1",
       "effect_tags": [
-        "bedrock:call:converse_conditional_live_only",
+        "bedrock:call:converse_via_broker_conditional_live_only",
         "process:compute:deterministic_stub_or_overclaim",
+        "process:call:bedrock_capability_broker_conditional_live_only",
         "prompt_log:append:raw_jsonl_per_item_conditional",
         "structured_log:emit:prompt_metadata_per_item"
       ],
@@ -564,7 +662,7 @@
         "prompt_recorded_then_injected_failure": "Prompt metadata and optional raw JSONL are written before timeout, rate-limit, provider-error or malformed outcome.",
         "overclaim": "Return synthetic overclaim text without external provider call.",
         "bedrock_live_blocked": "Prompt records are written, then live gate returns 503.",
-        "bedrock_live": "Only approved source configuration would call Bedrock adapter; no execution is claimed.",
+        "bedrock_live": "Only approved source configuration would call the fixed Unix-socket capability broker, which owns the conditional Bedrock invocation; no execution or provider receipt is claimed.",
         "local_stub": "Return deterministic local explanations without external provider call."
       }
     }
@@ -601,7 +699,7 @@
         "cached = await get_cached(cache_key)",
         "match_body = await run_matcher(",
         "explanation_status, explanations = await run_explanations(",
-        "if explanation_status == \"AVAILABLE\":",
+        "if explanation_status == \"AVAILABLE\" and not outcome_observation_degraded:",
         "await set_cached(cache_key, response)",
         "return response"
       ]
@@ -624,6 +722,7 @@
         "rows = db.execute(",
         "match_body = await run_matcher(",
         "explanation_status, explanations = await run_explanations(",
+        "build_recruiter_review_support(",
         "if explanation_status == \"AVAILABLE\":",
         "await set_cached(cache_key, response)",
         "return response"

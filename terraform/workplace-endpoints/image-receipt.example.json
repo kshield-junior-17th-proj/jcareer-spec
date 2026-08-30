@@ -1,0 +1,13 @@
+{
+  "schema_version": "jcareer-windows-image-receipt-v2",
+  "decision": "PENDING_HUMAN_IMAGE_REVIEW",
+  "image_build_ref": "",
+  "reviewer_ref": "",
+  "reviewed_at": "",
+  "expires_at": "",
+  "ami_id": "",
+  "image_source_sha256": "",
+  "build_observation_sha256": "",
+  "synthetic_data_only": true,
+  "notes": "Example only. This file does not release an AMI or authorize deployment."
+}

@@ -19,6 +19,8 @@ from generate_synthetic_training import (
     write_artifact,
 )
 from export_runtime_training import (
+    COMPANY_SOURCE_CONTRACT,
+    FEATURE_SCHEMA_VERSION as RUNTIME_FEATURE_SCHEMA_VERSION,
     FIELDNAMES as RUNTIME_FIELDNAMES,
     LABEL_NAME as RUNTIME_LABEL_NAME,
     SCHEMA_VERSION as RUNTIME_SCHEMA_VERSION,
@@ -63,10 +65,12 @@ def load_contract(
     elif schema_version == RUNTIME_SCHEMA_VERSION:
         required_contract = {
             "schema_version": RUNTIME_SCHEMA_VERSION,
+            "feature_schema_version": RUNTIME_FEATURE_SCHEMA_VERSION,
             "synthetic_only": True,
             "synthetic_attestation": SYNTHETIC_ATTESTATION,
             "member_data_used": True,
             "company_customer_data_used": True,
+            "company_source_contract": COMPANY_SOURCE_CONTRACT,
             "purpose": "synthetic_runtime_challenger_training_demonstration",
             "source_runtime_db_wired": True,
             "ranking_runtime_wired": False,
@@ -328,6 +332,10 @@ def train_from_manifest(
     }
     if "seed" in manifest:
         model["source_dataset"]["seed"] = manifest["seed"]
+    if runtime_source:
+        model["source_dataset"]["feature_schema_version"] = manifest[
+            "feature_schema_version"
+        ]
     model_content = (json.dumps(model, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode("utf-8")
     model_sha256 = hashlib.sha256(model_content).hexdigest()
     evaluation = {
@@ -357,6 +365,10 @@ def train_from_manifest(
             [
                 "historical application status can reproduce recruiter behavior",
                 "unresolved applied status rows are excluded",
+                "token-overlap features can be gamed by copying job or company terms",
+                "multiple synthetic company tenants are pooled for this platform-wide demo",
+                "synthetic document passed/not_passed outcomes are not training labels",
+                "seed identity/profile markers do not cryptographically bind in-place job text",
                 "no automatic compliance, fairness, or release decision is made",
             ]
             if runtime_source

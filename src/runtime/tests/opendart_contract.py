@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import sys
@@ -40,6 +41,17 @@ SENSITIVE_KEYS = {
     "ir_url",
     "crtfc_key",
 }
+
+
+def rehash_snapshot(payload: dict[str, object]) -> dict[str, object]:
+    result = {key: value for key, value in payload.items() if key != "content_sha256"}
+    canonical = json.dumps(
+        result, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    )
+    return {
+        **result,
+        "content_sha256": hashlib.sha256(canonical.encode("utf-8")).hexdigest(),
+    }
 
 
 def expect_error(callable_object, category: str) -> OpenDartError:
@@ -273,32 +285,42 @@ def main() -> None:
     tampered = dict(fixture)
     tampered["ceo_nm"] = "must-not-leak"
     tampered["company"] = {**fixture["company"], "bizr_no": "must-not-leak"}
-    projected = public_snapshot(tampered)
+    assert public_snapshot(tampered) is None
+    checks += 1
+    projected = public_snapshot(rehash_snapshot(tampered))
     assert projected is not None
     assert not (recursive_keys(projected) & SENSITIVE_KEYS)
     assert "must-not-leak" not in json.dumps(projected, ensure_ascii=False)
     assert "corp_code" not in projected
     checks += 1
 
-    wrong_schema = {**fixture, "schema_version": "unknown"}
+    wrong_provenance = rehash_snapshot({**fixture, "synthetic": False})
+    assert public_snapshot(wrong_provenance) is None
+    checks += 1
+
+    wrong_schema = rehash_snapshot({**fixture, "schema_version": "unknown"})
     assert public_snapshot(wrong_schema) is None
-    missing_name = {
-        **fixture,
-        "company": {**fixture["company"], "legal_name": ""},
-    }
+    missing_name = rehash_snapshot(
+        {
+            **fixture,
+            "company": {**fixture["company"], "legal_name": ""},
+        }
+    )
     assert public_snapshot(missing_name) is None
     checks += 2
 
     message = build_refresh_message(
-        company_id="00000000-0000-0000-0000-aaaaaaaaaaaa",
+        company_id="00000000-0000-0000-0000-000000""000001",
+        expected_company_name="아크웨이브",
         corp_code="90000001",
         requested_at=FIXED_TIME,
-        request_id="00000000-0000-0000-0000-bbbbbbbbbbbb",
+        request_id="00000000-0000-0000-0000-000000""000002",
     )
     assert set(message) == {
         "schema_version",
         "request_id",
         "company_id",
+        "expected_company_name",
         "corp_code",
         "requested_at",
     }
@@ -314,8 +336,10 @@ def main() -> None:
             return {"MessageId": "synthetic-queue-message"}
 
     previous_queue = os.environ.get("OPENDART_REFRESH_QUEUE_URL")
+    previous_broker_socket = os.environ.get("OPENDART_AWS_BROKER_SOCKET")
+    os.environ.pop("OPENDART_AWS_BROKER_SOCKET", None)
     os.environ["OPENDART_REFRESH_QUEUE_URL"] = (
-        "https://sqs.ap-northeast-2.amazonaws.com/ACCOUNT_ID/synthetic.fifo"
+        "https://sqs.ap-northeast-2.amazonaws.com/000000""000000/synthetic.fifo"
     )
     fake_queue = FakeQueue()
     queued = enqueue_refresh(message, sender_factory=lambda: fake_queue)
@@ -332,14 +356,25 @@ def main() -> None:
 
     distinct_message = build_refresh_message(
         company_id=message["company_id"],
+        expected_company_name=message["expected_company_name"],
         corp_code=message["corp_code"],
         requested_at=FIXED_TIME,
-        request_id="00000000-0000-0000-0000-cccccccccccc",
+        request_id="00000000-0000-0000-0000-000000""000003",
     )
     distinct = enqueue_refresh(distinct_message, sender_factory=lambda: fake_queue)
     assert distinct["deduplication_id"] != queued["deduplication_id"]
     checks += 1
 
+    os.environ.pop("OPENDART_REFRESH_QUEUE_URL", None)
+    os.environ["OPENDART_AWS_BROKER_SOCKET"] = "/run/jcareer-opendart/broker.sock"
+    broker_queue = FakeQueue()
+    broker_queued = enqueue_refresh(message, sender_factory=lambda: broker_queue)
+    assert broker_queued["request_id"] == message["request_id"]
+    assert broker_queue.call is not None
+    assert broker_queue.call["QueueUrl"] == "broker://configured-opendart-refresh"
+    checks += 1
+
+    os.environ.pop("OPENDART_AWS_BROKER_SOCKET", None)
     os.environ.pop("OPENDART_REFRESH_QUEUE_URL", None)
     try:
         enqueue_refresh(message, sender_factory=lambda: fake_queue)
@@ -350,6 +385,8 @@ def main() -> None:
     checks += 1
     if previous_queue is not None:
         os.environ["OPENDART_REFRESH_QUEUE_URL"] = previous_queue
+    if previous_broker_socket is not None:
+        os.environ["OPENDART_AWS_BROKER_SOCKET"] = previous_broker_socket
 
     print(f"OpenDART adapter contract: PASS ({checks}/{checks})")
 

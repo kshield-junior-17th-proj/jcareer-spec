@@ -1,6 +1,6 @@
 # J-Career AS-IS 합성 런타임 명세
 
-**기준일:** 2026-08-28
+**기준일:** 2026-08-30
 **상태:** 코드·로컬 합성 재현환경 명세. 실제 J사 운영 서비스나 AWS 배포 상태가 아니다.
 
 이 문서는 `src/runtime/**` 코드와 `terraform/asis/**` 모델을 한곳에서 대조한다. ISMS 또는
@@ -71,11 +71,12 @@ tenant·membership 경계를 대신하지 않는다.
 | 배포 단위 | 책임 | 직접 데이터 저장소 | Terraform 대응 |
 |---|---|---|---|
 | `web` | 지원자·기업·관리자 SPA | 없음 | ECS service와 ECR URI 문자열 배선; 실제 build/push·digest 검증 없음 |
-| `api` | 인증·인가, 양측 업무 API, 두 DB 조합, 캐시, matcher·설명 호출 | 회원 DB, 기업 DB, Redis | ECS service와 DB URL 계약; 서비스 발견 등 미배선 |
+| `api` | 인증·인가, 양측 업무 API, 세 DB 조합, 캐시, matcher·설명 호출 | 회원 DB, 기업 DB, 합성결과 DB, Redis | ECS service에는 회원·기업 DB URL만 모델링; 합성결과 DB와 서비스 발견 등 미배선 |
 | `agent` | 결정론적 70/20/10 점수·정렬 | 없음 | ECS service 정의; 공개 ALB 경로가 모델에 남음 |
 | `llm-gateway` | 점수와 분리된 설명, 기업 방향 직접 일치 표현, provider adapter, raw prompt 기록 | 로컬에서는 `prompt-logs` volume | ECS service 정의; Fargate 영속 저장소 미모델링 |
+| `opendart-worker` / API result collector | 기업 공개정보 온디맨드 조회 / request·tenant·corp code·회사명·no-score 경계 검증 뒤 last-known-good 반영 | SQS FIFO 요청, TTL DynamoDB 결과함 / 기업 DB | 별도 `terraform/serverless-opendart`; 기본 0-resource, AWS 실행·실호출 없음 |
 | `mlops-exporter` / `mlops-lambda` | DB 옆에서 합성 회원·기업 특징 5개 추출 / 엄격한 S3 snapshot 검증, 소형 challenger 학습, 합성 오프라인 비교 산출 | S3 source·result, DynamoDB run-state adapter | 별도 `terraform/serverless-mlops`; 기본 0-resource, AWS 실행·운영 모델 배선 없음 |
-| PostgreSQL | 회원·기업 논리 DB | 아래 데이터 소유 표 참조 | 같은 RDS Primary/Replica; 기업 DB bootstrap 미구현 |
+| PostgreSQL | 회원·기업·합성결과 논리 DB | 아래 데이터 소유 표 참조 | 같은 RDS Primary/Replica 모델; 기업·합성결과 DB bootstrap 미구현 |
 | Redis | 추천 응답 24시간 캐시 | 후보자·기업 추천 payload | ElastiCache 모델; API endpoint 주입 미구현 |
 
 Compose가 호스트에 publish하는 web·API·agent·gateway 포트는 기본값으로 loopback에만
@@ -89,11 +90,16 @@ Compose가 호스트에 publish하는 web·API·agent·gateway 포트는 기본�
 |---|---|---|
 | `jcareer_member` | `User`, `ConsentEvent`, `Resume`, `Application`, `AuditEvent` | 지원자와 기업 담당자 identity를 함께 보유 |
 | `jcareer_company` | `Company`, `Job` | 기업 방향·선언 가치·profile version 포함 |
+| `jcareer_outcome` | `OutcomeDataset`, `SyntheticDocumentOutcome` | 합성 관찰 전용; 원문 미저장 선언, 점수·순위 효과 `NONE` |
 
-로컬 Compose에서는 두 DB가 서로 다른 database와 app role을 사용하고 반대 DB `CONNECT`를
-회수한다. 교차 DB foreign key나 ORM relationship은 없다. API의 routing session만 두 engine을
-조합한다. 같은 RDS·보안그룹·백업·장애 경계를 공유하며, 두 DB를 건드리는 한 번의 commit은
-원자적이지 않다. Terraform은 기업 DB와 전용 role bootstrap을 아직 실행하지 않는다.
+로컬 Compose에서는 세 DB가 서로 다른 database와 app role을 사용하고 다른 DB에 대한 공개
+`CONNECT`를 회수한다. 교차 DB foreign key나 ORM relationship은 없다. API의 routing session이
+세 engine을 조합한다. 같은 PostgreSQL 컨테이너와 장애 경계를 공유하며, 여러 DB를 건드리는 한
+번의 commit은 원자적이지 않다. Terraform AS-IS는 기업·합성결과 DB와 전용 role bootstrap을
+아직 실행하지 않는다.
+
+DB boundary 시험 소스는 세 role의 자기 DB 외 여섯 연결 조합이 모두 거부되는지 검사한다.
+AWS teardown 뒤 최신 보강본의 Docker 실행은 하지 않았으므로 이는 실행 결과가 아니다.
 
 기업 담당자의 `User.company_id`와 지원 관계의 `Application.job_id`는 opaque 논리 참조다. 현재
 구조가 별도 identity realm이나 조직 membership을 구현했다는 뜻은 아니다.
@@ -105,7 +111,7 @@ DB에 구현됐거나 수집·전송이 승인됐다는 뜻은 아니다.
 ## 4. 외부 업무 API
 
 실행 시 FastAPI가 `/docs`와 `/openapi.json`을 생성한다. 아래 표는 코드 라우트의 역할 경계다.
-`contracts/api_surface.json`은 세 서비스의 33개 handler·38개 route tuple, 요청 model 선언,
+`contracts/api_surface.json`은 세 서비스의 35개 handler·40개 route tuple, 요청 model 선언,
 인증 role source와 선택된 tenant selector, 기업 계정 수명주기·현재 지원자료 참조·추천 audit·
 cache payload 검증의 선택된 source state를 AST fingerprint와 대조한다. 상태는
 `SOURCE_DECLARATION_NOT_EXECUTION_EVIDENCE`·`AST_PARTIAL`이다. 현재 OpenAPI에는 security scheme과
@@ -113,14 +119,14 @@ cache payload 검증의 선택된 source state를 AST fingerprint와 대조한�
 완전한 wire API 계약이라고 부르지 않는다. operation의 legacy `required_calls` 필드는 handler AST에
 선택된 호출 symbol이 존재한다는 뜻일 뿐, cache hit 같은 모든 분기에서 실행된다는 뜻이 아니다.
 
-`contracts/api_effects.json`은 33개 handler 전부에 대해 회원/기업 DB, audit, Redis, agent,
-llm-gateway, prompt log 효과와 분기 설명을 별도로 고정한다. 전 handler와 14개 helper의 AST 지문,
+`contracts/api_effects.json`은 35개 handler 전부에 대해 회원/기업/outcome DB, audit, Redis, agent,
+llm-gateway, prompt log, SQS와 DynamoDB 결과함 효과와 분기 설명을 별도로 고정한다. 전 handler와 20개 helper의 AST 지문,
 기업 가입·양측 추천 cache 순서·기업 overview/pipeline/admin 열람 감사·gateway prompt/provider 순서의
 선택된 9개 lexical marker를 검사한다. 이는 CFG dominance, 실제 cardinality, multi-bind commit의
 원자성, downstream 수신 또는 실행 trace를 증명하지 않는다.
 
-`contracts/api_wire_shapes.json`은 같은 33개 handler의 직접 `return` 표현식과 handler 안에
-직접 적힌 literal `HTTPException`만 AST에서 추출한다. 38개 decorator route는 alias를 포함한
+`contracts/api_wire_shapes.json`은 같은 35개 handler의 직접 `return` 표현식과 handler 안에
+직접 적힌 literal `HTTPException`만 AST에서 추출한다. 40개 decorator route는 alias를 포함한
 route 수이고 별도 handler로 다시 세지 않는다. literal object의 최상위 key 외에 nested shape를
 펼치지 않으며 helper call·local name·cache 반환은 각각 미확장 상태로 둔다. 따라서 빈 직접 오류
 목록은 operation이 실패하지 않는다는 뜻이 아니고 dependency·helper·downstream·422·500·header·
@@ -151,9 +157,13 @@ focus를 복원한다. 로그인 요청 중에는 form 밖의 polite status와 f
 계정 중복 요청을 막는다. 지원자·기업 가입 form도 API 입력 길이와 맞는 min/max 경계, email
 autocomplete·spellcheck 상태, form `aria-busy`, form 밖 polite status를 source 계약으로 둔다.
 브라우저 API client는 401 신호를 body decode보다 먼저 발행하고 body를 text로 한 번 읽은 뒤
-JSON·일반 text·204/205·빈 성공 body·malformed JSON을 구분한다. decoder의 7개 순수 `Response`
+JSON·일반 text·204/205·빈 성공 body·malformed JSON을 구분한다. decoder의 11개 순수 `Response`
 stub 회귀는 실제 브라우저 navigation, 서버 응답 또는 network 실행 증거가 아니다.
 이 피드백은 `/auth/me` 재검증, 서버 token 철회 또는 교차 탭 동기화를 추가하지 않는다.
+
+API middleware는 `/api/` 아래의 성공·오류 응답에 `Cache-Control: no-store, private`와
+`Pragma: no-cache`를 덧붙인다. 순수 계약은 API/비-API 분기만 확인했으며 CloudFront/Nginx를
+거친 header 보존, 실제 browser back/forward cache, logout 뒤 화면 복원은 실행 관찰하지 않았다.
 
 `/candidate/home`은 이력서·지원 현황·동의 API의 현재 응답을 한 화면에 모으고, 실패한 자료는
 나머지 화면과 구분해 표시한다. 프로필 입력률은 다섯 구조화 항목의 입력 여부일 뿐 추천 점수나
@@ -183,7 +193,7 @@ stub 회귀는 실제 브라우저 navigation, 서버 응답 또는 network 실�
 | 기업 | `PUT /api/v1/recruiter/jobs/{job_id}` | 자기 회사 공고 수정 |
 | 기업 | `GET /api/v1/recruiter/jobs/{job_id}/pipeline` | 자기 공고 지원자 파이프라인 |
 | 기업 | `PATCH /api/v1/recruiter/applications/{application_id}` | 전형 상태 변경 |
-| 기업 | `GET /api/v1/recruiter/jobs/{job_id}/recommendations` | 지원자 점수·분해·별도 설명 |
+| 기업 | `GET /api/v1/recruiter/jobs/{job_id}/recommendations` | 지원자 점수·분해·직접 문구 근거·별도 설명 |
 | 운영자 | `GET /api/v1/admin/audit` | 합성 감사 이벤트 필터 조회 |
 
 기업 경로는 `user.company_id`와 공고의 `company_id`를 대조해 다른 기업 객체 접근을 거부한다.
@@ -239,11 +249,12 @@ source state를 각각 표시한다.
 기업 담당자 세션
   → 자기 회사 공고인지 확인
   → Redis cache 조회
-  ├─ cache hit: 저장된 후보자 payload·score_breakdown·설명을 즉시 응답
+  ├─ cache hit: 저장된 후보자 payload·score_breakdown·원문 근거·설명을 즉시 응답
   └─ cache miss: 회원 DB에서 해당 공고의 활성 지원자 + Resume 조회
        → agent: 공고 구조화 항목과 각 지원자 구조화 항목으로 점수 계산
        → llm-gateway: 점수 결과와 지원자/기업 context로 설명 생성
-       → 후보자 payload·score_breakdown·설명을 분리해 응답
+       → API: 자기소개·프로젝트와 요구 기술·기업 선언의 직접 문구 위치만 대조
+       → 후보자 payload·score_breakdown·원문 근거·설명을 분리해 응답
 ```
 
 기업 추천 경로에는 최신 지원자 동의 확인, 추천 화면 열람 audit, 지원자 집합·이력서 version을
@@ -260,6 +271,13 @@ source state를 각각 표시한다.
 있고 서버 저장·공유·shortlist·채용 결정 이벤트를 만들지 않는다. 따라서 이 화면을 플랫폼 전체
 인재 소싱이나 기업 적합성 판정 구현으로 읽지 않는다.
 
+각 지원자 카드의 `recruiter_review_support`는 자기소개·프로젝트와 공고 요구 기술·기업 선언
+가치 사이에서 대소문자를 제외한 동일 문구 위치만 최대 8개 표시한다. 지원자 역량, 의미 유사도,
+합격 가능성 또는 기업 적합도를 추론하지 않으며 `score_effect=NONE`, `ranking_effect=NONE`과
+네 가지 자동판정 boolean `false`가 확인되지 않으면 UI가 근거를 표시하지 않는다. 기업 추천
+cache key에는 지원자 집합·이력서 version이 없으므로 cache hit의 근거도 생성 당시 snapshot이다.
+담당자는 현재 이력서·프로젝트·공고 원문을 다시 확인해야 한다.
+
 ## 8. 점수와 설명 계약
 
 ```text
@@ -268,16 +286,19 @@ source state를 각각 표시한다.
 
 - 산식 version: `deterministic-70-20-10-v1`
 - score breakdown: 기술·경력·직무 원시 기여도와 표시값
-- 점수 미사용: 이름, 연락처, 이메일, 생년월일, 주소, 학교/학력, 자격증, 자기소개
+- 점수 미사용: 이름, 연락처, 이메일, 생년월일, 주소, 학교/학력, 자격증, 프로젝트, 자기소개
 - 설명 입력: cache miss의 현재 요청에서는 API가 위 필드와 기업명·방향·선언 가치·공고 요약을
-  요청에 준비한다. 명시적인 candidate context는 8개 key이고 현재 field-name counter는 그중
+  요청에 준비한다. 명시적인 candidate context는 9개 key이고 현재 field-name counter는 그중
   6개를 표시한다. 그러나 `subject_ref`, score breakdown, matched label에도 지원자 파생 정보가
-  포함될 수 있으므로 이 8/6을 전체 LLM02 모수로 읽지 않는다. 정확한 계수 경계는
+  포함될 수 있으므로 이 9/6을 전체 LLM02 모수로 읽지 않는다. 정확한 계수 경계는
   [`DB_FIELD_CATALOG.md`](DB_FIELD_CATALOG.md)를 따른다. 빈 추천 집합에는 필드를 준비하지 않는다.
   cache hit는 원본 요청의 준비 필드 집합을 현재 cache envelope만으로 검증할 수 없으므로 빈 배열과
   별도 미검증 상태를 반환한다. 화면은 외부 공급자의 실제 수신을 단정하지 않고 이 상태와 gateway
   확인 상태를 따로 표시한다.
 - 기업 방향 결과: 문자열 직접 일치 기반이며 `score_effect=NONE`
+- 기업 담당자 원문 근거: `recruiter-evidence-review-v1` envelope이 허용된 원문에서 직접 겹친
+  문구와 source type만 표시한다. 점수·추천 순서·자동선발·합격확률·기업 적합 판정에는 쓰지 않고,
+  계약 경계가 달라지면 UI가 fail-closed로 숨긴다.
 - cache miss의 설명 경로 연결·HTTP·JSON·계약 검증 또는 gateway/외부 공급자 경로 unavailable/invalid:
   추천 목록·순서·점수 유지, 설명과 `company_alignment`는 함께 비어 legacy 상태
   `UNAVAILABLE_PROVIDER`로 축약된다. 이 상태만으로 외부 공급자 장애를 주장하지 않는다.
@@ -286,6 +307,11 @@ source state를 각각 표시한다.
   `CACHE_ENTRY_ACCEPTED_ORIGIN_NOT_VERIFIED`로 두어, 현재의 얕은 cache envelope 검사를 과거
   gateway 응답 검증 증거로 표현하지 않는다. 장애 중 과거 설명을 계속 보여 줄지는 사람의 제품
   결정이 남아 있다.
+- 후보자 추천 cache key는 합성결과 `DATASET_VERSION`과 현재 합성 관찰의 원문 없는 특징·태그·
+  생성결과 집합 revision을 포함한다. 관찰 내용이 바뀌면 과거 `historical_observation` cache를 재사용하지 않는다.
+  합성결과 DB는 별도 session으로 읽고, 조회 실패 시 점수·순서를 유지한 채
+  `UNAVAILABLE_OBSERVATION_STORE`·효과 `NONE`을 반환하며 cache 쓰기를 생략한다. 이것이 dataset
+  승인·품질 또는 현재 provider 상태를 검증한다는 뜻은 아니다.
 - 생성 문장 의미 검증: `NOT_IMPLEMENTED_ASIS`
 
 현재 70/20/10은 플랫폼 고정값이지 기업별·공고별 승인 가중치가 아니다. “이 기업이 이 요소를
@@ -303,11 +329,12 @@ hash를 쓰며, 이 지문은 실제 호출·수신·처리 리전을 증명하�
 adapter가 응답을 받더라도 exact `items` object, 요청 subject 집합, 문자열·길이 경계를
 통과하지 못하면 gateway는 설명 요청을 실패로 처리한다. 이 형식 검사는 생성 문장의 사실성·
 충실도·법적 의미를 검증하는 장치가 아니다.
-별도 `terraform/lab`에는 조건부 IAM 정책 초안이 있지만, Docker container가 EC2 profile
-자격증명을 받는 경계를 해결하지 못했다. IMDSv2 hop 1에서는 container 자격증명이 실패할 수
-있고 hop 2만 적용하면 다른 container로 role 접근면이 넓어질 수 있어, Terraform validation과
-배포 스크립트가 live 요청을 차단한다. 따라서 provider와 live flag만 바꾸어 AWS에서 동작한다고
-주장하지 않는다.
+별도 `terraform/lab`에는 조건부 IAM 정책과 고정 UID·peer 검증 Unix socket을 쓰는
+host-network capability broker source가 있다. 일반 API와 gateway container는 metadata와 AWS
+credential 환경을 받지 않고 각자 허용된 broker socket만 mount한다. 다만 두 broker는 같은 EC2
+instance role을 사용하므로 이는 process 분리이지 IAM 분리가 아니다. 기본값은 계속 live 비활성이고,
+현재 AWS 배포·broker 기동·Bedrock 응답 증거도 없다. 따라서 source 존재나 provider flag만으로
+AWS에서 동작한다고 주장하지 않는다.
 
 ### 9.1 합성 DB 기반 서버리스 MLOps 경계
 
@@ -325,6 +352,8 @@ adapter가 응답을 받더라도 exact `items` object, 요청 subject 집합, �
 이름·이메일은 source lineage digest 입력일 뿐 feature가 아니다. 연락처·생년·주소·학교·자격과
 자소서·기업 방향·공고 원문은 artifact에 기록하지 않는다. 지원 상태는
 `pipeline_progression_proxy`로만 사용하며 지원자 품질이나 합격 확률을 뜻하지 않는다. 현재
+합성결과 DB의 `passed/not_passed`는 같은 특징에서 문서 규칙으로 만든 관찰값이며 학습 label에
+연결하지 않는다. 이를 실제 서류 합격이나 독립된 품질 검증 데이터로 부르지 않는다. 현재
 `privacy_core`의 `ai_recommendation` 목적도 학습 동의로 해석하지 않는다. 따라서
 `JCAREER_SYNTHETIC_ONLY` 표식과 예약 이메일·합성 전화가 있는 랩 데이터만 처리한다.
 
@@ -340,6 +369,34 @@ Gateway의 원문 prompt 동작도 이 MLOps 특징 최소화로 바뀌지 않�
 활성화·event·환경 설정 검증과 최초 `RUNNING` 조건부 쓰기는 실패 상태 기록 경계 앞에 있다.
 따라서 pre-state 거부·중복 run ID·최초 DynamoDB 쓰기 실패는 `FAILED_SAFE` 없이 끝날 수 있고,
 `RUNNING` 이후의 snapshot 검증·학습·저장 실패만 `FAILED_SAFE` 전이를 시도한다.
+
+### 9.2 OpenDART 서버리스 조회 경계
+
+기본 `fixture_inline`은 예약된 합성 고유번호만 처리한다. 별도 승인된 `serverless_queue` 경로는
+API가 pending marker를 먼저 commit하고 최소 요청을 SQS FIFO에 보낸다. VPC 밖 Lambda는 기존
+SSM SecureString에서 OpenDART 키를 런타임에 읽어 외부 조회한 뒤, 기업 DB가 아니라 1시간 TTL의
+DynamoDB 결과함에 create-only 결과를 쓴다. 재시도 가능한 실패는 SQS partial batch failure로
+남기고 영구 실패는 `NOT_UPDATED` 결과로 기록한다.
+
+인증된 recruiter API만 결과를 회수한다. API는 pending request ID, 연결 기업, corp code,
+live/non-synthetic source, `score_effect=NONE`, 등록 기업명 일치를 확인한 뒤 기업 DB의
+last-known-good snapshot을 갱신하고 결과 삭제를 요청한다. DynamoDB TTL 삭제는 즉시성을 전제로
+하지 않으며 API가 `expires_at`을 직접 검사한다. 중복 refresh는 기존 request를 반환하고 timeout,
+expiry, 정상 결과 반영 모두 같은 pending request ID에 대한 DB CAS로만 상태를 바꾼다.
+Terraform source 단계 계약은 disabled 0, bootstrap 8, runtime 11개이며 암호화 S3 state와
+lockfile, root별 state key, plan 내 Lambda digest 결속을 요구한다. worker 게시 source는
+`Prepare`에서 보호 snapshot build·Trivy scan, `Review`에서 bootstrap state와 계정·repository의
+digest 결속 및 pending draft 생성, 별도 사람 결정 뒤 `Publish`에서만 ECR push·digest 재조회를
+허용한다. source revision은 사람이 공급한 label이고 실제 복사 byte는 tree/archive hash로 별도
+결속한다. backend 변경 뒤 승인 backend를 쓴 current plan/validate, image build·scan·push,
+AWS apply·OpenDART 실호출·외부 응답 receipt는 없다.
+
+빈 AWS 상태에서 OpenDART 연결 lab을 한 번에 만들 수는 없다. 먼저 최종 HTTPS·Bedrock 형태를
+선택한 OpenDART-off lab을 별도 승인 계획으로 만들어 역할을 확보하고(Stage A), 그 역할을 대상으로
+OpenDART bootstrap·worker image·runtime을 별도 승인한다(Stage B). 그 뒤 같은 lab을 OpenDART-on으로
+다시 계획·검토한다(Stage C). worker image operator source는 있으나 승인·scan 결과·게시·runtime
+receipt가 없으므로 현재 상태는 여전히 Stage B 실행 전이다. 제거는 lab broker 비활성화,
+OpenDART root 제거, lab 제거의 역순이며 단계마다 별도 사람 승인과 잔존 자원 확인이 필요하다.
 
 ## 10. 감사·보존·장애 관찰면
 
@@ -359,7 +416,7 @@ Gateway의 원문 prompt 동작도 이 MLOps 특징 최소화로 바뀌지 않�
 - 미실행 관찰 스크립트는 합성 cache의 정확한 job UUID·correlation ID로 한 entry를 찾아
   `score_breakdown`을 제거한 뒤 현재 API가 이를 hit로 반환하는지를 기록하도록 계획됨
 - raw prompt 기록과 Redis cache가 주 DB 탈퇴 처리와 동시에 제거되지 않음
-- 설명 context의 8개 필드 중 6개만 PII 필드명으로 분류해 기록함
+- 설명 context의 9개 필드 중 6개만 PII 필드명으로 분류해 기록함
 - 동의 이벤트의 `policy_version`은 server-side catalog/hash와 연결되지 않은 client 입력이며,
   기록된 수집 항목에는 이후 추천·설명 경로가 처리하는 `skills`, `desired_role`, `self_intro`가 없음.
   `birth_date`↔`birthdate`, `career`↔`years_experience`, `education`↔`school`의 의미 대응은 미승인
@@ -402,9 +459,10 @@ Gateway의 원문 prompt 동작도 이 MLOps 특징 최소화로 바뀌지 않�
 ## 11. Terraform 대조
 
 `terraform/asis`에는 2-AZ VPC, 네 ECS service 정의, RDS/Redis/S3, edge·관측·IAM 모델이 있다.
-이번 애플리케이션 계약 보강은 기존 resource block을 추가하지 않았지만, 현재 세션에는
-Terraform/OpenTofu CLI가 없어 validate와 mock plan을 다시 실행하지 못했다. 변경 전 마지막
-기록은 110 planned resources이며 현재 결과라고 재주장하지 않는다. `terraform apply`는 금지다.
+이번 애플리케이션 계약 보강은 `terraform/asis` resource block을 추가하지 않았다. Terraform
+1.15.9는 사용할 수 있지만 `terraform/asis` mock plan은 다시 실행하지 않았다. 변경 전 마지막
+기록인 110 planned resources를 현재 결과라고 재주장하지 않는다. 별도 OpenDART·Windows image·
+endpoint root는 validate와 기본 disabled 0-resource plan만 확인했고 apply하지 않았다.
 
 `src/runtime/contracts/application_artifacts.yaml`은 네 앱을 `UNBUILT`·`UNPUBLISHED`로,
 `endpoint_test_sample.yaml`은 Windows 3대·macOS 3대의 계획 표본을 `NOT_EXECUTED`로 고정한다.
@@ -433,12 +491,16 @@ AWS 기동을 주장하려면 최소한 다음 실행 계약이 별도로 필요
 
 1. immutable image digest와 배포 승인 입력
 2. API→agent/gateway, API→Redis service discovery
-3. 세션 서명키와 두 DB app role 자격증명 주입·회전
+3. 세션 서명키와 세 DB app role 자격증명 주입·회전
 4. 기업 DB·role bootstrap 및 migration/seed 단일 실행·rollback
 5. gateway 전용 Bedrock role과 내부 경로 인증
 6. Fargate에서 raw prompt를 어떻게 보존·접근·삭제할지에 대한 저장 계약
+7. OpenDART worker image digest, 기존 key·API role, exact saved plan과 외부 호출 receipt
+8. Windows parent image·build network·Image Builder 실행과 AMI receipt, 3대 임시 identity·만료
+9. macOS 물리 Mac+MDM 경로 또는 EC2 Mac 정책·라이선스·최소 할당 비용 예외
+10. 각 별도 root의 allowlist delete-only saved plan 승인과 제거 뒤 잔존 자원 관찰
 
-이 여섯 항목은 TO-BE 구현 승인이 아니며, 현재 AS-IS 모델의 실행 간극을 드러내는 목록이다.
+이 열 항목은 TO-BE 구현 승인이 아니며, 현재 AS-IS 모델의 실행 간극을 드러내는 목록이다.
 Terraform 출력 precondition은 회원·기업 DB 이름과 app role이 서로 다른지만 검사한다. 실제
 database·role 생성, 권한 부여, 자격증명 전달이 완료됐다는 뜻은 아니다.
 

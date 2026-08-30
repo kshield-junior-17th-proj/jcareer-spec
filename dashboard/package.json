@@ -1,0 +1,11 @@
+{
+  "name": "jcareer-consulting-evidence-desk",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "verify": "node tests/verify-static.mjs",
+    "package:help": "node tools/package-snapshot.mjs --help"
+  }
+}

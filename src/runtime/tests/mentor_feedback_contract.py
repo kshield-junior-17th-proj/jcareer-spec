@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import unittest
 from pathlib import Path
 
@@ -145,15 +146,24 @@ class MentorFeedbackContractTests(unittest.TestCase):
         self.assertIn("실제 운영 배포를 자동으로 증명하지 않는다", inventory)
 
     def test_real_user_training_is_disabled_and_synthetic_serverless_source_is_bounded(self) -> None:
+        invariants = self.contract["implementation_focus"]["invariants"]
         training = self.contract["training_and_mlops"]
         transfer = training["data_transfer"]
         matcher = training["runtime_matcher"]
         synthetic = training["synthetic_mlops"]
         user_data = training["user_data_training"]
+        self.assertIn(
+            "MLOps 시연은 실제 이용자·실제 기업 데이터를 쓰지 않고 합성 회원DB·기업DB snapshot만 쓰는 오프라인 흐름이다.",
+            invariants,
+        )
+        self.assertNotIn(
+            "MLOps 시연은 회원·기업 고객 데이터를 쓰지 않는 오프라인 합성 흐름이다.",
+            invariants,
+        )
         self.assertFalse(matcher["trains_agent"])
         self.assertFalse(matcher["training_endpoint_implemented"])
         self.assertEqual(matcher["bedrock_role"], "EXPLANATION_ONLY_NOT_SCORING")
-        self.assertEqual(transfer["candidate_context_key_count"], 8)
+        self.assertEqual(transfer["candidate_context_key_count"], 9)
         self.assertEqual(transfer["company_context_key_count"], 6)
         self.assertEqual(transfer["counter_flagged_key_count"], 6)
         self.assertFalse(transfer["approved_minimization_allowlist_implemented"])
@@ -230,6 +240,156 @@ class MentorFeedbackContractTests(unittest.TestCase):
             self.assertIn("Red", content)
             self.assertIn("Compliance", content)
             self.assertIn("AI 서비스 사실 경계", content)
+
+    def test_candidate_card_renders_bounded_decision_support_only(self) -> None:
+        app = (RUNTIME_ROOT / "web" / "src" / "App.jsx").read_text(encoding="utf-8")
+        styles = (RUNTIME_ROOT / "web" / "src" / "styles.css").read_text(encoding="utf-8")
+        component = app.split("function CandidateDecisionSupport", 1)[1].split(
+            "function CandidateRecommendationsPage", 1
+        )[0]
+        candidate_page = app.split("function CandidateRecommendationsPage", 1)[1].split(
+            "function WithdrawPage", 1
+        )[0]
+        recruiter_page = app.split("function RecruiterRecommendationsPage", 1)[1].split(
+            "function AdminAuditPage", 1
+        )[0]
+
+        self.assertIn("item.decision_support?.quantitative_evidence?.score_breakdown", candidate_page)
+        self.assertIn("<CandidateDecisionSupport decisionSupport={item.decision_support}", candidate_page)
+        self.assertNotIn("<CandidateDecisionSupport", recruiter_page)
+        self.assertIn("UNAVAILABLE_OBSERVATION_STORE", app)
+        self.assertIn("과거 관찰 자료는 이번 요청에 사용되지 않았습니다.", app)
+        for marker in (
+            "qualitative_evidence",
+            "candidate_excerpt",
+            "employer_excerpt",
+            "sample_count_bands",
+            "shared_evidence_tags",
+            "runtime effect",
+            "ranking effect",
+            "model effect",
+            "approved_for_model_training",
+            "allObservationEffectsNone",
+            "합성 데모 전용",
+            "사람이 원문을 확인합니다.",
+        ):
+            self.assertIn(marker, component)
+        for prohibited in ("합격확률", "합격 확률", "품질", "적합성"):
+            self.assertNotIn(prohibited, component)
+        for selector in (
+            ".candidate-decision-support",
+            ".literal-evidence-list",
+            ".sample-band-grid",
+            ".decision-support-human-boundary",
+        ):
+            self.assertIn(selector, styles)
+
+    def test_recruiter_card_renders_separate_literal_evidence_review(self) -> None:
+        app = (RUNTIME_ROOT / "web" / "src" / "App.jsx").read_text(encoding="utf-8")
+        styles = (RUNTIME_ROOT / "web" / "src" / "styles.css").read_text(encoding="utf-8")
+        component = app.split("function RecruiterEvidenceReview", 1)[1].split(
+            "function RecruiterRecommendationsPage", 1
+        )[0]
+        recruiter_page = app.split("function RecruiterRecommendationsPage", 1)[1].split(
+            "function AdminAuditPage", 1
+        )[0]
+
+        self.assertIn(
+            "<RecruiterEvidenceReview reviewSupport={item.recruiter_review_support}",
+            recruiter_page,
+        )
+        self.assertNotIn("<CandidateDecisionSupport", recruiter_page)
+        for marker in (
+            "recruiter-evidence-review-v1",
+            "candidate_source_material_review",
+            "is_candidate_quality_decision === false",
+            "is_hiring_probability === false",
+            "is_company_fit_decision === false",
+            "automatic_hiring_decision === false",
+            "reviewSupport.score_effect === \"NONE\"",
+            "reviewSupport.ranking_effect === \"NONE\"",
+            "qualitative.score_effect === \"NONE\"",
+            "qualitative.ranking_effect === \"NONE\"",
+            "qualitativeContractIsValid",
+            "claims.every(isValidRecruiterEvidenceClaim)",
+            "sourceVersionKeysAreExact",
+            "provenanceKeysAreExact",
+            "provenanceIsBound",
+            "합성 데모 전용",
+            "기업 검토용 원문 근거",
+            "점수·추천 순서 반영 없음",
+            "담당자가 원문을 직접 검토합니다.",
+            "근거를 표시하지 않습니다.",
+        ):
+            self.assertIn(marker, component)
+        for selector in (
+            ".recruiter-evidence-review",
+            ".recruiter-evidence-heading",
+            ".recruiter-evidence-state",
+            ".recruiter-evidence-boundary",
+        ):
+            self.assertIn(selector, styles)
+
+    def test_admin_ai_operations_is_configuration_evidence_only(self) -> None:
+        app = (RUNTIME_ROOT / "web" / "src" / "App.jsx").read_text(encoding="utf-8")
+        styles = (RUNTIME_ROOT / "web" / "src" / "styles.css").read_text(encoding="utf-8")
+        component = app.split("function AiServiceOperationsPanel", 1)[1].split(
+            "function AdminAuditPage", 1
+        )[0]
+        admin_page = app.split("function AdminAuditPage", 1)[1].split(
+            "function LegalPage", 1
+        )[0]
+        recruiter_page = app.split("function RecruiterRecommendationsPage", 1)[1].split(
+            "function AiServiceOperationsPanel", 1
+        )[0]
+
+        self.assertIn('api("/api/v1/admin/ai-operations")', admin_page)
+        self.assertNotIn('api("/api/v1/runtime")', admin_page)
+        self.assertIn("<AiServiceOperationsPanel", admin_page)
+        self.assertNotIn("<AiServiceOperationsPanel", recruiter_page)
+        for marker in (
+            "AI 구성·소스 연결 스냅샷",
+            "결정론 Matcher",
+            "LLM Gateway",
+            "OpenDART",
+            "합성 과거 관찰",
+            "서버리스 MLOps 연결",
+            "probe_state",
+            "내부 health",
+            "실행 확인",
+            "관찰시각",
+            "stale 경계",
+            "브라우저 수신 후",
+            "setTimeout",
+            'aria-busy={loading}',
+            'aria-live="polite"',
+            "runtime_effect",
+            "ranking_effect",
+            "model_effect",
+            "외부 서비스 실호출",
+            "사람 검토 필요",
+        ):
+            self.assertIn(marker, component)
+        self.assertIn("operationsReceivedAt", admin_page)
+        self.assertNotIn("Date.now() - capturedAtMillis", component)
+        for prohibited in ("품질 판정", "적합성 판정", "실호출 성공", "AWS 배포 완료"):
+            self.assertNotIn(prohibited, component)
+        for selector in (
+            ".ai-operations-shell",
+            ".ai-operations-grid",
+            ".ai-operations-boundary",
+            ".ai-operations-meta",
+            ".ai-operations-stale",
+            ".audit-events-section",
+        ):
+            self.assertIn(selector, styles)
+        ai_styles = styles.split(".ai-operations-shell", 1)[1].split(
+            ".audit-events-section", 1
+        )[0]
+        self.assertTrue(re.findall(r"font-size:\s*(\d+)px", ai_styles))
+        self.assertTrue(
+            all(int(size) >= 12 for size in re.findall(r"font-size:\s*(\d+)px", ai_styles))
+        )
 
     def test_brief_uses_text_nodes_and_has_accessibility_guards(self) -> None:
         html = (BRIEF_ROOT / "index.html").read_text(encoding="utf-8")

@@ -43,7 +43,8 @@ $readmeOkay = $readme.Contains('index.html') -and
     $readme.Contains('JCAREER_ASIS_FLOW.drawio') -and
     $readme.Contains('JCAREER_ASIS_2AZ.md') -and
     $readme.Contains('JCAREER_ASIS_2AZ.drawio') -and
-    $readme.Contains('legacy')
+    $readme.Contains('상세 기술 원본') -and
+    $readme.Contains('구판(legacy)')
 Add-Check 'readme_current_deliverables' $readmeOkay $(if ($readmeOkay) { 'current deliverables linked; legacy diagram marked' } else { 'README routing is incomplete' })
 
 $flowGuide = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'JCAREER_ASIS_FLOW.md')
@@ -59,7 +60,7 @@ $plainLanguageOkay = $spec.Contains('### 0.1 ') -and
     $specGuideHangul -ge 900 -and
     $flowGuide.Contains('## 0.') -and
     $flowGuideHangul -ge 40 -and
-    $drawioText.Contains('v3.8') -and
+    $drawioText.Contains('v3.12') -and
     $drawioHangul -ge 180 -and
     -not $drawioText.Contains('web · api') -and
     -not $drawioText.Contains('2개 AZ') -and
@@ -149,16 +150,23 @@ if ($runtimeSourceAvailable) {
     $runtimeRunnerPath = [System.IO.Path]::GetFullPath((Join-Path $runtimeRoot '../../tests/run_all_tests.sh'))
     if (Test-Path -LiteralPath $runtimeRunnerPath -PathType Leaf) {
         $runtimeRunnerLines = @(Get-Content -LiteralPath $runtimeRunnerPath -Encoding UTF8)
-        $runtimeRunnerChecks = @($runtimeRunnerLines | Where-Object { $_ -match '^(?:run|grepfail) [0-9]' }).Count
-        $runnerIncludesMlops = ($runtimeRunnerLines -join "`n").Contains('src/mlops/tests/test_synthetic_pipeline.py')
+        $runtimeRunnerChecks = @(
+            $runtimeRunnerLines |
+                Where-Object { $_ -match '^"\$PYTHON" -B (?:scripts/|-m unittest )' }
+        ).Count
+        $runnerText = $runtimeRunnerLines -join "`n"
+        $runnerIncludesMlops = (
+            $runnerText.Contains('scripts/check_serverless_mlops_static.py') -and
+            $runnerText.Contains('tests.test_serverless_mlops_static')
+        )
     }
 }
-$routeCountsOkay = $apiRoutes.Count -eq 28 -and
+$routeCountsOkay = $apiRoutes.Count -eq 30 -and
     $agentRoutes.Count -eq 6 -and
     $gatewayRoutes.Count -eq 4 -and
-    $runtimeRunnerChecks -eq 94 -and
+    $runtimeRunnerChecks -eq 6 -and
     $runnerIncludesMlops -and
-    $spec.Contains("현재 공개 runner 선언은 $runtimeRunnerChecks")
+    $spec.Contains("현재 공개 릴리스 검사는 $runtimeRunnerChecks")
 Add-Check 'runtime_api_route_counts' $routeCountsOkay $(if ($runtimeSourceAvailable) { "api $($apiRoutes.Count), agent $($agentRoutes.Count), gateway $($gatewayRoutes.Count); runner declares $runtimeRunnerChecks checks including MLOps" } else { "runtime source missing at expected sibling path: $runtimeRoot" })
 $screenContractOkay = $webRoutes.Count -eq 20 -and $spec.Contains('/candidate/home') -and $spec.Contains('/recruiter/overview') -and $spec.Contains('/privacy') -and $spec.Contains('/terms')
 Add-Check 'runtime_screen_contract' $screenContractOkay $(if ($runtimeSourceAvailable) { "React routes $($webRoutes.Count) including redirect/wildcard; candidate and recruiter home documented" } else { "runtime source missing at expected sibling path: $runtimeRoot" })
@@ -339,7 +347,8 @@ $localAwsDataSeparated = -not $layerRegions['candidate'].Contains('flow-line loc
     -not $layerRegions['recruiter'].Contains('cx="2132"')
 $overlayLegendOkay = $architecture.Contains('legend-line record') -and
     $architecture.Contains('기록·탐지 구성') -and
-    $architecture.Contains('.flow-line.record { stroke: #8a5a00; stroke-dasharray: none; }')
+    $architecture.Contains('.flow-line.record { stroke: #8a5a00; stroke-dasharray: 34 18; }') -and
+    $architecture.Contains('@keyframes flowMarch')
 $interactiveFlowOkay = $flowButtonCount -eq 6 -and
     $flowLayerCount -eq 6 -and
     $flowKeysOkay -and
@@ -417,7 +426,8 @@ $pdfFresh = (Get-Item -LiteralPath $pdfPath).LastWriteTimeUtc -ge (Get-Item -Lit
 $pdfSourceHash = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $root 'index.html')).Hash.ToLowerInvariant()
 $pdfSourceBound = $pdfAscii.Contains('% JCAREER_HTML_SOURCE: terraform/asis/index.html') -and
     $pdfAscii.Contains("% JCAREER_HTML_SHA256: $pdfSourceHash")
-Add-Check 'pdf_page_objects' ($pdfPages -eq 46 -and $pdfFresh -and $pdfSourceBound) "$pdfPages page objects; rendered after sources=$pdfFresh; HTML source bound=$pdfSourceBound"
+$pdfLoopbackLinks = [regex]::Matches($pdfAscii, '/URI\s*\(http://127\.0\.0\.1:').Count
+Add-Check 'pdf_page_objects' ($pdfPages -eq 46 -and $pdfFresh -and $pdfSourceBound -and $pdfLoopbackLinks -eq 0) "$pdfPages page objects; rendered after sources=$pdfFresh; HTML source bound=$pdfSourceBound; loopback links=$pdfLoopbackLinks"
 
 $secretPatterns = [ordered]@{
     account_id                = '\b\d{12}\b'

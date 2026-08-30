@@ -8,29 +8,36 @@ import os
 import re
 import uuid
 from contextlib import asynccontextmanager
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from typing import Literal
 
 import httpx
 import redis
 import redis.asyncio as async_redis
-from fastapi import Depends, FastAPI, HTTPException, Query, Response, status
+from fastapi import Depends, FastAPI, HTTPException, Query, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field, field_validator
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy import String, cast, delete, func, or_, select, text, update
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session, joinedload
 
 from .database import (
     CompanyBase,
     MemberBase,
+    OutcomeBase,
     SessionLocal,
     company_engine,
     ensure_runtime_schema,
     get_db,
     member_engine,
+    outcome_engine,
 )
+from .decision_support import build_qualitative_evidence
 from .models import Application, AuditEvent, Company, ConsentEvent, Job, Resume, User
+from .outcome_store import DATASET_VERSION as OUTCOME_DATASET_VERSION
+from .outcome_store import candidate_historical_observation
+from .outcome_store import outcome_observation_revision
 from .opendart import (
     OpenDartClient,
     OpenDartError,
@@ -41,6 +48,12 @@ from .opendart_dispatch import (
     OpenDartDispatchError,
     build_refresh_message,
     enqueue_refresh,
+)
+from .opendart_results import (
+    OpenDartResultExpired,
+    OpenDartResultError,
+    delete_refresh_result,
+    get_refresh_result,
 )
 from .security import current_user, hash_password, issue_token, require_role, verify_password
 from .seed import seed_demo
@@ -54,7 +67,9 @@ BEDROCK_REGION = os.getenv("BEDROCK_REGION", os.getenv("AWS_REGION", "ap-northea
 BEDROCK_MODEL_ID = os.getenv("BEDROCK_MODEL_ID", "apac.amazon.nova-lite-v1:0")
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 FAILURE_INJECTION_ENABLED = os.getenv("ENABLE_FAILURE_INJECTION", "false").lower() == "true"
-SCORE_RESPONSE_CONTRACT_VERSION = "score-contract-v2"
+INTERNAL_HEALTH_PROBE_TIMEOUT_SECONDS = 1.0
+INTERNAL_HEALTH_RESPONSE_MAX_BYTES = 16_384
+SCORE_RESPONSE_CONTRACT_VERSION = "score-contract-v3"
 EXPLANATION_CONTRACT_VERSION = "score-explanation-v1"
 EXPECTED_PROMPT_FIELDS = [
     "address",
@@ -63,6 +78,7 @@ EXPECTED_PROMPT_FIELDS = [
     "email",
     "name",
     "phone",
+    "projects",
     "school",
     "self_intro",
 ]
@@ -98,8 +114,150 @@ EXPECTED_EXCLUDED_SCORE_FIELDS = [
     "address",
     "school",
     "certificates",
+    "projects",
     "self_intro",
 ]
+
+
+class StrictResponseModel(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+
+class InternalProbeSnapshot(StrictResponseModel):
+    probe_state: Literal["AVAILABLE", "UNAVAILABLE"]
+    observation_state: Literal[
+        "HEALTH_ENDPOINT_REPORTED_READY", "ENDPOINT_UNAVAILABLE", "INVALID_RESPONSE"
+    ]
+    observed_at: datetime
+
+
+class MatcherOperationsSnapshot(InternalProbeSnapshot):
+    evidence_state: Literal["INTERNAL_HEALTH_PROBE"] = "INTERNAL_HEALTH_PROBE"
+    service: Literal["agent"] = "agent"
+    mode: Literal["DETERMINISTIC_RULE_MATCHER"] = "DETERMINISTIC_RULE_MATCHER"
+    matcher_version: Literal[
+        "deterministic-0.2.0", "UNRECOGNIZED_CONFIGURATION", "NOT_OBSERVED"
+    ]
+    formula_version: Literal[
+        "deterministic-70-20-10-v1", "UNRECOGNIZED_CONFIGURATION", "NOT_OBSERVED"
+    ]
+    score_contract_version: Literal["score-contract-v3"] = SCORE_RESPONSE_CONTRACT_VERSION
+    external_model_used_for_score: Literal[False] = False
+
+
+class LlmGatewayOperationsSnapshot(InternalProbeSnapshot):
+    evidence_state: Literal["INTERNAL_HEALTH_PROBE"] = "INTERNAL_HEALTH_PROBE"
+    service: Literal["llm-gateway"] = "llm-gateway"
+    provider: Literal[
+        "local-synthetic-stub", "bedrock", "UNRECOGNIZED_CONFIGURATION", "NOT_OBSERVED"
+    ]
+    bedrock_live_enabled: bool | None
+    role: Literal["EXPLANATION_ONLY"] = "EXPLANATION_ONLY"
+    score_effect: Literal["NONE"] = "NONE"
+    ranking_effect: Literal["NONE"] = "NONE"
+    external_provider_invocation_state: Literal["NOT_PROBED_BY_HEALTH_ENDPOINT"] = (
+        "NOT_PROBED_BY_HEALTH_ENDPOINT"
+    )
+
+
+class OpenDartOperationsSnapshot(StrictResponseModel):
+    evidence_state: Literal["SOURCE_CONFIGURATION_NOT_PROBED"] = (
+        "SOURCE_CONFIGURATION_NOT_PROBED"
+    )
+    probe_state: Literal["NOT_PROBED"] = "NOT_PROBED"
+    mode: Literal["disabled", "fixture", "live", "UNRECOGNIZED_CONFIGURATION"]
+    dispatch_mode: Literal[
+        "fixture_inline", "serverless_queue", "UNRECOGNIZED_CONFIGURATION"
+    ]
+    score_effect: Literal["NONE"] = "NONE"
+    ranking_effect: Literal["NONE"] = "NONE"
+    external_invocation_evidence: Literal["NOT_CAPTURED_BY_THIS_ENDPOINT"] = (
+        "NOT_CAPTURED_BY_THIS_ENDPOINT"
+    )
+
+
+class OutcomeObservationOperationsSnapshot(StrictResponseModel):
+    evidence_state: Literal["SOURCE_CONFIGURATION_NOT_PROBED"] = (
+        "SOURCE_CONFIGURATION_NOT_PROBED"
+    )
+    probe_state: Literal["NOT_PROBED"] = "NOT_PROBED"
+    dataset_version: str
+    response_wired: Literal[True] = True
+    runtime_effect: Literal["NONE"] = "NONE"
+    ranking_effect: Literal["NONE"] = "NONE"
+    model_effect: Literal["NONE"] = "NONE"
+    use_boundary: Literal["SYNTHETIC_DESCRIPTIVE_OBSERVATION_ONLY"] = (
+        "SYNTHETIC_DESCRIPTIVE_OBSERVATION_ONLY"
+    )
+
+
+class MlopsOperationsSnapshot(StrictResponseModel):
+    evidence_state: Literal["SOURCE_CONFIGURATION_NOT_PROBED"] = (
+        "SOURCE_CONFIGURATION_NOT_PROBED"
+    )
+    probe_state: Literal["NOT_PROBED"] = "NOT_PROBED"
+    implementation_boundary: Literal["SEPARATE_SERVERLESS_ON_DEMAND_SOURCE"] = (
+        "SEPARATE_SERVERLESS_ON_DEMAND_SOURCE"
+    )
+    runtime_wired: Literal[False] = False
+    ranking_runtime_wired: Literal[False] = False
+    automatic_model_activation: Literal[False] = False
+    execution_evidence: Literal["NOT_CAPTURED_BY_THIS_ENDPOINT"] = (
+        "NOT_CAPTURED_BY_THIS_ENDPOINT"
+    )
+
+
+class AiServiceOperationsResponse(StrictResponseModel):
+    contract_version: Literal["ai-service-operations-v2"] = "ai-service-operations-v2"
+    captured_at: datetime
+    stale_after_seconds: Literal[30] = 30
+    dataset_scope: Literal["SYNTHETIC_DEMO_ONLY"] = "SYNTHETIC_DEMO_ONLY"
+    matcher: MatcherOperationsSnapshot
+    llm_gateway: LlmGatewayOperationsSnapshot
+    opendart: OpenDartOperationsSnapshot
+    outcome_observation: OutcomeObservationOperationsSnapshot
+    mlops: MlopsOperationsSnapshot
+    external_service_call_proven: Literal[False] = False
+    aws_deployment_proven: Literal[False] = False
+    human_review_required: Literal[True] = True
+
+
+class RuntimeDatabaseBoundariesResponse(StrictResponseModel):
+    member: list[str]
+    company: list[str]
+    outcome: list[str]
+    cross_database_foreign_keys: Literal[False] = False
+    cross_database_atomic_commit: Literal[False] = False
+
+
+class PublicRuntimeResponse(StrictResponseModel):
+    service: Literal["J-Career synthetic AS-IS runtime"] = "J-Career synthetic AS-IS runtime"
+    live_client_service: Literal[False] = False
+    dataset_profile: Literal["demo_not_for_measurement", "UNRECOGNIZED_CONFIGURATION"]
+    explanation_provider: Literal[
+        "local-synthetic-stub", "bedrock", "UNRECOGNIZED_CONFIGURATION"
+    ]
+    score_contract_version: Literal["score-contract-v3"] = SCORE_RESPONSE_CONTRACT_VERSION
+    database_boundaries: RuntimeDatabaseBoundariesResponse
+    trace_enabled: Literal[False] = False
+    failure_injection_enabled: bool
+
+
+def normalised_dataset_profile() -> Literal[
+    "demo_not_for_measurement", "UNRECOGNIZED_CONFIGURATION"
+]:
+    value = os.getenv("DATASET_PROFILE", "demo_not_for_measurement").strip()
+    return value if value == "demo_not_for_measurement" else "UNRECOGNIZED_CONFIGURATION"
+
+
+def normalised_explanation_provider() -> Literal[
+    "local-synthetic-stub", "bedrock", "UNRECOGNIZED_CONFIGURATION"
+]:
+    return (
+        LLM_PROVIDER
+        if LLM_PROVIDER in {"local-synthetic-stub", "bedrock"}
+        else "UNRECOGNIZED_CONFIGURATION"
+    )
 
 
 def explanation_provider_config() -> dict[str, str]:
@@ -129,6 +287,157 @@ def explanation_provider_config() -> dict[str, str]:
             canonical.encode("utf-8")
         ).hexdigest(),
     }
+
+
+async def _probe_internal_health(
+    client: httpx.AsyncClient, base_url: str, expected_service: Literal["agent", "llm-gateway"]
+) -> tuple[
+    Literal["AVAILABLE", "UNAVAILABLE"],
+    Literal["HEALTH_ENDPOINT_REPORTED_READY", "ENDPOINT_UNAVAILABLE", "INVALID_RESPONSE"],
+    datetime,
+    dict[str, object] | None,
+]:
+    """Read one internal health document without returning transport or exception details."""
+
+    async def read_bounded_payload() -> object:
+        async with client.stream("GET", f"{base_url.rstrip('/')}/health") as response:
+            response.raise_for_status()
+            content_length = response.headers.get("content-length")
+            if content_length is not None:
+                try:
+                    if int(content_length) > INTERNAL_HEALTH_RESPONSE_MAX_BYTES:
+                        raise ValueError("health response too large")
+                except ValueError as exc:
+                    raise ValueError("invalid health response length") from exc
+            body = bytearray()
+            async for chunk in response.aiter_bytes(chunk_size=4096):
+                body.extend(chunk)
+                if len(body) > INTERNAL_HEALTH_RESPONSE_MAX_BYTES:
+                    raise ValueError("health response too large")
+            return json.loads(bytes(body))
+
+    try:
+        payload = await asyncio.wait_for(
+            read_bounded_payload(),
+            timeout=INTERNAL_HEALTH_PROBE_TIMEOUT_SECONDS,
+        )
+    except (TimeoutError, httpx.HTTPError, ValueError, TypeError, UnicodeError):
+        return "UNAVAILABLE", "ENDPOINT_UNAVAILABLE", datetime.now(timezone.utc), None
+    if (
+        not isinstance(payload, dict)
+        or payload.get("status") != "ok"
+        or payload.get("service") != expected_service
+    ):
+        return "UNAVAILABLE", "INVALID_RESPONSE", datetime.now(timezone.utc), None
+    return (
+        "AVAILABLE",
+        "HEALTH_ENDPOINT_REPORTED_READY",
+        datetime.now(timezone.utc),
+        payload,
+    )
+
+
+async def ai_service_operations_snapshot(
+    client: httpx.AsyncClient | None = None,
+) -> AiServiceOperationsResponse:
+    """Combine bounded internal health probes with explicit source-only boundaries."""
+
+    owns_client = client is None
+    if client is None:
+        client = httpx.AsyncClient(
+            timeout=httpx.Timeout(INTERNAL_HEALTH_PROBE_TIMEOUT_SECONDS),
+            follow_redirects=False,
+        )
+    try:
+        agent_probe, gateway_probe = await asyncio.gather(
+            _probe_internal_health(client, AGENT_BASE_URL, "agent"),
+            _probe_internal_health(client, LLM_GATEWAY_BASE_URL, "llm-gateway"),
+        )
+    finally:
+        if owns_client:
+            await client.aclose()
+
+    agent_state, agent_observation, agent_observed_at, agent_payload = agent_probe
+    if agent_payload is None:
+        matcher_version = "NOT_OBSERVED"
+        formula_version = "NOT_OBSERVED"
+    else:
+        matcher_version = (
+            "deterministic-0.2.0"
+            if agent_payload.get("matcher_version") == "deterministic-0.2.0"
+            else "UNRECOGNIZED_CONFIGURATION"
+        )
+        formula_version = (
+            "deterministic-70-20-10-v1"
+            if agent_payload.get("formula_version") == "deterministic-70-20-10-v1"
+            else "UNRECOGNIZED_CONFIGURATION"
+        )
+
+    gateway_state, gateway_observation, gateway_observed_at, gateway_payload = gateway_probe
+    gateway_provider = "NOT_OBSERVED"
+    gateway_live_enabled: bool | None = None
+    if gateway_payload is not None:
+        observed_provider = gateway_payload.get("provider")
+        observed_live = gateway_payload.get("bedrock_live_enabled")
+        if isinstance(observed_provider, str) and observed_provider in {
+            "local-synthetic-stub",
+            "bedrock",
+        }:
+            gateway_provider = observed_provider
+        else:
+            gateway_provider = "UNRECOGNIZED_CONFIGURATION"
+            gateway_state = "UNAVAILABLE"
+            gateway_observation = "INVALID_RESPONSE"
+        if isinstance(observed_live, str) and observed_live in {"true", "false"}:
+            gateway_live_enabled = observed_live == "true"
+        else:
+            gateway_state = "UNAVAILABLE"
+            gateway_observation = "INVALID_RESPONSE"
+        if gateway_provider == "local-synthetic-stub" and gateway_live_enabled is True:
+            gateway_state = "UNAVAILABLE"
+            gateway_observation = "INVALID_RESPONSE"
+            gateway_live_enabled = None
+
+    opendart_mode_raw = os.getenv("OPENDART_MODE", "fixture").strip().lower()
+    opendart_mode = (
+        opendart_mode_raw
+        if opendart_mode_raw in {"disabled", "fixture", "live"}
+        else "UNRECOGNIZED_CONFIGURATION"
+    )
+    dispatch_mode_raw = os.getenv(
+        "OPENDART_DISPATCH_MODE", "fixture_inline"
+    ).strip().lower()
+    dispatch_mode = (
+        dispatch_mode_raw
+        if dispatch_mode_raw in {"fixture_inline", "serverless_queue"}
+        else "UNRECOGNIZED_CONFIGURATION"
+    )
+
+    return AiServiceOperationsResponse(
+        captured_at=datetime.now(timezone.utc),
+        matcher=MatcherOperationsSnapshot(
+            probe_state=agent_state,
+            observation_state=agent_observation,
+            observed_at=agent_observed_at,
+            matcher_version=matcher_version,
+            formula_version=formula_version,
+        ),
+        llm_gateway=LlmGatewayOperationsSnapshot(
+            probe_state=gateway_state,
+            observation_state=gateway_observation,
+            observed_at=gateway_observed_at,
+            provider=gateway_provider,
+            bedrock_live_enabled=gateway_live_enabled,
+        ),
+        opendart=OpenDartOperationsSnapshot(
+            mode=opendart_mode,
+            dispatch_mode=dispatch_mode,
+        ),
+        outcome_observation=OutcomeObservationOperationsSnapshot(
+            dataset_version=OUTCOME_DATASET_VERSION,
+        ),
+        mlops=MlopsOperationsSnapshot(),
+    )
 
 
 def explanation_attempt_metadata(
@@ -175,6 +484,7 @@ def explanation_attempt_metadata(
 async def lifespan(_: FastAPI):
     MemberBase.metadata.create_all(bind=member_engine)
     CompanyBase.metadata.create_all(bind=company_engine)
+    OutcomeBase.metadata.create_all(bind=outcome_engine)
     ensure_runtime_schema()
     if os.getenv("AUTO_SEED", "true").lower() == "true":
         with SessionLocal() as db:
@@ -198,6 +508,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def prevent_api_response_storage(request: Request, call_next):
+    response = await call_next(request)
+    if request.url.path.startswith("/api/"):
+        response.headers["Cache-Control"] = "no-store, private"
+        response.headers["Pragma"] = "no-cache"
+    return response
 
 
 class SignupRequest(BaseModel):
@@ -280,6 +599,30 @@ def normalise_skill_values(values: list[str], label: str) -> list[str]:
     return unique
 
 
+class ResumeProjectRequest(BaseModel):
+    title: str = Field(min_length=2, max_length=120)
+    role: str = Field(min_length=2, max_length=200)
+    technologies: list[str] = Field(default_factory=list, max_length=20)
+    summary: str = Field(min_length=10, max_length=2000)
+    outcome: str = Field(default="", max_length=800)
+
+    @field_validator("title", "role", "summary", "outcome")
+    @classmethod
+    def normalise_project_text(cls, value: str, info) -> str:
+        cleaned = value.strip()
+        minimums = {"title": 2, "role": 2, "summary": 10, "outcome": 0}
+        if len(cleaned) < minimums[info.field_name]:
+            raise ValueError("프로젝트 텍스트는 공백을 제외한 최소 길이를 충족해야 합니다")
+        return cleaned
+
+    @field_validator("technologies")
+    @classmethod
+    def normalise_project_technologies(cls, values: list[str]) -> list[str]:
+        if not values:
+            return []
+        return normalise_skill_values(values, "프로젝트 사용 기술")
+
+
 class ResumeRequest(BaseModel):
     phone: str = Field(max_length=40)
     birth_date: date | None = None
@@ -289,6 +632,7 @@ class ResumeRequest(BaseModel):
     years_experience: int = Field(ge=0, le=60)
     skills: list[str] = Field(min_length=1, max_length=30)
     certificates: list[str] = Field(default_factory=list, max_length=30)
+    projects: list[ResumeProjectRequest] = Field(default_factory=list, max_length=10)
     self_intro: str = Field(default="", max_length=5000)
 
     @field_validator("phone")
@@ -563,6 +907,35 @@ def candidate_job_cache_contract(jobs: list[Job]) -> str:
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
 
 
+def unavailable_historical_observation(company_id: str, job_id: str) -> dict[str, object]:
+    """Return a fixed no-effect envelope when the optional outcome store is unavailable."""
+
+    return {
+        "state": "UNAVAILABLE_OBSERVATION_STORE",
+        "dataset_version": OUTCOME_DATASET_VERSION,
+        "scope": {"company_id": company_id, "job_id": job_id},
+        "cross_tenant_pooling": False,
+        "sample_count_bands": {
+            "total": "UNAVAILABLE",
+            "passed": "UNAVAILABLE",
+            "not_passed": "UNAVAILABLE",
+            "pending": "UNAVAILABLE",
+        },
+        "shared_evidence_tags": [],
+        "runtime_effect": "NONE",
+        "ranking_effect": "NONE",
+        "model_effect": "NONE",
+        "is_hiring_probability": False,
+        "is_causal": False,
+        "synthetic_demo_only": True,
+        "human_review_required": True,
+        "limitations": [
+            "synthetic observation store was unavailable for this request",
+            "recommendation scores and order do not use this observation",
+        ],
+    }
+
+
 def resume_payload(resume: Resume, user: User | None = None) -> dict[str, object]:
     payload: dict[str, object] = {
         "id": resume.id,
@@ -575,12 +948,50 @@ def resume_payload(resume: Resume, user: User | None = None) -> dict[str, object
         "years_experience": resume.years_experience,
         "skills": resume.skills,
         "certificates": resume.certificates,
+        "projects": resume.projects,
         "self_intro": resume.self_intro,
         "updated_at": resume.updated_at,
     }
     if user:
         payload.update({"display_name": user.display_name, "email": user.email})
     return payload
+
+
+def build_recruiter_review_support(resume: Resume, job: Job) -> dict[str, object]:
+    """Build a non-evaluative source-review envelope for one recruiter card."""
+
+    qualitative_evidence = build_qualitative_evidence(
+        self_intro=resume.self_intro,
+        projects=resume.projects or [],
+        job_summary=job.summary,
+        required_skills=job.required_skills,
+        direction_statement=job.company.direction_statement,
+        declared_values=job.company.declared_values,
+        resume_version=resume.updated_at.isoformat(),
+        job_version=job.updated_at.isoformat(),
+        company_profile_version=job.company.profile_version,
+    )
+    return {
+        "contract_version": "recruiter-evidence-review-v1",
+        "review_boundary": {
+            "owner": "recruiter",
+            "purpose": "candidate_source_material_review",
+            "is_candidate_quality_decision": False,
+            "is_hiring_probability": False,
+            "is_company_fit_decision": False,
+            "automatic_hiring_decision": False,
+        },
+        "qualitative_evidence": qualitative_evidence,
+        "provenance": {
+            "candidate_resume_version": resume.updated_at.isoformat(),
+            "job_version": job.updated_at.isoformat(),
+            "company_public_profile_version": job.company.profile_version,
+            "evidence_contract_version": qualitative_evidence["contract_version"],
+        },
+        "score_effect": "NONE",
+        "ranking_effect": "NONE",
+        "human_review_required": True,
+    }
 
 
 def redis_client() -> async_redis.Redis:
@@ -909,11 +1320,22 @@ def _validate_explanation_response(
             if isinstance(expected_company, dict)
             else ""
         )
-        expected_intro = (
-            str(expected_candidate.get("self_intro", "")).strip()
-            if isinstance(expected_candidate, dict)
-            else ""
-        )
+        expected_material = ""
+        if isinstance(expected_candidate, dict):
+            expected_parts = [str(expected_candidate.get("self_intro", "")).strip()]
+            projects = expected_candidate.get("projects", [])
+            if isinstance(projects, list):
+                for project in projects:
+                    if not isinstance(project, dict):
+                        continue
+                    expected_parts.extend(
+                        str(project.get(field, "")).strip()
+                        for field in ("title", "role", "summary", "outcome")
+                    )
+                    technologies = project.get("technologies", [])
+                    if isinstance(technologies, list):
+                        expected_parts.extend(str(value).strip() for value in technologies)
+            expected_material = " ".join(expected_parts)
         expected_matches = (
             [
                 value
@@ -921,7 +1343,7 @@ def _validate_explanation_response(
                 if isinstance(value, str)
                 and _normalise_alignment_text(value)
                 and _normalise_alignment_text(value)
-                in _normalise_alignment_text(expected_intro)
+                in _normalise_alignment_text(expected_material)
             ]
             if isinstance(expected_declared, list) and expected_direction
             else []
@@ -948,7 +1370,7 @@ def _validate_explanation_response(
             or any(not isinstance(value, str) for value in matched_values)
             or not set(matched_values).issubset(set(declared_values))
             or alignment.get("basis")
-            != "company-declared-profile-and-self-introduction"
+            != "company-declared-profile-and-candidate-materials"
             or alignment.get("score_effect") != "NONE"
             or alignment.get("human_review_required") is not True
             or (state == "DIRECT_DECLARED_VALUE_EVIDENCE_FOUND" and not matched_values)
@@ -1030,31 +1452,29 @@ def health(db: Session = Depends(get_db)) -> dict[str, object]:
         member_connection.execute(text("SELECT 1"))
     with company_engine.connect() as company_connection:
         company_connection.execute(text("SELECT 1"))
+    with outcome_engine.connect() as outcome_connection:
+        outcome_connection.execute(text("SELECT 1"))
     return {
         "status": "ok",
         "service": "api",
-        "databases": {"member": "ok", "company": "ok"},
-        "dataset_profile": os.getenv("DATASET_PROFILE", "demo_not_for_measurement"),
+        "databases": {"member": "ok", "company": "ok", "outcome": "ok"},
+        "dataset_profile": normalised_dataset_profile(),
     }
 
 
-@app.get("/api/v1/runtime")
-def runtime_info() -> dict[str, object]:
-    return {
-        "service": "J-Career synthetic AS-IS runtime",
-        "live_client_service": False,
-        "dataset_profile": os.getenv("DATASET_PROFILE", "demo_not_for_measurement"),
-        "explanation_provider": LLM_PROVIDER,
-        "score_contract_version": SCORE_RESPONSE_CONTRACT_VERSION,
-        "database_boundaries": {
-            "member": ["identity", "consent", "resume", "application", "audit"],
-            "company": ["company", "company_profile", "job"],
-            "cross_database_foreign_keys": False,
-            "cross_database_atomic_commit": False,
-        },
-        "trace_enabled": False,
-        "failure_injection_enabled": FAILURE_INJECTION_ENABLED,
-    }
+@app.get("/api/v1/runtime", response_model=PublicRuntimeResponse)
+def runtime_info(response: Response) -> PublicRuntimeResponse:
+    response.headers["Cache-Control"] = "no-store"
+    return PublicRuntimeResponse(
+        dataset_profile=normalised_dataset_profile(),
+        explanation_provider=normalised_explanation_provider(),
+        database_boundaries=RuntimeDatabaseBoundariesResponse(
+            member=["identity", "consent", "resume", "application", "audit"],
+            company=["company", "company_profile", "job"],
+            outcome=["synthetic_dataset_metadata", "synthetic_document_outcome"],
+        ),
+        failure_injection_enabled=FAILURE_INJECTION_ENABLED,
+    )
 
 
 @app.post("/api/v1/auth/signup", status_code=201)
@@ -1420,10 +1840,18 @@ async def candidate_recommendations(
         select(Job).options(joinedload(Job.company)).where(Job.status == "open")
     ).all()
     job_contract = candidate_job_cache_contract(jobs)
+    outcome_observation_degraded = False
+    try:
+        with Session(bind=outcome_engine) as outcome_db:
+            outcome_revision = outcome_observation_revision(outcome_db)
+    except SQLAlchemyError:
+        outcome_revision = "UNAVAILABLE"
+        outcome_observation_degraded = True
     cache_key = (
         f"asis:{SCORE_RESPONSE_CONTRACT_VERSION}:candidate-recommendations:"
         f"{user.id}:{resume.updated_at.isoformat()}:"
         f"{job_contract}:"
+        f"outcome:{OUTCOME_DATASET_VERSION}:{outcome_revision}:"
         f"{explanation_provider_config()['provider_config_fingerprint']}:"
         f"{explanation_mode or 'success'}"
     )
@@ -1475,6 +1903,7 @@ async def candidate_recommendations(
                 "address": resume.address_region,
                 "school": resume.education,
                 "certificates": resume.certificates,
+                "projects": resume.projects,
                 "self_intro": resume.self_intro,
             },
             "company_context": {
@@ -1498,6 +1927,44 @@ async def candidate_recommendations(
         if not job:
             continue
         explanation = explanations.get(job.id)
+        qualitative_evidence = build_qualitative_evidence(
+            self_intro=resume.self_intro,
+            projects=resume.projects or [],
+            job_summary=job.summary,
+            required_skills=job.required_skills,
+            direction_statement=job.company.direction_statement,
+            declared_values=job.company.declared_values,
+            resume_version=resume.updated_at.isoformat(),
+            job_version=job.updated_at.isoformat(),
+            company_profile_version=job.company.profile_version,
+        )
+        evidence_tags = [
+            str(claim["matched_term"])
+            for claim in qualitative_evidence["claims"]
+            if isinstance(claim, dict) and isinstance(claim.get("matched_term"), str)
+        ]
+        if outcome_observation_degraded:
+            historical_observation = unavailable_historical_observation(
+                job.company_id, job.id
+            )
+        else:
+            try:
+                with Session(bind=outcome_engine) as outcome_db:
+                    historical_observation = candidate_historical_observation(
+                        outcome_db,
+                        company_id=job.company_id,
+                        job_id=job.id,
+                        candidate_features_or_tags={
+                            "evidence_tags": evidence_tags,
+                            "skills": resume.skills,
+                        },
+                    )
+            except SQLAlchemyError:
+                outcome_observation_degraded = True
+                historical_observation = unavailable_historical_observation(
+                    job.company_id, job.id
+                )
+        resolved_explanation = explanation or {"status": explanation_status, "text": None}
         items.append(
             {
                 "job": job_payload(job),
@@ -1506,8 +1973,51 @@ async def candidate_recommendations(
                 "matched_feature_ids": match["matched_feature_ids"],
                 "matched_feature_labels": match["matched_feature_labels"],
                 "matcher_version": match["matcher_version"],
-                "explanation": explanation
-                or {"status": explanation_status, "text": None},
+                "explanation": resolved_explanation,
+                "decision_support": {
+                    "contract_version": "candidate-decision-support-v1",
+                    "decision_boundary": {
+                        "owner": "candidate",
+                        "purpose": "job_comparison",
+                        "is_hiring_probability": False,
+                        "is_company_fit_decision": False,
+                        "automatic_hiring_decision": False,
+                    },
+                    "quantitative_evidence": {
+                        "label": "조건 일치 점수",
+                        "value": match["score"],
+                        "max_value": 100,
+                        "score_breakdown": match["score_breakdown"],
+                        "matcher_version": match["matcher_version"],
+                        "is_hiring_probability": False,
+                    },
+                    "qualitative_evidence": qualitative_evidence,
+                    "historical_observation": historical_observation,
+                    "generated_explanation": {
+                        "status": resolved_explanation.get("status"),
+                        "text": resolved_explanation.get("text"),
+                        "contract_version": resolved_explanation.get(
+                            "contract_version", EXPLANATION_CONTRACT_VERSION
+                        ),
+                        "generation_mode": resolved_explanation.get(
+                            "generation_mode", "UNAVAILABLE"
+                        ),
+                        "output_validation_state": resolved_explanation.get(
+                            "output_validation_state", "NOT_AVAILABLE"
+                        ),
+                        "score_effect": "NONE",
+                        "ranking_effect": "NONE",
+                    },
+                    "provenance": {
+                        "candidate_resume_version": resume.updated_at.isoformat(),
+                        "job_version": job.updated_at.isoformat(),
+                        "company_public_profile_version": job.company.profile_version,
+                        "matcher_version": match["matcher_version"],
+                        "explanation_contract_version": EXPLANATION_CONTRACT_VERSION,
+                        "outcome_observation_revision": outcome_revision,
+                    },
+                    "human_review_required": True,
+                },
             }
         )
     response = {
@@ -1527,7 +2037,7 @@ async def candidate_recommendations(
             "provider_config_fingerprint"
         ],
     }
-    if explanation_status == "AVAILABLE":
+    if explanation_status == "AVAILABLE" and not outcome_observation_degraded:
         await set_cached(cache_key, response)
     return response
 
@@ -1763,17 +2273,43 @@ def refresh_recruiter_company_opendart(
 ) -> dict[str, object]:
     company = recruiter_company(db, user)
     attempted_at = datetime.now(timezone.utc)
-    company.opendart_last_attempt_at = attempted_at
     dispatch_mode = os.getenv("OPENDART_DISPATCH_MODE", "fixture_inline").strip().lower()
     if dispatch_mode == "serverless_queue":
         message = build_refresh_message(
             company_id=company.id,
+            expected_company_name=company.name,
             corp_code=request.corp_code,
             requested_at=attempted_at,
         )
-        company.opendart_sync_state = "REFRESH_DISPATCH_PENDING"
-        company.opendart_pending_request_id = message["request_id"]
-        company.opendart_pending_requested_at = attempted_at
+        transition = db.execute(
+            update(Company)
+            .where(
+                Company.id == company.id,
+                Company.opendart_pending_request_id.is_(None),
+            )
+            .values(
+                opendart_last_attempt_at=attempted_at,
+                opendart_sync_state="REFRESH_DISPATCH_PENDING",
+                opendart_pending_request_id=message["request_id"],
+                opendart_pending_corp_code=request.corp_code,
+                opendart_pending_requested_at=attempted_at,
+            )
+            .execution_options(synchronize_session=False)
+        )
+        if transition.rowcount != 1:
+            db.rollback()
+            db.expire_all()
+            company = recruiter_company(db, user)
+            return {
+                "refresh": {
+                    "state": "ALREADY_PENDING",
+                    "request_id": company.opendart_pending_request_id,
+                    "execution": "serverless_queue",
+                },
+                "company_profile": company_profile_payload(
+                    company, include_opendart_linkage=True
+                ),
+            }
         audit(
             db,
             event_type="company_opendart_refresh",
@@ -1791,21 +2327,32 @@ def refresh_recruiter_company_opendart(
                 "score_effect": "NONE",
             },
         )
-        # The worker validates this request id against the company row. Commit the
-        # pending marker before publishing so a fast consumer cannot discard a
-        # legitimate message simply because the API transaction is still open.
+        # Commit the pending marker before publishing. The result collector later
+        # checks this exact request/company binding before it writes the company DB.
         db.commit()
         try:
             enqueue_refresh(message)
         except OpenDartDispatchError as error:
             previous_snapshot_retained = bool(company.opendart_snapshot)
-            company.opendart_sync_state = (
-                "STALE_LAST_KNOWN_GOOD"
-                if previous_snapshot_retained
-                else "UNAVAILABLE_NO_SNAPSHOT"
+            failed_transition = db.execute(
+                update(Company)
+                .where(
+                    Company.id == company.id,
+                    Company.opendart_pending_request_id == message["request_id"],
+                )
+                .values(
+                    opendart_sync_state=(
+                        "STALE_LAST_KNOWN_GOOD"
+                        if previous_snapshot_retained
+                        else "UNAVAILABLE_NO_SNAPSHOT"
+                    ),
+                    opendart_pending_request_id=None,
+                    opendart_pending_corp_code=None,
+                    opendart_pending_requested_at=None,
+                )
+                .execution_options(synchronize_session=False)
             )
-            company.opendart_pending_request_id = None
-            company.opendart_pending_requested_at = None
+            failed_transitioned = failed_transition.rowcount == 1
             audit(
                 db,
                 event_type="company_opendart_refresh",
@@ -1813,13 +2360,14 @@ def refresh_recruiter_company_opendart(
                 target_type="company_public_facts",
                 target_ref=company.id,
                 action="enqueue",
-                result="not_queued",
+                result="not_queued" if failed_transitioned else "superseded",
                 purpose="company_profile_enrichment",
                 detail={
                     "provider": "OpenDART",
                     "execution": "serverless_queue",
                     "error_category": "QUEUE_UNAVAILABLE",
                     "previous_snapshot_retained": previous_snapshot_retained,
+                    "pending_state_transitioned": failed_transitioned,
                     "score_effect": "NONE",
                 },
             )
@@ -1835,6 +2383,7 @@ def refresh_recruiter_company_opendart(
             .values(opendart_sync_state="REFRESH_QUEUED")
             .execution_options(synchronize_session=False)
         )
+        transitioned = transition.rowcount == 1
         audit(
             db,
             event_type="company_opendart_refresh",
@@ -1842,14 +2391,14 @@ def refresh_recruiter_company_opendart(
             target_type="company_public_facts",
             target_ref=company.id,
             action="enqueue",
-            result="queued",
+            result="queued" if transitioned else "superseded",
             purpose="company_profile_enrichment",
             detail={
                 "provider": "OpenDART",
                 "execution": "serverless_queue",
                 "request_id": message["request_id"],
                 "previous_snapshot_retained": bool(company.opendart_snapshot),
-                "pending_state_transitioned": transition.rowcount == 1,
+                "pending_state_transitioned": transitioned,
                 "score_effect": "NONE",
             },
         )
@@ -1859,8 +2408,12 @@ def refresh_recruiter_company_opendart(
         db.refresh(company)
         return {
             "refresh": {
-                "state": "QUEUED",
-                "request_id": message["request_id"],
+                "state": "QUEUED" if transitioned else "QUEUE_RESULT_SUPERSEDED",
+                "request_id": (
+                    message["request_id"]
+                    if transitioned
+                    else company.opendart_pending_request_id
+                ),
                 "execution": "serverless_queue",
             },
             "company_profile": company_profile_payload(
@@ -1931,6 +2484,7 @@ def refresh_recruiter_company_opendart(
     )
     company.opendart_synced_at = attempted_at
     company.opendart_pending_request_id = None
+    company.opendart_pending_corp_code = None
     company.opendart_pending_requested_at = None
     audit(
         db,
@@ -1959,6 +2513,325 @@ def refresh_recruiter_company_opendart(
             "state": "UPDATED_SYNTHETIC_FIXTURE",
             "request_id": None,
             "execution": "fixture_inline",
+        },
+        "company_profile": company_profile_payload(
+            company, include_opendart_linkage=True
+        ),
+    }
+
+
+@app.post("/api/v1/recruiter/company-profile/opendart/collect", response_model=None)
+def collect_recruiter_company_opendart(
+    db: Session = Depends(get_db),
+    user: User = Depends(require_role("recruiter")),
+) -> dict[str, object] | JSONResponse:
+    if os.getenv("OPENDART_DISPATCH_MODE", "fixture_inline").strip().lower() != "serverless_queue":
+        raise HTTPException(
+            status_code=409,
+            detail="OpenDART 외부 조회 결과 회수 모드가 비활성화되어 있습니다",
+        )
+    company = recruiter_company(db, user)
+    request_id = company.opendart_pending_request_id
+    if not request_id:
+        return {
+            "refresh": {
+                "state": "NO_PENDING_REQUEST",
+                "request_id": None,
+                "execution": "serverless_queue",
+            },
+            "company_profile": company_profile_payload(
+                company, include_opendart_linkage=True
+            ),
+        }
+    try:
+        result = get_refresh_result(request_id)
+    except OpenDartResultExpired:
+        previous_snapshot_retained = bool(company.opendart_snapshot)
+        transition = db.execute(
+            update(Company)
+            .where(
+                Company.id == company.id,
+                Company.opendart_pending_request_id == request_id,
+            )
+            .values(
+                opendart_sync_state=(
+                    "STALE_LAST_KNOWN_GOOD"
+                    if previous_snapshot_retained
+                    else "UNAVAILABLE_NO_SNAPSHOT"
+                ),
+                opendart_last_attempt_at=datetime.now(timezone.utc),
+                opendart_pending_request_id=None,
+                opendart_pending_corp_code=None,
+                opendart_pending_requested_at=None,
+            )
+            .execution_options(synchronize_session=False)
+        )
+        transitioned = transition.rowcount == 1
+        audit(
+            db,
+            event_type="company_opendart_refresh",
+            actor=user,
+            target_type="company_public_facts",
+            target_ref=company.id,
+            action="collect",
+            result="expired" if transitioned else "superseded",
+            purpose="company_profile_enrichment",
+            detail={
+                "provider": "OpenDART",
+                "execution": "serverless_queue",
+                "request_id": request_id,
+                "error_category": "RESULT_EXPIRED",
+                "previous_snapshot_retained": previous_snapshot_retained,
+                "pending_state_transitioned": transitioned,
+                "score_effect": "NONE",
+            },
+        )
+        db.commit()
+        db.expire_all()
+        company = recruiter_company(db, user)
+        db.refresh(company)
+        cleanup_state = "REMOVED"
+        try:
+            delete_refresh_result(request_id, company.id)
+        except OpenDartResultError:
+            cleanup_state = "TTL_PENDING"
+        return {
+            "refresh": {
+                "state": "RESULT_EXPIRED" if transitioned else "RESULT_SUPERSEDED",
+                "request_id": request_id,
+                "execution": "serverless_queue",
+                "result_cleanup": cleanup_state,
+            },
+            "company_profile": company_profile_payload(
+                company, include_opendart_linkage=True
+            ),
+        }
+    except (OpenDartResultError, ValueError):
+        raise HTTPException(
+            status_code=503,
+            detail="OpenDART 외부 조회 결과를 확인하지 못했습니다",
+        ) from None
+    if result is None:
+        try:
+            pending_timeout_seconds = int(
+                os.getenv("OPENDART_PENDING_TIMEOUT_SECONDS", "1800")
+            )
+        except ValueError:
+            raise HTTPException(
+                status_code=503,
+                detail="OpenDART 대기 시간 설정을 확인할 수 없습니다",
+            ) from None
+        if pending_timeout_seconds < 900 or pending_timeout_seconds > 86400:
+            raise HTTPException(
+                status_code=503,
+                detail="OpenDART 대기 시간 설정을 확인할 수 없습니다",
+            )
+        requested_at = company.opendart_pending_requested_at
+        if requested_at is not None and requested_at.tzinfo is None:
+            requested_at = requested_at.replace(tzinfo=timezone.utc)
+        timed_out = bool(
+            requested_at
+            and requested_at
+            <= datetime.now(timezone.utc)
+            - timedelta(seconds=pending_timeout_seconds)
+        )
+        if timed_out:
+            previous_snapshot_retained = bool(company.opendart_snapshot)
+            timeout_transition = db.execute(
+                update(Company)
+                .where(
+                    Company.id == company.id,
+                    Company.opendart_pending_request_id == request_id,
+                )
+                .values(
+                    opendart_sync_state=(
+                        "STALE_LAST_KNOWN_GOOD"
+                        if previous_snapshot_retained
+                        else "UNAVAILABLE_NO_SNAPSHOT"
+                    ),
+                    opendart_pending_request_id=None,
+                    opendart_pending_corp_code=None,
+                    opendart_pending_requested_at=None,
+                )
+                .execution_options(synchronize_session=False)
+            )
+            transitioned = timeout_transition.rowcount == 1
+            audit(
+                db,
+                event_type="company_opendart_refresh",
+                actor=user,
+                target_type="company_public_facts",
+                target_ref=company.id,
+                action="collect",
+                result="timed_out" if transitioned else "superseded",
+                purpose="company_profile_enrichment",
+                detail={
+                    "provider": "OpenDART",
+                    "execution": "serverless_queue",
+                    "request_id": request_id,
+                    "error_category": "RESULT_TIMEOUT",
+                    "previous_snapshot_retained": previous_snapshot_retained,
+                    "pending_state_transitioned": transitioned,
+                    "score_effect": "NONE",
+                },
+            )
+            db.commit()
+            db.expire_all()
+            company = recruiter_company(db, user)
+            return {
+                "refresh": {
+                    "state": "RESULT_TIMEOUT" if transitioned else "RESULT_SUPERSEDED",
+                    "request_id": request_id,
+                    "execution": "serverless_queue",
+                },
+                "company_profile": company_profile_payload(
+                    company, include_opendart_linkage=True
+                ),
+            }
+        return JSONResponse(
+            status_code=202,
+            content={
+                "refresh": {
+                    "state": "PENDING",
+                    "request_id": request_id,
+                    "execution": "serverless_queue",
+                },
+                "company_profile": company_profile_payload(
+                    company, include_opendart_linkage=True
+                ),
+            },
+        )
+    if (
+        result.get("request_id") != request_id
+        or result.get("company_id") != company.id
+        or result.get("corp_code") != company.opendart_pending_corp_code
+    ):
+        raise HTTPException(
+            status_code=409,
+            detail="OpenDART 외부 조회 결과의 요청 연결을 확인할 수 없습니다",
+        )
+
+    outcome = result.get("outcome")
+    snapshot = result.get("snapshot")
+    error_category = result.get("error_category")
+    previous_snapshot_retained = bool(company.opendart_snapshot)
+    update_values: dict[str, object]
+    if outcome == "UPDATED":
+        projected = public_snapshot(snapshot)
+        dart_company = snapshot.get("company") if isinstance(snapshot, dict) else None
+        dart_name = (
+            str(dart_company.get("legal_name", ""))
+            if isinstance(dart_company, dict)
+            else ""
+        )
+        if (
+            projected is None
+            or snapshot.get("source_kind") != "live_open_api"
+            or snapshot.get("synthetic") is not False
+            or snapshot.get("score_effect") != "NONE"
+            or not company_names_match(company.name, dart_name)
+        ):
+            raise HTTPException(
+                status_code=409,
+                detail="OpenDART 외부 조회 저장본의 경계를 확인할 수 없습니다",
+            )
+        try:
+            synced_at = datetime.fromisoformat(
+                str(result["completed_at"])
+            ).astimezone(timezone.utc)
+        except (ValueError, TypeError):
+            raise HTTPException(
+                status_code=409,
+                detail="OpenDART 외부 조회 완료 시각을 확인할 수 없습니다",
+            ) from None
+        update_values = {
+            "opendart_corp_code": str(result["corp_code"]),
+            "opendart_snapshot": snapshot,
+            "opendart_sync_state": "AVAILABLE_LIVE",
+            "opendart_snapshot_version": (
+                f"opendart-snapshot-{str(snapshot['content_sha256'])[:12]}"
+            ),
+            "opendart_synced_at": synced_at,
+        }
+        final_state = "UPDATED_EXTERNAL_SNAPSHOT"
+    elif outcome == "NOT_UPDATED":
+        update_values = {
+            "opendart_sync_state": (
+                "STALE_LAST_KNOWN_GOOD"
+                if company.opendart_snapshot
+                else "UNAVAILABLE_NO_SNAPSHOT"
+            )
+        }
+        final_state = "NOT_UPDATED"
+    else:
+        raise HTTPException(
+            status_code=409,
+            detail="OpenDART 외부 조회 결과 상태를 확인할 수 없습니다",
+        )
+
+    update_values.update(
+        {
+            "opendart_last_attempt_at": datetime.now(timezone.utc),
+            "opendart_pending_request_id": None,
+            "opendart_pending_corp_code": None,
+            "opendart_pending_requested_at": None,
+        }
+    )
+    transition = db.execute(
+        update(Company)
+        .where(
+            Company.id == company.id,
+            Company.opendart_pending_request_id == request_id,
+            Company.opendart_pending_corp_code == result.get("corp_code"),
+        )
+        .values(**update_values)
+        .execution_options(synchronize_session=False)
+    )
+    transitioned = transition.rowcount == 1
+    audit(
+        db,
+        event_type="company_opendart_refresh",
+        actor=user,
+        target_type="company_public_facts",
+        target_ref=company.id,
+        action="collect",
+        result=(
+            "updated"
+            if transitioned and outcome == "UPDATED"
+            else "not_updated"
+            if transitioned
+            else "superseded"
+        ),
+        purpose="company_profile_enrichment",
+        detail={
+            "provider": "OpenDART",
+            "execution": "serverless_queue",
+            "request_id": request_id,
+            "error_category": error_category,
+            "previous_snapshot_retained": previous_snapshot_retained,
+            "pending_state_transitioned": transitioned,
+            "score_effect": "NONE",
+        },
+    )
+    db.commit()
+    db.expire_all()
+    company = recruiter_company(db, user)
+    db.refresh(company)
+    if not transitioned:
+        final_state = "RESULT_SUPERSEDED"
+    cleanup_state = "REMOVED"
+    try:
+        delete_refresh_result(request_id, company.id)
+    except OpenDartResultError:
+        # The one-hour TTL remains the bounded cleanup fallback. A successful DB
+        # update is not rolled back merely because post-commit deletion failed.
+        cleanup_state = "TTL_PENDING"
+    return {
+        "refresh": {
+            "state": final_state,
+            "request_id": request_id,
+            "execution": "serverless_queue",
+            "result_cleanup": cleanup_state,
         },
         "company_profile": company_profile_payload(
             company, include_opendart_linkage=True
@@ -2173,6 +3046,7 @@ async def recruiter_recommendations(
                     "address": resume.address_region,
                     "school": resume.education,
                     "certificates": resume.certificates,
+                    "projects": resume.projects,
                     "self_intro": resume.self_intro,
                 },
                 "company_context": {
@@ -2203,6 +3077,9 @@ async def recruiter_recommendations(
                 "matcher_version": match["matcher_version"],
                 "explanation": explanation
                 or {"status": explanation_status, "text": None},
+                "recruiter_review_support": build_recruiter_review_support(
+                    resume, job
+                ),
             }
         )
     response = {
@@ -2227,6 +3104,32 @@ async def recruiter_recommendations(
     if explanation_status == "AVAILABLE":
         await set_cached(cache_key, response)
     return response
+
+
+@app.get("/api/v1/admin/ai-operations", response_model=AiServiceOperationsResponse)
+async def admin_ai_operations(
+    http_response: Response,
+    db: Session = Depends(get_db),
+    user: User = Depends(require_role("admin")),
+) -> AiServiceOperationsResponse:
+    snapshot = await ai_service_operations_snapshot()
+    http_response.headers["Cache-Control"] = "no-store"
+    audit(
+        db,
+        event_type="ai_operations_snapshot_viewed",
+        actor=user,
+        target_type="ai_service_operations",
+        target_ref="current_snapshot",
+        action="read",
+        purpose="security_monitoring",
+        detail={
+            "agent_probe_state": snapshot.matcher.probe_state,
+            "llm_gateway_probe_state": snapshot.llm_gateway.probe_state,
+            "source_only_sections": ["opendart", "outcome_observation", "mlops"],
+        },
+    )
+    db.commit()
+    return snapshot
 
 
 @app.get("/api/v1/admin/audit")

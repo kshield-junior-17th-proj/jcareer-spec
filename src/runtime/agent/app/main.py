@@ -225,6 +225,7 @@ def calculate_score(job: JobInput, candidate: CandidateInput) -> MatchResult:
             "address",
             "school",
             "certificates",
+            "projects",
             "self_intro",
         ],
     )

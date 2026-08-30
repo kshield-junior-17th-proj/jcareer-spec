@@ -5,7 +5,7 @@ import contextlib
 import io
 import json
 import sys
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 
 
@@ -19,61 +19,8 @@ from app.opendart_dispatch import build_refresh_message  # noqa: E402
 
 
 FIXED_TIME = datetime(2026, 8, 28, 2, 3, 4, tzinfo=timezone.utc)
-COMPANY_ID = "00000000-0000-0000-0000-aaaaaaaaaaaa"
-REQUEST_ID = "00000000-0000-0000-0000-bbbbbbbbbbbb"
-
-
-class FakeRepository:
-    def __init__(
-        self,
-        *,
-        name: str = "아크웨이브",
-        pending_id: str = REQUEST_ID,
-        pending_at: datetime = FIXED_TIME,
-        complete_result: bool = True,
-    ) -> None:
-        self.company = {
-            "name": name,
-            "opendart_pending_request_id": pending_id,
-            "opendart_pending_requested_at": pending_at,
-        }
-        self.complete_result = complete_result
-        self.completed: list[dict[str, object]] = []
-        self.failures: list[dict[str, object]] = []
-
-    def load_company(self, _company_id: str) -> dict[str, object] | None:
-        return self.company
-
-    def complete(
-        self,
-        message: worker.RefreshMessage,
-        *,
-        expected_company_name: str,
-        snapshot: dict[str, object],
-    ) -> bool:
-        self.completed.append(
-            {
-                "message": message,
-                "expected_company_name": expected_company_name,
-                "snapshot": snapshot,
-            }
-        )
-        return self.complete_result
-
-    def record_failure(
-        self,
-        message: worker.RefreshMessage,
-        *,
-        category: str,
-        retryable: bool,
-    ) -> None:
-        self.failures.append(
-            {
-                "message": message,
-                "category": category,
-                "retryable": retryable,
-            }
-        )
+COMPANY_ID = "00000000-0000-0000-0000-000000""000001"
+REQUEST_ID = "00000000-0000-0000-0000-000000""000002"
 
 
 class RaisingClient:
@@ -100,6 +47,7 @@ def valid_body() -> str:
     return json.dumps(
         build_refresh_message(
             company_id=COMPANY_ID,
+            expected_company_name="아크웨이브",
             corp_code="90000001",
             requested_at=FIXED_TIME,
             request_id=REQUEST_ID,
@@ -113,6 +61,7 @@ def main() -> None:
     message = worker.parse_message(valid_body())
     assert message.request_id == REQUEST_ID
     assert message.company_id == COMPANY_ID
+    assert message.expected_company_name == "아크웨이브"
     assert message.requested_at == FIXED_TIME
     checks += 1
 
@@ -136,102 +85,60 @@ def main() -> None:
     )
     checks += 4
 
-    repository = FakeRepository()
-    outcome = worker.process_refresh(
+    durable_results: list[dict[str, object]] = []
+
+    def fake_result_writer(payload: dict[str, object]) -> str:
+        durable_results.append(payload)
+        return "RECORDED"
+
+    durable_outcome = worker.process_refresh_to_durable_result(
         message,
-        repository=repository,
         client=OpenDartClient(mode="fixture", clock=lambda: FIXED_TIME),
+        result_writer=fake_result_writer,
     )
-    assert outcome == "UPDATED"
-    assert len(repository.completed) == 1
-    assert repository.completed[0]["snapshot"]["synthetic"] is True
+    assert durable_outcome == "UPDATED"
+    assert durable_results[0]["company_id"] == COMPANY_ID
+    assert durable_results[0]["snapshot"]["score_effect"] == "NONE"
     checks += 1
 
-    factory_calls = 0
-
-    def forbidden_factory() -> OpenDartClient:
-        nonlocal factory_calls
-        factory_calls += 1
-        raise AssertionError("stale requests must not read a key or construct a client")
-
-    stale_repository = FakeRepository(
-        pending_id="00000000-0000-0000-0000-cccccccccccc"
+    mismatch_message = worker.RefreshMessage(
+        request_id=message.request_id,
+        company_id=message.company_id,
+        expected_company_name="다른기업",
+        corp_code=message.corp_code,
+        requested_at=message.requested_at,
     )
-    assert (
-        worker.process_refresh(
-            message,
-            repository=stale_repository,
-            client_factory=forbidden_factory,
-        )
-        == "STALE_REQUEST_IGNORED"
-    )
-    newer_repository = FakeRepository(pending_at=FIXED_TIME + timedelta(seconds=1))
-    assert (
-        worker.process_refresh(
-            message,
-            repository=newer_repository,
-            client_factory=forbidden_factory,
-        )
-        == "STALE_REQUEST_IGNORED"
-    )
-    assert factory_calls == 0
-    checks += 2
-
-    mismatch_repository = FakeRepository(name="다른기업")
-    assert (
-        worker.process_refresh(
-            message,
-            repository=mismatch_repository,
-            client=OpenDartClient(mode="fixture", clock=lambda: FIXED_TIME),
-        )
-        == "NOT_UPDATED"
-    )
-    assert mismatch_repository.failures[0]["category"] == "COMPANY_NAME_MISMATCH"
-    assert mismatch_repository.failures[0]["retryable"] is False
+    durable_results.clear()
+    assert worker.process_refresh_to_durable_result(
+        mismatch_message,
+        client=OpenDartClient(mode="fixture", clock=lambda: FIXED_TIME),
+        result_writer=fake_result_writer,
+    ) == "NOT_UPDATED"
+    assert durable_results[0]["error_category"] == "COMPANY_NAME_MISMATCH"
+    assert durable_results[0]["snapshot"] is None
     checks += 1
 
-    permanent_repository = FakeRepository()
-    permanent_client = RaisingClient("NO_DATA")
-    assert (
-        worker.process_refresh(
-            message,
-            repository=permanent_repository,
-            client=permanent_client,
-        )
-        == "NOT_UPDATED"
-    )
-    assert permanent_repository.failures[0]["retryable"] is False
-    checks += 1
-
-    retry_repository = FakeRepository()
-    retry_client = RaisingClient("RATE_LIMITED")
+    durable_results.clear()
+    assert worker.process_refresh_to_durable_result(
+        message,
+        client=RaisingClient("NO_DATA"),
+        result_writer=fake_result_writer,
+    ) == "NOT_UPDATED"
+    assert durable_results[0]["error_category"] == "NO_DATA"
     expect_worker_error(
-        lambda: worker.process_refresh(
+        lambda: worker.process_refresh_to_durable_result(
             message,
-            repository=retry_repository,
-            client=retry_client,
+            client=RaisingClient("RATE_LIMITED"),
+            result_writer=fake_result_writer,
         ),
         "RATE_LIMITED",
         True,
     )
-    assert retry_repository.failures[0]["retryable"] is True
-    checks += 1
+    checks += 2
 
-    raced_repository = FakeRepository(complete_result=False)
-    assert (
-        worker.process_refresh(
-            message,
-            repository=raced_repository,
-            client=OpenDartClient(mode="fixture", clock=lambda: FIXED_TIME),
-        )
-        == "STALE_REQUEST_IGNORED"
-    )
-    checks += 1
-
-    original_repository = worker.PostgresCompanySnapshotRepository
+    original_result_writer = worker.put_refresh_result
     original_key_reader = worker.read_opendart_api_key
     original_client = worker.OpenDartClient
-    lambda_repository = FakeRepository()
     key_reads = 0
 
     def fake_key_reader() -> str:
@@ -240,7 +147,7 @@ def main() -> None:
         return "k" * 40
 
     try:
-        worker.PostgresCompanySnapshotRepository = lambda _url: lambda_repository
+        worker.put_refresh_result = fake_result_writer
         worker.read_opendart_api_key = fake_key_reader
         worker.OpenDartClient = (
             lambda **_kwargs: OpenDartClient(mode="fixture", clock=lambda: FIXED_TIME)
@@ -265,30 +172,35 @@ def main() -> None:
         ]
         assert all("company_id" not in row and "corp_code" not in row for row in logs)
     finally:
-        worker.PostgresCompanySnapshotRepository = original_repository
+        worker.put_refresh_result = original_result_writer
         worker.read_opendart_api_key = original_key_reader
         worker.OpenDartClient = original_client
     checks += 1
 
-    stale_lambda_repository = FakeRepository(
-        pending_id="00000000-0000-0000-0000-cccccccccccc"
-    )
+    retryable_client = RaisingClient("RATE_LIMITED")
     try:
-        worker.PostgresCompanySnapshotRepository = lambda _url: stale_lambda_repository
-        worker.read_opendart_api_key = (
-            lambda: (_ for _ in ()).throw(
-                AssertionError("stale Lambda message must not read SSM")
-            )
-        )
+        worker.read_opendart_api_key = lambda: "k" * 40
+        worker.OpenDartClient = lambda **_kwargs: retryable_client
         with contextlib.redirect_stdout(io.StringIO()):
-            stale_result = worker.lambda_handler(
-                {"Records": [{"messageId": "synthetic-stale", "body": valid_body()}]},
+            retry_result = worker.lambda_handler(
+                {
+                    "Records": [
+                        {"messageId": "retry-first", "body": valid_body()},
+                        {"messageId": "not-processed", "body": valid_body()},
+                    ]
+                },
                 None,
             )
-        assert stale_result == {"batchItemFailures": []}
+        assert retry_result == {
+            "batchItemFailures": [
+                {"itemIdentifier": "retry-first"},
+                {"itemIdentifier": "not-processed"},
+            ]
+        }
+        assert retryable_client.calls == 1
     finally:
-        worker.PostgresCompanySnapshotRepository = original_repository
         worker.read_opendart_api_key = original_key_reader
+        worker.OpenDartClient = original_client
     checks += 1
 
     output = io.StringIO()

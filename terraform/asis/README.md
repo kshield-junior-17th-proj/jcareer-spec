@@ -2,13 +2,13 @@
 
 ## 처음 보는 분을 위한 요약
 
-이 폴더는 J-Career의 실제 운영 서버가 아니다. 기존 기획 문서와 도면을 보고 컨설팅팀이
-AWS 구성을 다시 적은 검토용 Terraform이다.
+이 폴더는 기존 기획 문서와 도면을 바탕으로 J-Career의 AWS 구성을 다시 적은 기준
+설계용 Terraform이다. 현재 구성과 개선 필요 지점을 같은 기준으로 검토할 때 사용한다.
 
 - 업무망 PC는 180대다. Windows 100대와 macOS 80대다.
 - Terraform은 여섯 부분으로 나뉘며, 기록된 모의 계획에는 생성 예정 항목이 110개다.
-- 그러나 이 작업에서 J-Career 고객사 AWS에 실제로 만든 리소스는 0개다.
-- 기준 애플리케이션 이미지와 실행 환경은 없다.
+- 이 기준선은 AWS에 적용하지 않았으며 현재 생성 리소스는 0개다.
+- 기준선에 애플리케이션 이미지와 실행 환경은 포함되어 있지 않다.
 - TRACE와 JC-RECEIPT 같은 신규 AI 서비스는 이번 범위에 넣지 않는다.
 
 자세한 설명은 아래의 [웹 명세](index.html)부터 읽으면 된다. 첫 장에 핵심 숫자와 용어
@@ -32,12 +32,14 @@ AWS 구성을 다시 적은 검토용 Terraform이다.
 - [웹 명세](index.html)
 - [PDF 명세](JCAREER_ASIS_SYSTEM_SPEC.pdf)
 - [도면 설명](architecture.html)
-- [편집 가능한 draw.io 원본](JCAREER_ASIS_FLOW.drawio)
-- [PNG 도면](JCAREER_ASIS_FLOW.drawio.png)
+- [쉽게 보는 draw.io 원본](JCAREER_ASIS_FLOW.drawio)
+- [쉽게 보는 PNG 도면](JCAREER_ASIS_FLOW.drawio.png)
+- [상세 기술 draw.io 원본](JCAREER_ASIS_2AZ.drawio)
 - [자동검사 결과](validation-report.json)
 
-`JCAREER_ASIS_2AZ.md`와 `JCAREER_ASIS_2AZ.drawio`는 초기 2-AZ 구판(legacy)이다. 로컬 runtime,
-Bedrock 실험, 컨설턴트 dashboard 경계가 없으므로 현재 기술 검토에는 위 산출물을 사용한다.
+`JCAREER_ASIS_2AZ.drawio`는 앱·데이터·조건부 AI 경계를 모두 담은 상세 기술 원본이다.
+`JCAREER_ASIS_2AZ.md`는 초기 2-AZ 구판(legacy) 설명이므로 현재 상태는 웹 명세와 위 두
+도면 원본을 기준으로 확인한다.
 
 ## 서비스 기획과의 경계
 
@@ -138,7 +140,7 @@ terraform/asis/
 ```
 
 **2-AZ 전체 전개다** (`CONFLICT_MATRIX` C-01 RESOLVED). 축약하지 않는다.
-도면에 있는 리소스를 전부 만든다. 대략 100~150개다.
+도면에 있는 리소스를 전부 만드는 기준 설계다. 기록된 모의 계획은 생성 예정 110개다.
 
 ### 왜 자르지 않는가
 

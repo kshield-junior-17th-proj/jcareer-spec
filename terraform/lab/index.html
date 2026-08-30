@@ -37,22 +37,37 @@
       <div class="shell">
         <p class="eyebrow">AWS 검증 환경 · 통제된 접속</p>
         <h1>AWS 검증 환경</h1>
-        <p class="hero-copy">공개 포트를 열지 않고 AWS Systems Manager로 관리하는 단기 검증 환경입니다. 서비스 기능과 MLOps 흐름을 합성 데이터로 확인할 수 있도록 Terraform으로 구성했습니다.</p>
+        <p class="hero-copy">공개 포트를 열지 않고 AWS Systems Manager로 관리하는 단기 검증 환경 설계입니다. 합성 데이터로 서비스 기능을 확인하도록 Terraform 실행 절차와 현재 관찰 결과를 함께 제공합니다.</p>
         <div class="hero-actions">
           <a class="button" href="https://github.com/kshield-junior-17th-proj/jcareer-spec/blob/main/terraform/lab/README.md">환경 구성 보기</a>
-          <a class="button button--line" href="../../mlops/">MLOps 검증 흐름</a>
+          <a class="button button--line" href="DEPLOYMENT_OBSERVATION_2026-08-30.md">최근 실행 결과</a>
         </div>
       </div>
     </section>
 
     <div class="shell">
       <section class="fact-strip" aria-label="AWS 검증 환경 핵심 구성">
-        <div class="fact"><strong>13개</strong><span>Terraform 기본 계획 항목</span></div>
-        <div class="fact"><strong>0개</strong><span>외부 인바운드 규칙</span></div>
-        <div class="fact"><strong>SSM</strong><span>관리 접속 경로</span></div>
-        <div class="fact"><strong>합성 데이터</strong><span>검증 데이터 범위</span></div>
+        <div class="fact"><strong>24개</strong><span>HTTPS·Bedrock 포함<br>검토된 생성 계획</span></div>
+        <div class="fact"><strong>0개</strong><span>복구 완료 뒤<br>현재 Lab 리소스</span></div>
+        <div class="fact"><strong>PASS</strong><span>Bedrock 직접<br>합성 호출</span></div>
+        <div class="fact"><strong>권한 대기</strong><span>IAM 역할 생성 뒤<br>전체 경로 재검증</span></div>
       </section>
     </div>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div><p class="section-label">2026-08-30 관찰</p><h2>계획과 실제 결과를<br>따로 표시합니다</h2></div>
+          <p class="section-intro">24개 생성 계획은 안전 검사를 통과했지만, 새 계정의 IAM 역할 생성 권한이 없어 적용이 중단됐습니다. 일부 생성된 16개 항목은 검토된 삭제 계획으로 정리했고 현재 Lab 리소스는 0개입니다.</p>
+        </div>
+        <div class="spec-grid">
+          <article class="spec-block"><h3>계획 확인</h3><p>HTTPS 비공개 원본과 Bedrock 브로커를 포함해 생성 24개, 변경 0개, 삭제 0개를 확인했습니다.</p></article>
+          <article class="spec-block"><h3>Bedrock 직접 확인</h3><p>합성 문장 한 건의 모델 응답을 확인했습니다. 애플리케이션 전체 경로를 통과한 결과는 아닙니다.</p></article>
+          <article class="spec-block"><h3>적용 중단과 복구</h3><p>IAM 역할 생성 권한 부족으로 멈춘 뒤, 부분 생성 항목만 지우는 저장 계획을 적용해 상태를 비웠습니다.</p></article>
+          <article class="spec-block"><h3>다음 확인</h3><p>제한된 IAM 권한을 준비한 뒤 원격 여섯 서비스, HTTPS 인증 경계, Bedrock 전체 경로와 재부팅 복구를 다시 확인합니다.</p></article>
+        </div>
+      </div>
+    </section>
 
     <section class="section">
       <div class="shell">

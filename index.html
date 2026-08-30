@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="J-Career의 채용 서비스 구조, AWS 기준 설계, 데이터 아키텍처와 AI 모델 검증 절차를 한눈에 보여 줍니다.">
-  <meta name="theme-color" content="#ffffff">
+  <meta name="theme-color" content="#172129">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ko_KR">
   <meta property="og:title" content="J-Career 서비스 아키텍처">
@@ -15,6 +15,10 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image:alt" content="J-Career 채용 서비스와 AWS 구성의 전체 흐름도">
   <link rel="canonical" href="https://kshield-junior-17th-proj.github.io/jcareer-spec/">
+  <link rel="preconnect" href="https://api.fontshare.com">
+  <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&amp;display=swap">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2318212b'/%3E%3Cpath d='M18 13h11v25c0 10-5 14-16 13v-9c4 0 5-1 5-5V13zm17 0h17v9h-7v29H35V13z' fill='%23ff7a1a'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="assets/site.css">
   <title>J-Career 서비스 아키텍처</title>
@@ -24,24 +28,33 @@
   <header class="site-header">
     <nav class="nav" aria-label="주요 메뉴">
       <a class="brand" href="./" aria-current="page">J-Career 아키텍처</a>
-      <div class="nav-links">
-        <a href="terraform/asis/">AWS 아키텍처</a>
-        <a href="mlops/">MLOps</a>
-        <a href="terraform/lab/">AWS 검증 환경</a>
+      <div class="nav-actions">
+        <div class="nav-links">
+          <a href="terraform/asis/">AWS 아키텍처</a>
+          <a href="mlops/">MLOps</a>
+          <a href="terraform/lab/">AWS 검증 환경</a>
+        </div>
+        <button class="motion-toggle" type="button" data-motion-toggle aria-pressed="false" hidden><span data-motion-label>움직임 줄이기</span></button>
       </div>
     </nav>
   </header>
 
   <main id="content">
     <section class="hero">
+      <img class="hero-blueprint" src="assets/JCAREER_PLATFORM_ANIMATED.png" width="1480" height="820" fetchpriority="high" alt="" aria-hidden="true">
       <div class="shell">
         <p class="eyebrow">서비스·클라우드 아키텍처 · 2026.08</p>
         <h1>J-Career<br>서비스 아키텍처</h1>
         <p class="hero-copy">구직자와 기업을 연결하는 채용 플랫폼의 서비스 구조입니다. 공고 추천과 인재 탐색, 지원 관리, AI 설명, 모델 검증을 AWS 기준 설계 위에서 한눈에 볼 수 있습니다.</p>
         <div class="hero-actions">
-          <a class="button" href="#quick-start">서비스 한눈에 보기</a>
-          <a class="button button--line" href="terraform/asis/architecture.html">전체 인프라</a>
-          <a class="button button--line" href="mlops/">AI 모델 검증</a>
+          <a class="button" href="terraform/asis/architecture.html">전체 인프라 흐름 보기</a>
+          <a class="button button--line" href="mlops/">MLOps 7단계 보기</a>
+        </div>
+        <div class="signal-marquee" aria-hidden="true">
+          <div class="signal-marquee__track">
+            <span>업무망 PC 180대</span><span>주소 안내</span><span>웹 전달</span><span>웹 요청 검사</span><span>앱 처리</span><span>데이터·기록</span>
+            <span>업무망 PC 180대</span><span>주소 안내</span><span>웹 전달</span><span>웹 요청 검사</span><span>앱 처리</span><span>데이터·기록</span>
+          </div>
         </div>
       </div>
     </section>
@@ -62,7 +75,7 @@
             <p class="section-label">서비스 한눈에 보기</p>
             <h2>두 고객을 잇는<br>하나의 채용 흐름</h2>
           </div>
-          <p class="section-intro">J-Career는 구직자와 기업이 서로 맞는 선택지를 빠르게 좁혀 가도록 돕습니다. 추천 점수와 이유를 함께 보여 주고, AI 학습 결과는 담당자 검토를 거쳐 다음 단계로 이동합니다.</p>
+          <p class="section-intro">J-Career는 구직자와 기업이 서로 맞는 선택지를 빠르게 좁혀 가도록 돕습니다. 추천 점수와 이유를 함께 보여 주고, AI 학습 결과는 사람 검토 대기에서 멈추며 현재 추천 흐름에는 연결하지 않습니다.</p>
         </div>
 
         <div class="plain-grid">
@@ -79,12 +92,12 @@
           <article class="plain-card">
             <span class="plain-number">03</span>
             <h3>AI 추천과 설명</h3>
-            <p>기술 70%, 경력 20%, 직무 10%의 기준으로 적합도를 계산합니다. 설명 생성은 점수 계산과 분리해 결과의 이유만 정리합니다.</p>
+            <p>기술 70%, 경력 20%, 직무 10%의 기준으로 조건 일치도를 계산합니다. 설명 생성은 점수 계산과 분리해 결과의 이유만 정리합니다.</p>
           </article>
           <article class="plain-card">
             <span class="plain-number">04</span>
             <h3>모델 검증</h3>
-            <p>합성 데이터로 후보 모델을 학습하고 결과와 실행 기록을 남깁니다. 담당자 검토 전에는 추천 흐름에 반영하지 않습니다.</p>
+            <p>합성 데이터로 후보 모델을 학습하고 결과와 실행 기록을 남깁니다. 자동 승격 경로가 없고 현재 추천 흐름에도 연결하지 않습니다.</p>
           </article>
         </div>
       </div>
@@ -100,6 +113,7 @@
           <p class="section-intro">서비스 기능, AWS 인프라, AI 모델 검증은 서로 연결되지만 확인 기준은 다릅니다. 각 영역의 역할과 현재 검증 범위를 따로 정리했습니다.</p>
         </div>
 
+        <div class="workstream-stack" data-card-stack>
         <article class="workstream">
           <p class="workstream-kicker">01 · 기준 설계</p>
           <div><h3>AWS 서비스 아키텍처</h3><p>서울 리전의 두 가용 영역에 네 애플리케이션 서비스와 데이터·보안·관측 구성을 배치합니다. Terraform 설계 항목은 110개입니다.</p></div>
@@ -120,6 +134,7 @@
           <div><h3>AWS 검증 Lab</h3><p>공개 접속 포트를 두지 않고 AWS Systems Manager로 관리하는 단기 검증 환경입니다. 비용과 배포 결과는 별도 기록으로 관리합니다.</p></div>
           <a class="workstream-link" href="terraform/lab/">환경 구성 →</a>
         </article>
+        </div>
       </div>
     </section>
 
@@ -131,8 +146,8 @@
             <h2>한 서버 안에서<br>업무별로 나눕니다</h2>
           </div>
           <div>
-            <p class="section-intro">PostgreSQL 서비스 1개 안에 논리 데이터베이스 3개를 둡니다. 회원, 기업, 분석 참고 데이터를 역할별로 나누고 Redis 캐시는 별도 서비스로 운영하는 구조입니다.</p>
-            <p class="status-note">구조 정의 완료 · API 참고 정보 연계 · 화면 연계 검토 중 · AWS 배포 검증 전</p>
+            <p class="section-intro">PostgreSQL 서비스 1개 안에 논리 데이터베이스 3개를 둡니다. 회원, 기업, 분석 참고 데이터를 역할별로 나누고 Redis 캐시는 데이터 저장소와 별도로 둔 구조입니다.</p>
+            <p class="status-note">구조 정의 완료 · API 참고 정보 연계 · 화면 연계 검토 중 · AWS 실행 결과는 별도 상태표에서 관리</p>
           </div>
         </div>
 
@@ -157,7 +172,7 @@
             <p class="section-label">전체 인프라</p>
             <h2>서비스별 경로를<br>한 장에서 확인합니다</h2>
           </div>
-          <p class="section-intro">서비스 버튼을 누르면 전체 인프라에서 관련 경로만 강조됩니다. 각 흐름은 1·2·3 순서로 읽을 수 있고 AWS 서비스명보다 맡은 역할을 먼저 표시했습니다.</p>
+          <p class="section-intro">서비스 버튼을 누르면 전체 인프라에서 관련 경로만 강조됩니다. 서비스별 경로는 1·2·3, 전체 기준 흐름은 1~6 순서로 보여 주며 AWS 서비스명보다 맡은 역할을 먼저 표시했습니다.</p>
         </div>
         <nav class="flow-shortcuts" aria-label="서비스별 인프라 경로 바로가기">
           <a href="terraform/asis/architecture.html"><span aria-hidden="true">전체</span><strong>전체 인프라</strong><small>①~⑥ 기준 흐름</small></a>
@@ -167,10 +182,43 @@
           <a href="terraform/asis/architecture.html?flow=mlops"><span aria-hidden="true">검증</span><strong>MLOps 학습·평가</strong><small>사람 검토 대기</small></a>
           <a href="terraform/asis/architecture.html?flow=operations"><span aria-hidden="true">운영</span><strong>기록·탐지</strong><small>로그·위협 탐지</small></a>
         </nav>
-        <a class="architecture-frame" href="terraform/asis/architecture.html" aria-label="대화형 전체 인프라 도면 열기">
-          <img src="terraform/asis/JCAREER_ASIS_FLOW.drawio.png" width="2400" height="1400" loading="lazy" decoding="async" alt="업무망 PC 180대와 J-Career AWS 기준 설계의 전체 흐름">
+        <a class="architecture-frame" href="terraform/asis/architecture.html" aria-label="대화형 전체 인프라 도면 열기" data-scale-reveal>
+          <img src="assets/JCAREER_PLATFORM_ANIMATED.svg" data-animated-diagram data-motion-src="assets/JCAREER_PLATFORM_ANIMATED.svg" data-still-src="assets/JCAREER_PLATFORM_ANIMATED.png" width="1480" height="820" loading="lazy" decoding="async" alt="업무망 PC 180대에서 J-Career AWS 기준 설계와 별도 MLOps 검증 경계로 이어지는 핵심 흐름">
         </a>
-        <p class="caption">Terraform 기준 설계를 시각화한 도면입니다. AWS 계정의 배포 상태는 검증 기록에서 별도로 관리합니다.</p>
+        <p class="caption">움직이는 점은 요청과 기록의 이동 순서를 설명합니다. AWS에서 관측한 요청이나 배포 상태를 뜻하지 않습니다.</p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="perspective-title">
+      <div class="shell">
+        <div class="section-head">
+          <div><p class="section-label">읽는 관점</p><h2 id="perspective-title">같은 구조를<br>역할에 맞게 봅니다</h2></div>
+          <p class="section-intro">아래 화살표나 키보드 방향키로 관점을 바꾸면, 각 사용자가 이 구조에서 먼저 확인할 내용을 짧게 볼 수 있습니다.</p>
+        </div>
+        <div class="perspective-carousel" data-perspective-carousel tabindex="0" role="region" aria-roledescription="캐러셀" aria-labelledby="perspective-title">
+          <div>
+            <article class="perspective-slide" data-perspective-slide data-perspective="candidate" role="group" aria-roledescription="슬라이드" aria-label="1 / 3">
+              <span class="perspective-role">구직자 관점</span>
+              <h3>왜 이 공고가 보이는지 확인합니다.</h3>
+              <p>프로필과 공고 조건을 비교한 점수와 설명을 함께 보고, 관심 있는 공고의 지원 상태를 이어서 확인합니다.</p>
+            </article>
+            <article class="perspective-slide" data-perspective-slide data-perspective="recruiter" role="group" aria-roledescription="슬라이드" aria-label="2 / 3" hidden>
+              <span class="perspective-role">기업 채용 담당자 관점</span>
+              <h3>자사 공고에 지원한 후보만 비교합니다.</h3>
+              <p>기업 고객은 자신이 등록한 공고의 지원자만 확인합니다. 필터와 최대 3명 비교는 서버가 준 추천 순서를 바꾸지 않습니다.</p>
+            </article>
+            <article class="perspective-slide" data-perspective-slide data-perspective="reviewer" role="group" aria-roledescription="슬라이드" aria-label="3 / 3" hidden>
+              <span class="perspective-role">인프라 검토자 관점</span>
+              <h3>설계와 검증 결과를 구분합니다.</h3>
+              <p>Terraform 계획, 애플리케이션 구현, AWS 배포 검증을 같은 뜻으로 섞지 않습니다. 각 화면에서 근거와 아직 확인하지 않은 범위를 함께 표시합니다.</p>
+            </article>
+          </div>
+          <div class="perspective-controls">
+            <button type="button" data-carousel-previous aria-label="이전 관점">←</button>
+            <button type="button" data-carousel-next aria-label="다음 관점">→</button>
+            <span class="perspective-count" data-carousel-count aria-live="polite">1 / 3</span>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -192,8 +240,39 @@
           <article class="spec-block"><h3>데이터 범위</h3><p>현재 검증은 합성 데이터를 기준으로 합니다. 운영 데이터 반입에는 별도의 승인 절차와 고객사 분리 통제가 필요합니다.</p></article>
           <article class="spec-block"><h3>모델 해석 범위</h3><p>현 단계의 비교 수치는 조건 일치도를 살펴보는 데 사용합니다. 합격 가능성이나 인재 수준을 자동 판정하는 값에서는 제외합니다.</p></article>
         </div>
+        <section class="readiness-panel" aria-labelledby="readiness-title">
+          <div class="readiness-summary">
+            <p class="section-label">검증 현황</p>
+            <h2 id="readiness-title">확인한 범위와<br>다음 할 일을 나눕니다</h2>
+            <span class="readiness-state">3 / 7 확인</span>
+            <p>설계·공개 파일과 Bedrock 직접 호출은 확인했습니다. AWS 전체 경로와 외부 연계, 단말·운영 관찰은 아래 항목대로 이어갑니다.</p>
+          </div>
+          <ol class="readiness-list">
+            <li class="readiness-item" data-readiness="done"><span class="readiness-index">01</span><div><strong>최신 PNG 내보내기</strong><p>새 한글 흐름도와 원본 해시를 함께 검증했습니다.</p></div><span class="readiness-tag">완료</span></li>
+            <li class="readiness-item" data-readiness="done"><span class="readiness-index">02</span><div><strong>공개 소스 검사</strong><p>Lab·MLOps·OpenDART 정적 검사와 단위시험 묶음을 통과했습니다.</p></div><span class="readiness-tag">완료</span></li>
+            <li class="readiness-item" data-readiness="done"><span class="readiness-index">03</span><div><strong>Bedrock 직접 합성 호출</strong><p>새 검증 계정에서 모델 응답과 토큰 집계를 확인했습니다.</p></div><span class="readiness-tag">완료</span></li>
+            <li class="readiness-item" data-readiness="pending"><span class="readiness-index">04</span><div><strong>AWS 애플리케이션 전체 경로</strong><p>IAM 역할 생성 권한을 준비한 뒤 여섯 서비스와 HTTPS·Bedrock 경로를 다시 확인합니다.</p></div><span class="readiness-tag">권한 대기</span></li>
+            <li class="readiness-item" data-readiness="pending"><span class="readiness-index">05</span><div><strong>OpenDART 외부 조회</strong><p>키와 이미지 검사에 대한 사람 판단이 없어 게시와 실호출을 멈춘 상태입니다.</p></div><span class="readiness-tag">대기</span></li>
+            <li class="readiness-item" data-readiness="pending"><span class="readiness-index">06</span><div><strong>업무망 단말 확인</strong><p>Windows·macOS 단말에서 접속과 주요 흐름을 직접 확인해야 합니다.</p></div><span class="readiness-tag">대기</span></li>
+            <li class="readiness-item" data-readiness="pending"><span class="readiness-index">07</span><div><strong>운영 관찰 기록</strong><p>로그, 경보, 장애 대응 결과를 남긴 관찰 기록이 필요합니다.</p></div><span class="readiness-tag">대기</span></li>
+          </ol>
+        </section>
       </div>
     </section>
+
+    <div class="shell">
+      <section class="action-panel" aria-labelledby="action-title">
+        <div>
+          <p class="section-label">다음 확인</p>
+          <h2 id="action-title">전체 그림에서 필요한 경로만 직접 골라 보세요.</h2>
+          <p>서비스 버튼을 누르면 같은 인프라 위에서 관련 구간과 단계 설명이 함께 바뀝니다.</p>
+        </div>
+        <div class="action-panel__links">
+          <a class="button" href="terraform/asis/architecture.html">대화형 흐름도 열기</a>
+          <a class="button button--line" href="terraform/asis/JCAREER_ASIS_SYSTEM_SPEC.pdf">PDF 명세 보기</a>
+        </div>
+      </section>
+    </div>
   </main>
 
   <footer class="footer">
@@ -202,5 +281,8 @@
       <span>기준 설계 · 구현 범위 · 검증 기록</span>
     </div>
   </footer>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js" integrity="sha384-XmJ9SoHtVOHoQUcKvFAzVXwdkKo1Ie3bhmSoIAkcdsHGaIrVJIkmozyq0FJeb/Ly" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js" integrity="sha384-wl5TeDVvOWt30Pbf8aSo2ZrzsOjddu3avOBvHe+p+OhJt9gP6w9YXmDkN5DK2/dF" crossorigin="anonymous"></script>
+  <script src="assets/motion.js"></script>
 </body>
 </html>

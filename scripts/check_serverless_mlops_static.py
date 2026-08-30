@@ -72,6 +72,10 @@ def load_sources(root: Path) -> dict[str, str]:
         "operator": module / "provisioning" / "invoke-synthetic-demo.ps1",
         "exporter_dockerfile": root / "src" / "mlops" / "Dockerfile.exporter",
         "lambda_dockerfile": root / "src" / "mlops" / "Dockerfile.lambda",
+        "lambda_handler": root / "src" / "mlops" / "lambda_handler.py",
+        "exporter_source": root / "src" / "mlops" / "export_runtime_training.py",
+        "review_source": root / "src" / "mlops" / "review_challenger.py",
+        "mlops_readme": root / "src" / "mlops" / "README.md",
     }
     missing.extend(
         str(path.relative_to(root)) for path in supporting.values() if not path.is_file()
@@ -99,6 +103,10 @@ def audit_sources(sources: dict[str, str]) -> list[str]:
     operator = sources["operator"]
     exporter_dockerfile = sources["exporter_dockerfile"]
     lambda_dockerfile = sources["lambda_dockerfile"]
+    lambda_handler = sources["lambda_handler"]
+    exporter_source = sources["exporter_source"]
+    review_source = sources["review_source"]
+    mlops_readme = sources["mlops_readme"]
     terraform_all = sources["terraform_all"]
 
     def require(observed: bool, message: str) -> None:
@@ -149,6 +157,14 @@ def audit_sources(sources: dict[str, str]) -> list[str]:
         and '"aws:SecureTransport" = "false"' in main,
         "S3 TLS-only bucket policy is missing",
     )
+    require(
+        'sse_algorithm = "AES256"' in main,
+        "artifact bucket must retain the currently wired SSE-S3 encryption",
+    )
+    forbid(
+        "bucket_key_enabled" in main,
+        "SSE-S3 must not declare the SSE-KMS-only S3 Bucket Key option",
+    )
     require('billing_mode = "PAY_PER_REQUEST"' in main, "DynamoDB must remain on-demand")
     require("reserved_concurrent_executions = 1" in main, "Lambda concurrency must remain one")
     require("timeout       = 300" in main, "Lambda timeout must remain bounded at 300 seconds")
@@ -178,6 +194,92 @@ def audit_sources(sources: dict[str, str]) -> list[str]:
     require(
         "COPY run_snapshot_pipeline.py" in lambda_dockerfile,
         "Lambda image is missing the feature-snapshot pipeline module",
+    )
+    require(
+        "COPY review_challenger.py" in lambda_dockerfile,
+        "Lambda image is missing the bounded human-review module",
+    )
+    require(
+        "record_human_review" in lambda_handler
+        and "ConditionExpression" in lambda_handler
+        and "attribute_not_exists(review_receipt_sha256)" in lambda_handler
+        and 'ReturnValues="ALL_NEW"' in lambda_handler,
+        "human review must use and validate the conditional single-record transition",
+    )
+    require(
+        '"IfNoneMatch": "*"' in lambda_handler
+        and 'response.get("VersionId")' in lambda_handler
+        and "artifact_bindings_json=canonical_json(artifact_bindings)" in lambda_handler,
+        "six result artifacts must be create-only and version-bound",
+    )
+    require(
+        '"ServerSideEncryption": "AES256"' in lambda_handler,
+        "Lambda result uploads must use the currently wired SSE-S3 encryption",
+    )
+    forbid(
+        "MLOPS_ARTIFACT_KMS_KEY_ID" in lambda_handler
+        or '"aws:kms"' in lambda_handler
+        or "SSEKMSKeyId" in lambda_handler,
+        "Lambda source must not expose an unwired SSE-KMS configuration path",
+    )
+    require(
+        "synthetic_only = :synthetic_true" in lambda_handler
+        and "artifact_count = :artifact_count" in lambda_handler
+        and "model_state = :model_state" in lambda_handler
+        and "runtime_ranking_wired = :false" in lambda_handler
+        and "automatic_model_activation = :false" in lambda_handler
+        and "release_authorized = :false" in lambda_handler,
+        "human review condition must bind every synthetic non-activation invariant",
+    )
+    require(
+        "def _transition_run_to_pending(" in lambda_handler
+        and "#state = :running_state AND human_input_state = :not_recorded" in lambda_handler
+        and "AND source_mode = :source_mode" in lambda_handler
+        and "attribute_not_exists(artifact_bindings)" in lambda_handler
+        and 'ReturnValues="ALL_NEW"' in lambda_handler,
+        "training completion must conditionally transition the unchanged RUNNING state",
+    )
+    require(
+        "for member in members.values():" in exporter_source
+        and "_assert_synthetic_member(member)" in exporter_source
+        and "_assert_synthetic_company_job_source(raw_jobs)" in exporter_source
+        and "EXPECTED_SEED_COMPANY_PROFILE_VERSION" in exporter_source
+        and "if any(dangling_reference_counts.values()):" in exporter_source
+        and "rejected an unresolved consent subject" in exporter_source
+        and exporter_source.index("for member in members.values():")
+        < exporter_source.index('source_material = {'),
+        "the complete member/reference read set must pass synthetic checks before lineage persistence",
+    )
+    require(
+        "_recorded_review_response" in lambda_handler
+        and "human review retry conflicts" in lambda_handler
+        and "RECORDED_REVIEW_STATE" in lambda_handler,
+        "identical human-review retries must be idempotent and conflicts rejected",
+    )
+    require(
+        "EXPECTED_ARTIFACT_FILES" in review_source
+        and "human_input_record_only" in review_source
+        and 'REVIEW_DECISIONS = frozenset({"APPROVED", "REJECTED"})' in review_source
+        and 'RECORDED_REVIEW_STATE = "HUMAN_INPUT_RECORDED"' in review_source
+        and '"decision_scope": DECISION_SCOPE' in review_source
+        and '"release_authorized": False' in review_source,
+        "human review must remain version-bound input recording without release authorization",
+    )
+    require(
+        "부분 객체" in mlops_readme
+        and "DynamoDB 상태만" in mlops_readme,
+        "documentation must forbid treating partial S3 objects as run success",
+    )
+    forbid(
+        '"automatic_model_activation": True' in lambda_handler
+        or '"runtime_ranking_wired": True' in lambda_handler
+        or '"automatic_model_activation": True' in review_source
+        or '"runtime_ranking_wired": True' in review_source,
+        "human review source must not activate a model or connect runtime ranking",
+    )
+    forbid(
+        "approval_state = :decision" in lambda_handler,
+        "APPROVED or REJECTED must not be stored as a release-like approval state",
     )
     require(
         "ENTRYPOINT" in exporter_dockerfile
@@ -218,6 +320,44 @@ def audit_sources(sources: dict[str, str]) -> list[str]:
         and "[REDACTED_RESOURCE_ID]" in operator
         and "[REDACTED_SECRET]" in operator,
         "operator diagnostics must redact identifiers and credentials",
+    )
+    require(
+        "[string]$ProviderAccountSha256" in operator
+        and "Get-ObservedProviderAccountSha256" in operator
+        and "Assert-ProviderAccountBinding" in operator
+        and "provider_account_sha256" in operator
+        and "--query', 'Account'" in operator
+        and "Get-StringSha256 -Value $account" in operator
+        and "Provider account binding changed before" in operator,
+        "operator approval must bind a fail-closed provider account SHA-256 without logging the raw account ID",
+    )
+    require(
+        "Resolve-RequiredExecutable" in operator
+        and "CommandType -ne 'Application'" in operator
+        and "[IO.Path]::IsPathRooted($path)" in operator
+        and "$script:ToolPaths.aws" in operator
+        and "$script:ToolPaths.docker" in operator
+        and "$script:ToolPaths.python" in operator
+        and "$script:ToolPaths.terraform" in operator
+        and "$script:ToolPaths.tar" in operator,
+        "operator tools must be resolved once to direct absolute executables and reject command shadowing",
+    )
+    require(
+        "New-JCareerProtectedSnapshotSet" in operator
+        and operator.count("Add-JCareerProtectedSnapshotFile") >= 3
+        and "Get-ExactFileSha256" in operator
+        and "Assert-SavedPlanExecutionContext" in operator
+        and "$bootstrapContext.PlanPath" in operator
+        and "$runtimeContext.PlanPath" in operator
+        and "Remove-JCareerProtectedSnapshotSet" in operator
+        and "plan.redacted.json" in operator
+        and "Protect-PlanJson ($planOutput" in operator,
+        "saved plans, redacted plan JSON, and approval context must stay read-locked and hash-bound through apply",
+    )
+    forbid(
+        re.search(r"(?m)&\s+(?:aws|docker|python|terraform|tar\.exe)\b", operator)
+        is not None,
+        "operator must not invoke a shadowable tool name directly",
     )
     forbid(
         re.search(r"(?i)\b(?:stop|terminate)-instances\b|terraform\s+destroy", operator)
