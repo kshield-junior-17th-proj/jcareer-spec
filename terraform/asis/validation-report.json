@@ -1,5 +1,5 @@
 {
-    "generated_at":  "2026-08-30T21:27:42+09:00",
+    "generated_at":  "2026-08-30T21:29:48+09:00",
     "scope":  "local static validation only; no AWS API or terraform apply",
     "passed":  25,
     "failed":  0,
@@ -112,7 +112,7 @@
                    {
                        "check":  "png_dimensions",
                        "status":  "PASS",
-                       "detail":  "2400x1400; rendered after drawio=True"
+                       "detail":  "2400x1400; PNG signature/IHDR=True; rendered after drawio=True"
                    },
                    {
                        "check":  "pdf_header",

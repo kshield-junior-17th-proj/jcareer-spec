@@ -406,14 +406,24 @@ $mlopsConnectedEdges = @($edges | Where-Object { $_.source -eq 'mlops_status' -o
 $drawioOkay = $drawioDuplicates.Count -eq 0 -and $badEdges.Count -eq 0 -and $mlopsCells.Count -eq 1 -and $mlopsConnectedEdges.Count -eq 0
 Add-Check 'drawio_xml' $drawioOkay "cells $($cells.Count), edges $($edges.Count), containers $($containers.Count), duplicate IDs $($drawioDuplicates.Count), bad edges $($badEdges.Count), isolated MLOps proposal cells $($mlopsCells.Count)"
 
-Add-Type -AssemblyName System.Drawing
 $pngPath = Join-Path $root 'JCAREER_ASIS_FLOW.drawio.png'
 $drawioPath = Join-Path $root 'JCAREER_ASIS_FLOW.drawio'
-$png = [System.Drawing.Image]::FromFile($pngPath)
+$pngBytes = [System.IO.File]::ReadAllBytes($pngPath)
+$pngSignature = [byte[]](137, 80, 78, 71, 13, 10, 26, 10)
+$pngSignatureOkay = $pngBytes.Length -ge 24
+for ($index = 0; $pngSignatureOkay -and $index -lt $pngSignature.Length; $index++) {
+    $pngSignatureOkay = $pngBytes[$index] -eq $pngSignature[$index]
+}
+$pngIhdrOkay = $pngSignatureOkay -and [System.Text.Encoding]::ASCII.GetString($pngBytes, 12, 4) -eq 'IHDR'
+$pngWidth = if ($pngIhdrOkay) {
+    [uint32]($pngBytes[16] * 16777216 + $pngBytes[17] * 65536 + $pngBytes[18] * 256 + $pngBytes[19])
+} else { 0 }
+$pngHeight = if ($pngIhdrOkay) {
+    [uint32]($pngBytes[20] * 16777216 + $pngBytes[21] * 65536 + $pngBytes[22] * 256 + $pngBytes[23])
+} else { 0 }
 $pngFresh = (Get-Item -LiteralPath $pngPath).LastWriteTimeUtc -ge (Get-Item -LiteralPath $drawioPath).LastWriteTimeUtc
-$pngOkay = $png.Width -eq 2400 -and $png.Height -eq 1400 -and $pngFresh
-$pngDetail = "$($png.Width)x$($png.Height); rendered after drawio=$pngFresh"
-$png.Dispose()
+$pngOkay = $pngIhdrOkay -and $pngWidth -eq 2400 -and $pngHeight -eq 1400 -and $pngFresh
+$pngDetail = "${pngWidth}x${pngHeight}; PNG signature/IHDR=$pngIhdrOkay; rendered after drawio=$pngFresh"
 Add-Check 'png_dimensions' $pngOkay $pngDetail
 
 $pdfBytes = [System.IO.File]::ReadAllBytes((Join-Path $root 'JCAREER_ASIS_SYSTEM_SPEC.pdf'))
