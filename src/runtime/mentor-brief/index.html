@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <meta
+      name="description"
+      content="J-Career 합성 AI 서비스의 점수, 설명, 데이터, 학습 경계를 중심으로 정리한 2026-08-28 CEO 브리프"
+    />
+    <title>J-Career · AI 서비스 CEO 브리프</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script type="module" src="./app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#brief-content">본문으로 건너뛰기</a>
+
+    <header class="masthead">
+      <div class="masthead__mark" aria-hidden="true">JC</div>
+      <div class="masthead__title">
+        <p class="eyebrow">J-Career / AI service fact desk</p>
+        <h1>AI 서비스 사실부터,<br />결정까지 한 장</h1>
+      </div>
+      <div class="source-stamp">
+        <span class="source-stamp__label">Primary note</span>
+        <strong>2026 · 08 · 28</strong>
+        <a id="source-link" href="#" target="_blank" rel="noreferrer">노션 원문 열기</a>
+      </div>
+    </header>
+
+    <div class="scope-ledger" aria-label="브리프 범위">
+      <p><span>점수</span> 결정론 70 · 20 · 10</p>
+      <p><span>설명</span> Bedrock은 점수 변경 불가</p>
+      <p><span>데이터</span> 회원DB · 기업DB 전송 경계 · allowlist 대기</p>
+      <p><span>학습</span> 이용자 데이터 기본 비활성</p>
+    </div>
+
+    <p id="load-state" class="load-state" role="status" aria-live="polite">
+      브리프 계약을 불러오는 중입니다.
+    </p>
+
+    <div class="brief-shell">
+      <aside class="decision-rail" aria-labelledby="rail-title">
+        <div class="decision-rail__heading">
+          <p class="eyebrow">Evidence spine</p>
+          <h2 id="rail-title">CEO 설명 순서</h2>
+        </div>
+        <ol id="masterplan" class="phase-list"></ol>
+        <div class="rail-boundary">
+          <span>자동 판정</span>
+          <strong>사용하지 않음</strong>
+          <p>관찰과 개선 후보를 보여주고, 승인·우선순위·책임자는 사람이 정합니다.</p>
+        </div>
+      </aside>
+
+      <main id="brief-content" class="brief-content" tabindex="-1">
+        <section class="brief-section" aria-labelledby="training-title">
+          <div class="section-heading">
+            <div>
+              <p class="section-code">AI SERVICE / 01</p>
+              <h2 id="training-title">점수, 설명, 데이터, 학습을 분리합니다</h2>
+            </div>
+            <p>결정론 matcher와 Bedrock 설명을 분리하고, 이용자 데이터 학습은 기본 비활성으로 둡니다.</p>
+          </div>
+          <div id="training-boundary" class="training-boundary"></div>
+        </section>
+
+        <section class="brief-section" aria-labelledby="asset-title">
+          <div class="section-heading">
+            <div>
+              <p class="section-code">SYSTEM / 02</p>
+              <h2 id="asset-title">AI 서비스를 둘러싼 정보처리·보호 자산</h2>
+            </div>
+            <p>기존 시나리오, source 모델, 멘토 요청 미확인 후보를 서로 다른 상태로 표시합니다.</p>
+          </div>
+          <div id="asset-register" class="asset-register"></div>
+        </section>
+
+        <section class="brief-section" aria-labelledby="scenario-title">
+          <div class="section-heading">
+            <div>
+              <p class="section-code">DEMO / 03</p>
+              <h2 id="scenario-title">CEO 시연 후보 8개</h2>
+            </div>
+            <p>관리·기술·물리 후보이며, 확정 취약점이나 위험 등급이 아닙니다.</p>
+          </div>
+          <div class="scenario-filter" role="group" aria-label="시연 후보 분류 필터">
+            <button type="button" class="filter-button is-active" data-scenario-filter="ALL" aria-pressed="true">전체</button>
+            <button type="button" class="filter-button" data-scenario-filter="MANAGEMENT" aria-pressed="false">관리</button>
+            <button type="button" class="filter-button" data-scenario-filter="TECHNICAL" aria-pressed="false">기술</button>
+            <button type="button" class="filter-button" data-scenario-filter="PHYSICAL" aria-pressed="false">물리</button>
+          </div>
+          <ol id="scenario-list" class="scenario-list"></ol>
+        </section>
+
+        <section class="brief-section brief-section--org" aria-labelledby="org-title">
+          <div class="section-heading">
+            <div>
+              <p class="section-code">CONTEXT / 04</p>
+              <h2 id="org-title">조직은 확정하지 않고 참고안으로 비교합니다</h2>
+            </div>
+            <p>조직이 바뀌어도 앞의 AI 서비스 사실 경계는 유지됩니다.</p>
+          </div>
+
+          <div class="view-switch" role="group" aria-label="조직 참고안 보기 선택">
+            <button type="button" class="view-switch__button" data-org-view="observed" aria-pressed="false">
+              화이트보드 관찰
+            </button>
+            <button type="button" class="view-switch__button is-active" data-org-view="proposed" aria-pressed="true">
+              멘토 제안
+            </button>
+          </div>
+          <div id="org-map" class="org-map" aria-live="polite"></div>
+        </section>
+
+        <section class="brief-section brief-section--checklist" aria-labelledby="checklist-title">
+          <div class="section-heading">
+            <div>
+              <p class="section-code">ISO / 05</p>
+              <h2 id="checklist-title">97개는 줄이지 않습니다</h2>
+            </div>
+          </div>
+          <div id="checklist-state" class="checklist-state"></div>
+        </section>
+      </main>
+    </div>
+
+    <footer class="page-footer">
+      <p>J-Career 합성 AS-IS · 실제 지원자·기업 데이터 없음 · 승인 상태 자동 생성 없음</p>
+      <p id="contract-version">contract loading</p>
+    </footer>
+  </body>
+</html>

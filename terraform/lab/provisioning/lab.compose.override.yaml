@@ -1,0 +1,20 @@
+services:
+  postgres:
+    mem_limit: 384m
+
+  redis:
+    mem_limit: 128m
+
+  agent:
+    mem_limit: 256m
+
+  llm-gateway:
+    mem_limit: 384m
+
+  api:
+    mem_limit: 512m
+
+  web:
+    mem_limit: 128m
+    volumes:
+      - ../../terraform/lab/provisioning/nginx.lab.conf:/etc/nginx/conf.d/default.conf:ro

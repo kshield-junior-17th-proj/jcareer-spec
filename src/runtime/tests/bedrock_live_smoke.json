@@ -1,0 +1,17 @@
+{
+  "modelId": "apac.amazon.nova-lite-v1:0",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "text": "You generate explanations for the synthetic J-Career recruiting demo. No real personal data is present. Using only the fact that Python and Docker match the job requirements, write one recommendation sentence in Korean."
+        }
+      ]
+    }
+  ],
+  "inferenceConfig": {
+    "maxTokens": 120,
+    "temperature": 0
+  }
+}

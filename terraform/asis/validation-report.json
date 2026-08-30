@@ -1,0 +1,133 @@
+{
+    "generated_at":  "2026-08-30T17:31:40+09:00",
+    "scope":  "local static validation only; no AWS API or terraform apply",
+    "passed":  25,
+    "failed":  0,
+    "checks":  [
+                   {
+                       "check":  "required_files",
+                       "status":  "PASS",
+                       "detail":  "all 6 deliverables present"
+                   },
+                   {
+                       "check":  "readme_current_deliverables",
+                       "status":  "PASS",
+                       "detail":  "current deliverables linked; legacy diagram marked"
+                   },
+                   {
+                       "check":  "plain_language_reader_guide",
+                       "status":  "PASS",
+                       "detail":  "spec guide Hangul 2782; flow guide Hangul 51; drawio Hangul 238; reader-first status labels checked"
+                   },
+                   {
+                       "check":  "render_temp_artifacts_absent",
+                       "status":  "PASS",
+                       "detail":  "0 browser profiles / intermediate renders"
+                   },
+                   {
+                       "check":  "required_scope_terms",
+                       "status":  "PASS",
+                       "detail":  "all 28 boundary terms in spec+index; architecture core 10"
+                   },
+                   {
+                       "check":  "prohibited_live_claims",
+                       "status":  "PASS",
+                       "detail":  "0 live / in-production claims"
+                   },
+                   {
+                       "check":  "excluded_ai_services",
+                       "status":  "PASS",
+                       "detail":  "no excluded AI service in Terraform"
+                   },
+                   {
+                       "check":  "terraform_file_count",
+                       "status":  "PASS",
+                       "detail":  "38 .tf files"
+                   },
+                   {
+                       "check":  "terraform_topology_blocks",
+                       "status":  "PASS",
+                       "detail":  "resource 73, module 6, data 6"
+                   },
+                   {
+                       "check":  "runtime_api_route_counts",
+                       "status":  "PASS",
+                       "detail":  "api 28, agent 6, gateway 4; runner declares 94 checks including MLOps"
+                   },
+                   {
+                       "check":  "runtime_screen_contract",
+                       "status":  "PASS",
+                       "detail":  "React routes 20 including redirect/wildcard; candidate and recruiter home documented"
+                   },
+                   {
+                       "check":  "terraform_state_absent",
+                       "status":  "PASS",
+                       "detail":  "0 state files"
+                   },
+                   {
+                       "check":  "html_local_links",
+                       "status":  "PASS",
+                       "detail":  "0 broken local links"
+                   },
+                   {
+                       "check":  "html_fragments",
+                       "status":  "PASS",
+                       "detail":  "0 broken HTML fragments"
+                   },
+                   {
+                       "check":  "html_duplicate_ids",
+                       "status":  "PASS",
+                       "detail":  "0 duplicate IDs"
+                   },
+                   {
+                       "check":  "html_list_semantics",
+                       "status":  "PASS",
+                       "detail":  "AS-IS limits ol 1/items 21; architecture flow ol 1/items 6"
+                   },
+                   {
+                       "check":  "html_ui_accessibility_contract",
+                       "status":  "PASS",
+                       "detail":  "canonical Open Graph metadata, skip links, focus, reduced motion, anchor offset, responsive image hints, zoom control, safe TOC selector"
+                   },
+                   {
+                       "check":  "mlops_first_page_summary",
+                       "status":  "PASS",
+                       "detail":  "top summary, plan stages 0/13/14, seven steps=7, AS-IS 110 separation, dedicated-page links"
+                   },
+                   {
+                       "check":  "interactive_service_flow",
+                       "status":  "PASS",
+                       "detail":  "controls 6, overlay layers 6, per-layer stages 3/3/3/3/3, markers 15; local/AWS data and MLOps separation, legend, URL state, detail links 6 checked"
+                   },
+                   {
+                       "check":  "flow_source_sync",
+                       "status":  "PASS",
+                       "detail":  "index+architecture match generator inputs; flow 9abba8054af8..."
+                   },
+                   {
+                       "check":  "drawio_xml",
+                       "status":  "PASS",
+                       "detail":  "cells 39, edges 8, containers 7, duplicate IDs 0, bad edges 0, isolated MLOps proposal cells 1"
+                   },
+                   {
+                       "check":  "png_dimensions",
+                       "status":  "PASS",
+                       "detail":  "2400x1400; rendered after drawio=True"
+                   },
+                   {
+                       "check":  "pdf_header",
+                       "status":  "PASS",
+                       "detail":  "%PDF-1.4"
+                   },
+                   {
+                       "check":  "pdf_page_objects",
+                       "status":  "PASS",
+                       "detail":  "46 page objects; rendered after sources=True; HTML source bound=True"
+                   },
+                   {
+                       "check":  "deliverable_secret_patterns",
+                       "status":  "PASS",
+                       "detail":  "0 patterns across 6 UTF-8 sources + 2 binary sentinels"
+                   }
+               ]
+}

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="J-Career AWS 검증 환경의 구성, 접속 방식, 데이터 기준과 AI 권한 통제를 설명합니다.">
+  <meta name="theme-color" content="#ffffff">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ko_KR">
+  <meta property="og:title" content="J-Career AWS 검증 환경">
+  <meta property="og:description" content="공개 포트 없이 관리하는 합성 데이터 기반 AWS 검증 환경을 설명합니다.">
+  <meta property="og:url" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/lab/">
+  <meta property="og:image" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/JCAREER_ASIS_FLOW.drawio.png">
+  <meta property="og:image:alt" content="J-Career AWS 기준 설계의 전체 흐름도">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image:alt" content="J-Career AWS 기준 설계의 전체 흐름도">
+  <link rel="canonical" href="https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/lab/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2318212b'/%3E%3Cpath d='M18 13h11v25c0 10-5 14-16 13v-9c4 0 5-1 5-5V13zm17 0h17v9h-7v29H35V13z' fill='%23ff7a1a'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <title>J-Career AWS 검증 환경</title>
+</head>
+<body>
+  <a class="skip-link" href="#content">본문으로 건너뛰기</a>
+  <header class="site-header">
+    <nav class="nav" aria-label="주요 메뉴">
+      <a class="brand" href="../../">J-Career 아키텍처</a>
+      <div class="nav-links">
+        <a href="../asis/">AWS 아키텍처</a>
+        <a href="../../mlops/">MLOps</a>
+        <a href="./" aria-current="page">AWS 검증 환경</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="content">
+    <section class="hero">
+      <div class="shell">
+        <p class="eyebrow">AWS 검증 환경 · 통제된 접속</p>
+        <h1>AWS 검증 환경</h1>
+        <p class="hero-copy">공개 포트를 열지 않고 AWS Systems Manager로 관리하는 단기 검증 환경입니다. 서비스 기능과 MLOps 흐름을 합성 데이터로 확인할 수 있도록 Terraform으로 구성했습니다.</p>
+        <div class="hero-actions">
+          <a class="button" href="https://github.com/kshield-junior-17th-proj/jcareer-spec/blob/main/terraform/lab/README.md">환경 구성 보기</a>
+          <a class="button button--line" href="../../mlops/">MLOps 검증 흐름</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="shell">
+      <section class="fact-strip" aria-label="AWS 검증 환경 핵심 구성">
+        <div class="fact"><strong>13개</strong><span>Terraform 기본 계획 항목</span></div>
+        <div class="fact"><strong>0개</strong><span>외부 인바운드 규칙</span></div>
+        <div class="fact"><strong>SSM</strong><span>관리 접속 경로</span></div>
+        <div class="fact"><strong>합성 데이터</strong><span>검증 데이터 범위</span></div>
+      </section>
+    </div>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div><p class="section-label">환경 운영 기준</p><h2>접속·데이터·AI 권한을<br>분리합니다</h2></div>
+          <p class="section-intro">환경을 만들기 전에 사용 권한, 예상 비용과 유지 기간을 확인합니다. 실행 결과는 별도의 검증 기록으로 남겨 설계와 배포 상태를 구분해 관리합니다.</p>
+        </div>
+        <div class="spec-grid">
+          <article class="spec-block"><h3>관리 접속</h3><p>SSH·RDP 인바운드 대신 Session Manager를 사용합니다. 사용자별 권한과 접속 기록은 조직의 접근통제 절차에 따라 관리합니다.</p></article>
+          <article class="spec-block"><h3>검증 데이터</h3><p>회원·기업 시나리오는 합성 데이터로 확인합니다. 고객 정보와 운영 비밀은 이 환경에 반입하지 않는 것이 기본 원칙입니다.</p></article>
+          <article class="spec-block"><h3>AI 권한</h3><p>Amazon Bedrock 관련 권한은 기본값에서 잠겨 있습니다. 승인된 검증 항목과 기간이 정해진 경우에만 별도로 활성화합니다.</p></article>
+          <article class="spec-block"><h3>MLOps 연계</h3><p>서비스 검증 자료를 비교 수치 파일로 변환한 뒤, 별도 Terraform 루트의 모델 검증 흐름으로 전달합니다.</p></article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="shell footer-inner">
+      <span>J-Career AWS 검증 환경</span>
+      <span>통제된 접속 · 합성 데이터 · 검증 기록</span>
+    </div>
+  </footer>
+</body>
+</html>

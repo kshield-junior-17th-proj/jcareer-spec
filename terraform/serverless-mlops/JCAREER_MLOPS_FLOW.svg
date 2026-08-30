@@ -1,0 +1,154 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1400" viewBox="0 0 2400 1400" role="img" aria-labelledby="title desc">
+  <title id="title">J-Career 합성 MLOps 7단계 흐름</title>
+  <desc id="desc">합성 자료를 숫자 비교값으로 바꾸고, 확인 문자열을 넣은 수동 호출로 시험 모델을 만든 뒤 사람 검토 대기에서 끝나는 흐름</desc>
+  <defs>
+    <style>
+      text { font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; fill: #18212b; }
+      .title { font-size: 42px; font-weight: 800; letter-spacing: -1.8px; }
+      .subtitle { font-size: 21px; fill: #5a6672; }
+      .boundary-title { font-size: 20px; font-weight: 800; }
+      .step-no { font-size: 22px; font-weight: 900; fill: #9f4300; }
+      .step-title { font-size: 20px; font-weight: 800; }
+      .step-copy { font-size: 16px; fill: #5a6672; }
+      .service { font-size: 14px; fill: #5a6672; }
+      .support-title { font-size: 18px; font-weight: 800; }
+      .support-copy { font-size: 14px; fill: #5a6672; }
+      .status-title { font-size: 18px; font-weight: 800; }
+      .status-copy { font-size: 16px; }
+      .warning { font-size: 20px; font-weight: 800; fill: #fff; }
+      .warning-copy { font-size: 18px; fill: #dce2e8; }
+      .flow { fill: none; stroke: #8996a3; stroke-width: 4; marker-end: url(#arrow); }
+      .flow-hot { fill: none; stroke: #d85e00; stroke-width: 4; marker-end: url(#arrow-hot); }
+      .assist { fill: none; stroke: #8996a3; stroke-width: 2.5; stroke-dasharray: 9 8; marker-end: url(#arrow); }
+      .fail { fill: none; stroke: #a62a1f; stroke-width: 3; stroke-dasharray: 9 8; marker-end: url(#arrow-red); }
+    </style>
+    <marker id="arrow" markerWidth="14" markerHeight="14" refX="12" refY="7" orient="auto" markerUnits="strokeWidth"><path d="M0 0L14 7L0 14Z" fill="#8996a3"/></marker>
+    <marker id="arrow-hot" markerWidth="14" markerHeight="14" refX="12" refY="7" orient="auto" markerUnits="strokeWidth"><path d="M0 0L14 7L0 14Z" fill="#d85e00"/></marker>
+    <marker id="arrow-red" markerWidth="14" markerHeight="14" refX="12" refY="7" orient="auto" markerUnits="strokeWidth"><path d="M0 0L14 7L0 14Z" fill="#a62a1f"/></marker>
+  </defs>
+
+  <rect width="2400" height="1400" fill="#f5f6f8"/>
+  <text class="title" x="54" y="69">시험용 자료로 시험 모델을 만드는 흐름</text>
+  <text class="subtitle" x="55" y="105">확인 문자열을 넣고 한 번 실행하는 설계 · 실제 실행을 확인한 자료가 아님</text>
+
+  <g transform="translate(1510 30)">
+    <rect width="360" height="82" rx="8" fill="#fff2e8" stroke="#d85e00" stroke-width="2"/>
+    <text class="status-title" x="22" y="33">기본 설정: 잠금</text>
+    <text class="status-copy" x="22" y="61">계획상 생성 0개</text>
+  </g>
+  <g transform="translate(1890 30)">
+    <rect width="460" height="82" rx="8" fill="#fff1ef" stroke="#a62a1f" stroke-width="2"/>
+    <text class="status-title" x="22" y="33" fill="#7e241c">실제 AWS 배포·실행</text>
+    <text class="status-copy" x="22" y="61" fill="#7e241c">확인하지 않음</text>
+  </g>
+
+  <rect x="50" y="160" width="620" height="600" rx="10" fill="#fff" stroke="#8996a3" stroke-width="2" stroke-dasharray="10 8"/>
+  <text class="boundary-title" x="76" y="202">별도 합성 실습 환경</text>
+  <text class="step-copy" x="298" y="202">원문은 이 영역 안에서 숫자 비교값으로 바꿉니다</text>
+
+  <rect x="700" y="160" width="1650" height="600" rx="10" fill="#fff" stroke="#d85e00" stroke-width="2" stroke-dasharray="10 8"/>
+  <text class="boundary-title" x="726" y="202" fill="#9f4300">확인 뒤 사용할 수 있는 1회 시연 영역</text>
+  <text class="step-copy" x="1126" y="202">기본값은 잠금</text>
+
+  <g transform="translate(86 350)">
+    <rect width="250" height="190" rx="8" fill="#fff" stroke="#8996a3" stroke-width="2"/>
+    <text class="step-no" x="125" y="42" text-anchor="middle">①</text>
+    <text class="step-title" x="125" y="83" text-anchor="middle">합성 자료 읽기</text>
+    <text class="step-copy" x="125" y="120" text-anchor="middle">합성 회원·기업 자료</text>
+    <path d="M87 148h76v18H87zM100 137h50v11h-50z" fill="#667382"/>
+  </g>
+  <g transform="translate(386 350)">
+    <rect width="250" height="190" rx="8" fill="#fff8f2" stroke="#d85e00" stroke-width="2"/>
+    <text class="step-no" x="125" y="42" text-anchor="middle">②</text>
+    <text class="step-title" x="125" y="82" text-anchor="middle">숫자 비교값 5개 만들기</text>
+    <text class="step-copy" x="125" y="117" text-anchor="middle">기술·경력·직무</text>
+    <text class="step-copy" x="125" y="145" text-anchor="middle">두 가지 단어 겹침</text>
+  </g>
+  <g transform="translate(745 330)">
+    <rect width="220" height="230" rx="8" fill="#fff" stroke="#8996a3" stroke-width="2"/>
+    <text class="step-no" x="110" y="37" text-anchor="middle">③</text>
+    <image href="../../assets/aws/amazon-s3.svg" x="70" y="55" width="80" height="80"/>
+    <text class="step-title" x="110" y="165" text-anchor="middle">입력 파일 3개 보관</text>
+    <text class="step-copy" x="110" y="194" text-anchor="middle">숫자 자료·목록·확인서</text>
+    <text class="service" x="110" y="218" text-anchor="middle">Amazon S3</text>
+  </g>
+  <g transform="translate(1020 320)">
+    <path d="M120 0L240 125L120 250L0 125Z" fill="#fff2e8" stroke="#d85e00" stroke-width="2"/>
+    <text class="step-no" x="120" y="72" text-anchor="middle">④</text>
+    <text class="step-title" x="120" y="112" text-anchor="middle">사람이 한 번 시작</text>
+    <text class="step-copy" x="120" y="145" text-anchor="middle">자동 일정 없음</text>
+    <text class="step-copy" x="120" y="173" text-anchor="middle">공개 주소 없음</text>
+  </g>
+  <g transform="translate(1310 330)">
+    <rect width="240" height="230" rx="8" fill="#fff" stroke="#d85e00" stroke-width="2"/>
+    <text class="step-no" x="120" y="37" text-anchor="middle">⑤</text>
+    <image href="../../assets/aws/aws-lambda.svg" x="78" y="52" width="84" height="84"/>
+    <text class="step-title" x="120" y="165" text-anchor="middle">시험 모델 만들기</text>
+    <text class="step-copy" x="120" y="194" text-anchor="middle">세 파일·해시 확인</text>
+    <text class="service" x="120" y="218" text-anchor="middle">AWS Lambda</text>
+  </g>
+  <g transform="translate(1600 286)">
+    <rect width="370" height="320" rx="8" fill="#fff" stroke="#8996a3" stroke-width="2"/>
+    <text class="step-no" x="185" y="41" text-anchor="middle">⑥</text>
+    <text class="step-title" x="185" y="76" text-anchor="middle">결과 6개와 상태 저장</text>
+    <image href="../../assets/aws/amazon-s3.svg" x="65" y="105" width="76" height="76"/>
+    <image href="../../assets/aws/amazon-dynamodb.svg" x="229" y="105" width="76" height="76"/>
+    <text class="step-copy" x="103" y="213" text-anchor="middle">결과 파일</text>
+    <text class="step-copy" x="267" y="213" text-anchor="middle">실행 상태</text>
+    <text class="service" x="103" y="239" text-anchor="middle">Amazon S3</text>
+    <text class="service" x="267" y="239" text-anchor="middle">Amazon DynamoDB</text>
+    <text class="service" x="103" y="286" text-anchor="middle">3번과 같은 S3 보관함</text>
+  </g>
+  <g transform="translate(2020 350)">
+    <rect width="280" height="190" rx="8" fill="#fff2e8" stroke="#d85e00" stroke-width="3"/>
+    <text class="step-no" x="140" y="46" text-anchor="middle">⑦</text>
+    <text class="step-title" x="140" y="93" text-anchor="middle">사람 검토 대기</text>
+    <text class="step-copy" x="140" y="134" text-anchor="middle">여기서 멈춤</text>
+  </g>
+
+  <path class="flow" d="M336 445H386"/>
+  <path class="flow" d="M636 445H745"/>
+  <path class="flow" d="M965 445H1020"/>
+  <path class="flow-hot" d="M1260 445H1310"/>
+  <path class="flow" d="M1550 445H1600"/>
+  <path class="flow-hot" d="M1970 445H2020"/>
+
+  <g transform="translate(1165 642)">
+    <rect width="610" height="72" rx="6" fill="#fff1ef" stroke="#a62a1f" stroke-width="2" stroke-dasharray="8 7"/>
+    <text x="305" y="31" text-anchor="middle" font-size="16" font-weight="800" fill="#7e241c">확인 실패 → 가능한 경우 실패 상태 기록</text>
+    <text x="305" y="55" text-anchor="middle" font-size="15" fill="#7e241c">학습 결과를 성공 처리하지 않고 안전 중단</text>
+  </g>
+  <path class="fail" d="M1430 560V610H1470V642"/>
+
+  <g transform="translate(95 615)">
+    <rect width="530" height="82" rx="6" fill="#f4f6f8" stroke="#d8dee6"/>
+    <text class="step-copy" x="265" y="34" text-anchor="middle">이름·연락처·자소서 원문은</text>
+    <text class="step-copy" x="265" y="61" text-anchor="middle">입력·결과 파일에 보관하지 않음</text>
+  </g>
+
+  <rect x="350" y="820" width="1700" height="300" rx="10" fill="#fff" stroke="#8996a3" stroke-width="2"/>
+  <text class="boundary-title" x="380" y="861">같은 AWS 시연의 지원 구성</text>
+  <text class="step-copy" x="700" y="861">주 흐름이 아님</text>
+  <g transform="translate(570 905)">
+    <image href="../../assets/aws/amazon-ecr.svg" x="70" y="0" width="86" height="86"/>
+    <text class="support-title" x="113" y="121" text-anchor="middle">실행 이미지 보관</text>
+    <text class="support-copy" x="113" y="149" text-anchor="middle">Amazon ECR</text>
+  </g>
+  <g transform="translate(1030 905)">
+    <image href="../../assets/aws/aws-iam.svg" x="70" y="0" width="86" height="86"/>
+    <text class="support-title" x="113" y="121" text-anchor="middle">경로별 접근 범위</text>
+    <text class="support-copy" x="113" y="149" text-anchor="middle">AWS IAM</text>
+  </g>
+  <g transform="translate(1490 905)">
+    <image href="../../assets/aws/amazon-cloudwatch.svg" x="70" y="0" width="86" height="86"/>
+    <text class="support-title" x="113" y="121" text-anchor="middle">실행 기록 보관</text>
+    <text class="support-copy" x="113" y="149" text-anchor="middle">Amazon CloudWatch Logs</text>
+  </g>
+  <path class="assist" d="M683 905V790H1340V560"/>
+  <path class="assist" d="M1143 905V800H1430V560"/>
+  <path class="assist" d="M1490 560V780H1603V905"/>
+
+  <rect x="140" y="1210" width="2120" height="120" rx="8" fill="#18212b"/>
+  <text class="warning" x="1200" y="1255" text-anchor="middle">운영 서비스 아님 · 예약·반복 학습 없음 · 자동 배포·추천 반영 없음</text>
+  <text class="warning-copy" x="1200" y="1294" text-anchor="middle">단어 겹침은 의미 이해가 아니며, 지원 단계 표식은 합격 가능성·지원자 품질 예측이 아님</text>
+</svg>

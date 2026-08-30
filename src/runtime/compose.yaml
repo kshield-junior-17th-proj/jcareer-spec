@@ -1,0 +1,119 @@
+name: jcareer-asis-runtime
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: jcareer_admin
+      POSTGRES_PASSWORD: synthetic-local-admin-password
+    volumes:
+      - postgres-split-data:/var/lib/postgresql/data
+      - ./db-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "psql -U jcareer_member_app -d jcareer_member -tAc 'SELECT 1' && psql -U jcareer_company_app -d jcareer_company -tAc 'SELECT 1'"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  agent:
+    build: ./agent
+    environment:
+      LOG_LEVEL: INFO
+      MATCHER_VERSION: deterministic-0.2.0
+      SCORING_FORMULA_VERSION: deterministic-70-20-10-v1
+      SCORE_BREAKDOWN_SCHEMA_VERSION: score-breakdown-v1
+      SKILL_MAX_POINTS: "70"
+      EXPERIENCE_MAX_POINTS: "20"
+      ROLE_MAX_POINTS: "10"
+    ports:
+      - "127.0.0.1:8100:8100"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8100/health', timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  llm-gateway:
+    build: ./llm_gateway
+    environment:
+      LLM_PROVIDER: ${LLM_PROVIDER:-local-synthetic-stub}
+      ALLOW_BEDROCK_LIVE: ${ALLOW_BEDROCK_LIVE:-false}
+      BEDROCK_REGION: ${BEDROCK_REGION:-ap-northeast-2}
+      BEDROCK_MODEL_ID: ${BEDROCK_MODEL_ID:-apac.amazon.nova-lite-v1:0}
+      EXPLANATION_CONTRACT_VERSION: score-explanation-v1
+      LLM_STUB_MODE: ${LLM_STUB_MODE:-success}
+      LLM_STUB_TIMEOUT_SECONDS: ${LLM_STUB_TIMEOUT_SECONDS:-3}
+      ASIS_RAW_PROMPT_LOG: ${ASIS_RAW_PROMPT_LOG:-true}
+      ENABLE_FAILURE_INJECTION: "true"
+      PROMPT_LOG_PATH: /data/prompt-log.jsonl
+    volumes:
+      - prompt-logs:/data
+    ports:
+      - "127.0.0.1:8200:8200"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8200/health', timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  api:
+    build: ./api
+    environment:
+      MEMBER_DATABASE_URL: postgresql+psycopg://jcareer_member_app:synthetic-member-db-password@postgres:5432/jcareer_member
+      COMPANY_DATABASE_URL: postgresql+psycopg://jcareer_company_app:synthetic-company-db-password@postgres:5432/jcareer_company
+      REDIS_URL: redis://redis:6379/0
+      AGENT_BASE_URL: http://agent:8100
+      LLM_GATEWAY_BASE_URL: http://llm-gateway:8200
+      LLM_GATEWAY_TIMEOUT_SECONDS: "15"
+      LLM_PROVIDER: ${LLM_PROVIDER:-local-synthetic-stub}
+      BEDROCK_REGION: ${BEDROCK_REGION:-ap-northeast-2}
+      BEDROCK_MODEL_ID: ${BEDROCK_MODEL_ID:-apac.amazon.nova-lite-v1:0}
+      SESSION_SIGNING_KEY: ${SESSION_SIGNING_KEY:-synthetic-local-session-key-change-me}
+      SESSION_TTL_SECONDS: 43200
+      AUTO_SEED: "true"
+      DATASET_PROFILE: demo_not_for_measurement
+      OPENDART_DISPATCH_MODE: ${OPENDART_DISPATCH_MODE:-fixture_inline}
+      OPENDART_REFRESH_QUEUE_URL: ${OPENDART_REFRESH_QUEUE_URL:-}
+      ENABLE_FAILURE_INJECTION: "true"
+      CORS_ORIGINS: http://localhost:3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+
+  web:
+    build: ./web
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "${WEB_BIND_ADDRESS:-127.0.0.1}:3000:3000"
+    restart: unless-stopped
+
+volumes:
+  postgres-split-data:
+  redis-data:
+  prompt-logs:

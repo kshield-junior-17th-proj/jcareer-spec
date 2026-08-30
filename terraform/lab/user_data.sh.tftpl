@@ -1,0 +1,68 @@
+#!/bin/bash
+set -Eeuo pipefail
+
+fail_safe_stop() {
+  set +e
+  systemctl start --no-block jcareer-lab-auto-stop.service || /sbin/shutdown -h now
+}
+trap fail_safe_stop ERR
+
+cat >/etc/systemd/system/jcareer-lab-auto-stop.service <<'UNIT'
+[Unit]
+Description=Stop the short-lived J-Career lab instance
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/shutdown -h now
+UNIT
+
+cat >/etc/systemd/system/jcareer-lab-auto-stop.timer <<'UNIT'
+[Unit]
+Description=Auto-stop timer for the J-Career lab
+
+[Timer]
+OnBootSec=${auto_stop_minutes}min
+Unit=jcareer-lab-auto-stop.service
+
+[Install]
+WantedBy=timers.target
+UNIT
+
+systemctl daemon-reload
+systemctl enable --now jcareer-lab-auto-stop.timer
+
+# Install the cost fail-safe before any package or network operation. AL2023 ships curl-minimal;
+# installing the full curl package would conflict with that base package.
+dnf install -y docker tar gzip openssl python3
+systemctl enable --now docker
+systemctl enable --now amazon-ssm-agent
+
+fallocate -l 2G /var/lib/jcareer-lab.swap
+chmod 0600 /var/lib/jcareer-lab.swap
+mkswap /var/lib/jcareer-lab.swap
+swapon /var/lib/jcareer-lab.swap
+echo '/var/lib/jcareer-lab.swap none swap sw 0 0' >> /etc/fstab
+
+compose_version="v5.4.0"
+compose_sha256="837fd1d35bf6a494f41b5b5988269a7be79de337cf1a1a6ff0e45ab51bb4e9be"
+compose_path="/usr/local/lib/docker/cli-plugins/docker-compose"
+buildx_version="v0.36.1"
+buildx_sha256="48af8a397ebd60178778bf63611dbcebe5f5e7a9be90eb9147b24b9587455778"
+buildx_path="/usr/local/lib/docker/cli-plugins/docker-buildx"
+mkdir -p "$(dirname "$compose_path")"
+curl --fail --silent --show-error --location \
+  "https://github.com/docker/compose/releases/download/$compose_version/docker-compose-linux-x86_64" \
+  --output "$compose_path"
+echo "$compose_sha256  $compose_path" | sha256sum --check --strict
+chmod 0755 "$compose_path"
+curl --fail --silent --show-error --location \
+  "https://github.com/docker/buildx/releases/download/$buildx_version/buildx-$buildx_version.linux-amd64" \
+  --output "$buildx_path"
+echo "$buildx_sha256  $buildx_path" | sha256sum --check --strict
+chmod 0755 "$buildx_path"
+docker compose version
+docker buildx version | grep -F "$${buildx_version#v}"
+
+mkdir -p /var/lib/jcareer-lab
+touch /var/lib/jcareer-lab/bootstrap-ready
+trap - ERR

@@ -1,0 +1,61 @@
+schema_version: jcareer-application-artifacts-v1
+synthetic_only: true
+terraform_layer: asis-model-only
+
+artifacts:
+  - service_id: web
+    source_dir: src/runtime/web
+    dockerfile_path: src/runtime/web/Dockerfile
+    terraform_model_ref: terraform/asis/compute/locals.tf::default_container_images.web
+    build_status: UNBUILT
+    publish_status: UNPUBLISHED
+    intended_source_revision: null
+    build_context_sha256: null
+    image_digest: null
+    published_image_ref: null
+    base_image_source_ref: null
+    image_approval_ref: null
+    build_evidence_ref: null
+    publish_evidence_ref: null
+  - service_id: api
+    source_dir: src/runtime/api
+    dockerfile_path: src/runtime/api/Dockerfile
+    terraform_model_ref: terraform/asis/compute/locals.tf::default_container_images.api
+    build_status: UNBUILT
+    publish_status: UNPUBLISHED
+    intended_source_revision: null
+    build_context_sha256: null
+    image_digest: null
+    published_image_ref: null
+    base_image_source_ref: null
+    image_approval_ref: null
+    build_evidence_ref: null
+    publish_evidence_ref: null
+  - service_id: agent
+    source_dir: src/runtime/agent
+    dockerfile_path: src/runtime/agent/Dockerfile
+    terraform_model_ref: terraform/asis/compute/locals.tf::default_container_images.agent
+    build_status: UNBUILT
+    publish_status: UNPUBLISHED
+    intended_source_revision: null
+    build_context_sha256: null
+    image_digest: null
+    published_image_ref: null
+    base_image_source_ref: null
+    image_approval_ref: null
+    build_evidence_ref: null
+    publish_evidence_ref: null
+  - service_id: llm-gateway
+    source_dir: src/runtime/llm_gateway
+    dockerfile_path: src/runtime/llm_gateway/Dockerfile
+    terraform_model_ref: terraform/asis/compute/locals.tf::default_container_images.llm-gateway
+    build_status: UNBUILT
+    publish_status: UNPUBLISHED
+    intended_source_revision: null
+    build_context_sha256: null
+    image_digest: null
+    published_image_ref: null
+    base_image_source_ref: null
+    image_approval_ref: null
+    build_evidence_ref: null
+    publish_evidence_ref: null

@@ -1,0 +1,467 @@
+﻿[CmdletBinding()]
+param()
+
+$ErrorActionPreference = 'Stop'
+$root = Split-Path -Parent $MyInvocation.MyCommand.Path
+$results = [System.Collections.Generic.List[object]]::new()
+
+function Add-Check {
+    param(
+        [Parameter(Mandatory)] [string] $Name,
+        [Parameter(Mandatory)] [bool] $Passed,
+        [Parameter(Mandatory)] [string] $Detail
+    )
+
+    $results.Add([pscustomobject]@{
+        check  = $Name
+        status = if ($Passed) { 'PASS' } else { 'FAIL' }
+        detail = $Detail
+    })
+}
+
+$required = @(
+    'JCAREER_ASIS_SYSTEM_SPEC.md',
+    'index.html',
+    'architecture.html',
+    'JCAREER_ASIS_SYSTEM_SPEC.pdf',
+    'JCAREER_ASIS_FLOW.drawio',
+    'JCAREER_ASIS_FLOW.drawio.png'
+)
+$missing = @($required | Where-Object { -not (Test-Path -LiteralPath (Join-Path $root $_) -PathType Leaf) })
+Add-Check 'required_files' ($missing.Count -eq 0) $(if ($missing.Count) { $missing -join ', ' } else { "all $($required.Count) deliverables present" })
+
+$spec = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'JCAREER_ASIS_SYSTEM_SPEC.md')
+$index = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'index.html')
+$architecture = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'architecture.html')
+$publishedText = $spec + "`n" + $index + "`n" + $architecture
+
+$readme = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'README.md')
+$readmeOkay = $readme.Contains('index.html') -and
+    $readme.Contains('architecture.html') -and
+    $readme.Contains('validation-report.json') -and
+    $readme.Contains('JCAREER_ASIS_SYSTEM_SPEC.pdf') -and
+    $readme.Contains('JCAREER_ASIS_FLOW.drawio') -and
+    $readme.Contains('JCAREER_ASIS_2AZ.md') -and
+    $readme.Contains('JCAREER_ASIS_2AZ.drawio') -and
+    $readme.Contains('legacy')
+Add-Check 'readme_current_deliverables' $readmeOkay $(if ($readmeOkay) { 'current deliverables linked; legacy diagram marked' } else { 'README routing is incomplete' })
+
+$flowGuide = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'JCAREER_ASIS_FLOW.md')
+$drawioText = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'JCAREER_ASIS_FLOW.drawio')
+$specGuideRegion = [regex]::Match($spec, '(?s)## 0\..*?## 1\.').Value
+$flowGuideRegion = [regex]::Match($flowGuide, '(?s)## 0\..*?## 1\.').Value
+$specGuideHangul = [regex]::Matches($specGuideRegion, '[\uAC00-\uD7A3]').Count
+$flowGuideHangul = [regex]::Matches($flowGuideRegion, '[\uAC00-\uD7A3]').Count
+$drawioHangul = [regex]::Matches($drawioText, '[\uAC00-\uD7A3]').Count
+$plainLanguageOkay = $spec.Contains('### 0.1 ') -and
+    $spec.Contains('### 0.2 ') -and
+    $spec.Contains('### 0.4 ') -and
+    $specGuideHangul -ge 900 -and
+    $flowGuide.Contains('## 0.') -and
+    $flowGuideHangul -ge 40 -and
+    $drawioText.Contains('v3.8') -and
+    $drawioHangul -ge 180 -and
+    -not $drawioText.Contains('web · api') -and
+    -not $drawioText.Contains('2개 AZ') -and
+    -not $drawioText.Contains('Terraform 생성 예정') -and
+    $index.Contains('id="executive-title"') -and
+    $index.Contains('data-status="MODELLED"')
+Add-Check 'plain_language_reader_guide' $plainLanguageOkay "spec guide Hangul $specGuideHangul; flow guide Hangul $flowGuideHangul; drawio Hangul $drawioHangul; reader-first status labels checked"
+
+$renderTemps = @(Get-ChildItem -LiteralPath $root -Force | Where-Object {
+    ($_.PSIsContainer -and $_.Name -match '^\.edge-(?:diagram|pdf)-profile') -or
+    (-not $_.PSIsContainer -and (
+        $_.Name -in @('.diagram-overlay.html', '.drawio-render.html', 'JCAREER_ASIS_FLOW.base.png', 'JCAREER_ASIS_FLOW.review.png') -or
+        $_.Name -match '^JCAREER_ASIS_FLOW\.v\d+.*\.png$' -or
+        $_.Name -match '^JCAREER_ASIS_SYSTEM_SPEC\.(?:final|next\d*|v\d+)\.pdf$'
+    ))
+})
+Add-Check 'render_temp_artifacts_absent' ($renderTemps.Count -eq 0) $(if ($renderTemps.Count) { ($renderTemps.Name -join ', ') } else { '0 browser profiles / intermediate renders' })
+
+$requiredTerms = @(
+    'Windows 100', 'macOS 80', 'managed create 110',
+    'mock provider', 'PLANNED_UNIMPLEMENTED', '0 resources', 'fail-closed',
+    'approved snapshot ingestion', 'redacted snapshot', 'per-user auth',
+    'tenant isolation', 'audit logs', 'client AWS', 'ISO XLSX',
+    'LOCAL_SYNTHETIC_IMPLEMENTED', 'IMPLEMENTED_GUARDED_NOT_ACTIVE',
+    'BRANCH_PROTOTYPE_UNDEPLOYED', 'REPO_REPORTED_PREVIEW_DEPLOYED',
+    'PEER_OBSERVED_PREVIEW_AVAILABLE', 'REQ-PC-01', 'DELETE_COMPLETE',
+    'deterministic-70-20-10-v1',
+    'score_effect=NONE', 'gateway source/container hash',
+    'EXPERIMENT_UNWIRED_NOT_APPROVED', 'runtime_wired=false',
+    'TRAINED_SYNTHETIC_NOT_APPROVED', 'MEASURED_SYNTHETIC_NOT_ASSESSED'
+)
+$missingTerms = @($requiredTerms | Where-Object { -not $spec.Contains($_) -or -not $index.Contains($_) })
+$architectureTerms = @(
+    'Windows 100', 'macOS 80', '2-AZ', '계획 110개',
+    'MLOps 학습·평가', 'AWS 비접속', '고객사 AWS에 직접 연결하지 않는다',
+    '승인된 비식별본', '승인 전 리소스 0개', '제안 단계 신규 서비스'
+)
+$missingArchitectureTerms = @($architectureTerms | Where-Object { -not $architecture.Contains($_) })
+$scopeTermsOkay = $missingTerms.Count -eq 0 -and $missingArchitectureTerms.Count -eq 0
+$scopeTermDetail = if ($scopeTermsOkay) {
+    "all $($requiredTerms.Count) boundary terms in spec+index; architecture core $($architectureTerms.Count)"
+} else {
+    "spec/index: $($missingTerms -join ', '); architecture: $($missingArchitectureTerms -join ', ')"
+}
+Add-Check 'required_scope_terms' $scopeTermsOkay $scopeTermDetail
+
+$prohibitedClaims = [ordered]@{
+    live_word             = '(?i)(?<!aria-)\blive\b'
+    production_in_service = '(?i)(?:AWS|service|system)\s*(?:is\s*)?(?:live|in production)'
+}
+$claimHits = [System.Collections.Generic.List[string]]::new()
+foreach ($entry in $prohibitedClaims.GetEnumerator()) {
+    if ($publishedText -match $entry.Value) { $claimHits.Add($entry.Key) }
+}
+Add-Check 'prohibited_live_claims' ($claimHits.Count -eq 0) $(if ($claimHits.Count) { $claimHits -join ', ' } else { '0 live / in-production claims' })
+
+$tfFiles = @(Get-ChildItem -LiteralPath $root -Filter '*.tf' -File -Recurse)
+$tfText = ($tfFiles | ForEach-Object { Get-Content -Raw -Encoding UTF8 $_.FullName }) -join "`n"
+$excludedInTerraform = @('TRACE', 'JC-RECEIPT') | Where-Object { $tfText -match [regex]::Escape($_) }
+Add-Check 'excluded_ai_services' ($excludedInTerraform.Count -eq 0) $(if ($excludedInTerraform.Count) { $excludedInTerraform -join ', ' } else { 'no excluded AI service in Terraform' })
+Add-Check 'terraform_file_count' ($tfFiles.Count -eq 38) "$($tfFiles.Count) .tf files"
+$resourceBlocks = [regex]::Matches($tfText, '(?m)^\s*resource\s+"[^"\r\n]+"\s+"[^"\r\n]+"\s*\{').Count
+$moduleBlocks = [regex]::Matches($tfText, '(?m)^\s*module\s+"[^"\r\n]+"\s*\{').Count
+$dataBlocks = [regex]::Matches($tfText, '(?m)^\s*data\s+"[^"\r\n]+"\s+"[^"\r\n]+"\s*\{').Count
+$topologyOkay = $resourceBlocks -eq 73 -and $moduleBlocks -eq 6 -and $dataBlocks -eq 6
+Add-Check 'terraform_topology_blocks' $topologyOkay "resource $resourceBlocks, module $moduleBlocks, data $dataBlocks"
+
+$repositoryRuntimeRoot = [System.IO.Path]::GetFullPath((Join-Path $root '../../src/runtime'))
+$legacySiblingRuntimeRoot = [System.IO.Path]::GetFullPath((Join-Path $root '../../../asis-runtime-mvp/src/runtime'))
+$runtimeRoot = if (Test-Path -LiteralPath $repositoryRuntimeRoot -PathType Container) {
+    $repositoryRuntimeRoot
+} else {
+    $legacySiblingRuntimeRoot
+}
+$runtimeSourceAvailable = Test-Path -LiteralPath $runtimeRoot -PathType Container
+$apiRoutes = @()
+$agentRoutes = @()
+$gatewayRoutes = @()
+$webRoutes = @()
+$runtimeRunnerChecks = 0
+$runnerIncludesMlops = $false
+if ($runtimeSourceAvailable) {
+    $apiRoutes = @(Select-String -LiteralPath (Join-Path $runtimeRoot 'api/app/main.py') -Pattern '^@app\.(get|post|put|patch|delete)\(')
+    $agentRoutes = @(Select-String -LiteralPath (Join-Path $runtimeRoot 'agent/app/main.py') -Pattern '^@app\.(get|post|put|patch|delete)\(')
+    $gatewayRoutes = @(Select-String -LiteralPath (Join-Path $runtimeRoot 'llm_gateway/app/main.py') -Pattern '^@app\.(get|post|put|patch|delete)\(')
+    $webRoutes = @(Select-String -LiteralPath (Join-Path $runtimeRoot 'web/src/App.jsx') -Pattern '(?:<Route\s+path=|\{\s*path:\s*")')
+    $runtimeRunnerPath = [System.IO.Path]::GetFullPath((Join-Path $runtimeRoot '../../tests/run_all_tests.sh'))
+    if (Test-Path -LiteralPath $runtimeRunnerPath -PathType Leaf) {
+        $runtimeRunnerLines = @(Get-Content -LiteralPath $runtimeRunnerPath -Encoding UTF8)
+        $runtimeRunnerChecks = @($runtimeRunnerLines | Where-Object { $_ -match '^(?:run|grepfail) [0-9]' }).Count
+        $runnerIncludesMlops = ($runtimeRunnerLines -join "`n").Contains('src/mlops/tests/test_synthetic_pipeline.py')
+    }
+}
+$routeCountsOkay = $apiRoutes.Count -eq 28 -and
+    $agentRoutes.Count -eq 6 -and
+    $gatewayRoutes.Count -eq 4 -and
+    $runtimeRunnerChecks -eq 94 -and
+    $runnerIncludesMlops -and
+    $spec.Contains("현재 공개 runner 선언은 $runtimeRunnerChecks")
+Add-Check 'runtime_api_route_counts' $routeCountsOkay $(if ($runtimeSourceAvailable) { "api $($apiRoutes.Count), agent $($agentRoutes.Count), gateway $($gatewayRoutes.Count); runner declares $runtimeRunnerChecks checks including MLOps" } else { "runtime source missing at expected sibling path: $runtimeRoot" })
+$screenContractOkay = $webRoutes.Count -eq 20 -and $spec.Contains('/candidate/home') -and $spec.Contains('/recruiter/overview') -and $spec.Contains('/privacy') -and $spec.Contains('/terms')
+Add-Check 'runtime_screen_contract' $screenContractOkay $(if ($runtimeSourceAvailable) { "React routes $($webRoutes.Count) including redirect/wildcard; candidate and recruiter home documented" } else { "runtime source missing at expected sibling path: $runtimeRoot" })
+
+$stateFiles = @(Get-ChildItem -LiteralPath $root -File -Recurse | Where-Object { $_.Name -match '^terraform\.tfstate(?:\.|$)' })
+Add-Check 'terraform_state_absent' ($stateFiles.Count -eq 0) "$($stateFiles.Count) state files"
+
+$htmlFiles = @('index.html', 'architecture.html')
+$brokenLinks = [System.Collections.Generic.List[string]]::new()
+$brokenFragments = [System.Collections.Generic.List[string]]::new()
+$duplicateIds = [System.Collections.Generic.List[string]]::new()
+$htmlIdMap = @{}
+foreach ($htmlName in $htmlFiles) {
+    $html = Get-Content -Raw -Encoding UTF8 (Join-Path $root $htmlName)
+    $htmlIdMap[$htmlName] = [System.Collections.Generic.HashSet[string]]::new(
+        [string[]]@([regex]::Matches($html, '\bid="([^"]+)"') | ForEach-Object { $_.Groups[1].Value })
+    )
+}
+foreach ($htmlName in $htmlFiles) {
+    $htmlPath = Join-Path $root $htmlName
+    $html = Get-Content -Raw -Encoding UTF8 $htmlPath
+    $ids = @([regex]::Matches($html, '\bid="([^"]+)"') | ForEach-Object { $_.Groups[1].Value })
+    $duplicateIds.AddRange([string[]]@($ids | Group-Object | Where-Object Count -gt 1 | ForEach-Object { "$htmlName#$($_.Name)" }))
+    $hrefs = @([regex]::Matches($html, '\bhref="([^"]+)"') | ForEach-Object { $_.Groups[1].Value })
+    foreach ($href in $hrefs) {
+        if ($href -match '^(?:https?:|mailto:|data:)') { continue }
+        $parts = $href -split '#', 2
+        $target = $parts[0]
+        $fragment = if ($parts.Count -eq 2) { [uri]::UnescapeDataString($parts[1]) } else { '' }
+        if ($target -and -not (Test-Path -LiteralPath (Join-Path $root $target))) {
+            $brokenLinks.Add("$htmlName -> $href")
+            continue
+        }
+        if ($fragment) {
+            $targetHtml = if (-not $target) { $htmlName } elseif ($target -match '\.html$') { Split-Path -Leaf $target } else { '' }
+            if ($targetHtml -and $htmlIdMap.ContainsKey($targetHtml) -and -not $htmlIdMap[$targetHtml].Contains($fragment)) {
+                $brokenFragments.Add("$htmlName -> $href")
+            }
+        }
+    }
+}
+Add-Check 'html_local_links' ($brokenLinks.Count -eq 0) $(if ($brokenLinks.Count) { $brokenLinks -join '; ' } else { '0 broken local links' })
+Add-Check 'html_fragments' ($brokenFragments.Count -eq 0) $(if ($brokenFragments.Count) { $brokenFragments -join '; ' } else { '0 broken HTML fragments' })
+Add-Check 'html_duplicate_ids' ($duplicateIds.Count -eq 0) $(if ($duplicateIds.Count) { $duplicateIds -join '; ' } else { '0 duplicate IDs' })
+
+$limitRegion = [regex]::Match($index, '(?s)<h3[^>]*>8\.1 .*?</h3>(?<body>.*?)<h3[^>]*>8\.2 ')
+$flowRegion = [regex]::Match($architecture, '(?s)<h2[^>]*>2\. .*?</h2>(?<body>.*?)<h2[^>]*>3\. ')
+$limitLists = if ($limitRegion.Success) { [regex]::Matches($limitRegion.Groups['body'].Value, '<ol(?:\s[^>]*)?>').Count } else { 0 }
+$limitItems = if ($limitRegion.Success) { [regex]::Matches($limitRegion.Groups['body'].Value, '<li>').Count } else { 0 }
+$flowLists = if ($flowRegion.Success) { [regex]::Matches($flowRegion.Groups['body'].Value, '<ol(?:\s[^>]*)?>').Count } else { 0 }
+$flowItems = if ($flowRegion.Success) { [regex]::Matches($flowRegion.Groups['body'].Value, '<li>').Count } else { 0 }
+$listSemanticsOkay = $limitLists -eq 1 -and $limitItems -eq 21 -and $flowLists -eq 1 -and $flowItems -eq 6
+Add-Check 'html_list_semantics' $listSemanticsOkay "AS-IS limits ol $limitLists/items $limitItems; architecture flow ol $flowLists/items $flowItems"
+
+$metadataContractOkay = $index.Contains('<meta property="og:url" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/">') -and
+    $index.Contains('<link rel="canonical" href="https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/">') -and
+    $architecture.Contains('<meta property="og:url" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/architecture.html">') -and
+    $architecture.Contains('<link rel="canonical" href="https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/architecture.html">') -and
+    $index.Contains('<meta property="og:image" content="https://') -and
+    $architecture.Contains('<meta property="og:image" content="https://') -and
+    $index.Contains('<meta property="og:image:alt"') -and
+    $architecture.Contains('<meta property="og:image:alt"')
+$uiContractOkay = $metadataContractOkay -and
+    $index.Contains('class="skip"') -and
+    $architecture.Contains('class="skip"') -and
+    $index.Contains(':focus-visible') -and
+    $index.Contains('prefers-reduced-motion') -and
+    $index.Contains('scroll-margin-top') -and
+    $index.Contains('loading="lazy"') -and
+    $architecture.Contains('fetchpriority="high"') -and
+    $architecture.Contains('id="diagram-zoom"') -and
+    $architecture.Contains('aria-pressed="false"') -and
+    $architecture.Contains("classList.toggle('is-zoomed')") -and
+    $index.Contains('document.querySelectorAll(''.toc ol a[href^="#"]'')') -and
+    $index -notmatch 'transition\s*:\s*all' -and
+    $publishedText -notmatch '(?:user-scalable\s*=\s*no|maximum-scale\s*=\s*1)'
+Add-Check 'html_ui_accessibility_contract' $uiContractOkay $(if ($uiContractOkay) { 'canonical Open Graph metadata, skip links, focus, reduced motion, anchor offset, responsive image hints, zoom control, safe TOC selector' } else { 'one or more metadata, accessibility, or performance guards are missing' })
+
+$mlopsStageCount = [regex]::Matches($index, 'data-mlops-stage="[1-7]"').Count
+$mlopsSummaryOkay = $index.Contains('id="mlops-overview"') -and
+    $index.Contains('href="../../mlops/"') -and
+    $index.Contains('data-mlops-plan="0"') -and
+    $index.Contains('data-mlops-plan="13"') -and
+    $index.Contains('data-mlops-plan="14"') -and
+    $mlopsStageCount -eq 7 -and
+    $index.Contains('기준 110개와 분리한 별도 계획이며 수치를 합산하지 않습니다') -and
+    $architecture.Contains('href="../../mlops/"')
+Add-Check 'mlops_first_page_summary' $mlopsSummaryOkay "top summary, plan stages 0/13/14, seven steps=$mlopsStageCount, AS-IS 110 separation, dedicated-page links"
+
+$flowButtonCount = [regex]::Matches($architecture, 'data-flow-button="[^"]+"').Count
+$flowLayerCount = [regex]::Matches($architecture, 'data-flow-layer="[^"]+"').Count
+$expectedFlowKeys = @('candidate', 'explanation', 'mlops', 'operations', 'overview', 'recruiter')
+$flowButtonKeys = @([regex]::Matches($architecture, 'data-flow-button="(?<key>[^"]+)"') | ForEach-Object { $_.Groups['key'].Value } | Sort-Object)
+$flowLayerKeys = @([regex]::Matches($architecture, 'data-flow-layer="(?<key>[^"]+)"') | ForEach-Object { $_.Groups['key'].Value } | Sort-Object)
+$flowKeysOkay = ($flowButtonKeys -join ',') -eq ($expectedFlowKeys -join ',') -and ($flowLayerKeys -join ',') -eq ($expectedFlowKeys -join ',')
+$flowDefinitionMatch = [regex]::Match($architecture, '(?s)const flowDefinitions = (?<json>\{.*?\});\s*const flowButtons')
+$serviceFlowKeys = @('candidate', 'recruiter', 'explanation', 'mlops', 'operations')
+$serviceStageCounts = @{}
+$stageCoordinatesOkay = $false
+$flowDefinitionsOkay = $false
+$detailLinksOkay = $false
+if ($flowDefinitionMatch.Success) {
+    try {
+        $flowDefinitionsObject = $flowDefinitionMatch.Groups['json'].Value | ConvertFrom-Json
+        foreach ($key in $serviceFlowKeys) {
+            $serviceStageCounts[$key] = @($flowDefinitionsObject.$key.stages).Count
+        }
+        $badCoordinateKeys = [System.Collections.Generic.List[string]]::new()
+        foreach ($key in $serviceFlowKeys) {
+            $positions = @($flowDefinitionsObject.$key.stages | ForEach-Object { [int]$_.x })
+            if ($positions.Count -ne 3 -or $positions[0] -ge $positions[1] -or $positions[1] -ge $positions[2]) {
+                $badCoordinateKeys.Add($key)
+            }
+        }
+        $stageCoordinatesOkay = $badCoordinateKeys.Count -eq 0
+        $expectedDetailLinks = @{
+            overview = @{ href = 'index.html#section-14'; label = '서비스·구성요소 명세 보기' }
+            candidate = @{ href = 'index.html#section-31'; label = '공고 추천 기능 명세 보기' }
+            recruiter = @{ href = 'index.html#section-31'; label = '기업용 인재 찾기 명세 보기' }
+            explanation = @{ href = 'index.html#section-33'; label = 'AI 점수·설명 규칙 보기' }
+            mlops = @{ href = '../../mlops/'; label = 'MLOps 7단계 상세 보기' }
+            operations = @{ href = 'index.html#section-52'; label = '보안·운영 명세 보기' }
+        }
+        $detailLinksOkay = $true
+        foreach ($key in $expectedDetailLinks.Keys) {
+            $expected = $expectedDetailLinks[$key]
+            $targetExists = $true
+            if ($expected.href.StartsWith('index.html#')) {
+                $fragment = $expected.href.Substring('index.html#'.Length)
+                $targetExists = $index.Contains("id=`"$fragment`"")
+            }
+            if ($flowDefinitionsObject.$key.detailHref -ne $expected.href -or
+                $flowDefinitionsObject.$key.detailLabel -ne $expected.label -or
+                -not $targetExists) {
+                $detailLinksOkay = $false
+            }
+        }
+        $flowDefinitionsOkay = @($flowDefinitionsObject.overview.stages).Count -eq 6 -and
+            (@($serviceStageCounts.Values | Where-Object { $_ -ne 3 }).Count -eq 0) -and
+            $stageCoordinatesOkay
+    } catch {
+        $flowDefinitionsOkay = $false
+    }
+}
+$stepMarkerCount = [regex]::Matches($architecture, 'data-flow-step="[123]"').Count
+$stepOneCount = [regex]::Matches($architecture, 'data-flow-step="1"').Count
+$stepTwoCount = [regex]::Matches($architecture, 'data-flow-step="2"').Count
+$stepThreeCount = [regex]::Matches($architecture, 'data-flow-step="3"').Count
+$layerMarkersOkay = $true
+$layerRegions = @{}
+$layerOrder = @('overview', 'candidate', 'recruiter', 'explanation', 'mlops', 'operations')
+for ($layerIndex = 0; $layerIndex -lt $layerOrder.Count; $layerIndex++) {
+    $key = $layerOrder[$layerIndex]
+    $start = $architecture.IndexOf("data-flow-layer=`"$key`"")
+    $end = if ($layerIndex -lt $layerOrder.Count - 1) {
+        $architecture.IndexOf("data-flow-layer=`"$($layerOrder[$layerIndex + 1])`"", $start + 1)
+    } else {
+        $architecture.IndexOf('</svg>', $start + 1)
+    }
+    $region = if ($start -ge 0 -and $end -gt $start) { $architecture.Substring($start, $end - $start) } else { '' }
+    $layerRegions[$key] = $region
+    $numbers = @([regex]::Matches($region, 'data-flow-step="([123])"') | ForEach-Object { $_.Groups[1].Value })
+    $expectedNumbers = if ($key -eq 'overview') { '' } else { '1,2,3' }
+    if (($numbers -join ',') -ne $expectedNumbers) { $layerMarkersOkay = $false }
+}
+$mlopsLayerStart = $architecture.IndexOf('<g class="flow-layer" data-flow-layer="mlops">')
+$operationsLayerStart = $architecture.IndexOf('<g class="flow-layer" data-flow-layer="operations">')
+$mlopsLayerRegion = if ($mlopsLayerStart -ge 0 -and $operationsLayerStart -gt $mlopsLayerStart) { $architecture.Substring($mlopsLayerStart, $operationsLayerStart - $mlopsLayerStart) } else { '' }
+$mlopsSeparated = $mlopsLayerRegion -and
+    -not $mlopsLayerRegion.Contains('<path') -and
+    -not $mlopsLayerRegion.Contains('flow-node') -and
+    $mlopsLayerRegion.Contains('x="1752" y="42" width="624" height="118"')
+$localAwsDataSeparated = -not $layerRegions['candidate'].Contains('flow-line local') -and
+    -not $layerRegions['recruiter'].Contains('flow-line local') -and
+    -not $layerRegions['candidate'].Contains('cx="1900"') -and
+    -not $layerRegions['candidate'].Contains('cx="2132"') -and
+    -not $layerRegions['recruiter'].Contains('cx="1900"') -and
+    -not $layerRegions['recruiter'].Contains('cx="2132"')
+$overlayLegendOkay = $architecture.Contains('legend-line record') -and
+    $architecture.Contains('기록·탐지 구성') -and
+    $architecture.Contains('.flow-line.record { stroke: #8a5a00; stroke-dasharray: none; }')
+$interactiveFlowOkay = $flowButtonCount -eq 6 -and
+    $flowLayerCount -eq 6 -and
+    $flowKeysOkay -and
+    $flowDefinitionsOkay -and
+    $detailLinksOkay -and
+    $stepMarkerCount -eq 15 -and $stepOneCount -eq 5 -and $stepTwoCount -eq 5 -and $stepThreeCount -eq 5 -and
+    $layerMarkersOkay -and
+    $mlopsSeparated -and
+    $localAwsDataSeparated -and
+    $overlayLegendOkay -and
+    $architecture.Contains('기업용 인재 찾기') -and
+    $architecture.Contains('공고 지원자 안에서') -and
+    $architecture.Contains('자사 공고에 지원한 활성 후보자를 대상으로 합니다') -and
+    $architecture.Contains('AI 설명 만들기') -and
+    $architecture.Contains('MLOps 학습·평가') -and
+    $architecture.Contains('전체 보기 1개 · 서비스·보조 경로 5개') -and
+    $architecture.Contains('모델 검증 · 검토 대기') -and
+    $architecture.Contains('class="flow-step__number"') -and
+    $architecture.Contains('class="flow-selector" role="group"') -and
+    $architecture.Contains('aria-live="polite"') -and
+    $architecture.Contains('flowSteps.replaceChildren') -and
+    $architecture.Contains('id="flow-detail-link"') -and
+    $architecture.Contains('flowDetailLink.href = definition.detailHref') -and
+    $architecture.Contains('flowDetailLink.textContent = definition.detailLabel') -and
+    $architecture.Contains('.flow-detail__link:hover { color: var(--accent); border-color: var(--accent); }') -and
+    -not $architecture.Contains('var(--accent-2)') -and
+    $architecture.Contains('history.replaceState') -and
+    $architecture.Contains('updateAddress || requestedKey !== key') -and
+    -not $architecture.Contains('<path class="flow-line local" d="M1600 582V920" />') -and
+    $architecture.Contains('@media (prefers-reduced-motion: reduce)') -and
+    $architecture.Contains('MLOps는 합성 데이터 기반 모델 검증과 사람 검토 단계를 보여 줍니다') -and
+    -not $architecture.Contains('TRACE') -and
+    -not $architecture.Contains('JC-RECEIPT')
+Add-Check 'interactive_service_flow' $interactiveFlowOkay "controls $flowButtonCount, overlay layers $flowLayerCount, per-layer stages 3/3/3/3/3, markers $stepMarkerCount; local/AWS data and MLOps separation, legend, URL state, detail links 6 checked"
+
+$flowSourceHash = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $root 'JCAREER_ASIS_FLOW.md')).Hash.ToLowerInvariant()
+$generationOutput = @(& node (Join-Path $root 'build-spec.mjs') --check 2>&1)
+$generationExitCode = $LASTEXITCODE
+$flowHashOkay = $architecture.Contains("flow-source-sha256`" content=`"$flowSourceHash`"") -and
+    $architecture.Contains("data-flow-source-sha256=`"$flowSourceHash`"") -and
+    $generationExitCode -eq 0
+Add-Check 'flow_source_sync' $flowHashOkay $(if ($flowHashOkay) { "index+architecture match generator inputs; flow $($flowSourceHash.Substring(0, 12))..." } else { "stale generated output: $($generationOutput -join '; ')" })
+
+[xml]$drawio = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'JCAREER_ASIS_FLOW.drawio')
+$cells = @($drawio.mxfile.diagram.mxGraphModel.root.mxCell)
+$edges = @($cells | Where-Object { $_.edge -eq '1' })
+$containers = @($cells | Where-Object { $_.style -match 'container=1' })
+$ids = @($cells | ForEach-Object { [string]$_.id })
+$drawioDuplicates = @($ids | Group-Object | Where-Object Count -gt 1)
+$idSet = [System.Collections.Generic.HashSet[string]]::new([string[]]$ids)
+$badEdges = @($edges | Where-Object { -not $idSet.Contains([string]$_.source) -or -not $idSet.Contains([string]$_.target) })
+$mlopsCells = @($cells | Where-Object { $_.id -eq 'mlops_status' })
+$mlopsConnectedEdges = @($edges | Where-Object { $_.source -eq 'mlops_status' -or $_.target -eq 'mlops_status' })
+$drawioOkay = $drawioDuplicates.Count -eq 0 -and $badEdges.Count -eq 0 -and $mlopsCells.Count -eq 1 -and $mlopsConnectedEdges.Count -eq 0
+Add-Check 'drawio_xml' $drawioOkay "cells $($cells.Count), edges $($edges.Count), containers $($containers.Count), duplicate IDs $($drawioDuplicates.Count), bad edges $($badEdges.Count), isolated MLOps proposal cells $($mlopsCells.Count)"
+
+Add-Type -AssemblyName System.Drawing
+$pngPath = Join-Path $root 'JCAREER_ASIS_FLOW.drawio.png'
+$drawioPath = Join-Path $root 'JCAREER_ASIS_FLOW.drawio'
+$png = [System.Drawing.Image]::FromFile($pngPath)
+$pngFresh = (Get-Item -LiteralPath $pngPath).LastWriteTimeUtc -ge (Get-Item -LiteralPath $drawioPath).LastWriteTimeUtc
+$pngOkay = $png.Width -eq 2400 -and $png.Height -eq 1400 -and $pngFresh
+$pngDetail = "$($png.Width)x$($png.Height); rendered after drawio=$pngFresh"
+$png.Dispose()
+Add-Check 'png_dimensions' $pngOkay $pngDetail
+
+$pdfBytes = [System.IO.File]::ReadAllBytes((Join-Path $root 'JCAREER_ASIS_SYSTEM_SPEC.pdf'))
+$pdfHeader = [System.Text.Encoding]::ASCII.GetString($pdfBytes, 0, [Math]::Min(8, $pdfBytes.Length))
+Add-Check 'pdf_header' ($pdfHeader.StartsWith('%PDF-')) $pdfHeader.Trim()
+$pdfAscii = [System.Text.Encoding]::ASCII.GetString($pdfBytes)
+$pdfPages = [regex]::Matches($pdfAscii, '/Type\s*/Page\b').Count
+$pdfPath = Join-Path $root 'JCAREER_ASIS_SYSTEM_SPEC.pdf'
+$pdfFresh = (Get-Item -LiteralPath $pdfPath).LastWriteTimeUtc -ge (Get-Item -LiteralPath (Join-Path $root 'index.html')).LastWriteTimeUtc -and
+    (Get-Item -LiteralPath $pdfPath).LastWriteTimeUtc -ge (Get-Item -LiteralPath (Join-Path $root 'JCAREER_ASIS_SYSTEM_SPEC.md')).LastWriteTimeUtc
+$pdfSourceHash = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $root 'index.html')).Hash.ToLowerInvariant()
+$pdfSourceBound = $pdfAscii.Contains('% JCAREER_HTML_SOURCE: terraform/asis/index.html') -and
+    $pdfAscii.Contains("% JCAREER_HTML_SHA256: $pdfSourceHash")
+Add-Check 'pdf_page_objects' ($pdfPages -eq 46 -and $pdfFresh -and $pdfSourceBound) "$pdfPages page objects; rendered after sources=$pdfFresh; HTML source bound=$pdfSourceBound"
+
+$secretPatterns = [ordered]@{
+    account_id                = '\b\d{12}\b'
+    access_key                = '\b(?:AKIA|ASIA)[0-9A-Z]{16}\b'
+    private_key               = '-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----'
+    generic_secret_assignment = '(?im)\b(?:password|passwd|secret|token|api[_-]?key|client[_-]?secret)\s*[:=]\s*["'']?[A-Za-z0-9+/_=-]{8,}'
+}
+$secretHits = [System.Collections.Generic.List[string]]::new()
+$textDeliverables = @('JCAREER_ASIS_SYSTEM_SPEC.md', 'index.html', 'architecture.html', 'JCAREER_ASIS_FLOW.md', 'JCAREER_ASIS_FLOW.drawio', 'validation-report.json')
+foreach ($file in $textDeliverables) {
+    $content = Get-Content -Raw -Encoding UTF8 (Join-Path $root $file)
+    foreach ($entry in $secretPatterns.GetEnumerator()) {
+        if ($content -match $entry.Value) { $secretHits.Add("${file}:$($entry.Key)") }
+    }
+}
+$binaryPatterns = [ordered]@{
+    account_id  = '\b\d{12}\b'
+    access_key  = '\b(?:AKIA|ASIA)[0-9A-Z]{16}\b'
+    private_key = '-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----'
+}
+foreach ($file in @('JCAREER_ASIS_SYSTEM_SPEC.pdf', 'JCAREER_ASIS_FLOW.drawio.png')) {
+    $binaryAscii = [System.Text.Encoding]::ASCII.GetString([System.IO.File]::ReadAllBytes((Join-Path $root $file)))
+    foreach ($entry in $binaryPatterns.GetEnumerator()) {
+        if ($binaryAscii -match $entry.Value) { $secretHits.Add("${file}:$($entry.Key)") }
+    }
+}
+Add-Check 'deliverable_secret_patterns' ($secretHits.Count -eq 0) $(if ($secretHits.Count) { $secretHits -join ', ' } else { "0 patterns across $($textDeliverables.Count) UTF-8 sources + 2 binary sentinels" })
+
+$summary = [pscustomobject]@{
+    generated_at = (Get-Date).ToString('yyyy-MM-ddTHH:mm:ssK')
+    scope = 'local static validation only; no AWS API or terraform apply'
+    passed = @($results | Where-Object status -eq 'PASS').Count
+    failed = @($results | Where-Object status -eq 'FAIL').Count
+    checks = $results
+}
+$reportJson = (($summary | ConvertTo-Json -Depth 5) -replace "`r`n", "`n") + "`n"
+[System.IO.File]::WriteAllText(
+    (Join-Path $root 'validation-report.json'),
+    $reportJson,
+    [System.Text.UTF8Encoding]::new($false)
+)
+$currentReport = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'validation-report.json')
+$currentReportHits = @($secretPatterns.GetEnumerator() | Where-Object { $currentReport -match $_.Value })
+if ($currentReportHits.Count -gt 0) { throw 'Current validation-report.json failed the post-write secret-pattern guard' }
+$results | Format-Table -AutoSize
+Write-Host "PASS=$($summary.passed) FAIL=$($summary.failed)"
+if ($summary.failed -gt 0) { exit 1 }

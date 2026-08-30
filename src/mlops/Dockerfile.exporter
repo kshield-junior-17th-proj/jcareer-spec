@@ -1,0 +1,14 @@
+FROM python:3.12-slim
+
+WORKDIR /opt/jcareer/mlops
+
+COPY requirements.txt ./requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY generate_synthetic_training.py ./
+COPY export_runtime_training.py ./
+
+# The database URLs are supplied only to the short-lived container environment.
+# They are not baked into the image or copied into the feature snapshot.
+ENTRYPOINT ["/bin/sh", "-c"]
+CMD ["exec python export_runtime_training.py --member-database-url \"$MEMBER_DATABASE_URL\" --company-database-url \"$COMPANY_DATABASE_URL\" --synthetic-attestation JCAREER_SYNTHETIC_ONLY --out-dir /output"]

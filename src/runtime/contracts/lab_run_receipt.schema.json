@@ -1,0 +1,369 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jcareer.test/schemas/lab-run-receipt-v2.json",
+  "title": "J-Career synthetic lab run receipt",
+  "description": "Schema only. Its presence is not evidence that a lab run occurred.",
+  "x-jcareer-artifact-state": "SCHEMA_ONLY_NO_RECEIPT_NO_EXECUTION_EVIDENCE",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "synthetic_only",
+    "run_id",
+    "started_at",
+    "completed_at",
+    "approval_ref",
+    "source",
+    "platform",
+    "provider",
+    "artifacts",
+    "functional_smoke",
+    "risk_observation",
+    "cleanup",
+    "account_identifiers_included",
+    "sensitive_values_included",
+    "automatic_assessment_included"
+  ],
+  "properties": {
+    "schema_version": {"const": "jcareer-synthetic-lab-run-receipt-v2"},
+    "synthetic_only": {"const": true},
+    "run_id": {"type": "string", "format": "uuid"},
+    "started_at": {"type": "string", "format": "date-time"},
+    "completed_at": {"type": "string", "format": "date-time"},
+    "approval_ref": {"type": "string", "pattern": "^docs/current/[^#]+#[^#]+$"},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "revision",
+        "archive_sha256",
+        "application_manifest_sha256",
+        "endpoint_manifest_sha256",
+        "api_surface_sha256",
+        "api_effects_sha256",
+        "risk_plan_sha256",
+        "receipt_schema_sha256",
+        "deploy_script_sha256"
+      ],
+      "properties": {
+        "revision": {"type": "string", "pattern": "^[0-9a-f]{40,64}$"},
+        "archive_sha256": {"$ref": "#/$defs/sha256"},
+        "application_manifest_sha256": {"$ref": "#/$defs/sha256"},
+        "endpoint_manifest_sha256": {"$ref": "#/$defs/sha256"},
+        "api_surface_sha256": {"$ref": "#/$defs/sha256"},
+        "api_effects_sha256": {"$ref": "#/$defs/sha256"},
+        "risk_plan_sha256": {"$ref": "#/$defs/sha256"},
+        "receipt_schema_sha256": {"$ref": "#/$defs/sha256"},
+        "deploy_script_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "platform": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["architecture", "resolved_image_ref_hash", "docker_version", "compose_version", "compose_binary_sha256"],
+      "properties": {
+        "architecture": {"enum": ["x86_64", "arm64"]},
+        "resolved_image_ref_hash": {"$ref": "#/$defs/sha256"},
+        "docker_version": {"type": "string", "minLength": 1, "maxLength": 100},
+        "compose_version": {"type": "string", "minLength": 1, "maxLength": 100},
+        "compose_binary_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "bedrock_live_enabled", "region", "model_ref_hash"],
+      "properties": {
+        "mode": {"enum": ["local-synthetic-stub", "bedrock"]},
+        "bedrock_live_enabled": {"type": "boolean"},
+        "region": {"type": ["string", "null"], "maxLength": 40},
+        "model_ref_hash": {"anyOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"mode": {"const": "local-synthetic-stub"}}, "required": ["mode"]},
+          "then": {
+            "properties": {
+              "bedrock_live_enabled": {"const": false},
+              "region": {"type": "null"},
+              "model_ref_hash": {"type": "null"}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"mode": {"const": "bedrock"}}, "required": ["mode"]},
+          "then": {
+            "properties": {
+              "bedrock_live_enabled": {"const": true},
+              "region": {"type": "string", "minLength": 1, "maxLength": 40},
+              "model_ref_hash": {"$ref": "#/$defs/sha256"}
+            }
+          }
+        }
+      ]
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "uniqueItems": true,
+      "allOf": [
+        {"contains": {"properties": {"service_id": {"const": "web"}}, "required": ["service_id"]}, "minContains": 1, "maxContains": 1},
+        {"contains": {"properties": {"service_id": {"const": "api"}}, "required": ["service_id"]}, "minContains": 1, "maxContains": 1},
+        {"contains": {"properties": {"service_id": {"const": "agent"}}, "required": ["service_id"]}, "minContains": 1, "maxContains": 1},
+        {"contains": {"properties": {"service_id": {"const": "llm-gateway"}}, "required": ["service_id"]}, "minContains": 1, "maxContains": 1}
+      ],
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["service_id", "build_context_sha256", "image_digest"],
+        "properties": {
+          "service_id": {"enum": ["web", "api", "agent", "llm-gateway"]},
+          "build_context_sha256": {"$ref": "#/$defs/sha256"},
+          "image_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "functional_smoke": {"$ref": "#/$defs/checkClass"},
+    "risk_observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "scenario_results",
+        "human_review_required",
+        "automatic_judgment_included"
+      ],
+      "properties": {
+        "status": {"enum": ["NOT_RUN", "OBSERVATIONS_RECORDED", "SCRIPT_FAILED"]},
+        "scenario_results": {
+          "type": "array",
+          "minItems": 16,
+          "maxItems": 16,
+          "uniqueItems": true,
+          "allOf": [
+            {"contains": {"properties": {"scenario_id": {"const": "OBS-COMPANY-STATUS-GATE"}, "sequence_index": {"const": 1}}, "required": ["scenario_id", "sequence_index"]}, "minContains": 1, "maxContains": 1},
+            {"contains": {"properties": {"scenario_id": {"const": "OBS-COMPANY-LIFECYCLE-DECLARATION"}, "sequence_index": {"const": 2}}, "required": ["scenario_id", "sequence_index"]}, "minContains": 1, "maxContains": 1},
+            {"contains": {"properties": {"scenario_id": {"const": "OBS-CURRENT-MATERIAL-NOT-SNAPSHOT"}, "sequence_index": {"const": 3}}, "required": ["scenario_id", "sequence_index"]}, "minContains": 1, "maxContains": 1},
+            {"contains": {"properties": {"scenario_id": {"const": "OBS-CONSENT-WITHDRAWAL-ENTERPRISE-READ"}, "sequence_index": {"const": 4}}, "required": ["scenario_id", "sequence_index"]}, "minContains": 1, "maxContains": 1},
+            {"contains": {"properties": {"scenario_id": {"const": "OBS-CONSENT-CATALOG-DRIFT"}, "sequence_index": {"const": 5}}, "required": ["scenario_id", "sequence_index"]}, "minContains": 1, "maxContains": 1},
+            {"contains": {"properties": {"scenario_id": {"const": "OBS-RECRUITER-CACHE-STALE"}, "sequence_index": {"const": 6}}, "required": ["scenario_id", "sequence_index"]}, "minContains": 1, "maxContains": 1},
+            {"contains": {"properties": {"scenario_id": {"const": "OBS-RECOMMENDATION-AUDIT-GAP"}, "sequence_index": {"const": 7}}, "required": ["scenario_id", "sequence_index"]}, "minContains": 1, "maxContains": 1},
+            {"contains": {"properties": {"scenario_id": {"const": "OBS-APPLICATION-AUDIT-SHAPE"}, "sequence_index": {"const": 8}}, "required": ["scenario_id", "sequence_index"]}, "minContains": 1, "maxContains": 1},
+            {"contains": {"properties": {"scenario_id": {"const": "OBS-CACHE-ITEM-SCHEMA"}, "sequence_index": {"const": 9}}, "required": ["scenario_id", "sequence_index"]}, "minContains": 1, "maxContains": 1},
+            {"contains": {"properties": {"scenario_id": {"const": "OBS-RAW-PROMPT-RETAINED"}, "sequence_index": {"const": 10}}, "required": ["scenario_id", "sequence_index"]}, "minContains": 1, "maxContains": 1},
+            {"contains": {"properties": {"scenario_id": {"const": "OBS-INTERNAL-SERVICE-UNAUTHENTICATED"}, "sequence_index": {"const": 11}}, "required": ["scenario_id", "sequence_index"]}, "minContains": 1, "maxContains": 1},
+            {"contains": {"properties": {"scenario_id": {"const": "OBS-PROMPT-FIELD-OVERDISCLOSURE"}, "sequence_index": {"const": 12}}, "required": ["scenario_id", "sequence_index"]}, "minContains": 1, "maxContains": 1},
+            {"contains": {"properties": {"scenario_id": {"const": "OBS-BOLA-DENIAL-TENANT-SHAPE"}, "sequence_index": {"const": 13}}, "required": ["scenario_id", "sequence_index"]}, "minContains": 1, "maxContains": 1},
+            {"contains": {"properties": {"scenario_id": {"const": "OBS-PUBLIC-CLOSED-JOB-DETAIL"}, "sequence_index": {"const": 14}}, "required": ["scenario_id", "sequence_index"]}, "minContains": 1, "maxContains": 1},
+            {"contains": {"properties": {"scenario_id": {"const": "OBS-API-TOKEN-REUSE-AND-ACCOUNT-ACTIVE-GATE"}, "sequence_index": {"const": 15}}, "required": ["scenario_id", "sequence_index"]}, "minContains": 1, "maxContains": 1},
+            {"contains": {"properties": {"scenario_id": {"const": "OBS-RECRUITER-LOGICAL-LINK-RESOLUTION"}, "sequence_index": {"const": 16}}, "required": ["scenario_id", "sequence_index"]}, "minContains": 1, "maxContains": 1}
+          ],
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "scenario_id",
+              "sequence_index",
+              "source_digest_sha256",
+              "execution_status",
+              "observation_status",
+              "result_digest_sha256",
+              "evidence_digest_sha256",
+              "evidence_record_count",
+              "started_at",
+              "completed_at",
+              "failure_code",
+              "prior_failure_scenario_id"
+            ],
+            "properties": {
+              "scenario_id": {"enum": [
+                "OBS-COMPANY-STATUS-GATE",
+                "OBS-COMPANY-LIFECYCLE-DECLARATION",
+                "OBS-CURRENT-MATERIAL-NOT-SNAPSHOT",
+                "OBS-CONSENT-WITHDRAWAL-ENTERPRISE-READ",
+                "OBS-CONSENT-CATALOG-DRIFT",
+                "OBS-RECRUITER-CACHE-STALE",
+                "OBS-RECOMMENDATION-AUDIT-GAP",
+                "OBS-APPLICATION-AUDIT-SHAPE",
+                "OBS-CACHE-ITEM-SCHEMA",
+                "OBS-RAW-PROMPT-RETAINED",
+                "OBS-INTERNAL-SERVICE-UNAUTHENTICATED",
+                "OBS-PROMPT-FIELD-OVERDISCLOSURE",
+                "OBS-BOLA-DENIAL-TENANT-SHAPE",
+                "OBS-PUBLIC-CLOSED-JOB-DETAIL",
+                "OBS-API-TOKEN-REUSE-AND-ACCOUNT-ACTIVE-GATE",
+                "OBS-RECRUITER-LOGICAL-LINK-RESOLUTION"
+              ]},
+              "sequence_index": {"type": "integer", "minimum": 1, "maximum": 16},
+              "source_digest_sha256": {"$ref": "#/$defs/sha256"},
+              "execution_status": {"enum": ["NOT_RUN", "COMPLETED", "FAILED", "SKIPPED_AFTER_FAILURE"]},
+              "observation_status": {"enum": ["NOT_OBSERVED", "SOURCE_ASSERTION_MATCH", "SOURCE_ASSERTION_MISMATCH", "OBSERVATION_INCOMPLETE"]},
+              "result_digest_sha256": {"anyOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]},
+              "evidence_digest_sha256": {"anyOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]},
+              "evidence_record_count": {"type": "integer", "minimum": 0},
+              "started_at": {"type": ["string", "null"], "format": "date-time"},
+              "completed_at": {"type": ["string", "null"], "format": "date-time"},
+              "failure_code": {"anyOf": [{"type": "string", "pattern": "^[A-Z][A-Z0-9_]{0,79}$"}, {"type": "null"}]},
+              "prior_failure_scenario_id": {"anyOf": [{"enum": [
+                "OBS-COMPANY-STATUS-GATE",
+                "OBS-COMPANY-LIFECYCLE-DECLARATION",
+                "OBS-CURRENT-MATERIAL-NOT-SNAPSHOT",
+                "OBS-CONSENT-WITHDRAWAL-ENTERPRISE-READ",
+                "OBS-CONSENT-CATALOG-DRIFT",
+                "OBS-RECRUITER-CACHE-STALE",
+                "OBS-RECOMMENDATION-AUDIT-GAP",
+                "OBS-APPLICATION-AUDIT-SHAPE",
+                "OBS-CACHE-ITEM-SCHEMA",
+                "OBS-RAW-PROMPT-RETAINED",
+                "OBS-INTERNAL-SERVICE-UNAUTHENTICATED",
+                "OBS-PROMPT-FIELD-OVERDISCLOSURE",
+                "OBS-BOLA-DENIAL-TENANT-SHAPE",
+                "OBS-PUBLIC-CLOSED-JOB-DETAIL",
+                "OBS-API-TOKEN-REUSE-AND-ACCOUNT-ACTIVE-GATE",
+                "OBS-RECRUITER-LOGICAL-LINK-RESOLUTION"
+              ]}, {"type": "null"}]}
+            },
+            "allOf": [
+              {
+                "if": {"properties": {"execution_status": {"const": "NOT_RUN"}}, "required": ["execution_status"]},
+                "then": {"properties": {
+                  "observation_status": {"const": "NOT_OBSERVED"},
+                  "result_digest_sha256": {"type": "null"},
+                  "evidence_digest_sha256": {"type": "null"},
+                  "evidence_record_count": {"const": 0},
+                  "started_at": {"type": "null"},
+                  "completed_at": {"type": "null"},
+                  "failure_code": {"type": "null"},
+                  "prior_failure_scenario_id": {"type": "null"}
+                }}
+              },
+              {
+                "if": {"properties": {"execution_status": {"const": "COMPLETED"}}, "required": ["execution_status"]},
+                "then": {"properties": {
+                  "observation_status": {"enum": ["SOURCE_ASSERTION_MATCH", "SOURCE_ASSERTION_MISMATCH"]},
+                  "result_digest_sha256": {"$ref": "#/$defs/sha256"},
+                  "evidence_digest_sha256": {"$ref": "#/$defs/sha256"},
+                  "evidence_record_count": {"type": "integer", "minimum": 1},
+                  "started_at": {"type": "string", "format": "date-time"},
+                  "completed_at": {"type": "string", "format": "date-time"},
+                  "failure_code": {"type": "null"},
+                  "prior_failure_scenario_id": {"type": "null"}
+                }}
+              },
+              {
+                "if": {"properties": {"execution_status": {"const": "FAILED"}}, "required": ["execution_status"]},
+                "then": {"properties": {
+                  "observation_status": {"const": "OBSERVATION_INCOMPLETE"},
+                  "result_digest_sha256": {"$ref": "#/$defs/sha256"},
+                  "evidence_digest_sha256": {"$ref": "#/$defs/sha256"},
+                  "evidence_record_count": {"type": "integer", "minimum": 1},
+                  "started_at": {"type": "string", "format": "date-time"},
+                  "completed_at": {"type": "string", "format": "date-time"},
+                  "failure_code": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]{0,79}$"},
+                  "prior_failure_scenario_id": {"type": "null"}
+                }}
+              },
+              {
+                "if": {"properties": {"execution_status": {"const": "SKIPPED_AFTER_FAILURE"}}, "required": ["execution_status"]},
+                "then": {"properties": {
+                  "observation_status": {"const": "NOT_OBSERVED"},
+                  "result_digest_sha256": {"type": "null"},
+                  "evidence_digest_sha256": {"type": "null"},
+                  "evidence_record_count": {"const": 0},
+                  "started_at": {"type": "null"},
+                  "completed_at": {"type": "null"},
+                  "failure_code": {"type": "null"},
+                  "prior_failure_scenario_id": {"enum": [
+                    "OBS-COMPANY-STATUS-GATE",
+                    "OBS-COMPANY-LIFECYCLE-DECLARATION",
+                    "OBS-CURRENT-MATERIAL-NOT-SNAPSHOT",
+                    "OBS-CONSENT-WITHDRAWAL-ENTERPRISE-READ",
+                    "OBS-CONSENT-CATALOG-DRIFT",
+                    "OBS-RECRUITER-CACHE-STALE",
+                    "OBS-RECOMMENDATION-AUDIT-GAP",
+                    "OBS-APPLICATION-AUDIT-SHAPE",
+                    "OBS-CACHE-ITEM-SCHEMA",
+                    "OBS-RAW-PROMPT-RETAINED",
+                    "OBS-INTERNAL-SERVICE-UNAUTHENTICATED",
+                    "OBS-PROMPT-FIELD-OVERDISCLOSURE",
+                    "OBS-BOLA-DENIAL-TENANT-SHAPE",
+                    "OBS-PUBLIC-CLOSED-JOB-DETAIL",
+                    "OBS-API-TOKEN-REUSE-AND-ACCOUNT-ACTIVE-GATE",
+                    "OBS-RECRUITER-LOGICAL-LINK-RESOLUTION"
+                  ]}
+                }}
+              }
+            ]
+          }
+        },
+        "human_review_required": {"const": true},
+        "automatic_judgment_included": {"const": false}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"status": {"const": "NOT_RUN"}}, "required": ["status"]},
+          "then": {"properties": {"scenario_results": {"items": {"properties": {"execution_status": {"const": "NOT_RUN"}}}}}}
+        },
+        {
+          "if": {"properties": {"status": {"const": "OBSERVATIONS_RECORDED"}}, "required": ["status"]},
+          "then": {"properties": {"scenario_results": {"items": {"properties": {"execution_status": {"const": "COMPLETED"}}}}}}
+        },
+        {
+          "if": {"properties": {"status": {"const": "SCRIPT_FAILED"}}, "required": ["status"]},
+          "then": {"properties": {"scenario_results": {
+            "items": {"properties": {"execution_status": {"enum": ["COMPLETED", "FAILED", "SKIPPED_AFTER_FAILURE"]}}},
+            "contains": {"properties": {"execution_status": {"const": "FAILED"}}, "required": ["execution_status"]},
+            "minContains": 1,
+            "maxContains": 1
+          }}}
+        }
+      ]
+    },
+    "cleanup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runtime_stop_status",
+        "synthetic_identifier_set_hash",
+        "synthetic_identifier_count",
+        "prompt_pair_set_hash",
+        "prompt_pair_count",
+        "database_residue_count",
+        "cache_key_residue_count",
+        "raw_prompt_record_count"
+      ],
+      "properties": {
+        "runtime_stop_status": {"enum": ["NOT_REQUESTED", "REQUESTED", "CONFIRMED", "FAILED"]},
+        "synthetic_identifier_set_hash": {"$ref": "#/$defs/sha256"},
+        "synthetic_identifier_count": {"type": "integer", "minimum": 0},
+        "prompt_pair_set_hash": {"$ref": "#/$defs/sha256"},
+        "prompt_pair_count": {"type": "integer", "minimum": 0},
+        "database_residue_count": {"type": "integer", "minimum": 0},
+        "cache_key_residue_count": {"type": "integer", "minimum": 0},
+        "raw_prompt_record_count": {"type": "integer", "minimum": 0}
+      }
+    },
+    "account_identifiers_included": {"const": false},
+    "sensitive_values_included": {"const": false},
+    "automatic_assessment_included": {"const": false}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"provider": {"properties": {"mode": {"const": "bedrock"}}, "required": ["mode"]}}, "required": ["provider"]},
+      "then": {"properties": {"risk_observation": {"properties": {"status": {"const": "NOT_RUN"}}}}}
+    }
+  ],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "checkClass": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "check_ids"],
+      "properties": {
+        "status": {"enum": ["NOT_RUN", "PASS", "FAIL"]},
+        "check_ids": {"type": "array", "items": {"type": "string", "minLength": 1, "maxLength": 120}, "uniqueItems": true}
+      }
+    }
+  }
+}

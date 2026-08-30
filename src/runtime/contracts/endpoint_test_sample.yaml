@@ -1,0 +1,77 @@
+schema_version: jcareer-endpoint-test-sample-v1
+execution_status: NOT_EXECUTED
+synthetic_only: true
+terraform_managed: false
+
+fleet_inventory:
+  boundary: scenario-document-only
+  windows: 100
+  macos: 80
+  source_ref: fleet/README.md#시나리오-inventory--구축하지-않는다
+
+test_sample:
+  representative_of_fleet: false
+  windows: 3
+  macos: 3
+
+profiles:
+  - profile_id: WIN-01
+    os_family: windows
+    os_version: null
+    browser_name: null
+    browser_version: null
+    synthetic_persona: candidate
+    allowed_flow_ids: [candidate-journey]
+    image_source_ref: null
+    image_approval_ref: null
+    evidence_ref: null
+  - profile_id: WIN-02
+    os_family: windows
+    os_version: null
+    browser_name: null
+    browser_version: null
+    synthetic_persona: recruiter
+    allowed_flow_ids: [recruiter-journey]
+    image_source_ref: null
+    image_approval_ref: null
+    evidence_ref: null
+  - profile_id: WIN-03
+    os_family: windows
+    os_version: null
+    browser_name: null
+    browser_version: null
+    synthetic_persona: administrator
+    allowed_flow_ids: [admin-audit-read]
+    image_source_ref: null
+    image_approval_ref: null
+    evidence_ref: null
+  - profile_id: MAC-01
+    os_family: macos
+    os_version: null
+    browser_name: null
+    browser_version: null
+    synthetic_persona: candidate
+    allowed_flow_ids: [candidate-journey]
+    image_source_ref: null
+    image_approval_ref: null
+    evidence_ref: null
+  - profile_id: MAC-02
+    os_family: macos
+    os_version: null
+    browser_name: null
+    browser_version: null
+    synthetic_persona: recruiter
+    allowed_flow_ids: [recruiter-journey]
+    image_source_ref: null
+    image_approval_ref: null
+    evidence_ref: null
+  - profile_id: MAC-03
+    os_family: macos
+    os_version: null
+    browser_name: null
+    browser_version: null
+    synthetic_persona: administrator
+    allowed_flow_ids: [admin-audit-read]
+    image_source_ref: null
+    image_approval_ref: null
+    evidence_ref: null

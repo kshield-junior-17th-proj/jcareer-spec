@@ -1,0 +1,1047 @@
+{
+  "schema_version": "1.0",
+  "contract_id": "jcareer-asis-api-wire-shapes-v1",
+  "contract_status": "SOURCE_RETURN_AND_DIRECT_EXCEPTION_CATALOG_NOT_RUNTIME_EVIDENCE",
+  "scope": {
+    "operation_coverage": "ALL_33_HANDLER_OPERATION_GROUPS",
+    "route_entry_coverage": "INHERITED_38_ROUTE_ENTRIES_NOT_RECOUNTED",
+    "return_semantics": "DIRECT_HANDLER_RETURN_EXPRESSIONS_ONLY",
+    "error_semantics": "DIRECT_HANDLER_LITERAL_HTTPEXCEPTION_CALLS_ONLY",
+    "nested_schema": "NOT_ENUMERATED_OR_ENFORCED",
+    "dependency_helper_framework_errors": "NOT_ENUMERATED",
+    "response_model_enforcement": "NOT_PRESENT_ON_DECLARED_ROUTES",
+    "runtime_verification": "NOT_CURRENT",
+    "aws_or_bedrock_execution": "NOT_CLAIMED",
+    "compliance_or_risk_decision": "HUMAN_ONLY"
+  },
+  "limitations": [
+    "This catalog is derived from handler AST and route decorators; it is not an HTTP capture or execution trace.",
+    "Top-level literal keys are source observations, not an exact or enforced response schema.",
+    "Helper-call, local-name, and list-item references are not expanded into nested schemas.",
+    "A cached object is labeled only as a validated subset and is not promoted to an exact response shape.",
+    "Only HTTPException calls written directly in each handler body are listed.",
+    "An empty direct_http_exceptions array does not mean the operation cannot fail.",
+    "Dependency, helper, downstream, FastAPI or Pydantic 422, unhandled 500, headers, and serialization behavior are not enumerated.",
+    "Direct detail literals are implementation strings and are not declared product-stable API error codes.",
+    "The 38 decorated routes include aliases for 33 handler operation groups and are not recounted as handlers.",
+    "The malformed synthetic gateway response remains a source return variant and is not evidence that the branch was executed.",
+    "Bedrock labels and conditional source branches do not prove a provider call, AWS deployment, or provider receipt.",
+    "No entry is a compliance, conformity, suitability, security, or residual-risk determination."
+  ],
+  "upstream_contracts": [
+    {
+      "path": "src/runtime/contracts/api_surface.json",
+      "contract_id": "jcareer-asis-api-surface-v1",
+      "sha256": "3405d52e2ba6604cd4ddaba97db37a4be2865d742bc290801fc61a286ffa26b8"
+    },
+    {
+      "path": "src/runtime/contracts/api_effects.json",
+      "contract_id": "jcareer-asis-source-effects-v1",
+      "sha256": "72652b268cae4e4f696f4f2da73c331fbb4a2c2e38741b0194c84229dba57ae1"
+    }
+  ],
+  "operations": [
+    {
+      "operation_ref": "api:health",
+      "source_function_sha256": "5cb678306bebe6dfb54528282396ba8a3e7779f216e2cc470a3e8b832bd00c57",
+      "route_success_statuses": [
+        200
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "DICT_LITERAL",
+          "reference": null,
+          "top_level_literal_keys": [
+            "status",
+            "service",
+            "databases",
+            "dataset_profile"
+          ],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "EMITTED_TOP_LEVEL_KEYS_SOURCE_ONLY"
+        }
+      ],
+      "direct_http_exceptions": []
+    },
+    {
+      "operation_ref": "api:runtime_info",
+      "source_function_sha256": "56bdf34203d50c4eae65bddf4f1b9da2fa0a763831ceaee57cabace9b59031e1",
+      "route_success_statuses": [
+        200
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "DICT_LITERAL",
+          "reference": null,
+          "top_level_literal_keys": [
+            "service",
+            "live_client_service",
+            "dataset_profile",
+            "explanation_provider",
+            "score_contract_version",
+            "database_boundaries",
+            "trace_enabled",
+            "failure_injection_enabled"
+          ],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "EMITTED_TOP_LEVEL_KEYS_SOURCE_ONLY"
+        }
+      ],
+      "direct_http_exceptions": []
+    },
+    {
+      "operation_ref": "api:signup",
+      "source_function_sha256": "237553dc60c1e957ca2e967d5fc2f6923a29c093bdd7c973bb67d97a56b41b66",
+      "route_success_statuses": [
+        201
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "DICT_LITERAL",
+          "reference": null,
+          "top_level_literal_keys": [
+            "access_token",
+            "token_type",
+            "user"
+          ],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "EMITTED_TOP_LEVEL_KEYS_SOURCE_ONLY"
+        }
+      ],
+      "direct_http_exceptions": [
+        {
+          "status": 409,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "이미 사용 중인 이메일입니다",
+          "detail_expression": null,
+          "occurrences": 1
+        }
+      ]
+    },
+    {
+      "operation_ref": "api:recruiter_signup",
+      "source_function_sha256": "e2fac3288bbffdf51c34377512b223471b2622bcc601c996dd35fb7182077d3e",
+      "route_success_statuses": [
+        201
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "DICT_LITERAL",
+          "reference": null,
+          "top_level_literal_keys": [
+            "access_token",
+            "token_type",
+            "user"
+          ],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "EMITTED_TOP_LEVEL_KEYS_SOURCE_ONLY"
+        }
+      ],
+      "direct_http_exceptions": [
+        {
+          "status": 409,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "이미 등록된 이메일 또는 기업명입니다",
+          "detail_expression": null,
+          "occurrences": 1
+        }
+      ]
+    },
+    {
+      "operation_ref": "api:login",
+      "source_function_sha256": "12914a43dfdd7e66cf2f722bca3ed199cbe17aa0fea6dff5bf316c4746ebce04",
+      "route_success_statuses": [
+        200
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "DICT_LITERAL",
+          "reference": null,
+          "top_level_literal_keys": [
+            "access_token",
+            "token_type",
+            "user"
+          ],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "EMITTED_TOP_LEVEL_KEYS_SOURCE_ONLY"
+        }
+      ],
+      "direct_http_exceptions": [
+        {
+          "status": 401,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "이메일 또는 비밀번호를 확인해 주세요",
+          "detail_expression": null,
+          "occurrences": 1
+        },
+        {
+          "status": 503,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "기업 계정 연결 정보를 확인할 수 없습니다",
+          "detail_expression": null,
+          "occurrences": 1
+        }
+      ]
+    },
+    {
+      "operation_ref": "api:me",
+      "source_function_sha256": "073827b0f6dcc992a39a73a8d6893cd7faa476078f69d604884f645b1bbd75ae",
+      "route_success_statuses": [
+        200
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "CALL",
+          "reference": "user_payload",
+          "top_level_literal_keys": [],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "HELPER_RETURN_NOT_EXPANDED"
+        }
+      ],
+      "direct_http_exceptions": [
+        {
+          "status": 503,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "기업 계정 연결 정보를 확인할 수 없습니다",
+          "detail_expression": null,
+          "occurrences": 1
+        }
+      ]
+    },
+    {
+      "operation_ref": "api:record_consent",
+      "source_function_sha256": "b84f55c7233211915ff6cb57228f6d7439fe4e5610330be94da46cb8275a8cb8",
+      "route_success_statuses": [
+        201
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "DICT_LITERAL",
+          "reference": null,
+          "top_level_literal_keys": [
+            "id",
+            "consent_type",
+            "action"
+          ],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "EMITTED_TOP_LEVEL_KEYS_SOURCE_ONLY"
+        }
+      ],
+      "direct_http_exceptions": []
+    },
+    {
+      "operation_ref": "api:list_consents",
+      "source_function_sha256": "84327e397077bb1fc088c0c53c17409682716ecd6718fc8524196258faa45140",
+      "route_success_statuses": [
+        200
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "LIST_COMPREHENSION",
+          "reference": null,
+          "top_level_literal_keys": [],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": "DICT_LITERAL",
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [
+            "id",
+            "consent_type",
+            "action",
+            "policy_version",
+            "collected_items",
+            "purposes",
+            "occurred_at"
+          ],
+          "shape_state": "LIST_ITEM_LITERAL_KEYS_SOURCE_ONLY"
+        }
+      ],
+      "direct_http_exceptions": []
+    },
+    {
+      "operation_ref": "api:revoke_consent",
+      "source_function_sha256": "07a310f6bf0bccfc4a118716b0aeaf503370ae79fda87996908e5b3d00b0d630",
+      "route_success_statuses": [
+        201
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "DICT_LITERAL",
+          "reference": null,
+          "top_level_literal_keys": [
+            "id",
+            "action"
+          ],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "EMITTED_TOP_LEVEL_KEYS_SOURCE_ONLY"
+        }
+      ],
+      "direct_http_exceptions": []
+    },
+    {
+      "operation_ref": "api:get_resume",
+      "source_function_sha256": "e9e1fa43a1726b64e18cff50e433d3d343d653cadaa572f471b06aaa913ffc69",
+      "route_success_statuses": [
+        200
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "CALL",
+          "reference": "resume_payload",
+          "top_level_literal_keys": [],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "HELPER_RETURN_NOT_EXPANDED"
+        }
+      ],
+      "direct_http_exceptions": [
+        {
+          "status": 404,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "저장된 이력서가 없습니다",
+          "detail_expression": null,
+          "occurrences": 1
+        }
+      ]
+    },
+    {
+      "operation_ref": "api:save_resume",
+      "source_function_sha256": "20aa0a761bff78b9dcb9a7312f835dc916ba0dc5e269af30457d84f01808f645",
+      "route_success_statuses": [
+        200
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "CALL",
+          "reference": "resume_payload",
+          "top_level_literal_keys": [],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "HELPER_RETURN_NOT_EXPANDED"
+        }
+      ],
+      "direct_http_exceptions": [
+        {
+          "status": 409,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "이력서가 동시에 변경되었습니다. 다시 저장해 주세요",
+          "detail_expression": null,
+          "occurrences": 2
+        }
+      ]
+    },
+    {
+      "operation_ref": "api:list_jobs",
+      "source_function_sha256": "c29f27a8ef620119d05131ceaeac3e4f1037e16c63b2330a228aa4b69f02d066",
+      "route_success_statuses": [
+        200
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "LIST_COMPREHENSION",
+          "reference": null,
+          "top_level_literal_keys": [],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": "CALL",
+          "list_item_reference": "job_payload",
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "LIST_ITEM_HELPER_RETURN_NOT_EXPANDED"
+        }
+      ],
+      "direct_http_exceptions": []
+    },
+    {
+      "operation_ref": "api:get_job",
+      "source_function_sha256": "c0f2f54384db0c33231d419dd5071c00074341d2d967d7d7d8c985026ef2a64c",
+      "route_success_statuses": [
+        200
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "CALL",
+          "reference": "job_payload",
+          "top_level_literal_keys": [],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "HELPER_RETURN_NOT_EXPANDED"
+        }
+      ],
+      "direct_http_exceptions": [
+        {
+          "status": 404,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "공고를 찾을 수 없습니다",
+          "detail_expression": null,
+          "occurrences": 1
+        }
+      ]
+    },
+    {
+      "operation_ref": "api:apply_to_job",
+      "source_function_sha256": "5d4be0a00b3cdafda83a9651deabd0b9f650ab1731ffbd31da407fb1e84b1044",
+      "route_success_statuses": [
+        201
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "DICT_LITERAL",
+          "reference": null,
+          "top_level_literal_keys": [
+            "id",
+            "job_id",
+            "status"
+          ],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "EMITTED_TOP_LEVEL_KEYS_SOURCE_ONLY"
+        }
+      ],
+      "direct_http_exceptions": [
+        {
+          "status": 404,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "지원 가능한 공고가 아닙니다",
+          "detail_expression": null,
+          "occurrences": 1
+        },
+        {
+          "status": 409,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "지원 전에 이력서를 작성해 주세요",
+          "detail_expression": null,
+          "occurrences": 1
+        },
+        {
+          "status": 409,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "이미 지원한 공고입니다",
+          "detail_expression": null,
+          "occurrences": 2
+        }
+      ]
+    },
+    {
+      "operation_ref": "api:candidate_applications",
+      "source_function_sha256": "9f069d28c5da7a608d833b59f0e53e331850b75d0f5a6d07486944cea7e952fc",
+      "route_success_statuses": [
+        200
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "LIST_COMPREHENSION",
+          "reference": null,
+          "top_level_literal_keys": [],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": "DICT_LITERAL",
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [
+            "id",
+            "status",
+            "applied_at",
+            "job"
+          ],
+          "shape_state": "LIST_ITEM_LITERAL_KEYS_SOURCE_ONLY"
+        }
+      ],
+      "direct_http_exceptions": [
+        {
+          "status": 503,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "일부 지원 내역의 기업 DB 공고 참조를 확인할 수 없습니다",
+          "detail_expression": null,
+          "occurrences": 1
+        }
+      ]
+    },
+    {
+      "operation_ref": "api:candidate_recommendations",
+      "source_function_sha256": "c3a108f5f27f5ccfdb163dc9aa491fdfda09cc4160a49191a809295ce194ef83",
+      "route_success_statuses": [
+        200
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "NAME_REFERENCE",
+          "reference": "cached",
+          "top_level_literal_keys": [],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "CACHED_OBJECT_VALIDATED_SUBSET"
+        },
+        {
+          "expression_kind": "NAME_REFERENCE",
+          "reference": "response",
+          "top_level_literal_keys": [],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "LOCAL_NAME_REFERENCE_NOT_EXPANDED"
+        }
+      ],
+      "direct_http_exceptions": [
+        {
+          "status": 409,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "추천을 받으려면 이력서를 작성해 주세요",
+          "detail_expression": null,
+          "occurrences": 1
+        }
+      ]
+    },
+    {
+      "operation_ref": "api:withdraw_candidate",
+      "source_function_sha256": "8e7bb526eb7ec8605be0e38c9f304657b0b5276ff07cd1d60148cd113d6c0bc8",
+      "route_success_statuses": [
+        202
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "DICT_LITERAL",
+          "reference": null,
+          "top_level_literal_keys": [
+            "status",
+            "subject_ref",
+            "message"
+          ],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "EMITTED_TOP_LEVEL_KEYS_SOURCE_ONLY"
+        }
+      ],
+      "direct_http_exceptions": []
+    },
+    {
+      "operation_ref": "api:recruiter_jobs",
+      "source_function_sha256": "c6d195dd173a7b92414c233f565d6e6e87a6bee5e49ac5bb514d3c5e091f2d28",
+      "route_success_statuses": [
+        200
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "NAME_REFERENCE",
+          "reference": "result",
+          "top_level_literal_keys": [],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "LOCAL_NAME_REFERENCE_NOT_EXPANDED"
+        }
+      ],
+      "direct_http_exceptions": []
+    },
+    {
+      "operation_ref": "api:recruiter_overview",
+      "source_function_sha256": "47735e778f685ce65b002d8d0f019ffd8f2664fc294238387b71dbf97f0760fd",
+      "route_success_statuses": [
+        200
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "DICT_LITERAL",
+          "reference": null,
+          "top_level_literal_keys": [
+            "company",
+            "metrics",
+            "application_stages",
+            "recent_jobs",
+            "customer_boundary",
+            "data_boundary"
+          ],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "EMITTED_TOP_LEVEL_KEYS_SOURCE_ONLY"
+        }
+      ],
+      "direct_http_exceptions": []
+    },
+    {
+      "operation_ref": "api:get_recruiter_company_profile",
+      "source_function_sha256": "51514b9608aec9a54d210563280cef73107f2628fcf6dec1b9a9ac713f2bb45c",
+      "route_success_statuses": [
+        200
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "CALL",
+          "reference": "company_profile_payload",
+          "top_level_literal_keys": [],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "HELPER_RETURN_NOT_EXPANDED"
+        }
+      ],
+      "direct_http_exceptions": []
+    },
+    {
+      "operation_ref": "api:update_recruiter_company_profile",
+      "source_function_sha256": "856885a0887489667ea9a4c672f8d85172dccfe95994359d59ee2d76d4ac048d",
+      "route_success_statuses": [
+        200
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "CALL",
+          "reference": "company_profile_payload",
+          "top_level_literal_keys": [],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "HELPER_RETURN_NOT_EXPANDED"
+        }
+      ],
+      "direct_http_exceptions": []
+    },
+    {
+      "operation_ref": "api:refresh_recruiter_company_opendart",
+      "source_function_sha256": "e931adaf325172f8dcc9b1867a4a4d8750800374622ea30e5d228d0960d23b8e",
+      "route_success_statuses": [
+        202
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "DICT_LITERAL",
+          "reference": null,
+          "top_level_literal_keys": [
+            "refresh",
+            "company_profile"
+          ],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "EMITTED_TOP_LEVEL_KEYS_SOURCE_ONLY"
+        },
+        {
+          "expression_kind": "DICT_LITERAL",
+          "reference": null,
+          "top_level_literal_keys": [
+            "refresh",
+            "company_profile"
+          ],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "EMITTED_TOP_LEVEL_KEYS_SOURCE_ONLY"
+        }
+      ],
+      "direct_http_exceptions": [
+        {
+          "status": 503,
+          "detail_kind": "EXPRESSION",
+          "detail_literal": null,
+          "detail_expression": "str(error)",
+          "occurrences": 2
+        },
+        {
+          "status": 409,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "OpenDART 갱신 실행 모드가 비활성화되어 있습니다",
+          "detail_expression": null,
+          "occurrences": 1
+        },
+        {
+          "status": 409,
+          "detail_kind": "EXPRESSION",
+          "detail_literal": null,
+          "detail_expression": "str(error)",
+          "occurrences": 1
+        },
+        {
+          "status": 422,
+          "detail_kind": "EXPRESSION",
+          "detail_literal": null,
+          "detail_expression": "str(error)",
+          "occurrences": 1
+        },
+        {
+          "status": 404,
+          "detail_kind": "EXPRESSION",
+          "detail_literal": null,
+          "detail_expression": "str(error)",
+          "occurrences": 1
+        }
+      ]
+    },
+    {
+      "operation_ref": "api:create_recruiter_job",
+      "source_function_sha256": "179c99445761d07256c7bd7cf6d8becb7c7c6ac1ff05a5605045ef1f5291aa76",
+      "route_success_statuses": [
+        201
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "CALL",
+          "reference": "job_payload",
+          "top_level_literal_keys": [],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "HELPER_RETURN_NOT_EXPANDED"
+        }
+      ],
+      "direct_http_exceptions": []
+    },
+    {
+      "operation_ref": "api:update_recruiter_job",
+      "source_function_sha256": "95422cd8f0c325bc1f7d397fadc93b03d9a4be43630b6548af8e8452df072612",
+      "route_success_statuses": [
+        200
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "CALL",
+          "reference": "job_payload",
+          "top_level_literal_keys": [],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "HELPER_RETURN_NOT_EXPANDED"
+        }
+      ],
+      "direct_http_exceptions": []
+    },
+    {
+      "operation_ref": "api:recruiter_pipeline",
+      "source_function_sha256": "d1adeb7958b892a4c78bdbae7cf2d76fedfefcbf5f802c15fb5c37274920dc9e",
+      "route_success_statuses": [
+        200
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "DICT_LITERAL",
+          "reference": null,
+          "top_level_literal_keys": [
+            "job",
+            "items"
+          ],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "EMITTED_TOP_LEVEL_KEYS_SOURCE_ONLY"
+        }
+      ],
+      "direct_http_exceptions": []
+    },
+    {
+      "operation_ref": "api:update_application_status",
+      "source_function_sha256": "0d5f31fcf8e8c1687b90c5bc49b13714e1c2359adc009e51cfafb1791bab081e",
+      "route_success_statuses": [
+        200
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "DICT_LITERAL",
+          "reference": null,
+          "top_level_literal_keys": [
+            "id",
+            "status"
+          ],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "EMITTED_TOP_LEVEL_KEYS_SOURCE_ONLY"
+        }
+      ],
+      "direct_http_exceptions": [
+        {
+          "status": 404,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "지원 내역을 찾을 수 없습니다",
+          "detail_expression": null,
+          "occurrences": 1
+        },
+        {
+          "status": 409,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "지원 내역의 공고 참조를 확인할 수 없습니다",
+          "detail_expression": null,
+          "occurrences": 1
+        },
+        {
+          "status": 403,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "다른 기업의 지원 내역은 변경할 수 없습니다",
+          "detail_expression": null,
+          "occurrences": 1
+        }
+      ]
+    },
+    {
+      "operation_ref": "api:recruiter_recommendations",
+      "source_function_sha256": "ba78c73834936043d7ba96b6090b628f837d35c9fddd1f5f0b93bec45776de67",
+      "route_success_statuses": [
+        200
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "NAME_REFERENCE",
+          "reference": "cached",
+          "top_level_literal_keys": [],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "CACHED_OBJECT_VALIDATED_SUBSET"
+        },
+        {
+          "expression_kind": "NAME_REFERENCE",
+          "reference": "response",
+          "top_level_literal_keys": [],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "LOCAL_NAME_REFERENCE_NOT_EXPANDED"
+        }
+      ],
+      "direct_http_exceptions": []
+    },
+    {
+      "operation_ref": "api:admin_audit",
+      "source_function_sha256": "0f54d983335cb2b4c2ae6574f9d48248968fc3d0d961586ae48d4bad774315a2",
+      "route_success_statuses": [
+        200
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "NAME_REFERENCE",
+          "reference": "response",
+          "top_level_literal_keys": [],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "LOCAL_NAME_REFERENCE_NOT_EXPANDED"
+        }
+      ],
+      "direct_http_exceptions": []
+    },
+    {
+      "operation_ref": "agent:health",
+      "source_function_sha256": "676c462aad3ddc93849e269f99b8769fc99ae4a6f0e69af125056a9793514958",
+      "route_success_statuses": [
+        200
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "DICT_LITERAL",
+          "reference": null,
+          "top_level_literal_keys": [
+            "status",
+            "service",
+            "matcher_version",
+            "formula_version"
+          ],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "EMITTED_TOP_LEVEL_KEYS_SOURCE_ONLY"
+        }
+      ],
+      "direct_http_exceptions": []
+    },
+    {
+      "operation_ref": "agent:match_candidates",
+      "source_function_sha256": "e532f949b40830ac7e1bc53d0f7923b81aa15ccc7c88aa7aa4e025351e9ab1d8",
+      "route_success_statuses": [
+        200
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "DICT_LITERAL",
+          "reference": null,
+          "top_level_literal_keys": [
+            "status",
+            "matcher_version",
+            "items"
+          ],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "EMITTED_TOP_LEVEL_KEYS_SOURCE_ONLY"
+        }
+      ],
+      "direct_http_exceptions": []
+    },
+    {
+      "operation_ref": "agent:match_jobs",
+      "source_function_sha256": "eb1bef2286597388e40678182147524983ae012a6f6e7dddee53b92ecfc4c1c5",
+      "route_success_statuses": [
+        200
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "DICT_LITERAL",
+          "reference": null,
+          "top_level_literal_keys": [
+            "status",
+            "matcher_version",
+            "items"
+          ],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "EMITTED_TOP_LEVEL_KEYS_SOURCE_ONLY"
+        }
+      ],
+      "direct_http_exceptions": []
+    },
+    {
+      "operation_ref": "llm-gateway:health",
+      "source_function_sha256": "391719b8c2c523cd4e773c13b92428956ea99923abf523f56e769442e91cbb9b",
+      "route_success_statuses": [
+        200
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "DICT_LITERAL",
+          "reference": null,
+          "top_level_literal_keys": [
+            "status",
+            "service",
+            "mode",
+            "raw_prompt_log_enabled",
+            "bedrock_live_enabled"
+          ],
+          "mapping_unpack_references": [
+            "_provider_config_metadata"
+          ],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "EMITTED_LITERAL_KEYS_PLUS_UNEXPANDED_MAPPING"
+        }
+      ],
+      "direct_http_exceptions": []
+    },
+    {
+      "operation_ref": "llm-gateway:explanations",
+      "source_function_sha256": "fdc75bbdf274282bf67f23f98e2108413df676e4a22ac6758602a8b8d27905e1",
+      "route_success_statuses": [
+        200
+      ],
+      "direct_return_variants": [
+        {
+          "expression_kind": "DICT_LITERAL",
+          "reference": null,
+          "top_level_literal_keys": [
+            "unexpected"
+          ],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "EMITTED_TOP_LEVEL_KEYS_SOURCE_ONLY"
+        },
+        {
+          "expression_kind": "DICT_LITERAL",
+          "reference": null,
+          "top_level_literal_keys": [
+            "status",
+            "correlation_id",
+            "items"
+          ],
+          "mapping_unpack_references": [],
+          "list_item_expression_kind": null,
+          "list_item_reference": null,
+          "list_item_top_level_literal_keys": [],
+          "shape_state": "EMITTED_TOP_LEVEL_KEYS_SOURCE_ONLY"
+        }
+      ],
+      "direct_http_exceptions": [
+        {
+          "status": 404,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "synthetic failure injection is disabled",
+          "detail_expression": null,
+          "occurrences": 1
+        },
+        {
+          "status": 504,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "synthetic provider timeout",
+          "detail_expression": null,
+          "occurrences": 1
+        },
+        {
+          "status": 429,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "synthetic provider rate limit",
+          "detail_expression": null,
+          "occurrences": 1
+        },
+        {
+          "status": 503,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "synthetic provider unavailable",
+          "detail_expression": null,
+          "occurrences": 1
+        },
+        {
+          "status": 503,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "Bedrock live invocation is disabled for the AS-IS runtime",
+          "detail_expression": null,
+          "occurrences": 1
+        },
+        {
+          "status": 503,
+          "detail_kind": "STRING_LITERAL",
+          "detail_literal": "Bedrock explanation unavailable",
+          "detail_expression": null,
+          "occurrences": 1
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-08-28T12:00:00.000Z" agent="Codex" version="24.7.17" type="device">
+  <diagram id="jcareer-mlops-flow" name="합성 MLOps 7단계">
+    <mxGraphModel dx="2800" dy="1600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="1400" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="bg" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F5F6F8;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="2400" height="1400" as="geometry" />
+        </mxCell>
+        <mxCell id="title" value="&lt;b&gt;시험용 자료로 시험 모델을 만드는 흐름&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#5A6672&quot;&gt;확인 문자열을 넣고 한 번 실행하는 설계 · 실제 실행을 확인한 자료가 아님&lt;/font&gt;" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=28;spacing=8;fontColor=#18212B;" vertex="1" parent="1">
+          <mxGeometry x="50" y="28" width="1280" height="86" as="geometry" />
+        </mxCell>
+        <mxCell id="status_zero" value="&lt;b&gt;기본 설정: 잠금&lt;/b&gt;&lt;br&gt;계획상 생성 0개" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFF2E8;strokeColor=#D85E00;strokeWidth=2;fontColor=#18212B;fontSize=17;align=left;verticalAlign=middle;spacing=14;" vertex="1" parent="1">
+          <mxGeometry x="1520" y="30" width="360" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="status_unverified" value="&lt;b&gt;실제 AWS 배포·실행&lt;/b&gt;&lt;br&gt;확인하지 않음" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFF1EF;strokeColor=#A62A1F;strokeWidth=2;fontColor=#7E241C;fontSize=17;align=left;verticalAlign=middle;spacing=14;" vertex="1" parent="1">
+          <mxGeometry x="1900" y="30" width="450" height="78" as="geometry" />
+        </mxCell>
+
+        <mxCell id="lab" value="&lt;b&gt;별도 합성 실습 환경&lt;/b&gt; · 원문은 이 영역 안에서 숫자 비교값으로 바꿉니다" style="rounded=1;arcSize=6;fontColor=#4B5968;fillColor=#FFFFFF;strokeColor=#8996A3;strokeWidth=2;dashed=1;verticalAlign=top;align=left;html=1;whiteSpace=wrap;fontSize=18;fontStyle=1;container=1;dropTarget=1;spacingTop=14;spacingLeft=16;" vertex="1" parent="1">
+          <mxGeometry x="50" y="160" width="620" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="aws" value="&lt;b&gt;확인 뒤 사용할 수 있는 1회 시연 영역&lt;/b&gt; · Terraform 기본값은 잠금" style="rounded=1;arcSize=6;fontColor=#9F4300;fillColor=#FFFFFF;strokeColor=#D85E00;strokeWidth=2;dashed=1;verticalAlign=top;align=left;html=1;whiteSpace=wrap;fontSize=18;fontStyle=1;container=1;dropTarget=1;spacingTop=14;spacingLeft=16;" vertex="1" parent="1">
+          <mxGeometry x="700" y="160" width="1650" height="600" as="geometry" />
+        </mxCell>
+
+        <mxCell id="step1" value="&lt;font color=&quot;#9F4300&quot;&gt;&lt;b&gt;①&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;b&gt;합성 자료 읽기&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#5A6672&quot;&gt;합성 회원·기업 자료&lt;/font&gt;" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#8996A3;strokeWidth=2;fontColor=#18212B;fontSize=18;align=center;verticalAlign=middle;spacing=14;" vertex="1" parent="lab">
+          <mxGeometry x="35" y="190" width="250" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="step2" value="&lt;font color=&quot;#9F4300&quot;&gt;&lt;b&gt;②&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;b&gt;숫자 비교값 5개 만들기&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#5A6672&quot;&gt;기술·경력·직무&lt;br&gt;두 가지 단어 겹침&lt;/font&gt;" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFF8F2;strokeColor=#D85E00;strokeWidth=2;fontColor=#18212B;fontSize=18;align=center;verticalAlign=middle;spacing=14;" vertex="1" parent="lab">
+          <mxGeometry x="335" y="190" width="250" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="lab_note" value="이름·연락처·자소서 원문은 입력·결과 파일에 보관하지 않음" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#F4F6F8;strokeColor=#D8DEE6;fontColor=#4B5968;fontSize=15;align=center;verticalAlign=middle;spacing=10;" vertex="1" parent="lab">
+          <mxGeometry x="65" y="450" width="490" height="74" as="geometry" />
+        </mxCell>
+
+        <mxCell id="step3" value="&lt;b&gt;③ 입력 파일 3개 보관&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#5A6672&quot;&gt;숫자 자료·목록·확인서&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#6D7F12&quot; font-size=&quot;13&quot;&gt;Amazon S3&lt;/font&gt;" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#18212B;fillColor=#7AA116;strokeColor=#FFFFFF;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=17;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;" vertex="1" parent="aws">
+          <mxGeometry x="60" y="190" width="120" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="step4" value="&lt;font color=&quot;#9F4300&quot;&gt;&lt;b&gt;④&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;b&gt;사람이 한 번 시작&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#5A6672&quot;&gt;자동 일정·공개 주소 없음&lt;/font&gt;" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FFF2E8;strokeColor=#D85E00;strokeWidth=2;fontColor=#18212B;fontSize=17;align=center;verticalAlign=middle;spacing=12;" vertex="1" parent="aws">
+          <mxGeometry x="335" y="175" width="230" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="step5" value="&lt;b&gt;⑤ 시험 모델 만들기&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#5A6672&quot;&gt;세 파일·해시 확인&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#C45500&quot; font-size=&quot;13&quot;&gt;AWS Lambda&lt;/font&gt;" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#18212B;fillColor=#ED7100;strokeColor=#FFFFFF;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=17;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="aws">
+          <mxGeometry x="650" y="190" width="120" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="step6_group" value="&lt;font color=&quot;#9F4300&quot;&gt;&lt;b&gt;⑥&lt;/b&gt;&lt;/font&gt; &lt;b&gt;결과 6개와 상태 저장&lt;/b&gt;" style="rounded=1;arcSize=6;fontColor=#18212B;fillColor=#FFFFFF;strokeColor=#8996A3;strokeWidth=2;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=17;fontStyle=1;container=1;dropTarget=1;spacingTop=12;" vertex="1" parent="aws">
+          <mxGeometry x="910" y="130" width="360" height="330" as="geometry" />
+        </mxCell>
+        <mxCell id="step6_s3" value="결과 파일&lt;br&gt;&lt;font color=&quot;#6D7F12&quot; font-size=&quot;12&quot;&gt;Amazon S3&lt;/font&gt;" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#18212B;fillColor=#7AA116;strokeColor=#FFFFFF;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=14;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;" vertex="1" parent="step6_group">
+          <mxGeometry x="60" y="90" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="step6_ddb" value="실행 상태&lt;br&gt;&lt;font color=&quot;#3D4FA3&quot; font-size=&quot;12&quot;&gt;Amazon DynamoDB&lt;/font&gt;" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#18212B;fillColor=#3F48CC;strokeColor=#FFFFFF;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=14;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.dynamodb;" vertex="1" parent="step6_group">
+          <mxGeometry x="215" y="90" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="step6_note" value="3번과 같은 S3 보관함" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontColor=#5A6672;" vertex="1" parent="step6_group">
+          <mxGeometry x="30" y="250" width="150" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="step7" value="&lt;font color=&quot;#9F4300&quot;&gt;&lt;b&gt;⑦&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;b&gt;사람 검토 대기&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#5A6672&quot;&gt;여기서 멈춤&lt;/font&gt;" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFF2E8;strokeColor=#D85E00;strokeWidth=3;fontColor=#18212B;fontSize=19;align=center;verticalAlign=middle;spacing=14;" vertex="1" parent="aws">
+          <mxGeometry x="1355" y="190" width="245" height="190" as="geometry" />
+        </mxCell>
+
+        <mxCell id="failure" value="&lt;b&gt;확인 실패&lt;/b&gt; → 가능한 경우 실패 상태 기록 → 안전 중단" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#FFF1EF;strokeColor=#A62A1F;strokeWidth=2;dashed=1;fontColor=#7E241C;fontSize=15;align=center;verticalAlign=middle;spacing=10;" vertex="1" parent="aws">
+          <mxGeometry x="560" y="500" width="520" height="66" as="geometry" />
+        </mxCell>
+
+        <mxCell id="support" value="&lt;b&gt;같은 AWS 시연의 지원 구성&lt;/b&gt; · 주 흐름이 아님" style="rounded=1;arcSize=6;fontColor=#4B5968;fillColor=#FFFFFF;strokeColor=#8996A3;strokeWidth=2;verticalAlign=top;align=left;html=1;whiteSpace=wrap;fontSize=18;fontStyle=1;container=1;dropTarget=1;spacingTop=14;spacingLeft=16;" vertex="1" parent="1">
+          <mxGeometry x="360" y="820" width="1680" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="ecr" value="&lt;b&gt;실행 이미지 보관&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#C45500&quot; font-size=&quot;13&quot;&gt;Amazon ECR&lt;/font&gt;" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#18212B;fillColor=#ED7100;strokeColor=#FFFFFF;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=16;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.ecr;" vertex="1" parent="support">
+          <mxGeometry x="180" y="80" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="iam" value="&lt;b&gt;경로별 접근 범위&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#A62A1F&quot; font-size=&quot;13&quot;&gt;AWS IAM&lt;/font&gt;" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#18212B;fillColor=#DD344C;strokeColor=#FFFFFF;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=16;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.identity_and_access_management;" vertex="1" parent="support">
+          <mxGeometry x="795" y="80" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="cloudwatch" value="&lt;b&gt;실행 기록 보관&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#A02D6F&quot; font-size=&quot;13&quot;&gt;Amazon CloudWatch Logs&lt;/font&gt;" style="sketch=0;outlineConnect=0;fontColor=#18212B;fillColor=#E7157B;strokeColor=#FFFFFF;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=16;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cloudwatch;" vertex="1" parent="support">
+          <mxGeometry x="1240" y="80" width="90" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="warning" value="&lt;b&gt;운영 서비스 아님 · 예약·반복 학습 없음 · 자동 배포·추천 반영 없음&lt;/b&gt;&lt;br&gt;단어 겹침은 의미 이해가 아니며, 지원 단계 표식은 합격 가능성·지원자 품질 예측이 아님" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#18212B;strokeColor=#18212B;fontColor=#FFFFFF;fontSize=18;align=center;verticalAlign=middle;spacing=18;" vertex="1" parent="1">
+          <mxGeometry x="140" y="1210" width="2120" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e12" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#8996A3;endArrow=block;endFill=1;" edge="1" parent="1" source="step1" target="step2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e23" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#8996A3;endArrow=block;endFill=1;" edge="1" parent="1" source="step2" target="step3"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e34" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#8996A3;endArrow=block;endFill=1;" edge="1" parent="1" source="step3" target="step4"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e45" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#D85E00;endArrow=block;endFill=1;" edge="1" parent="1" source="step4" target="step5"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e56" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#8996A3;endArrow=block;endFill=1;" edge="1" parent="1" source="step5" target="step6_group"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e67" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#D85E00;endArrow=block;endFill=1;" edge="1" parent="1" source="step6_group" target="step7"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="efail" value="실패" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#A62A1F;dashed=1;endArrow=block;endFill=1;fontColor=#7E241C;fontSize=14;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="step5" target="failure"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="eecr" value="이미지" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#8996A3;dashed=1;endArrow=block;endFill=1;fontColor=#4B5968;fontSize=13;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="ecr" target="step5"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="eiam" value="권한" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#8996A3;dashed=1;endArrow=block;endFill=1;fontColor=#4B5968;fontSize=13;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="iam" target="step5"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="elogs" value="기록" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#8996A3;dashed=1;endArrow=block;endFill=1;fontColor=#4B5968;fontSize=13;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="step5" target="cloudwatch"><mxGeometry relative="1" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

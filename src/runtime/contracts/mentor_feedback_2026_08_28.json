@@ -1,0 +1,630 @@
+{
+  "schema_version": "jcareer-mentor-feedback-2026-08-28-v1",
+  "document_state": "DRAFT_FOR_HUMAN_DECISION",
+  "implementation_focus": {
+    "source_type": "USER_DIRECTION_2026_08_28",
+    "primary": "AI_SERVICE_FACT_BOUNDARY",
+    "organization": "CHANGEABLE_CONTEXT_HUMAN_DECISION_PENDING",
+    "invariants": [
+      "결정론 matcher가 점수와 순위를 확정한다.",
+      "Bedrock은 선택적 설명만 생성하고 점수를 변경하지 않는다.",
+      "회원DB와 기업DB를 논리 분리하고 현재 전송 key를 계수하되 승인된 최소화 allowlist는 아직 적용하지 않는다.",
+      "이용자 데이터 학습은 기본 비활성이며 현재 전용 동의가 없다.",
+      "MLOps 시연은 회원·기업 고객 데이터를 쓰지 않는 오프라인 합성 흐름이다."
+    ]
+  },
+  "source": {
+    "title": "8/28 멘토 회의",
+    "section": "0828 회의록 정리본",
+    "meeting_date": "2026-08-28",
+    "notion_page_id": "3ca0be57-10e8-805b-adf9-c7fa7c8f762b",
+    "notion_url": "https://app.notion.com/p/3ca0be5710e8805badf9c7fa7c8f762b?pvs=204",
+    "fetched_at": "2026-08-28T05:59:26.409Z",
+    "source_type": "MENTOR_MEETING_NOTE"
+  },
+  "decision_boundary": {
+    "automatic_assessment": false,
+    "automatic_compliance_decision": false,
+    "automatic_risk_rating": false,
+    "automatic_remediation_approval": false,
+    "current_organization_baseline_replaced": false,
+    "proposal_can_change_runtime_topology": false,
+    "human_decisions_required": [
+      "화이트보드 관찰 조직과 멘토 제안 조직 중 시나리오 기준선을 확정한다.",
+      "인프라팀·SI팀·데이터팀의 인원, 보고선, 자산 소유자를 확정한다.",
+      "Blue·Red·Compliance를 조직명으로 쓸지 기능 구분으로 쓸지 확정한다.",
+      "이용자 데이터를 학습에 쓰는 시나리오를 채택할지와 별도 안내·동의 문안을 확정한다.",
+      "97개 체크리스트 원본과 CEO 보고용 7~8개 핵심 항목을 사람이 선택한다."
+    ],
+    "preserved_existing_facts": [
+      "화이트보드와 멘토 회의록에 반대 값이 없는 320만 회원 설정",
+      "화이트보드와 멘토 회의록에 반대 값이 없는 매출 412억원 설정",
+      "현재 AWS AS-IS 모델과 합성 런타임의 기술 배포 단위"
+    ]
+  },
+  "organization": {
+    "observed_whiteboard": {
+      "state": "OBSERVED_WHITEBOARD_2026_08_28_NOT_BASELINE",
+      "total_headcount": 150,
+      "unresolved_labels": [
+        "80명 상위 노드명",
+        "정보보안팀 첫 기능 명칭"
+      ],
+      "ai_service": {
+        "headcount": 20,
+        "observed_functions": [
+          "개발",
+          "서비스운영",
+          "DevOps"
+        ]
+      },
+      "information_security": {
+        "headcount": 30,
+        "observed_functions": [
+          "첫 기능 명칭 미해결",
+          "모의해킹",
+          "인증관리"
+        ]
+      },
+      "source_refs": [
+        "src/runtime/ASIS_RUNTIME_SPEC.md#0.1 2026-08-28 조직 관찰값과 이 명세의 경계",
+        "context/findings/WHITEBOARD_IMPACT_ASSESSMENT_2026-08-28.md#0. 입력과 결정 경계"
+      ]
+    },
+    "mentor_target_proposal": {
+      "state": "MENTOR_PROPOSED_HUMAN_DECISION_PENDING",
+      "interpretation": "DevOps를 별도 팀으로 두지 않고 AI서비스팀의 DevOps 업무를 인프라팀 책임으로 옮기며, 인프라팀 안에 SI팀과 데이터팀을 둔다.",
+      "ai_service": {
+        "retained_functions": [
+          "개발",
+          "서비스운영"
+        ],
+        "moved_out_functions": [
+          "DevOps"
+        ],
+        "explicitly_not_modeled": [
+          "Agent 자체학습"
+        ]
+      },
+      "infrastructure_team": {
+        "label": "인프라팀",
+        "devops_team_created": false,
+        "headcount": "HUMAN_DECISION_PENDING",
+        "reporting_line": "HUMAN_DECISION_PENDING",
+        "functions": [
+          {
+            "id": "INFRA-DEVOPS",
+            "label": "DevOps 업무 · 별도 팀 아님",
+            "state": "MOVED_FROM_AI_SERVICE_IN_PROPOSAL"
+          },
+          {
+            "id": "INFRA-SI",
+            "label": "SI팀",
+            "state": "MENTOR_PROPOSED"
+          },
+          {
+            "id": "INFRA-DATA",
+            "label": "데이터팀",
+            "state": "MENTOR_PROPOSED"
+          }
+        ]
+      },
+      "information_security_team": {
+        "label": "정보보안팀",
+        "grouping_mode": "CAPABILITY_VIEW_NOT_APPROVED_ORG_NAMES",
+        "capabilities": [
+          {
+            "id": "SEC-BLUE",
+            "label": "Blue",
+            "state": "MENTOR_PROPOSED"
+          },
+          {
+            "id": "SEC-RED",
+            "label": "Red",
+            "state": "MENTOR_PROPOSED"
+          },
+          {
+            "id": "SEC-COMPLIANCE",
+            "label": "Compliance",
+            "state": "MENTOR_PROPOSED"
+          }
+        ],
+        "whiteboard_function_mapping": "HUMAN_DECISION_PENDING"
+      },
+      "source_ref": "https://app.notion.com/p/3ca0be5710e8805badf9c7fa7c8f762b?pvs=204"
+    },
+    "governance_observation": {
+      "scenario_id": "MGMT-GOV-01",
+      "classification": "MANAGEMENT",
+      "state": "OBSERVATION_SCENARIO_NOT_EXECUTED",
+      "framing": "신규 AI 서비스 정책 부재를 단일 문서 부재가 아니라 관리 거버넌스의 책임·승인·변경·모니터링 체계가 기록되지 않은 시나리오로 관찰한다.",
+      "do_not_claim": "회사 전체에 거버넌스가 실제로 없다고 자동 확정하지 않는다.",
+      "evidence_to_request": [
+        "AI 서비스 책임자와 의사결정 RACI",
+        "모델·데이터 변경 승인 절차",
+        "AI 서비스 정책과 운영 철학",
+        "사고·이상징후 보고 및 경영진 검토 기록",
+        "교육 계획과 역량 확인 기록"
+      ]
+    }
+  },
+  "assets": {
+    "catalog_state": "MENTOR_SCOPE_AND_EXISTING_BASELINE_WITH_SOURCE_STATE",
+    "information_protection_register_ref": "src/runtime/INFORMATION_PROTECTION_SYSTEM_INVENTORY.md#2. 현재 정보보호시스템 대장",
+    "ownership_state": "HUMAN_ASSIGNMENT_PENDING",
+    "scope_exclusions": [
+      {
+        "id": "EX-ASSET-GROUPWARE",
+        "label": "그룹웨어 서버",
+        "state": "EXCLUDED_BY_2026_08_28_MENTOR_NOTE",
+        "note": "기존 화이트보드 기록을 삭제하지 않고 이번 멘토 제안 자산 범위에서만 제외한다."
+      },
+      {
+        "id": "EX-ASSET-INTERNAL-DB",
+        "label": "사내DB",
+        "state": "EXCLUDED_BY_2026_08_28_MENTOR_NOTE",
+        "note": "회원DB와 기업DB 경계는 유지하고 사내DB만 이번 멘토 제안 자산 범위에서 제외한다."
+      },
+      {
+        "id": "EX-ASSET-ROUTER",
+        "label": "공유기",
+        "state": "EXCLUDED_BY_WHITEBOARD_STRIKETHROUGH",
+        "note": "화이트보드 취소선을 유지한다."
+      }
+    ],
+    "items": [
+      {
+        "id": "AST-PROC-RUNTIME",
+        "label": "J-Career 웹·API 정보처리시스템",
+        "category": "INFORMATION_PROCESSING_SYSTEM",
+        "type": "APPLICATION_RUNTIME",
+        "scope_state": "SOURCE_IMPLEMENTED_SYNTHETIC_RUNTIME",
+        "operational_state": "NOT_CLAIMED_AS_PRODUCTION",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "source_ref": "src/runtime/ASIS_RUNTIME_SPEC.md#2. 서비스 책임"
+      },
+      {
+        "id": "AST-PROC-BACKUP",
+        "label": "백업 서버",
+        "category": "INFORMATION_PROCESSING_SYSTEM",
+        "type": "BACKUP_SYSTEM",
+        "scope_state": "OBSERVED_WHITEBOARD_NOT_BASELINE",
+        "operational_state": "PRESENCE_UNVERIFIED",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "source_ref": "context/findings/WHITEBOARD_IMPACT_ASSESSMENT_2026-08-28.md#0. 입력과 결정 경계"
+      },
+      {
+        "id": "AST-PROT-FIREWALL",
+        "label": "네트워크 방화벽",
+        "category": "INFORMATION_PROTECTION_SYSTEM",
+        "type": "FIREWALL",
+        "scope_state": "SCENARIO_BASELINE_AND_MENTOR_REQUIRED_DIMENSION",
+        "operational_state": "DOCUMENTED_NOT_LAB_EVIDENCE",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "source_ref": "context/raw/SCENARIO_FACTS-가상고객사J사.md#9.3 사내 업무망 `SCENARIO_CONFIRMED`"
+      },
+      {
+        "id": "AST-PROT-WAF",
+        "label": "웹 애플리케이션 방화벽",
+        "category": "INFORMATION_PROTECTION_SYSTEM",
+        "type": "WAF",
+        "scope_state": "TERRAFORM_ASIS_MODELED",
+        "operational_state": "DEPLOYMENT_NOT_INFERRED_FROM_SOURCE",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "source_ref": "src/runtime/ASIS_RUNTIME_SPEC.md#11. Terraform 대조"
+      },
+      {
+        "id": "AST-PROT-SG",
+        "label": "VPC Security Group",
+        "category": "INFORMATION_PROTECTION_SYSTEM",
+        "type": "NETWORK_SECURITY_GROUP",
+        "scope_state": "TERRAFORM_ASIS_MODELED",
+        "operational_state": "DEPLOYMENT_NOT_INFERRED_FROM_SOURCE",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "source_ref": "src/runtime/INFORMATION_PROTECTION_SYSTEM_INVENTORY.md#2. 현재 정보보호시스템 대장"
+      },
+      {
+        "id": "AST-PROT-VPN",
+        "label": "VPN + MFA",
+        "category": "INFORMATION_PROTECTION_SYSTEM",
+        "type": "REMOTE_ACCESS_VPN",
+        "scope_state": "SCENARIO_BASELINE",
+        "operational_state": "DOCUMENTED_NOT_LAB_EVIDENCE",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "source_ref": "src/runtime/INFORMATION_PROTECTION_SYSTEM_INVENTORY.md#2. 현재 정보보호시스템 대장"
+      },
+      {
+        "id": "AST-PROT-SSM",
+        "label": "SSM Session Manager",
+        "category": "INFORMATION_PROTECTION_SYSTEM",
+        "type": "PRIVILEGED_ACCESS_CHANNEL",
+        "scope_state": "SCENARIO_BASELINE_AND_TERRAFORM_MODELED",
+        "operational_state": "DOCUMENTED_NOT_LAB_EVIDENCE",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "source_ref": "src/runtime/INFORMATION_PROTECTION_SYSTEM_INVENTORY.md#2. 현재 정보보호시스템 대장"
+      },
+      {
+        "id": "AST-PROT-IAM",
+        "label": "AWS IAM 역할·정책",
+        "category": "INFORMATION_PROTECTION_SYSTEM",
+        "type": "ACCESS_CONTROL_SYSTEM",
+        "scope_state": "TERRAFORM_ASIS_MODELED",
+        "operational_state": "DEPLOYMENT_NOT_INFERRED_FROM_SOURCE",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "source_ref": "src/runtime/INFORMATION_PROTECTION_SYSTEM_INVENTORY.md#2. 현재 정보보호시스템 대장"
+      },
+      {
+        "id": "AST-PROT-GUARDDUTY",
+        "label": "Amazon GuardDuty",
+        "category": "INFORMATION_PROTECTION_SYSTEM",
+        "type": "THREAT_DETECTION_SYSTEM",
+        "scope_state": "SCENARIO_BASELINE_AND_TERRAFORM_MODELED",
+        "operational_state": "DOCUMENTED_NOT_LAB_EVIDENCE",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "source_ref": "src/runtime/INFORMATION_PROTECTION_SYSTEM_INVENTORY.md#2. 현재 정보보호시스템 대장"
+      },
+      {
+        "id": "AST-PROT-CLOUDTRAIL",
+        "label": "AWS CloudTrail",
+        "category": "INFORMATION_PROTECTION_SYSTEM",
+        "type": "AUDIT_TRAIL_SYSTEM",
+        "scope_state": "SCENARIO_BASELINE_AND_TERRAFORM_MODELED",
+        "operational_state": "DOCUMENTED_NOT_LAB_EVIDENCE",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "source_ref": "src/runtime/INFORMATION_PROTECTION_SYSTEM_INVENTORY.md#2. 현재 정보보호시스템 대장"
+      },
+      {
+        "id": "AST-PROT-FLOWLOG",
+        "label": "VPC Flow Logs",
+        "category": "INFORMATION_PROTECTION_SYSTEM",
+        "type": "NETWORK_TRAFFIC_LOGGING_SYSTEM",
+        "scope_state": "SCENARIO_BASELINE_AND_TERRAFORM_MODELED",
+        "operational_state": "DOCUMENTED_NOT_LAB_EVIDENCE",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "source_ref": "src/runtime/INFORMATION_PROTECTION_SYSTEM_INVENTORY.md#2. 현재 정보보호시스템 대장"
+      },
+      {
+        "id": "AST-PROT-CLOUDWATCH",
+        "label": "Amazon CloudWatch Logs",
+        "category": "INFORMATION_PROTECTION_SYSTEM",
+        "type": "SECURITY_LOG_REPOSITORY",
+        "scope_state": "SCENARIO_BASELINE_AND_TERRAFORM_MODELED",
+        "operational_state": "DOCUMENTED_NOT_LAB_EVIDENCE",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "source_ref": "src/runtime/INFORMATION_PROTECTION_SYSTEM_INVENTORY.md#2. 현재 정보보호시스템 대장"
+      },
+      {
+        "id": "AST-PROT-AV",
+        "label": "백신",
+        "category": "INFORMATION_PROTECTION_SYSTEM",
+        "type": "ANTIVIRUS",
+        "scope_state": "SCENARIO_DECLARED_WINDOWS_ONLY",
+        "operational_state": "DOCUMENTED_NOT_LAB_EVIDENCE",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "source_ref": "fleet/README.md#시나리오 inventory — 구축하지 않는다"
+      },
+      {
+        "id": "AST-PROT-EDR",
+        "label": "EDR",
+        "category": "INFORMATION_PROTECTION_SYSTEM",
+        "type": "EDR",
+        "scope_state": "SCENARIO_DECLARED_NOT_INTRODUCED",
+        "operational_state": "ABSENCE_NOT_EXECUTION_TESTED",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "source_ref": "fleet/README.md#시나리오 inventory — 구축하지 않는다"
+      },
+      {
+        "id": "AST-PROT-IPS",
+        "label": "IPS",
+        "category": "INFORMATION_PROTECTION_SYSTEM",
+        "type": "IPS",
+        "scope_state": "MENTOR_REQUESTED_INVENTORY_DIMENSION",
+        "operational_state": "PRESENCE_UNVERIFIED",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "source_ref": "https://app.notion.com/p/3ca0be5710e8805badf9c7fa7c8f762b?pvs=204"
+      },
+      {
+        "id": "AST-PROT-IDS",
+        "label": "IDS",
+        "category": "INFORMATION_PROTECTION_SYSTEM",
+        "type": "IDS",
+        "scope_state": "MENTOR_REQUESTED_INVENTORY_DIMENSION",
+        "operational_state": "PRESENCE_UNVERIFIED",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "source_ref": "https://app.notion.com/p/3ca0be5710e8805badf9c7fa7c8f762b?pvs=204"
+      },
+      {
+        "id": "AST-PHYS-RACK",
+        "label": "랙 장비",
+        "category": "PHYSICAL_ASSET",
+        "type": "RACK_EQUIPMENT",
+        "scope_state": "MENTOR_REQUESTED_INVENTORY_DIMENSION",
+        "operational_state": "PRESENCE_UNVERIFIED",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "source_ref": "https://app.notion.com/p/3ca0be5710e8805badf9c7fa7c8f762b?pvs=204"
+      },
+      {
+        "id": "AST-SAAS-SLACK",
+        "label": "Slack",
+        "category": "SAAS",
+        "type": "COLLABORATION_SAAS",
+        "scope_state": "USER_REQUESTED_MENTOR_SAAS_EXAMPLE",
+        "operational_state": "SCENARIO_USE_UNVERIFIED",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "data_boundary": "WORKSPACE_AND_RETENTION_SCOPE_PENDING",
+        "source_ref": "https://app.notion.com/p/3ca0be5710e8805badf9c7fa7c8f762b?pvs=204"
+      },
+      {
+        "id": "AST-DATA-MEMBER",
+        "label": "회원DB",
+        "category": "DATA_ASSET",
+        "type": "MEMBER_DATABASE",
+        "scope_state": "SOURCE_IMPLEMENTED_LOGICAL_DATABASE",
+        "operational_state": "SYNTHETIC_RUNTIME_ONLY",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "source_ref": "src/runtime/DB_FIELD_CATALOG.md#3.1 `jcareer_member`"
+      },
+      {
+        "id": "AST-DATA-COMPANY",
+        "label": "기업DB",
+        "category": "DATA_ASSET",
+        "type": "COMPANY_DATABASE",
+        "scope_state": "SOURCE_IMPLEMENTED_LOGICAL_DATABASE",
+        "operational_state": "SYNTHETIC_RUNTIME_ONLY",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "source_ref": "src/runtime/DB_FIELD_CATALOG.md#3.2 `jcareer_company`"
+      },
+      {
+        "id": "AST-ENDPOINT-PC",
+        "label": "업무용 PC",
+        "category": "ENDPOINT_ASSET",
+        "type": "WINDOWS_AND_MACOS_ENDPOINTS",
+        "scope_state": "SCENARIO_INVENTORY_180_NOT_LAB_FLEET",
+        "operational_state": "DOCUMENTED_NOT_PROVISIONED",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "source_ref": "fleet/README.md#두 층을 섞지 않는다"
+      },
+      {
+        "id": "AST-ENDPOINT-PRINTER",
+        "label": "프린터",
+        "category": "ENDPOINT_ASSET",
+        "type": "PRINTER",
+        "scope_state": "OBSERVED_WHITEBOARD_NOT_BASELINE",
+        "operational_state": "PRESENCE_UNVERIFIED",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "source_ref": "context/findings/WHITEBOARD_IMPACT_ASSESSMENT_2026-08-28.md#0. 입력과 결정 경계"
+      }
+    ]
+  },
+  "training_and_mlops": {
+    "data_transfer": {
+      "member_database_boundary": "LOGICALLY_SEPARATE_SOURCE_IMPLEMENTED",
+      "company_database_boundary": "LOGICALLY_SEPARATE_SOURCE_IMPLEMENTED",
+      "candidate_context_key_count": 8,
+      "company_context_key_count": 6,
+      "counter_flagged_key_count": 6,
+      "full_candidate_derived_provider_field_count": "HUMAN_DECISION_PENDING",
+      "approved_minimization_allowlist_implemented": false,
+      "allowlist_state": "NOT_IMPLEMENTED_HUMAN_DECISION_PENDING",
+      "source_ref": "src/runtime/DB_FIELD_CATALOG.md#5. LLM02 측정 모수 계약"
+    },
+    "runtime_matcher": {
+      "mode": "DETERMINISTIC_70_20_10_V1",
+      "trains_agent": false,
+      "training_endpoint_implemented": false,
+      "bedrock_role": "EXPLANATION_ONLY_NOT_SCORING",
+      "source_ref": "src/runtime/AI_MATCHING_FLOW.md#현재 점수 계약"
+    },
+    "synthetic_mlops": {
+      "state": "OFFLINE_RUNTIME_DB_AND_S3_FEATURE_SNAPSHOT_SOURCE_IMPLEMENTED_AWS_EXECUTION_NOT_CLAIMED",
+      "member_data_used": true,
+      "company_customer_data_used": true,
+      "runtime_wired": false,
+      "source_runtime_db_wired": true,
+      "ranking_runtime_wired": false,
+      "synthetic_attestation": "JCAREER_SYNTHETIC_ONLY",
+      "training_features": [
+        "skill_overlap",
+        "experience_fit",
+        "role_overlap",
+        "self_intro_job_overlap",
+        "company_direction_overlap"
+      ],
+      "label": "pipeline_progression_proxy",
+      "label_semantics": "HISTORICAL_APPLICATION_STATUS_PROXY_NOT_CANDIDATE_QUALITY_OR_HIRING_PROBABILITY",
+      "qualitative_feature_boundary": {
+        "self_intro_job_method": "TOKEN_OVERLAP_PROXY_V1",
+        "company_direction_method": "TOKEN_OVERLAP_PROXY_V1",
+        "bedrock_embedding_wired": false,
+        "bedrock_role_today": "SEPARATE_EXPLANATION_ONLY_NOT_SCORING",
+        "semantic_understanding_claim_allowed": false
+      },
+      "serverless_source": {
+        "compute": "LAMBDA_ONE_SHOT",
+        "source_mode": "S3_FEATURE_SNAPSHOT",
+        "source_prefix": "mlops/sources/{run_id}/",
+        "artifact_store": "S3_ADAPTER",
+        "run_state_store": "DYNAMODB_ADAPTER",
+        "trigger": "APPROVED_MANUAL_INVOCATION_ONLY",
+        "schedule_enabled": false,
+        "database_urls_in_terraform": false,
+        "object_encryption": "SSE_S3_ONLY_KMS_NOT_WIRED",
+        "failed_safe_boundary": "ONLY_AFTER_RUNNING_PRESTATE_REJECTIONS_MAY_HAVE_NO_FAILED_SAFE_RECORD",
+        "sagemaker_used": false,
+        "aws_execution_state": "NOT_CLAIMED"
+      },
+      "lifecycle": [
+        "synthetic_data_generation",
+        "synthetic_runtime_member_and_company_db_extraction",
+        "direct_identifier_exclusion_and_free_text_feature_derivation",
+        "manifest_and_hash",
+        "s3_feature_snapshot_strict_validation",
+        "one_shot_challenger_training",
+        "evaluation_observation",
+        "s3_artifact_adapter",
+        "dynamodb_run_state_adapter",
+        "manual_approval_required",
+        "runtime_release_not_implemented"
+      ],
+      "source_ref": "src/mlops/README.md#DB 기반 학습 경로"
+    },
+    "user_data_training": {
+      "default_state": "REAL_USER_DATA_DISABLED_SYNTHETIC_RUNTIME_DATA_ENABLED",
+      "current_training_consent_type": "NOT_IMPLEMENTED",
+      "current_runtime_consent_types": [
+        "privacy_core",
+        "marketing"
+      ],
+      "ai_recommendation_purpose_is_training_consent": false,
+      "future_enablement_state": "OPTIONAL_HUMAN_DECISION_PENDING",
+      "required_gates_before_any_enablement": [
+        "학습 목적·대상 데이터·모델 영향에 대한 별도 안내",
+        "현재 서비스 이용 동의와 구분되는 명시적 동의",
+        "회원DB·기업DB 필드 allowlist와 최소화 검토",
+        "민감정보 및 자유서술 원문의 기본 제외",
+        "동의 철회가 dataset·artifact·model lineage에 전파되는 절차",
+        "보존기간·삭제·재학습 정책",
+        "사람의 데이터 사용 및 모델 배포 승인"
+      ],
+      "source_refs": [
+        "src/runtime/DB_FIELD_CATALOG.md#5. LLM02 측정 모수 계약",
+        "https://app.notion.com/p/3ca0be5710e8805badf9c7fa7c8f762b?pvs=204"
+      ]
+    }
+  },
+  "checklist": {
+    "declared_item_count": 97,
+    "reduction_allowed": false,
+    "full_item_source_state": "NOT_INCLUDED_IN_FETCHED_MEETING_NOTE",
+    "full_items_imported": 0,
+    "display_policy": "97개 원본을 유지한 뒤 CEO 화면에는 사람이 고른 중요 항목만 요약한다.",
+    "completion_claim_allowed": false
+  },
+  "ceo_brief": {
+    "presentation_state": "DRAFT_CANDIDATES_FOR_HUMAN_REVIEW",
+    "audience": "CEO",
+    "flow": [
+      "OBSERVATION",
+      "IMPROVEMENT_CANDIDATE",
+      "MASTERPLAN_PHASE",
+      "HUMAN_DECISION"
+    ],
+    "candidate_scenario_count": 8,
+    "candidate_scenarios": [
+      {
+        "id": "CEO-M01",
+        "classification": "MANAGEMENT",
+        "title": "AI 관리 거버넌스와 경영진 의사결정",
+        "observation": "AI 서비스 책임·승인·변경·모니터링 근거가 현재 합성 런타임 산출물에 연결돼 있지 않다.",
+        "improvement_candidate": "정책, 운영 철학, RACI, 경영진 검토 주기를 하나의 승인 경로로 연결한다.",
+        "phase": "P1_BASELINE_DECISION",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "evidence_state": "NOT_COLLECTED"
+      },
+      {
+        "id": "CEO-M02",
+        "classification": "MANAGEMENT",
+        "title": "AI서비스·인프라·정보보안 책임 분리",
+        "observation": "화이트보드 관찰 조직과 인프라팀·SI팀·데이터팀 및 Blue·Red·Compliance 멘토 제안이 아직 하나의 승인 기준선이 아니다.",
+        "improvement_candidate": "DevOps를 AI서비스에서 분리한 목표 조직과 검토 독립성 RACI를 사람이 승인한다.",
+        "phase": "P1_BASELINE_DECISION",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "evidence_state": "PROPOSAL_RECORDED"
+      },
+      {
+        "id": "CEO-M03",
+        "classification": "MANAGEMENT",
+        "title": "이용자 데이터 학습 안내·동의",
+        "observation": "현재 동의 유형에는 모델 학습용 별도 동의가 없고 합성 MLOps만 사용한다.",
+        "improvement_candidate": "학습 시나리오를 채택할 경우 별도 안내·동의·철회·lineage 절차를 먼저 승인한다.",
+        "phase": "P1_BASELINE_DECISION",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "evidence_state": "SOURCE_OBSERVED"
+      },
+      {
+        "id": "CEO-T01",
+        "classification": "TECHNICAL",
+        "title": "회원DB·기업DB와 LLM 전송 경계",
+        "observation": "두 논리 DB는 분리돼 있지만 설명 payload의 전체 candidate-derived 필드 모수는 결정 대기다.",
+        "improvement_candidate": "route별 allowlist, 계수 단위, 파생필드 포함 규칙을 승인된 측정 계약으로 고정한다.",
+        "phase": "P0_DEMO_EVIDENCE",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "evidence_state": "SOURCE_CATALOG_AVAILABLE"
+      },
+      {
+        "id": "CEO-T02",
+        "classification": "TECHNICAL",
+        "title": "결정론 점수와 Bedrock 설명 분리",
+        "observation": "점수는 고정 산식이 만들고 Bedrock은 설명 계층 후보이며 점수를 변경하지 않는다.",
+        "improvement_candidate": "같은 입력에서 점수 불변과 설명 fallback을 합성 smoke로 시연한다.",
+        "phase": "P0_DEMO_EVIDENCE",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "evidence_state": "SOURCE_AND_TESTS_AVAILABLE"
+      },
+      {
+        "id": "CEO-T03",
+        "classification": "TECHNICAL",
+        "title": "합성 MLOps 생명주기",
+        "observation": "합성 데이터 생성·hash·학습·평가 관찰은 구현됐으나 registry·승격·rollback은 런타임에 연결되지 않았다.",
+        "improvement_candidate": "합성 artifact를 PendingManualApproval 이후 단계와 연결하는 설계를 시연한다.",
+        "phase": "P0_DEMO_EVIDENCE",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "evidence_state": "OFFLINE_DEMONSTRATOR_AVAILABLE"
+      },
+      {
+        "id": "CEO-T04",
+        "classification": "TECHNICAL",
+        "title": "OpenDART 비동기 수집 경계",
+        "observation": "상시 API 서버 경로와 별개로 SQS→Lambda 후보 worker가 source에 존재하며 실제 배포 상태는 별도다.",
+        "improvement_candidate": "승인된 경우 요청·queue·worker·snapshot 상태 전이를 합성 이벤트로 관찰한다.",
+        "phase": "P2_OPERATIONALIZATION",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "evidence_state": "SOURCE_CANDIDATE_AVAILABLE"
+      },
+      {
+        "id": "CEO-P01",
+        "classification": "PHYSICAL",
+        "title": "단말·랙·보호시스템 자산 범위",
+        "observation": "PC와 일부 백신 설정은 문서에 있으나 방화벽·IPS·IDS·랙·Slack의 존재와 소유자는 확인되지 않았다.",
+        "improvement_candidate": "정보처리·정보보호·물리·SaaS 자산을 존재 확인과 소유자 지정 단계로 분리한다.",
+        "phase": "P1_BASELINE_DECISION",
+        "owner": "HUMAN_ASSIGNMENT_PENDING",
+        "evidence_state": "INVENTORY_DIMENSIONS_RECORDED"
+      }
+    ],
+    "masterplan": [
+      {
+        "phase": "P0_DEMO_EVIDENCE",
+        "label": "오늘 · 보여줄 수 있는 합성 AS-IS",
+        "objective": "현재 source와 합성 실행에서 관찰 가능한 경계를 CEO 흐름으로 묶는다.",
+        "workstream_ids": [
+          "CEO-T01",
+          "CEO-T02",
+          "CEO-T03"
+        ],
+        "approval_state": "HUMAN_DECISION_NOT_RECORDED"
+      },
+      {
+        "phase": "P1_BASELINE_DECISION",
+        "label": "다음 · 기준선과 책임 확정",
+        "objective": "조직·자산·학습 동의·97개 체크리스트 원본을 사람 승인 기준선에 연결한다.",
+        "workstream_ids": [
+          "CEO-M01",
+          "CEO-M02",
+          "CEO-M03",
+          "CEO-P01"
+        ],
+        "approval_state": "HUMAN_DECISION_NOT_RECORDED"
+      },
+      {
+        "phase": "P2_OPERATIONALIZATION",
+        "label": "이후 · 승인된 변경 운영화",
+        "objective": "승인된 비동기 수집·모델 승격·관찰 증적을 제한된 실행 경로에 연결한다.",
+        "workstream_ids": [
+          "CEO-T04"
+        ],
+        "approval_state": "HUMAN_DECISION_NOT_RECORDED"
+      }
+    ]
+  }
+}

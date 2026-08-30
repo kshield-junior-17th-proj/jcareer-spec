@@ -1,0 +1,185 @@
+schema_version: jcareer-asis-risk-observation-plan-v1
+plan_status: DRAFT_NOT_APPROVED
+execution_status: NOT_EXECUTED
+synthetic_only: true
+
+runtime_preconditions:
+  live_client_service: false
+  dataset_profile: demo_not_for_measurement
+  explanation_provider: local-synthetic-stub
+  explanation_mode: success
+  raw_prompt_log_enabled: true
+  bedrock_live_enabled: false
+
+source:
+  script_path: src/runtime/tests/two_sided_asis_observations.py
+  script_sha256: 67868168bf59ce47285af38e9c684f8b2d06fae6683c55eadd842f59822e0917
+
+separation:
+  functional_smoke: SEPARATE_EVIDENCE_CLASS
+  automatic_execution: false
+  automatic_risk_judgment: false
+
+coverage_limitations:
+  browser_local_storage_state_transition: NOT_OBSERVED_NO_BROWSER_HARNESS
+  token_expiration_boundary: NOT_OBSERVED
+  organization_membership_and_role_lifecycle: NOT_OBSERVED_NO_API_LIFECYCLE
+  cross_store_partial_commit_fault_injection: NOT_OBSERVED_NO_COMMIT_FAULT_INJECTION
+
+scenarios:
+  - scenario_id: OBS-COMPANY-STATUS-GATE
+    customer_sides: [candidate, company, platform]
+    observation_intent: Record whether a suspended synthetic company's open job remains in the public list and detail, accepts and appears in a candidate application tracker, appears in candidate recommendations, and remains available through enterprise overview, pipeline, and recommendation paths.
+    source_assertion_markers:
+      - 'sum(item["id"] == job["id"] for item in suspended_public_jobs) == 1'
+      - 'suspended_candidate_job["job"]["id"] == job["id"]'
+      - 'suspended_application["status"] == "applied"'
+      - 'item["job"]["id"] == job["id"] for item in suspended_candidate_applications'
+      - 'overview["customer_boundary"]["company_status_gate_enforced"] is False'
+      - 'company_status_gate_observed=public-list,public-detail,candidate-application,candidate-application-tracker,candidate-recommendations,overview,pipeline,recruiter-recommendations'
+    cleanup_surface: COMPANY_STATUS_AND_SYNTHETIC_ROWS
+    automatic_decision: false
+  - scenario_id: OBS-COMPANY-LIFECYCLE-DECLARATION
+    customer_sides: [company, platform]
+    observation_intent: Record that signup creates one recruiter and a new company without a company-to-recruiter cardinality constraint, the approved model default without a review transition, seven declared lifecycle absences, logical job reference, and separately declared operation ID, idempotency, compensation, reconciliation, and outbox states without treating response flags alone as proof that no other implementation exists.
+    source_assertion_markers:
+      - '== "recruiter-company-logical-link-no-cardinality-constraint"'
+      - '== "one-recruiter-with-new-company"'
+      - '"company_recruiter_cardinality_constraint"'
+      - 'signup_overview["customer_boundary"]["company_status_record"] == "approved"'
+      - 'signup_initial_status_source == "approved-model-default-without-review-transition"'
+      - 'overview["customer_boundary"][key] is False'
+      - 'recovery_absence_keys = ('
+      - 'company_lifecycle_declaration_observed=signup-one-recruiter-no-cardinality,signup-default-approved,seven-lifecycle-absences,logical-job-ref,no-atomic-commit,no-operation-id,no-idempotency,no-compensation,no-reconciliation,no-outbox'
+    cleanup_surface: SYNTHETIC_ROWS
+    automatic_decision: false
+  - scenario_id: OBS-CURRENT-MATERIAL-NOT-SNAPSHOT
+    customer_sides: [candidate, company]
+    observation_intent: Record whether the enterprise pipeline reads current resume, job, and company profile material after application time.
+    source_assertion_markers:
+      - 'observed["candidate"]["self_intro"] == after_resume["self_intro"]'
+      - 'pipeline_material_source=current-resume,current-job,current-company-profile'
+    cleanup_surface: SYNTHETIC_ROWS
+    automatic_decision: false
+  - scenario_id: OBS-CONSENT-WITHDRAWAL-ENTERPRISE-READ
+    customer_sides: [candidate, company]
+    observation_intent: Record the candidate recommendation and enterprise read status after the latest synthetic core-consent revocation.
+    source_assertion_markers:
+      - 'candidate_recommendation_after_revoke=409; enterprise_read_after_revoke=200'
+      - 'revoked candidate remains readable through the current enterprise path'
+    cleanup_surface: SYNTHETIC_ROWS_AND_RUN_CACHE_KEYS
+    automatic_decision: false
+  - scenario_id: OBS-CONSENT-CATALOG-DRIFT
+    customer_sides: [candidate, platform]
+    observation_intent: Record client-supplied policy version and fields absent from the stored collection list.
+    source_assertion_markers:
+      - 'latest_consent["policy_version"] == "asis-observation-client-value"'
+      - '{"skills", "desired_role", "self_intro"}.isdisjoint'
+    cleanup_surface: SYNTHETIC_ROWS
+    automatic_decision: false
+  - scenario_id: OBS-RECRUITER-CACHE-STALE
+    customer_sides: [candidate, company, platform]
+    observation_intent: Record whether resume and applicant-set changes are absent from the current recruiter recommendation cache key.
+    source_assertion_markers:
+      - 'stale_recommendations["cache"] == "hit"'
+      - 'recruiter_cache_dependency_observed=resume-and-applicant-set-omitted'
+    cleanup_surface: SYNTHETIC_ROWS_AND_RUN_CACHE_KEYS
+    automatic_decision: false
+  - scenario_id: OBS-RECOMMENDATION-AUDIT-GAP
+    customer_sides: [company, platform]
+    observation_intent: Record the recruiter audit-event count delta across one cache miss and one cache hit without interpreting sufficiency.
+    source_assertion_markers:
+      - 'audit_after_miss == audit_before_miss'
+      - 'recommendation_audit_delta=miss:0,hit:0'
+    cleanup_surface: SYNTHETIC_ROWS_AND_RUN_CACHE_KEYS
+    automatic_decision: false
+  - scenario_id: OBS-APPLICATION-AUDIT-SHAPE
+    customer_sides: [candidate, company, platform]
+    observation_intent: Record the current application submission and status-change audit field shape without judging sufficiency.
+    source_assertion_markers:
+      - 'submitted_audit.returncode == 0 and submitted_audit.stdout.strip() == "1"'
+      - 'application_audit_shape=submitted:job-only,status-change:application-and-new-status-only'
+    cleanup_surface: SYNTHETIC_ROWS
+    automatic_decision: false
+  - scenario_id: OBS-CACHE-ITEM-SCHEMA
+    customer_sides: [company, platform]
+    observation_intent: Record whether a synthetic cached recommendation item missing score_breakdown is returned as a cache hit.
+    source_assertion_markers:
+      - 'cached_items[0].pop("score_breakdown", None) is not None'
+      - 'cache_item_schema_observed=missing-score-breakdown-returned'
+    cleanup_surface: SYNTHETIC_ROWS_AND_RUN_CACHE_KEYS
+    automatic_decision: false
+  - scenario_id: OBS-RAW-PROMPT-RETAINED
+    customer_sides: [candidate, platform]
+    observation_intent: Record the exact synthetic prompt-log record count after database-row and run-cache cleanup.
+    source_assertion_markers:
+      - 'observed.stdout.strip() != "1"'
+      - 'raw-prompt-log=observed-retained'
+    cleanup_surface: RAW_PROMPT_OBSERVED_NOT_DELETED
+    automatic_decision: false
+  - scenario_id: OBS-INTERNAL-SERVICE-UNAUTHENTICATED
+    customer_sides: [candidate, company, platform]
+    observation_intent: Record whether caller-supplied matcher and explanation operations accept synthetic requests without an application caller token.
+    source_assertion_markers:
+      - '"/agent/internal/match/jobs"'
+      - '"/llm/internal/explanations"'
+      - 'internal_service_auth_observed=agent-and-llm-operations-without-caller-token'
+    cleanup_surface: RAW_PROMPT_OBSERVED_NOT_DELETED
+    automatic_decision: false
+  - scenario_id: OBS-PROMPT-FIELD-OVERDISCLOSURE
+    customer_sides: [candidate, company, platform]
+    observation_intent: Record the prepared candidate field set, its six name-based PII classifications, and its separation from score inputs.
+    source_assertion_markers:
+      - 'assert explanation["prompt_fields_prepared"] == prompt_fields'
+      - 'prompt_field_boundary_observed=8-prepared,6-classified-pii,score-effect-none'
+    cleanup_surface: RAW_PROMPT_OBSERVED_NOT_DELETED
+    automatic_decision: false
+  - scenario_id: OBS-BOLA-DENIAL-TENANT-SHAPE
+    customer_sides: [company, platform]
+    observation_intent: Record the actor-company and target-object shape of four denied cross-company requests without claiming an authorization bypass.
+    source_assertion_markers:
+      - 'assert exact_denial.stdout.strip() == "1"'
+      - 'denial_shape.stdout.strip() == "4"'
+      - 'authorization_denial_tenant_shape_observed=actor-company,target-object,no-target-company-snapshot'
+    cleanup_surface: SYNTHETIC_ROWS
+    automatic_decision: false
+  - scenario_id: OBS-PUBLIC-CLOSED-JOB-DETAIL
+    customer_sides: [candidate, company, platform]
+    observation_intent: Record whether one closed synthetic job is absent from the public list while its unauthenticated detail and company profile remain readable.
+    source_assertion_markers:
+      - 'public_closed_detail["status"] == "closed"'
+      - 'sum(item["id"] == job["id"] for item in public_jobs_before_close) == 1'
+      - 'sum(item["id"] == job["id"] for item in public_jobs) == 0'
+      - 'public_closed_job_detail_observed=baseline-open:1,list-after-close:0,detail-present'
+    cleanup_surface: SYNTHETIC_ROWS
+    automatic_decision: false
+  - scenario_id: OBS-API-TOKEN-REUSE-AND-ACCOUNT-ACTIVE-GATE
+    customer_sides: [candidate, platform]
+    observation_intent: Record the status codes returned for one synthetic candidate token by GET /api/v1/auth/me before and after an attempted POST /api/v1/auth/logout, and after a privileged test-harness mutation of that candidate's users.active flag. The attempted-path result is not evidence about browser logout, every session-termination mechanism, token expiration, or token revocation.
+    source_assertion_markers:
+      - '"/api/v1/auth/logout"'
+      - 'conditionally_replace_member_state(restore, False)'
+      - 'restore_member_state_record(cleanup, restore)'
+      - 'api_token_account_gate_observed='
+    cleanup_surface: MUTATED_MEMBER_STATE_AND_SYNTHETIC_ROWS
+    automatic_decision: false
+  - scenario_id: OBS-RECRUITER-LOGICAL-LINK-RESOLUTION
+    customer_sides: [company, platform]
+    observation_intent: Record the exact response of GET /api/v1/recruiter/overview after a privileged test-harness mutation changes one synthetic recruiter's Member DB company_id first to a verified-nonexistent UUID and then to the distinct company UUID of another synthetic recruiter, followed by verification that the original UUID was restored. This observes logical-link resolution only; it is not evidence of an external mutation path, database compromise, BOLA, organization-membership behavior, or a cross-store partial commit.
+    source_assertion_markers:
+      - 'missing_count.returncode == 0 and missing_count.stdout.strip() == "0"'
+      - 'alternate_overview["company"]["company_id"] == alternate_company'
+      - 'restore_member_state_record(cleanup, restore)'
+      - 'logical_link_resolution_observed='
+    cleanup_surface: MUTATED_MEMBER_STATE_AND_SYNTHETIC_ROWS
+    automatic_decision: false
+
+cleanup_contract:
+  identifiers: CURRENT_RUN_CANONICAL_UUIDS_ONLY
+  member_user_state: CONDITIONAL_EXACT_RESTORE_WITH_DELETE_FALLBACK
+  database_rows: DELETE_AND_VERIFY_ZERO
+  redis_keys: DELETE_MATCHED_RUN_KEYS_AND_VERIFY_ZERO
+  raw_prompt_log: RETAIN_AND_VERIFY_EXACT_RECORDED_PAIRS
+  cleanup_failure_masks_scenario_failure: false
+
+evidence_ref: null

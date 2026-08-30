@@ -1,0 +1,45 @@
+# Terraform local artifacts
+**/.terraform/**
+*.tfstate
+*.tfstate.*
+*.tfplan
+tfplan*
+plan*.json
+*.tfvars
+*.tfvars.json
+crash.log
+measurement/out/**
+
+# Synthetic MLOps run material
+**/mlops/sources/**
+**/mlops/runs/**
+ranking_dataset.csv
+dataset_manifest.json
+source_read_receipt.json
+challenger_model.json
+evaluation_observations.json
+pipeline_run_receipt.json
+
+# Credentials and local configuration
+.env
+.env.*
+!.env.example
+credentials
+aws_credentials
+*.pem
+*.ppk
+
+# Build and cache output
+node_modules/
+dist/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Editors and operating systems
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
