@@ -1,5 +1,7 @@
 ﻿[CmdletBinding()]
-param()
+param(
+    [switch] $CheckOnly
+)
 
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -476,12 +478,18 @@ $summary = [pscustomobject]@{
     checks = $results
 }
 $reportJson = (($summary | ConvertTo-Json -Depth 5) -replace "`r`n", "`n") + "`n"
-[System.IO.File]::WriteAllText(
-    (Join-Path $root 'validation-report.json'),
-    $reportJson,
-    [System.Text.UTF8Encoding]::new($false)
-)
-$currentReport = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'validation-report.json')
+if (-not $CheckOnly) {
+    [System.IO.File]::WriteAllText(
+        (Join-Path $root 'validation-report.json'),
+        $reportJson,
+        [System.Text.UTF8Encoding]::new($false)
+    )
+}
+$currentReport = if ($CheckOnly) {
+    $reportJson
+} else {
+    Get-Content -Raw -Encoding UTF8 (Join-Path $root 'validation-report.json')
+}
 $currentReportHits = @($secretPatterns.GetEnumerator() | Where-Object { $currentReport -match $_.Value })
 if ($currentReportHits.Count -gt 0) { throw 'Current validation-report.json failed the post-write secret-pattern guard' }
 $results | Format-Table -AutoSize
