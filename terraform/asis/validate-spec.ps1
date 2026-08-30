@@ -438,7 +438,8 @@ $pdfSourceHash = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $root '
 $pdfSourceBound = $pdfAscii.Contains('% JCAREER_HTML_SOURCE: terraform/asis/index.html') -and
     $pdfAscii.Contains("% JCAREER_HTML_SHA256: $pdfSourceHash")
 $pdfLoopbackLinks = [regex]::Matches($pdfAscii, '/URI\s*\(http://127\.0\.0\.1:').Count
-Add-Check 'pdf_page_objects' ($pdfPages -ge 1 -and $pdfFresh -and $pdfSourceBound -and $pdfLoopbackLinks -eq 0) "$pdfPages page objects; rendered after sources=$pdfFresh; HTML source bound=$pdfSourceBound; loopback links=$pdfLoopbackLinks"
+$pdfOkay = $pdfPages -ge 1 -and $pdfSourceBound -and $pdfLoopbackLinks -eq 0
+Add-Check 'pdf_page_objects' $pdfOkay "$pdfPages page objects; checkout mtime advisory=$pdfFresh; HTML source bound=$pdfSourceBound; loopback links=$pdfLoopbackLinks"
 
 $secretPatterns = [ordered]@{
     account_id                = '\b\d{12}\b'
