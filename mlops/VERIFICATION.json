@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "verified_at": "2026-08-30T21:32:59+09:00",
+  "verified_at": "2026-08-30T21:36:41+09:00",
   "aws_api_calls": 0,
   "terraform_apply_destroy": false,
   "environment": {
@@ -95,7 +95,7 @@
       "spec": "assets/JCAREER_PLATFORM_ANIMATED.spec.json",
       "spec_sha256": "c880eb49599f6abd35ec618785abfe6013e8be05befb16ebcd1e99d639426aaa",
       "svg": "assets/JCAREER_PLATFORM_ANIMATED.svg",
-      "svg_sha256": "7798d879cb4a9bc9673cf16d34b42ac67ac0a54338a61b897284d9ba5adc00f5",
+      "svg_sha256": "71c6b3712f9e17a5fe3da753d0c263db71fc39d8950d024fafd9c1550190dae2",
       "png": "assets/JCAREER_PLATFORM_ANIMATED.png",
       "png_sha256": "ce8d11b6a2b073e6c0c0daf238ae81798a0d3e02a59524d10ba5da870fcd14ef",
       "canvas_css_px": [
@@ -119,7 +119,7 @@
     "assets/aws/README.md": "ed9035648780eb3c5bb8111fae3e11031d53263918dcbdde21a011ba7040a666",
     "assets/JCAREER_PLATFORM_ANIMATED.png": "ce8d11b6a2b073e6c0c0daf238ae81798a0d3e02a59524d10ba5da870fcd14ef",
     "assets/JCAREER_PLATFORM_ANIMATED.spec.json": "c880eb49599f6abd35ec618785abfe6013e8be05befb16ebcd1e99d639426aaa",
-    "assets/JCAREER_PLATFORM_ANIMATED.svg": "7798d879cb4a9bc9673cf16d34b42ac67ac0a54338a61b897284d9ba5adc00f5",
+    "assets/JCAREER_PLATFORM_ANIMATED.svg": "71c6b3712f9e17a5fe3da753d0c263db71fc39d8950d024fafd9c1550190dae2",
     "assets/motion.js": "d9c4c2c93c23d37c1a9f2f6a46176c46984f64e1ce86ac4097df077d3cf251bd",
     "assets/site.css": "f7d9b1cdbc211623c4c2e6f05538edadfc15624c81c5284b6b4fa4f1e808ccb9",
     "index.html": "45a59a79a85285508a5acc737996a6021236899e51dd258d0f7997c4321ce6c4",
@@ -131,7 +131,7 @@
     "scripts/check_public_mlops.py": "32be0e9f86e56b44e96b87e257e1802ebe785fb15a907c0c3abba813d01dcc63",
     "scripts/check_public_ui.mjs": "a2dec3dcb3adb103387ffc393ae941bc0f09012a8753b945074687bec34f735a",
     "scripts/check_serverless_mlops_static.py": "f5935cbdf61dfcda864cd50f117fbfefae881f5c9fb9499ab7b675f244bf4d7c",
-    "scripts/finalize_animated_arch.mjs": "8d5cfa0918ca5b517655c06622286316e7d5551d44974a3f18ac2babd93c8d55",
+    "scripts/finalize_animated_arch.mjs": "ec9c15005a988e9f5f799eed8a9dbf70cb16b08d631787090443315478c16ca4",
     "scripts/render_spec_pdf.mjs": "4c2494a1f36bebf1780a02e62377826aba5f3f125b68f47b8da0352c0b9e026a",
     "scripts/update_public_mlops_evidence.py": "0a0794faa68c40d54b04074e0a3e0e9859de2e93d232b0c157f1d8415108288b",
     "src/mlops/Dockerfile.exporter": "49a6cf2d4466a15eda580be6829c96ccd8357c92371ff6fdc4b1224972c1c68a",
