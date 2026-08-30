@@ -29,6 +29,7 @@ output = output.replace(
   /<circle(?![^>]*\bclass="motion-dot")([^>]*)><animateMotion\b/g,
   '<circle class="motion-dot"$1><animateMotion',
 );
+output = output.replace(/[ \t]+$/gm, '');
 
 const motionCount = (output.match(/<animateMotion\b/g) || []).length;
 const guardedMotionCount = (output.match(/<circle class="motion-dot"[^>]*><animateMotion\b/g) || []).length;

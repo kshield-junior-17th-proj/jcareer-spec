@@ -82,7 +82,7 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 | 항목 | 값 |
 |---|---|
 | 문서 번호 | `JC-ASIS-SPEC-001` |
-| 개정 | 3.12 |
+| 개정 | 3.13 |
 | 기준일 | 2026-08-30 |
 | 작성 기준 | 기존 기획, AWS에 접속하지 않는 Terraform 계획, 별도 서비스 구현 범위 |
 | 승인 상태 | 기준 설계 · 기술 검토 진행. `docs/current` 승인 문서 0건 |
@@ -105,6 +105,7 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 | 3.10 | 2026-08-28 | 첫 화면에 MLOps 7단계와 0/13/14 계획을 독립 영역으로 표시. 최신 서버리스 전용 루트의 데이터·보안·장애 경계와 전용 명세 연결을 반영 |
 | 3.11 | 2026-08-29 | 서비스별 인프라 경로에 기능·보안·MLOps 상세 명세 바로가기를 추가하고 링크 자동 검사를 보강 |
 | 3.12 | 2026-08-30 | AWS 검증 Lab과 AS-IS 모의 기준선을 분리하고, MLOps·대시보드의 최신 검사 수와 쉬운 한국어 상태표를 반영 |
+| 3.13 | 2026-08-30 | 공개 문서 정합성 재검토. PDF 소스 결속, 시점별 Lab 관찰, 공개 도면 39셀·8연결, 서비스별 관찰 상태를 분리하고 고정 검사 추가 |
 
 ### 0.7 상태를 읽는 법
 
@@ -376,6 +377,9 @@ HTTP 200과 shared-passcode session 발급을 관찰했다. 이 명세 작성 �
 | 컨설턴트 backend | HTTP API/Lambda, 암호화 DynamoDB+PITR, SSM SecureString, activity 기록 | client AWS가 아니라 컨설턴트 영역. activity는 성공한 session/save 중심이며 immutable audit trail 아님 | 소스·템플릿 존재, 저장소상 배포 기록 |
 | 운영 배치 | approved snapshot ingestion만 | per-user auth, tenant isolation, audit logs, 승인 진위 검사 | `GATED` |
 | client AWS 직접 조회 | 없음 | 자격증명, cross-account role, API poller를 두지 않음 | `OUT_OF_SCOPE` |
+
+로컬 Evidence Desk의 validator·화면 변환·원본 자료 결속 시험은 28건을 통과했다. 이는 소스와
+합성 시험 범위이며, 승인된 복사본 반입이나 운영 배포를 확인한 결과는 아니다.
 
 AIMS Desk의 현재 소스에는 조항별 다음 조치 행과 네 가지 빠른 필터(우선순위, 판단 대기,
 근거 없음, 담당자 없음)가 있다. 담당자와 확인 기한을 입력·표시하며 대비 token도 보정했다.
@@ -1338,7 +1342,7 @@ fallback 또는 운영 SLA로 표현하지 않는다.
 - 배포용 PDF 명세: [`JCAREER_ASIS_SYSTEM_SPEC.pdf`](JCAREER_ASIS_SYSTEM_SPEC.pdf)
 - 편집 원본: [`JCAREER_ASIS_FLOW.drawio`](JCAREER_ASIS_FLOW.drawio)
 - PNG: [`JCAREER_ASIS_FLOW.drawio.png`](JCAREER_ASIS_FLOW.drawio.png)
-- 상세 기술 원본: [`JCAREER_ASIS_2AZ.drawio`](JCAREER_ASIS_2AZ.drawio)
+- 보조 상세 도면은 원본 작업 트리에 별도로 보관한다. 공개 기준 도면의 수량과 검증에는 포함하지 않는다.
 - 상호작용 도면 설명: [`architecture.html`](architecture.html). 전체 보기 1개와 구직자 추천,
   기업용 인재 찾기, AI 설명, MLOps 학습·평가, 기록·탐지의 서비스·보조 경로 5개가 있다. 항목을
   누르면 관련 구간과 번호가 붙은 3단계 설명, 확인 수준, 해당 상세 명세 바로가기가 함께 바뀐다.
@@ -1385,7 +1389,7 @@ IAM 역할 생성 권한이 없어 적용이 중단됐다. 그 과정에서 만�
 | PNG 크기 및 시각 검토 | PASS — 2400×1400, 왼쪽에서 오른쪽으로 이어지는 6단계 기준 흐름과 승인 전 MLOps 안내 영역의 분리 상태를 눈으로 확인 |
 | HTML 구조 및 로컬 링크 | PASS — HTML 2개, 내부 anchor·로컬 산출물 링크 broken 0, duplicate ID 0 |
 | HTML 목록 의미 구조 | PASS — AS-IS 한계 21개와 도면 요청 흐름 6개가 각각 하나의 연속 `<ol>`로 생성되며 들여쓴 문장이 같은 `<li>` 안에 유지됨 |
-| PDF 인쇄본 | PASS — PDF 1.4 헤더, A4 인쇄 스타일, 46쪽 확인 |
+| PDF 인쇄본 | PASS — PDF 1.4 헤더, A4 인쇄 스타일, HTML 원본 지문 결속과 페이지 객체 확인 |
 | 웹 품질 계측 | 이전 PASS(로컬 모바일) — Lighthouse 12.8.2 기준 본문 96/100/100/100, 도면 98/100/100/100(성능/접근성/권장사항/검색). v3.10에서는 데스크톱·모바일 화면과 MLOps 영역의 배치를 확인했다. v3.11에서는 가로 390px의 휴대전화 화면으로 다시 확인했다. 도면 안쪽의 좌우 이동 영역을 제외하면 페이지 바깥으로 튀어나온 내용은 없었다. MLOps 버튼을 눌렀을 때 설명과 전용 명세 링크가 함께 바뀌는지도 확인했다. Lighthouse 점수는 다시 측정하지 않아 이전 값을 유지함 |
 | 기계 판독 회귀검사 | PASS — `validate-spec.ps1` 25/25, FAIL 0. 상세 결과는 `validation-report.json`에 기록 |
 | account ID·비밀정보 패턴 | PASS — 공개용 UTF-8 원본 6개에서 12자리 account ID, access key, private key, 일반 secret assignment 패턴 0건. PDF·PNG는 raw byte sentinel 검사와 검사를 마친 원본의 생성 체인으로 확인 |

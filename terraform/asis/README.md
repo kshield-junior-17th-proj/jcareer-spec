@@ -34,12 +34,13 @@
 - [도면 설명](architecture.html)
 - [쉽게 보는 draw.io 원본](JCAREER_ASIS_FLOW.drawio)
 - [쉽게 보는 PNG 도면](JCAREER_ASIS_FLOW.drawio.png)
-- [상세 기술 draw.io 원본](JCAREER_ASIS_2AZ.drawio)
+- [보조 상세 draw.io 원본](JCAREER_ASIS_2AZ.drawio)
 - [자동검사 결과](validation-report.json)
 
-`JCAREER_ASIS_2AZ.drawio`는 앱·데이터·조건부 AI 경계를 모두 담은 상세 기술 원본이다.
-`JCAREER_ASIS_2AZ.md`는 초기 2-AZ 구판(legacy) 설명이므로 현재 상태는 웹 명세와 위 두
-도면 원본을 기준으로 확인한다.
+`JCAREER_ASIS_2AZ.drawio`는 원본 작업 트리에서 관리한 별도 기술 기록이다. 공개 기준 도면의
+수량과 검증 결과에는 합치지 않는다. 공개 화면은 39개 셀·8개 연결의
+`JCAREER_ASIS_FLOW.drawio`와 같은 이름의 PNG를 기준으로 읽는다. `JCAREER_ASIS_2AZ.md`는
+초기 2-AZ 구판(legacy) 설명이다.
 
 ## 서비스 기획과의 경계
 

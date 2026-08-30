@@ -22,7 +22,7 @@
   <meta property="og:description" content="서비스 버튼을 누르면 채용 기능과 MLOps, 보안·운영 경로를 단계별로 볼 수 있습니다.">
   <meta property="og:url" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/architecture.html">
   <link rel="canonical" href="https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/architecture.html">
-  <meta name="flow-source-sha256" content="d9818b950b7cac1606c4c3643c256b2f3d430d5e4035024c489fb8351a3cdb03">
+  <meta name="flow-source-sha256" content="fcfef6269fe5ba638dddaa7f476107d39b8ffca8855955dc86be637d4e277c45">
   <title>J-Career AWS 인프라 흐름도</title>
   <style>
 
@@ -475,7 +475,7 @@
       <figcaption class="diagram-legend"><span><i class="legend-line"></i>Terraform 기준 진입 경로</span><span><i class="legend-line local"></i>서비스 구현 경로</span><span><i class="legend-line missing"></i>추가 연결 검토</span><span><i class="legend-line record"></i>기록·탐지 구성</span><span>바탕 ①~⑥은 전체 흐름, 큰 원 1·2·3은 선택 경로입니다.</span><span>색상과 단계 설명을 함께 확인할 수 있습니다.</span></figcaption>
     </figure>
     </div>
-    <section class="plate__section plate__source" data-flow-source-sha256="d9818b950b7cac1606c4c3643c256b2f3d430d5e4035024c489fb8351a3cdb03"><aside class="note">기준일: 2026-08-30 도면 성격: J-Career 채용 서비스와 AWS 인프라 기준 설계 핵심 수치: 업무망 PC 180대, 2-AZ, 6개 모듈, Terraform 계획 항목 110개</aside>
+    <section class="plate__section plate__source" data-flow-source-sha256="fcfef6269fe5ba638dddaa7f476107d39b8ffca8855955dc86be637d4e277c45"><aside class="note">기준일: 2026-08-30 도면 성격: J-Career 채용 서비스와 AWS 인프라 기준 설계 핵심 수치: 업무망 PC 180대, 2-AZ, 6개 모듈, Terraform 계획 항목 110개</aside>
 <p>이 문서는 <a href="JCAREER_ASIS_FLOW.drawio">JCAREER_ASIS_FLOW.drawio</a>의 짧은 해설이다. <a href="architecture.html">웹 도면</a>에서는 전체 인프라의 ①~⑥을 보거나 서비스·보조 경로 5개 중 하나를 눌러 1·2·3 순서와 한계를 함께 볼 수 있다. 선택한 설명 아래의 바로가기를 누르면 관련 상세 명세로 이어진다. 자세한 기능과 API, 보안, 장애 내용은 <a href="index.html">웹 명세</a>에 있다.</p>
 <h2 id="section-1">0. 먼저 볼 숫자<a class="anchor" href="#section-1" aria-label="0. 먼저 볼 숫자 바로가기">#</a></h2>
 <p>아래 세 숫자가 현재 범위를 보여 준다.</p>
@@ -496,7 +496,7 @@
 <div class="table-scroll"><table><thead><tr><th scope="col">구역</th><th scope="col">들어 있는 것</th><th scope="col">쉬운 설명</th></tr></thead><tbody><tr><td>공개 구역</td><td>도면에는 ALB 표시. Terraform의 NAT 2개는 생략</td><td>인터넷 요청을 받고 외부 연결을 내보내도록 설계됨</td></tr><tr><td>앱 구역</td><td>ECS Fargate 서비스 4종</td><td>화면, 업무 처리, 추천, 인공지능 설명을 맡도록 설계됨</td></tr><tr><td>데이터 구역</td><td>RDS, Redis</td><td>주요 데이터와 임시 추천 결과를 보관함</td></tr></tbody></table></div>
 <p>세 구역은 서울 지역의 2a와 2c에 나누도록 설계됐다. 데이터 구역에는 인터넷으로 바로 나가는 경로가 없다.</p>
 <h2 id="section-7">5. 기준 설계 밖의 항목<a class="anchor" href="#section-7" aria-label="5. 기준 설계 밖의 항목 바로가기">#</a></h2>
-<ul><li>서비스 구현 코드는 검증용 합성 데이터를 사용한다. 공개 릴리스의 Lab·MLOps·OpenDART 검사 6단계를 통과했다.</li><li>OpenDART 공개정보 기능의 기본값은 합성 예시다. SQS·Lambda 작업자 소스는 있으나 AWS 자원과 실행 증거는 없다.</li><li>MLOps 전용 루트는 합성 특징 파일만 받도록 작성됐고 현재 추천 점수나 순위를 바꾸지 않는다. 0/13/14는 별도 계획 수이며 AWS 배포 수량이 아니다.</li><li>MLOps 전용 경계 시험 19건과 합성 파이프라인 시험 22건을 통과했다. AWS 배포와 모델 품질 평가는 포함하지 않는다.</li><li>Bedrock 직접 합성 호출은 별도 AWS 검증 계정에서 확인했다. Lab 적용은 IAM 권한에서 중단돼 정리했으므로 현재 관련 리소스는 0개이며, 애플리케이션 전체 경로는 확인하지 못했다.</li><li>컨설턴트 대시보드는 고객사 AWS에 직접 연결하지 않는다. 승인된 비식별본만 받아야 한다.</li><li>외부 미리보기에는 민감정보 제거본만 쓴다.</li><li>개선안(TO-BE)은 승인 전 리소스 0개를 유지한다. 승인 정보에 문제가 있으면 중단한다.</li></ul>
+<ul><li>서비스 구현 코드는 검증용 합성 데이터를 사용한다. 전체 source/static/fixture 검사 115건을 통과했다. 이는 소스와 시험 자료의 예상 결과를 대조한 값이며 AWS 실행 결과가 아니다.</li><li>OpenDART 공개정보 기능의 기본값은 합성 예시다. SQS·Lambda 작업자 소스는 있으나 AWS 자원과 실행 증거는 없다.</li><li>MLOps 전용 루트는 합성 특징 파일만 받도록 작성됐고 현재 추천 점수나 순위를 바꾸지 않는다. 0/13/14는 별도 계획 수이며 AWS 배포 수량이 아니다.</li><li>MLOps 전용 경계 시험 19건과 합성 파이프라인 시험 22건을 통과했다. AWS 배포와 모델 품질 평가는 포함하지 않는다.</li><li>Bedrock 직접 합성 호출은 별도 AWS 검증 계정에서 확인했다. API→gateway→broker→Bedrock 전체 경로는 별도 항목이며 아직 확인하지 못했다.</li><li>AWS 검증 Lab은 생성 예정 24개 계획을 두 차례 확인했지만 모두 같은 IAM 권한에서 중단됐다. 각 실패의 부분 생성 16개를 지웠고, 2026-08-30 21:17 KST에 관련 자원과 상태가 모두 0개임을 다시 확인했다. 계획 24개·부분 생성 16개·AS-IS 기준선 110개는 서로 합산하지 않는다.</li><li>컨설턴트 대시보드는 고객사 AWS에 직접 연결하지 않는다. 승인된 비식별본만 받아야 한다.</li><li>외부 미리보기에는 민감정보 제거본만 쓴다.</li><li>개선안(TO-BE)은 승인 전 리소스 0개를 유지한다. 승인 정보에 문제가 있으면 중단한다.</li></ul>
 <h2 id="section-8">6. 이 그림만 보고 단정하면 안 되는 것<a class="anchor" href="#section-8" aria-label="6. 이 그림만 보고 단정하면 안 되는 것 바로가기">#</a></h2>
 <ul><li>고객사 AWS에 같은 구성이 실제로 있다는 뜻이 아니다.</li><li>기준 애플리케이션이 실행 중이라는 뜻이 아니다. 실행 이미지가 없다.</li><li>업무망 PC가 AWS에 연결됐다는 뜻이 아니다. 실제 접속 경로는 확인하지 못했다.</li><li>제안 단계 신규 서비스는 이번 구성에 구현하지 않았다.</li></ul></section>
   </main>

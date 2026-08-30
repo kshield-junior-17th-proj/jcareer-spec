@@ -60,10 +60,11 @@ S3에서 읽습니다. Lambda는 후보 모델을 한 차례 학습한 뒤 결�
 - [PDF 명세](terraform/asis/JCAREER_ASIS_SYSTEM_SPEC.pdf)
 - [PNG 도면](terraform/asis/JCAREER_ASIS_FLOW.drawio.png)
 - [쉽게 보는 draw.io 원본](terraform/asis/JCAREER_ASIS_FLOW.drawio)
-- [상세 기술 draw.io 원본](terraform/asis/JCAREER_ASIS_2AZ.drawio)
+- [보조 상세 draw.io 원본](terraform/asis/JCAREER_ASIS_2AZ.drawio): 원본 작업 트리의 별도 기술 기록이며 공개 기준 도면 수량에는 포함하지 않음
 
 업무망 PC 180대는 Windows 100대와 macOS 80대로 구분합니다. 이 수량은 사용자 확정 입력이며
-Terraform 자원 수나 동시 사용자 수로 바꾸어 해석하지 않습니다.
+Terraform 자원 수나 동시 사용자 수로 바꾸어 해석하지 않습니다. 실물 배치는 관찰하지 않았고,
+Windows 3대와 macOS 3대 검토 표본도 아직 실행하지 않았습니다.
 
 ## 보안 서비스는 어디에 있나
 

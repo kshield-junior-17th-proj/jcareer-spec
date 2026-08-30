@@ -15,12 +15,21 @@
   smoke·API 경계·점수·DB 경계·보안·복원력·양면 관찰 스크립트 PASS, cleanup exit 0과
   container·volume·network·image 잔존 0이었다. 그 뒤 OpenDART·MLOps·Bedrock broker·승인형
   wrapper 소스가 바뀌었으므로 이 기록을 현재 소스의 실행 증거로 사용하지 않는다.
-- `terraform/lab`의 관리 자원 17개는 delete-only 저장 계획으로 제거했고, state와 태그·이름
-  기반 AWS 잔존 조회는 모두 0이었다. `terraform/asis`는 적용하지 않았다.
-- 이후 소스 변경 뒤 Docker·원격 runtime smoke는 다시 실행하지 않았다. 따라서 아래 런타임
-  관찰은 최신 source의 실행 증거가 아니라 해당 시점의 역사적 기록이다.
-- 2026-08-28 AWS 실행 범위와 2026-08-29 teardown은
-  `context/findings/AWS_LAB_RUNTIME_OBSERVATION_2026-08-28.md`에 분리해 기록한다.
+- `terraform/asis`는 적용하지 않았다. AWS Lab 관찰은 아래처럼 서로 다른 시점의 기록이다.
+
+| 관찰 시각 | 계획·상태 | 실행 결과 |
+|---|---|---|
+| 2026-08-28 19:04 KST~2026-08-29 | 당시 HTTPS Lab 관리 자원 17개 | 여섯 서비스와 합성 시험을 관찰한 뒤 저장된 삭제 계획으로 지워 0개를 확인했다. 이후 소스 변경분의 실행 증거로 쓰지 않는다. |
+| 2026-08-30, 1차 최종 확인 20:08 KST | 새 계정에서 생성 24·변경 0·삭제 0 계획 | IAM 역할 생성 권한 부족으로 중단됐다. 부분 생성된 16개만 저장된 삭제 계획으로 지우고 관련 조회와 상태에서 0개를 확인했다. |
+| 2026-08-30, 재시도 최종 확인 21:17 KST | 새 토큰으로 다시 만든 생성 24·변경 0·삭제 0 계획 | 같은 권한에서 다시 중단됐다. 허용된 그래프의 부분집합 16개만 지운 뒤 VPC·서브넷·NAT·탄력적 IP·실행 인스턴스·CloudFront 함수/배포·Lab IAM 역할·Lab 예산·Terraform 상태가 모두 0임을 확인했다. 전체 애플리케이션은 기동하지 못했다. |
+
+- 이후 소스 변경 뒤 Docker·원격 runtime smoke는 다시 실행하지 않았다. 아래 런타임 관찰은
+  최신 source의 실행 증거가 아니라 각 표에 적힌 시점의 기록이다.
+- 20:08의 1차 기록과 21:17의 재시도 기록은 서로 다른 실행이다. 계획 24개와 부분 생성
+  16개를 합산한 수치로 읽지 않는다.
+- 2026-08-28 실행과 2026-08-29 제거 기록은 원본 작업 트리의
+  `context/findings/AWS_LAB_RUNTIME_OBSERVATION_2026-08-28.md`에 두었다. 공개 저장소에서는
+  2026-08-30 기록을 `terraform/lab/DEPLOYMENT_OBSERVATION_2026-08-30.md`로 제공한다.
 
 ## 검증 범위
 
@@ -164,7 +173,7 @@ python tests/outage_probe.py --explanation AVAILABLE --cache hit
 | `scripts/check_asis_contract.py` | `.tf` 38개, 금지 data source 없음, mock provider 플래그 확인 |
 | 컨설턴트 dashboard | snapshot validator·view-model·source artifact 결속 28개 통과. 한 관찰의 양측 metadata 투영과 고유 건수 유지, 보이지 않는 문자·양방향 표시 제어문자 거부, CSP `connect-src 'none'`, network API·browser persistence·판정 계산 심볼 없음, `EXTERNAL_PREVIEW` fail-closed, loaded/error 제목 focus는 모바일에서 화면 밖에 숨지 않도록 스크롤 허용. packager는 이미 승인된 snapshot의 source SHA-256만 확인하고 판단을 생성하지 않으며 실제 승인 입력·package 실행 증거는 없음 |
 | dashboard 빈 상태 브라우저 확인 | loopback 요청만 관찰, console 오류 없음, 승인 입력 부재를 숫자 없이 표시; 확인 뒤 임시 서버 종료 |
-| AWS 다이어그램 원본·PNG | 상세 편집 원본 `terraform/asis/JCAREER_ASIS_2AZ.drawio`는 공식 AWS4 아이콘 허용 목록, 77개 셀·23개 연결과 14개 회귀를 통과했다. 지원자/기업·세 논리 DB·조건부 Bedrock/OpenDART·기본 0자원 MLOps·Windows 3/macOS 3 미배포 경계를 표시하며, VPN+MFA·UTM·Slack과 IPS·IDS·rack은 AWS 데이터 흐름에 연결하지 않은 선언 항목으로 구분한다. 공개 페이지의 간소화 도면은 `JCAREER_ASIS_FLOW.drawio`와 같은 이름의 PNG로 따로 제공하고 2400×1400 크기·내부 링크·원본 파일 존재 여부를 검사한다. 어느 도면도 AWS 실행 증거가 아니다. |
+| AWS 다이어그램 원본·PNG | 공개 기준 도면 `terraform/asis/JCAREER_ASIS_FLOW.drawio`는 39개 셀·8개 연결이며 같은 이름의 2400×1400 PNG와 함께 검사한다. 77개 셀·23개 연결은 원본 작업 트리의 별도 상세 도면 기록으로, 공개 기준 도면 검사 수에 합치지 않는다. 공개 도면은 지원자·기업 흐름, 데이터 저장소, 조건부 Bedrock/OpenDART, 기본 0자원 MLOps와 미관찰 단말 경계를 간단히 보여 준다. 도면은 AWS 실행 증거가 아니다. |
 | 미래 lab 정적 경계 | lab static 단위 회귀 100개를 포함: EC2 1대·`t3.small`·기본 13/Bedrock 포함 14/HTTPS 프리뷰 23/HTTPS+Bedrock 24 exact resource inventory·기본 inbound 0·승인 모드 CloudFront 관리형 prefix-list TCP/3000만 허용·직접 CIDR 금지·SSM loopback·Bedrock 기본 비활성·승인 전 차단, OpenDART clean-state 3단계/역순 제거와 Prepare→Review→사람 결정→Publish 문서 순서, deploy-broker 이름 경계, user-data unit write 전 실패 trap과 direct shutdown fallback, 정확한 SSM policy/profile-name 결속, lab nginx 내부경로 deny·보안 header, 회원/기업 role probe와 outcome 연결·memory limit·saved plan/JSON lock·SHA·provider account digest 재확인. 생성·제거 plan-only는 provider account, exact binary plan, 최상위 timestamp를 제외한 normalized JSON projection digest를 출력한다. apply는 재계획하지 않고 보존된 binary plan·JSON과 세 digest를 확인한다. provider/모든 Terraform 명령 전에 공통 경로 mutex와 same-worktree exclusive file lock·pending marker 검사를 수행하고, stable plan을 GUID operation path로 이동해 durable marker를 만든 뒤 그 binary만 소비한다. marker 생성부터 apply·계정 재검사·artifact cleanup까지 중단·실패하면 marker와 operation artifact를 남겨 후속 wrapper를 막고 사람의 state 확인·처분을 요구한다. marker는 runtime upload/remote check 및 destroy 후 state inventory 전에 제거되므로 그 이후 검증 실패의 표식은 아니며, 직렬화는 복제 worktree나 다른 host까지 확장되지 않는다. Terraform 변수인 runtime mode·승인문·HTTPS token digest도 대조한다. HTTPS token은 같은 operator-retained SecureString을 요구하고 1~32자 period와 최소 다양성 placeholder를 거부하지만 CSPRNG 사용 자체를 증명하지 않는다. JSON projection은 정식 canonical JSON으로 주장하지 않으며, OpenDART 실호출·browser open·backend/receipt 경로 같은 post-apply 실행 의도는 plan digest에 포함되지 않는다. auto-stop output은 기존 host의 실제 timer 관찰값이 아니라 구성 입력값임을 명시한다. source 계약이며 최신 runtime 실행 증거는 아님 |
 | 미실행 runtime manifest | 전체 100 Windows + 80 macOS와 분리한 3+3 합성 시험 profile은 `NOT_EXECUTED`·Terraform 비관리, 네 앱은 `UNBUILT`·`UNPUBLISHED`로 검사; 상류 manifest 21개 회귀와 별도 endpoint review pack의 37개 fail-closed 회귀가 중복 YAML key 거부, profile 결속·가명 asset ID·`devices_exist=false`·`NOT_PROCURED`·posture 전량 `NOT_OBSERVED`를 확인한다. 실제 단말·이미지·직원 신원·office network 증거는 아님 |
 | 미실행 위험 관찰·lab receipt 계약 | 16개 시나리오는 `DRAFT_NOT_APPROVED`·`NOT_EXECUTED`, 합성 stub·성공 mode·raw prompt 기록 활성·Bedrock 비활성 전용, 자동 실행·자동 위험 판정 금지로 검사. API token/회원 `active` 게이트와 담당자-기업 논리 연결 관찰은 조건부 정확히 한 행 변경·즉시 복구를 요구하고, 브라우저 저장 상태·token 만료·조직 membership/role 수명주기·교차 저장소 부분 commit fault injection은 미관찰로 고정한다. receipt v2 schema는 네 app과 열여섯 scenario를 canonical 순서로 각각 정확히 한 번, source/archive/manifest/API surface/API effect/plan/schema/deploy hash, 원문 없는 cleanup identifier/prompt-pair 집합 hash, provider 모순 금지, Bedrock mode에서 위험 관찰 `NOT_RUN`, 비판정 관찰 상태·사람 검토를 요구한다. 시나리오별 source/result/evidence digest, source payload bytes·parsed plan 결속, 허용된 집계 evidence payload와 result 의미, 전체 완료 또는 `COMPLETED* → FAILED → SKIPPED_AFTER_FAILURE*` 관계를 순수 instance validator로 검사한다. `AuditEvent.detail` JSON key 조회가 두 위치 모두 `detail::jsonb ? ...`를 쓰는 정적 회귀를 포함해 74개가 통과하며, 선택적 `jsonschema`가 없어도 같은 순수·구조 회귀가 실행된다. schema·validator만 있고 실제 receipt·archive member hash·승인 참조 ingestion·서명·실행 증거는 없음 |

@@ -2,8 +2,9 @@
 
 기업 담당자가 공개된 기업 정보를 요청하면, J-Career API가 제한된 중계 경로를 통해
 OpenDART를 조회하고 결과 복사본을 기업 DB에 저장하는 설계다. 추천 점수에는 영향을 주지
-않는다. 현재는 이미지 검사 결과를 사람이 확인하기 전 단계이며, AWS 배포와 OpenDART
-실호출은 아직 수행하지 않았다.
+않는다. Terraform은 기본 비활성 상태에서 0개, 준비 단계에서 8개, 실행 단계에서 11개를
+계획한다. 현재는 이미지 검사 결과를 사람이 확인하기 전 단계다. 소스가 있다는 사실은 AWS
+배포나 OpenDART 외부 조회 성공을 뜻하지 않는다.
 
 This isolated, default-off Terraform root provides on-demand public-company lookup
 for the existing recruiter API. It does not modify `terraform/asis`, and source

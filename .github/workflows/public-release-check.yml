@@ -1,0 +1,41 @@
+name: public-release-check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: 공개 명세 정합성
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: 소스·문서 단위시험
+        run: python3 -B -m unittest discover -s tests -p 'test_*.py'
+      - name: 공개 문서 수치·상태 정합성
+        run: python3 -B scripts/check_public_document_consistency.py
+      - name: AS-IS HTML·PDF·도면 결속
+        shell: pwsh
+        run: ./terraform/asis/validate-spec.ps1
+      - name: MLOps 공개 명세 결속
+        run: python3 -B scripts/check_public_mlops.py
+      - name: 업무 단말 이미지 정의 12개 검사
+        run: python3 -B scripts/check_workplace_images_static.py
+      - name: 애니메이션 원본 결속
+        run: node scripts/finalize_animated_arch.mjs --check
+      - name: 모바일·데스크톱 화면 검사
+        run: node scripts/check_public_ui.mjs
+      - name: 공개 파일 비밀정보 패턴 검사
+        run: python3 -B scripts/scan_secrets.py .
+      - name: 공백 오류 검사
+        run: git diff --check

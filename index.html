@@ -242,19 +242,21 @@
         </div>
         <section class="readiness-panel" aria-labelledby="readiness-title">
           <div class="readiness-summary">
-            <p class="section-label">검증 현황</p>
-            <h2 id="readiness-title">확인한 범위와<br>다음 할 일을 나눕니다</h2>
-            <span class="readiness-state">3 / 7 확인</span>
-            <p>설계·공개 파일과 Bedrock 직접 호출은 확인했습니다. AWS 전체 경로와 외부 연계, 단말·운영 관찰은 아래 항목대로 이어갑니다.</p>
+            <p class="section-label">관찰 상태</p>
+            <h2 id="readiness-title">서로 다른 시험을<br>한 줄에 섞지 않습니다</h2>
+            <span class="readiness-state">9개 항목 · 개별 확인</span>
+            <p>설계, AWS Lab, 애플리케이션과 외부 연계를 따로 적었습니다. 한 항목의 성공을 다른 항목의 성공으로 넓혀 읽지 않습니다.</p>
           </div>
           <ol class="readiness-list">
-            <li class="readiness-item" data-readiness="done"><span class="readiness-index">01</span><div><strong>최신 PNG 내보내기</strong><p>새 한글 흐름도와 원본 해시를 함께 검증했습니다.</p></div><span class="readiness-tag">완료</span></li>
-            <li class="readiness-item" data-readiness="done"><span class="readiness-index">02</span><div><strong>공개 소스 검사</strong><p>Lab·MLOps·OpenDART 정적 검사와 단위시험 묶음을 통과했습니다.</p></div><span class="readiness-tag">완료</span></li>
-            <li class="readiness-item" data-readiness="done"><span class="readiness-index">03</span><div><strong>Bedrock 직접 합성 호출</strong><p>새 검증 계정에서 모델 응답과 토큰 집계를 확인했습니다.</p></div><span class="readiness-tag">완료</span></li>
-            <li class="readiness-item" data-readiness="pending"><span class="readiness-index">04</span><div><strong>AWS 애플리케이션 전체 경로</strong><p>IAM 역할 생성 권한을 준비한 뒤 여섯 서비스와 HTTPS·Bedrock 경로를 다시 확인합니다.</p></div><span class="readiness-tag">권한 대기</span></li>
-            <li class="readiness-item" data-readiness="pending"><span class="readiness-index">05</span><div><strong>OpenDART 외부 조회</strong><p>키와 이미지 검사에 대한 사람 판단이 없어 게시와 실호출을 멈춘 상태입니다.</p></div><span class="readiness-tag">대기</span></li>
-            <li class="readiness-item" data-readiness="pending"><span class="readiness-index">06</span><div><strong>업무망 단말 확인</strong><p>Windows·macOS 단말에서 접속과 주요 흐름을 직접 확인해야 합니다.</p></div><span class="readiness-tag">대기</span></li>
-            <li class="readiness-item" data-readiness="pending"><span class="readiness-index">07</span><div><strong>운영 관찰 기록</strong><p>로그, 경보, 장애 대응 결과를 남긴 관찰 기록이 필요합니다.</p></div><span class="readiness-tag">대기</span></li>
+            <li class="readiness-item" data-readiness="done"><span class="readiness-index">01</span><div><strong>AS-IS 기준선</strong><p>AWS에 접속하지 않은 모의 계획입니다. 2-AZ, 6개 모듈, 생성 예정 110개이며 <code>terraform/asis</code> 적용 결과가 아닙니다.</p></div><span class="readiness-tag">기록 확인</span></li>
+            <li class="readiness-item" data-readiness="done"><span class="readiness-index">02</span><div><strong>AWS 검증 Lab</strong><p>별도 24개 생성 계획을 다시 실행했지만 같은 권한에서 멈췄습니다. 부분 생성 16개를 지운 뒤 2026-08-30 21:17 KST에 관련 자원 0개를 다시 확인했습니다.</p></div><span class="readiness-tag">정리 완료</span></li>
+            <li class="readiness-item" data-readiness="pending"><span class="readiness-index">03</span><div><strong>애플리케이션 여섯 서비스</strong><p>과거 기동 기록은 있으나 이후 소스가 바뀌었습니다. 최신 전체 실행 경로는 다시 확인해야 합니다.</p></div><span class="readiness-tag">재검증 중</span></li>
+            <li class="readiness-item" data-readiness="done"><span class="readiness-index">04</span><div><strong>Bedrock 직접 합성 호출</strong><p>합성 문장 한 건의 모델 응답은 확인했습니다. 애플리케이션을 거치지 않은 별도 시험입니다.</p></div><span class="readiness-tag">직접 호출 확인</span></li>
+            <li class="readiness-item" data-readiness="pending"><span class="readiness-index">05</span><div><strong>Bedrock 전체 연결 경로</strong><p>API→설명 게이트웨이→권한 중계기→Bedrock 경로는 IAM 역할을 만들지 못해 실행하지 못했습니다.</p></div><span class="readiness-tag">권한 보완 대기</span></li>
+            <li class="readiness-item" data-readiness="pending"><span class="readiness-index">06</span><div><strong>OpenDART</strong><p>외부 조회는 관찰하지 않았습니다. 합성 예시와 작업자 빌드·검사 준비는 실조회 증거가 아닙니다.</p></div><span class="readiness-tag">외부 조회 미관찰</span></li>
+            <li class="readiness-item" data-readiness="pending"><span class="readiness-index">07</span><div><strong>MLOps</strong><p>합성 소스와 0/13/14 계획을 확인했습니다. AWS 배포, Lambda 실행과 추천 연결은 관찰하지 않았습니다.</p></div><span class="readiness-tag">소스·계획 확인</span></li>
+            <li class="readiness-item" data-readiness="pending"><span class="readiness-index">08</span><div><strong>업무 단말</strong><p>180대는 시나리오 입력입니다. Windows 3대와 macOS 3대 검토 표본도 실제로 관찰하지 않았습니다.</p></div><span class="readiness-tag">실물 미관찰</span></li>
+            <li class="readiness-item" data-readiness="pending"><span class="readiness-index">09</span><div><strong>컨설턴트 대시보드</strong><p>고객사 AWS에 직접 연결하지 않습니다. 운영 전에는 사용자별 인증, 고객사 분리, 감사 기록과 승인된 복사본 반입이 필요합니다.</p></div><span class="readiness-tag">운영 조건 필요</span></li>
           </ol>
         </section>
       </div>

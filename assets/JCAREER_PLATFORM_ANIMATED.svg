@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1480 820" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" role="img" aria-label="J-Career 서비스·AWS 핵심 흐름">
 <title>J-Career 서비스·AWS 핵심 흐름</title>
-<metadata id="jcareer-animated-source" data-spec-sha256="583668975ca3bc2cb7bb8124b05f47714f3091a02ab4bdb4d26f606e7b8e5c41"/>
+<metadata id="jcareer-animated-source" data-spec-sha256="c880eb49599f6abd35ec618785abfe6013e8be05befb16ebcd1e99d639426aaa"/>
 <defs>
 <pattern id="grid" width="34" height="34" patternUnits="userSpaceOnUse"><path d="M34 0 H0 V34" fill="none" stroke="#EAEFF6" stroke-width="1"/></pattern>
 <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9" fill="none" stroke="context-stroke" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></marker>
@@ -15,7 +15,7 @@
 <text x="770" y="140" font-size="11" font-weight="700" fill="#B21667">별도 MLOps 계획 · 기본 0 / 준비 13 / 실행 14 · 승인 전 반영 차단</text>
 <rect x="760" y="326" width="570" height="160" rx="12" fill="rgba(140,79,255,0.06)" stroke="#8C4FFF" stroke-width="1.5" stroke-dasharray="6 4"/>
 <text x="778" y="348" font-size="11" font-weight="700" fill="#7C3AED">요청 처리 경로 · 서울 리전 2-AZ 기준</text>
-<path class="flow" d="M 95.0 400.0 L 257.0 400.0" fill="none" stroke="#1D4ED8" stroke-width="2" marker-end="url(#ah)"/>
+<path class="flow" d="M 143.0 400.0 L 257.0 400.0" fill="none" stroke="#1D4ED8" stroke-width="2" marker-end="url(#ah)"/>
 <path class="flow" d="M 303.0 400.0 L 437.0 400.0" fill="none" stroke="#1D4ED8" stroke-width="2" marker-end="url(#ah)"/>
 <path class="flow" d="M 483.0 400.0 L 617.0 400.0" fill="none" stroke="#1D4ED8" stroke-width="2" marker-end="url(#ah)"/>
 <path class="flow" d="M 663.0 400.0 L 797.0 400.0" fill="none" stroke="#1D4ED8" stroke-width="2" marker-end="url(#ah)"/>
@@ -26,7 +26,7 @@
 <path class="flow" d="M 723.0 560.0 L 820.0 560.0 L 820.0 627.0" fill="none" stroke="#B45309" stroke-width="2" marker-end="url(#ah)"/>
 <path class="flow" d="M 1010.0 423.0 L 1010.0 627.0" fill="none" stroke="#0369A1" stroke-width="2" marker-end="url(#ah)"/>
 <path class="flow" d="M 843.0 650.0 L 987.0 650.0" fill="none" stroke="#B45309" stroke-width="2" marker-end="url(#ah)"/>
-<circle class="motion-dot" r="4" fill="#1D4ED8"><animateMotion dur="3.2s" begin="0.00s" repeatCount="indefinite" path="M 95.0 400.0 L 257.0 400.0"/></circle>
+<circle class="motion-dot" r="4" fill="#1D4ED8"><animateMotion dur="3.2s" begin="0.00s" repeatCount="indefinite" path="M 143.0 400.0 L 257.0 400.0"/></circle>
 <circle class="motion-dot" r="4" fill="#1D4ED8"><animateMotion dur="3.2s" begin="0.53s" repeatCount="indefinite" path="M 303.0 400.0 L 437.0 400.0"/></circle>
 <circle class="motion-dot" r="4" fill="#1D4ED8"><animateMotion dur="3.2s" begin="1.07s" repeatCount="indefinite" path="M 483.0 400.0 L 617.0 400.0"/></circle>
 <circle class="motion-dot" r="4" fill="#1D4ED8"><animateMotion dur="3.2s" begin="1.60s" repeatCount="indefinite" path="M 663.0 400.0 L 797.0 400.0"/></circle>
@@ -37,13 +37,13 @@
 <circle class="motion-dot" r="3.4" fill="#0F766E"><animateMotion dur="3.4s" begin="1.13s" repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear" path="M 663.0 400.0 L 797.0 400.0"/></circle>
 <circle class="motion-dot" r="3.4" fill="#0F766E"><animateMotion dur="3.4s" begin="1.70s" repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear" path="M 483.0 400.0 L 617.0 400.0"/></circle>
 <circle class="motion-dot" r="3.4" fill="#0F766E"><animateMotion dur="3.4s" begin="2.27s" repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear" path="M 303.0 400.0 L 437.0 400.0"/></circle>
-<circle class="motion-dot" r="3.4" fill="#0F766E"><animateMotion dur="3.4s" begin="2.83s" repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear" path="M 95.0 400.0 L 257.0 400.0"/></circle>
+<circle class="motion-dot" r="3.4" fill="#0F766E"><animateMotion dur="3.4s" begin="2.83s" repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear" path="M 143.0 400.0 L 257.0 400.0"/></circle>
 <circle class="motion-dot" r="4" fill="#7E22CE"><animateMotion dur="2.8s" begin="0.00s" repeatCount="indefinite" path="M 843.0 190.0 L 987.0 190.0"/></circle>
 <circle class="motion-dot" r="4" fill="#7E22CE"><animateMotion dur="2.8s" begin="1.40s" repeatCount="indefinite" path="M 1033.0 190.0 L 1217.0 190.0"/></circle>
 <circle class="motion-dot" r="4" fill="#B45309"><animateMotion dur="2.5s" begin="0.00s" repeatCount="indefinite" path="M 723.0 560.0 L 820.0 560.0 L 820.0 627.0"/></circle>
 <circle class="motion-dot" r="4" fill="#B45309"><animateMotion dur="2.5s" begin="1.25s" repeatCount="indefinite" path="M 843.0 650.0 L 987.0 650.0"/></circle>
 <circle class="motion-dot" r="4" fill="#0369A1"><animateMotion dur="2.4s" begin="0.00s" repeatCount="indefinite" path="M 1010.0 423.0 L 1010.0 627.0"/></circle>
-<rect x="49.0" y="377.0" width="46" height="46" rx="8" fill="#64748B"/><circle cx="72" cy="400" r="7" fill="none" stroke="#fff" stroke-width="2.4"/><circle cx="72" cy="400" r="1.8" fill="#fff"/><text x="72" y="438" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">업무망 PC 180대</text><text x="72" y="451" text-anchor="middle" font-size="9.5" fill="#5A6B7B">Windows 100 · macOS 80</text>
+<rect x="97.0" y="377.0" width="46" height="46" rx="8" fill="#64748B"/><circle cx="120" cy="400" r="7" fill="none" stroke="#fff" stroke-width="2.4"/><circle cx="120" cy="400" r="1.8" fill="#fff"/><text x="120" y="438" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">업무망 PC 180대</text><text x="120" y="451" text-anchor="middle" font-size="9.5" fill="#5A6B7B">선언: Windows 100 / macOS 80 · 실물 미관찰</text>
 <g transform="translate(257.00,377.00) scale(0.5750)">
 
 
@@ -230,7 +230,7 @@
     </g>
 </g><text x="1010" y="688" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">앱·흐름 로그</text><text x="1010" y="701" text-anchor="middle" font-size="9.5" fill="#5A6B7B">CloudWatch Logs</text>
 <rect x="1217.0" y="627.0" width="46" height="46" rx="8" fill="#64748B"/><circle cx="1240" cy="650" r="7" fill="none" stroke="#fff" stroke-width="2.4"/><circle cx="1240" cy="650" r="1.8" fill="#fff"/><text x="1240" y="688" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">AWS 작업 기록</text><text x="1240" y="701" text-anchor="middle" font-size="9.5" fill="#5A6B7B">CloudTrail → S3</text>
-<circle cx="176" cy="400" r="9" fill="#232F3E"/><text x="176" y="403" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fff">1</text>
+<circle cx="200" cy="400" r="9" fill="#232F3E"/><text x="200" y="403" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fff">1</text>
 <circle cx="370" cy="400" r="9" fill="#232F3E"/><text x="370" y="403" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fff">2</text>
 <circle cx="550" cy="400" r="9" fill="#232F3E"/><text x="550" y="403" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fff">3</text>
 <circle cx="730" cy="400" r="9" fill="#232F3E"/><text x="730" y="403" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fff">4</text>

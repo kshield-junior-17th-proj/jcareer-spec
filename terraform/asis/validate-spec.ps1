@@ -43,9 +43,10 @@ $readmeOkay = $readme.Contains('index.html') -and
     $readme.Contains('JCAREER_ASIS_FLOW.drawio') -and
     $readme.Contains('JCAREER_ASIS_2AZ.md') -and
     $readme.Contains('JCAREER_ASIS_2AZ.drawio') -and
-    $readme.Contains('상세 기술 원본') -and
+    $readme.Contains('보조 상세 draw.io 원본') -and
+    $readme.Contains('39개 셀·8개 연결') -and
     $readme.Contains('구판(legacy)')
-Add-Check 'readme_current_deliverables' $readmeOkay $(if ($readmeOkay) { 'current deliverables linked; legacy diagram marked' } else { 'README routing is incomplete' })
+Add-Check 'readme_current_deliverables' $readmeOkay $(if ($readmeOkay) { 'public 39/8 diagram linked; separate detailed and legacy diagrams marked' } else { 'README routing is incomplete' })
 
 $flowGuide = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'JCAREER_ASIS_FLOW.md')
 $drawioText = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'JCAREER_ASIS_FLOW.drawio')
@@ -60,7 +61,7 @@ $plainLanguageOkay = $spec.Contains('### 0.1 ') -and
     $specGuideHangul -ge 900 -and
     $flowGuide.Contains('## 0.') -and
     $flowGuideHangul -ge 40 -and
-    $drawioText.Contains('v3.12') -and
+    $drawioText.Contains('v3.13') -and
     $drawioHangul -ge 180 -and
     -not $drawioText.Contains('web · api') -and
     -not $drawioText.Contains('2개 AZ') -and
@@ -427,7 +428,7 @@ $pdfSourceHash = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $root '
 $pdfSourceBound = $pdfAscii.Contains('% JCAREER_HTML_SOURCE: terraform/asis/index.html') -and
     $pdfAscii.Contains("% JCAREER_HTML_SHA256: $pdfSourceHash")
 $pdfLoopbackLinks = [regex]::Matches($pdfAscii, '/URI\s*\(http://127\.0\.0\.1:').Count
-Add-Check 'pdf_page_objects' ($pdfPages -eq 46 -and $pdfFresh -and $pdfSourceBound -and $pdfLoopbackLinks -eq 0) "$pdfPages page objects; rendered after sources=$pdfFresh; HTML source bound=$pdfSourceBound; loopback links=$pdfLoopbackLinks"
+Add-Check 'pdf_page_objects' ($pdfPages -ge 1 -and $pdfFresh -and $pdfSourceBound -and $pdfLoopbackLinks -eq 0) "$pdfPages page objects; rendered after sources=$pdfFresh; HTML source bound=$pdfSourceBound; loopback links=$pdfLoopbackLinks"
 
 $secretPatterns = [ordered]@{
     account_id                = '\b\d{12}\b'

@@ -283,14 +283,14 @@
               <tr><td>Terraform 형식·구문</td><td>PASS</td><td><code>fmt -check</code>, <code>validate</code></td></tr>
               <tr><td>AWS 비접속 단계별 계획</td><td>3/3 PASS</td><td><code>disabled 0</code>, <code>bootstrap 13</code>, <code>runtime 14</code></td></tr>
               <tr><td>기본 잠금 계획</td><td>PASS · 관리 자원 0</td><td><code>-refresh=false</code>, 기존 state 없음</td></tr>
-              <tr><td>위험 설정 차단 시험</td><td>19/19 PASS</td><td>허용 주소, 삭제·금지 서비스, 실행 도구</td></tr>
-              <tr><td>합성 데이터 처리 시험</td><td>22/22 PASS</td><td>테스트 대역 S3·DynamoDB, 원문 잔류·중복·실패 조건</td></tr>
+              <tr><td>서버리스 경계 시험</td><td>19/19 PASS</td><td>허용 주소, 삭제·금지 서비스, 실행 도구</td></tr>
+              <tr><td>합성 MLOps 단위시험</td><td>22/22 PASS</td><td>테스트 대역 S3·DynamoDB, 원문 잔류·중복·실패 조건</td></tr>
               <tr><td>공개 파일 일치 검사</td><td>PASS</td><td>7단계, 링크, 그림 원본, 2400×1400 PNG, 파일 지문 일치</td></tr>
               <tr><td>공개 전 안전 검사</td><td>PASS</td><td>임시 실행 파일 0, 비밀키·실제 계정 번호처럼 보이는 값 0</td></tr>
             </tbody>
           </table>
         </div>
-        <p class="caption">PASS는 공개 소스와 Terraform 계획이 정해진 검사 조건을 통과했다는 뜻입니다. AWS 배포와 모델 품질 평가는 별도 검증 기록으로 관리합니다.</p>
+        <p class="caption">서버리스 경계 시험 19/19, 합성 MLOps 단위시험 22/22를 확인했습니다. 모두 소스·시험 범위이며 AWS 실행 결과나 모델 품질 판정이 아닙니다.</p>
       </div>
     </section>
 

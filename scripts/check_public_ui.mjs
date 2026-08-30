@@ -334,7 +334,7 @@ async function runChecks(client, origin) {
   assert(landingMotion.gsap, 'Pinned GSAP and ScrollTrigger did not load.');
   assert(landingMotion.headingOpacity === 1 && landingMotion.headingLines <= 3, 'Landing hero is hidden or wraps beyond three lines.');
   assert(landingMotion.slides === 3 && landingMotion.activeSlides === 1, 'Perspective carousel did not initialise one of three views.');
-  assert(landingMotion.readinessItems === 7 && landingMotion.readinessDone === 3, 'Demo readiness blockers are incomplete or overstated.');
+  assert(landingMotion.readinessItems === 9 && landingMotion.readinessDone === 3, 'Demo readiness blockers are incomplete or overstated.');
   assert(landingMotion.diagramSource.endsWith('.svg'), 'Animated architecture source is not active.');
 
   await evaluate(client, 'document.querySelector("[data-carousel-next]").click(); true');

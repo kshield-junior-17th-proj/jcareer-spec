@@ -4,7 +4,7 @@
   "footer": "움직이는 점은 데이터 이동 순서를 설명합니다. AWS에서 관측한 요청이나 배포 상태를 뜻하지 않습니다.",
   "canvas": {"w": 1480, "h": 820},
   "nodes": [
-    {"id": "office", "x": 72, "y": 400, "icon": "tile:generic", "label": "업무망 PC 180대", "sub": "Windows 100 · macOS 80"},
+    {"id": "office", "x": 120, "y": 400, "icon": "tile:generic", "label": "업무망 PC 180대", "sub": "선언: Windows 100 / macOS 80 · 실물 미관찰"},
     {"id": "route", "x": 280, "y": 400, "icon": "route53", "label": "주소 안내", "sub": "Route 53"},
     {"id": "front", "x": 460, "y": 400, "icon": "cloudfront", "label": "웹 전달", "sub": "CloudFront"},
     {"id": "waf", "x": 640, "y": 400, "icon": "waf", "label": "웹 요청 검사", "sub": "CloudFront 연결 WAF"},
