@@ -392,7 +392,7 @@ $guardedFlowsOkay = $layerRegions['trace'].Contains('flow-line local') -and
     $architecture.Contains('실제 credential, Slack·Notion workspace, 메일 시스템, 메시지 전송 또는 AWS 리소스는 없습니다')
 $overlayLegendOkay = $architecture.Contains('legend-line record') -and
     $architecture.Contains('기록·탐지 경로') -and
-    $architecture.Contains('.flow-line.record { stroke: #8a5a00; stroke-dasharray: 34 18; }') -and
+    $architecture.Contains('.flow-line.record { stroke: #7a5b1e; stroke-dasharray: 28 22; }') -and
     $architecture.Contains('@keyframes flowMarch')
 $interactiveFlowOkay = $flowButtonCount -eq 9 -and
     $flowLayerCount -eq 9 -and

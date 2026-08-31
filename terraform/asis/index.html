@@ -91,8 +91,8 @@
   .button:active { transform: translateY(0); }
   .button.button--accent { color: #fff; background: var(--accent); border-color: var(--accent); }
   .button.button--accent[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); box-shadow: inset 0 -4px 0 var(--accent); }
-  .document { min-width: 0; background: var(--surface); border: 1px solid var(--line); box-shadow: 12px 12px 0 rgba(118,108,92,.09), var(--shadow); }
-  .executive { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(270px, .65fr); gap: 28px; padding: clamp(28px, 5vw, 60px); background: linear-gradient(120deg, #fffdf8 0 72%, #f1e9dc 72%); border-bottom: 1px solid var(--line); }
+  .document { min-width: 0; background: var(--surface); border: 1px solid var(--line); box-shadow: 0 16px 42px rgba(45,49,47,.08); }
+  .executive { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(270px, .65fr); gap: 28px; padding: clamp(28px, 5vw, 60px); background: #fffdf8; border-bottom: 1px solid var(--line); }
   .section-label { margin: 0 0 12px; color: var(--accent); font: 700 11px/1.2 var(--mono); letter-spacing: .09em; text-transform: uppercase; }
   .executive h2 { margin: 0; font-size: clamp(1.65rem, 3vw, 2.6rem); line-height: 1.16; letter-spacing: -.035em; }
   .executive p { max-width: 65ch; margin: 18px 0 0; color: var(--ink-2); }
@@ -320,7 +320,7 @@
           <a class="button" href="architecture.html">서비스 경로 탐색</a>
         </div>
         <a class="diagram-link" href="architecture.html" aria-label="서비스별로 탐색할 수 있는 AWS 인프라 흐름도 열기">
-          <img src="JCAREER_ASIS_FLOW.drawio.png" width="2400" height="1400" loading="lazy" decoding="async" alt="업무망 Windows 100대와 macOS 80대, 사용자 요청 6단계, 가용 영역 두 곳, 데이터 저장소, 기록·탐지와 승인 전 MLOps 확장 경계를 표시한 J-Career 기존 설계 흐름도">
+          <img src="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg" width="2320" height="1500" loading="lazy" decoding="async" alt="업무망 PC 180대와 Slack·Notion·SMTP 경계, GitHub Actions 검사와 Pages 배포, AWS 2-AZ 런타임 기준 설계, LLM Gateway·Bedrock·OpenDART, 별도 서버리스 MLOps를 연결한 J-Career 전체 인프라 지도">
         </a>
         <div class="diagram-caption"><span>실선: 구성 확인 · 점선: 실제 연결 미구현</span><span>서비스별 강조 경로는 도면 페이지에서 확인 · 비밀정보 미표시</span></div>
       </section>
