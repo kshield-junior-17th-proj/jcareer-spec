@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+import hashlib
 import hmac
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Response
+from fastapi import APIRouter, Depends, Header, HTTPException, Request, Response
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from fastapi.routing import APIRoute
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
@@ -25,7 +29,24 @@ from .service import (
 )
 
 
-router = APIRouter()
+class _RedactedValidationRoute(APIRoute):
+    def get_route_handler(self):
+        original_handler = super().get_route_handler()
+
+        async def redacted_handler(request: Request):
+            try:
+                return await original_handler(request)
+            except RequestValidationError:
+                return JSONResponse(
+                    status_code=422,
+                    content={"detail": "invalid_integration_request"},
+                    headers={"Cache-Control": "no-store"},
+                )
+
+        return redacted_handler
+
+
+router = APIRouter(route_class=_RedactedValidationRoute)
 _integration_service = IntegrationService.from_environment()
 
 
@@ -127,6 +148,25 @@ async def admin_synthetic_integration_send(
     key = request.idempotency_key or header_key
     if key is None:
         raise HTTPException(status_code=422, detail="idempotency_key_required")
+    idempotency_ref = "idem_" + hashlib.sha256(key.encode("utf-8")).hexdigest()[:20]
+    if not _record_admin_audit(
+        db,
+        user=user,
+        event_type="synthetic_integration_send_requested",
+        target_ref=idempotency_ref,
+        action="authorise_dispatch",
+        result="accepted",
+        detail={
+            "idempotency_ref": idempotency_ref,
+            "providers": [provider.value for provider in request.providers],
+            "data_classification": "SYNTHETIC_NON_PERSONAL",
+        },
+    ):
+        raise HTTPException(
+            status_code=503,
+            detail="integration_audit_unavailable",
+            headers={"Cache-Control": "no-store"},
+        )
     try:
         response = await service.synthetic_send(
             providers=request.providers,
@@ -151,14 +191,16 @@ async def admin_synthetic_integration_send(
         audit_result = "disabled"
     else:
         audit_result = "success"
-    _record_admin_audit(
+    audit_recorded = _record_admin_audit(
         db,
         user=user,
         event_type="synthetic_integration_send",
-        target_ref=response.event.event_id,
+        target_ref=idempotency_ref,
         action="dispatch",
         result=audit_result,
         detail={
+            "idempotency_ref": idempotency_ref,
+            "event_id": response.event.event_id,
             "providers": [provider.value for provider in request.providers],
             "states": states,
             "replayed_count": sum(
@@ -167,4 +209,10 @@ async def admin_synthetic_integration_send(
             "data_classification": response.event.data_classification,
         },
     )
+    if not audit_recorded:
+        raise HTTPException(
+            status_code=424,
+            detail="integration_delivery_audit_unavailable",
+            headers={"Cache-Control": "no-store"},
+        )
     return response

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import sys
 import time
 import unittest
@@ -11,6 +12,7 @@ from types import SimpleNamespace
 
 import httpx
 from pydantic import ValidationError
+from sqlalchemy.exc import SQLAlchemyError
 
 
 API_ROOT = Path(__file__).resolve().parents[1] / "api"
@@ -30,7 +32,11 @@ from app.integrations.contracts import (  # noqa: E402
     ProviderStatus,
 )
 from app.integrations.redaction import redact_text, redact_value  # noqa: E402
-from app.integrations.service import IntegrationService  # noqa: E402
+from app.integrations.service import (  # noqa: E402
+    IdempotencyCapacityError,
+    IdempotencyStore,
+    IntegrationService,
+)
 
 
 SYNTHETIC_EVENT = IntegrationEvent(
@@ -180,6 +186,33 @@ class IntegrationConfigurationTests(unittest.TestCase):
 
 
 class IntegrationDeliveryTests(unittest.IsolatedAsyncioTestCase):
+    async def test_httpx_info_logs_redact_slack_webhook_credentials(self) -> None:
+        values = enabled_environment()
+        values["SLACK_WEBHOOK_URL"] = (
+            "HTTPS://WEBHOOK.EXAMPLE.TEST/services/T/B/SYNTHETIC_UPPER_SECRET"
+        )
+        values["SLACK_ALLOWED_HOSTS"] = "webhook.example.test"
+
+        def handler(_request: httpx.Request) -> httpx.Response:
+            return httpx.Response(200, text="ok")
+
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            service = IntegrationService.from_environment(
+                values, slack_client=client, notion_client=client
+            )
+            with self.assertLogs("httpx", level=logging.INFO) as captured:
+                response = await service.synthetic_send(
+                    providers=[DeliveryProvider.SLACK_WEBHOOK],
+                    idempotency_key="logging-probe-001",
+                )
+
+        rendered = "\n".join(captured.output)
+        self.assertEqual(response.overall_state, "ALL_DELIVERED")
+        self.assertNotIn(values["SLACK_WEBHOOK_URL"], rendered)
+        self.assertNotIn(str(httpx.URL(values["SLACK_WEBHOOK_URL"])), rendered)
+        self.assertNotIn("SYNTHETIC_UPPER_SECRET", rendered)
+        self.assertIn("[REDACTED]", rendered)
+
     async def test_default_off_never_touches_any_transport(self) -> None:
         calls: list[str] = []
 
@@ -308,6 +341,82 @@ class IntegrationDeliveryTests(unittest.IsolatedAsyncioTestCase):
         self.assertLess(names.index("starttls"), names.index("login"))
         self.assertLess(names.index("login"), names.index("send_message"))
 
+    async def test_smtp_worker_is_single_flight_and_never_finishes_after_receipt(
+        self,
+    ) -> None:
+        values = enabled_environment()
+        values["INTEGRATION_TIMEOUT_SECONDS"] = "0.05"
+        calls: list[str] = []
+
+        class SlowFakeSmtp(FakeSmtp):
+            def send_message(self, message) -> None:
+                calls.append("send_started")
+                time.sleep(0.12)
+                calls.append("send_completed")
+
+        def smtp_ssl_factory(*_args, **_kwargs):
+            return SlowFakeSmtp([])
+
+        service = IntegrationService.from_environment(
+            values,
+            smtp_ssl_factory=smtp_ssl_factory,
+            ssl_context_factory=lambda: object(),
+        )
+        first_task = asyncio.create_task(
+            service.synthetic_send(
+                providers=[DeliveryProvider.SMTP_TLS],
+                idempotency_key="smtp-worker-probe-001",
+            )
+        )
+        for _ in range(50):
+            if calls:
+                break
+            await asyncio.sleep(0.005)
+        second = await service.synthetic_send(
+            providers=[DeliveryProvider.SMTP_TLS],
+            idempotency_key="smtp-worker-probe-002",
+        )
+        first = await first_task
+
+        self.assertEqual(calls, ["send_started", "send_completed"])
+        self.assertEqual(first.receipts[0].state, DeliveryState.DELIVERED)
+        self.assertEqual(second.receipts[0].state, DeliveryState.FAILED)
+        self.assertEqual(second.receipts[0].failure_code, FailureCode.TIMEOUT)
+
+    async def test_repeated_cancellation_cannot_release_live_smtp_worker(self) -> None:
+        values = enabled_environment()
+        values["INTEGRATION_TIMEOUT_SECONDS"] = "0.05"
+        settings = IntegrationSettings.from_environment(values)
+        calls: list[str] = []
+
+        class SlowFakeSmtp(FakeSmtp):
+            def send_message(self, message) -> None:
+                calls.append("send_started")
+                time.sleep(0.12)
+                calls.append("send_completed")
+
+        adapter = SmtpTlsAdapter(
+            settings.smtp,
+            smtp_ssl_factory=lambda *_args, **_kwargs: SlowFakeSmtp([]),
+            ssl_context_factory=lambda: object(),
+        )
+        first = asyncio.create_task(adapter.deliver(SYNTHETIC_EVENT))
+        for _ in range(50):
+            if calls:
+                break
+            await asyncio.sleep(0.005)
+        first.cancel()
+        await asyncio.sleep(0.005)
+        first.cancel()
+
+        with self.assertRaises(DeliveryError) as blocked:
+            await adapter.deliver(SYNTHETIC_EVENT)
+        with self.assertRaises(asyncio.CancelledError):
+            await first
+
+        self.assertEqual(blocked.exception.code, FailureCode.TIMEOUT)
+        self.assertEqual(calls, ["send_started", "send_completed"])
+
     async def test_allowlist_rejection_happens_before_http(self) -> None:
         values = enabled_environment()
         values["SLACK_WEBHOOK_URL"] = "https://attacker.example/services/T/B/value"
@@ -398,6 +507,35 @@ class IntegrationDeliveryTests(unittest.IsolatedAsyncioTestCase):
             [False, True],
         )
 
+    async def test_batch_capacity_is_reserved_before_any_new_delivery(self) -> None:
+        async def succeeds(_event: IntegrationEvent) -> None:
+            return None
+
+        adapters = [
+            StubAdapter(DeliveryProvider.SLACK_WEBHOOK, succeeds),
+            StubAdapter(DeliveryProvider.NOTION_API, succeeds),
+            StubAdapter(DeliveryProvider.SMTP_TLS, succeeds),
+        ]
+        service = IntegrationService(
+            IntegrationSettings.from_environment({}),
+            adapters,
+            idempotency_store=IdempotencyStore(ttl_seconds=900, max_entries=10),
+        )
+        for index in range(9):
+            await service.synthetic_send(
+                providers=[DeliveryProvider.SLACK_WEBHOOK],
+                idempotency_key=f"capacity-fill-{index:03d}",
+            )
+        calls_before = [adapter.calls for adapter in adapters]
+
+        with self.assertRaises(IdempotencyCapacityError):
+            await service.synthetic_send(
+                providers=list(DeliveryProvider),
+                idempotency_key="capacity-batch-001",
+            )
+
+        self.assertEqual([adapter.calls for adapter in adapters], calls_before)
+
 
 class IntegrationRouteTests(unittest.TestCase):
     def test_admin_routes_are_registered_without_changing_recommendations(self) -> None:
@@ -416,8 +554,11 @@ class IntegrationRouteTests(unittest.TestCase):
         from app.security import current_user
 
         class FakeSession:
+            def __init__(self) -> None:
+                self.added = []
+
             def add(self, _value) -> None:
-                return None
+                self.added.append(_value)
 
             def commit(self) -> None:
                 return None
@@ -466,12 +607,107 @@ class IntegrationRouteTests(unittest.TestCase):
                 )
             )
             self.assertNotIn("api-probe-001", send_response.text)
+            requested, completed = fake_db.added[-2:]
+            self.assertEqual(requested.target_ref, completed.target_ref)
+            self.assertEqual(
+                requested.detail["idempotency_ref"],
+                completed.detail["idempotency_ref"],
+            )
+            self.assertEqual(
+                completed.detail["event_id"], send_response.json()["event"]["event_id"]
+            )
             self.assertEqual(
                 client.post(
                     "/api/v1/admin/integrations/synthetic-send", json={}
                 ).status_code,
                 422,
             )
+        finally:
+            api_main.app.dependency_overrides.clear()
+
+    def test_outbound_send_is_blocked_when_audit_is_unavailable(self) -> None:
+        import app.main as api_main
+        from app.database import get_db
+        from app.integrations.router import get_integration_service
+        from app.security import current_user
+
+        class FailingAuditSession:
+            def add(self, _value) -> None:
+                return None
+
+            def commit(self) -> None:
+                raise SQLAlchemyError("synthetic audit failure")
+
+            def rollback(self) -> None:
+                return None
+
+        async def succeeds(_event: IntegrationEvent) -> None:
+            return None
+
+        adapters = [
+            StubAdapter(provider, succeeds) for provider in DeliveryProvider
+        ]
+        service = IntegrationService(IntegrationSettings.from_environment({}), adapters)
+        api_main.app.dependency_overrides[get_db] = lambda: FailingAuditSession()
+        api_main.app.dependency_overrides[get_integration_service] = lambda: service
+        api_main.app.dependency_overrides[current_user] = lambda: SimpleNamespace(
+            id="admin-audit-test", role="admin", company_id=None
+        )
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            from fastapi.testclient import TestClient
+
+            client = TestClient(api_main.app)
+        try:
+            response = client.post(
+                "/api/v1/admin/integrations/synthetic-send",
+                headers={"Idempotency-Key": "audit-gate-probe-001"},
+                json={"providers": ["slack_webhook"]},
+            )
+            self.assertEqual(response.status_code, 503)
+            self.assertEqual(
+                response.json()["detail"], "integration_audit_unavailable"
+            )
+            self.assertEqual([adapter.calls for adapter in adapters], [0, 0, 0])
+        finally:
+            api_main.app.dependency_overrides.clear()
+
+    def test_rejected_body_does_not_reflect_sensitive_input(self) -> None:
+        import app.main as api_main
+        from app.database import get_db
+        from app.security import current_user
+
+        class FakeSession:
+            def __init__(self) -> None:
+                self.added = []
+
+            def add(self, _value) -> None:
+                self.added.append(_value)
+
+            def commit(self) -> None:
+                return None
+
+            def rollback(self) -> None:
+                return None
+
+        api_main.app.dependency_overrides[get_db] = lambda: FakeSession()
+        api_main.app.dependency_overrides[current_user] = lambda: SimpleNamespace(
+            id="admin-validation-test", role="admin", company_id=None
+        )
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            from fastapi.testclient import TestClient
+
+            client = TestClient(api_main.app)
+        secret_marker = "Authorization:Bearer SYNTHETIC_DEMO_SECRET_123456"
+        try:
+            response = client.post(
+                "/api/v1/admin/integrations/synthetic-send",
+                json={"idempotency_key": secret_marker},
+            )
+            self.assertEqual(response.status_code, 422)
+            self.assertNotIn(secret_marker, response.text)
+            self.assertEqual(response.json()["detail"], "invalid_integration_request")
         finally:
             api_main.app.dependency_overrides.clear()
 

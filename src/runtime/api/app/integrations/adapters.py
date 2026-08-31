@@ -19,6 +19,10 @@ from .contracts import (
     IntegrationEvent,
     ProviderStatus,
 )
+from .redaction import install_httpx_log_redaction
+
+
+install_httpx_log_redaction()
 
 
 class DeliveryError(RuntimeError):
@@ -67,6 +71,16 @@ class SlackWebhookAdapter:
     ) -> None:
         self.settings = settings
         self._client = client
+        webhook = (
+            settings.webhook_url.get_secret_value()
+            if settings.webhook_url is not None
+            else ""
+        )
+        try:
+            canonical_webhook = str(httpx.URL(webhook)) if webhook else ""
+        except httpx.InvalidURL:
+            canonical_webhook = ""
+        install_httpx_log_redaction(secrets=(webhook, canonical_webhook))
 
     def status(self) -> ProviderStatus:
         return ProviderStatus(
@@ -232,6 +246,7 @@ class SmtpTlsAdapter:
         self._smtp_factory = smtp_factory
         self._smtp_ssl_factory = smtp_ssl_factory
         self._ssl_context_factory = ssl_context_factory
+        self._delivery_gate = asyncio.Semaphore(1)
 
     def status(self) -> ProviderStatus:
         credential_configured = (
@@ -255,7 +270,35 @@ class SmtpTlsAdapter:
 
     async def deliver(self, event: IntegrationEvent) -> None:
         _assert_ready(self.status())
-        await asyncio.to_thread(self._deliver_sync, event)
+        try:
+            await asyncio.wait_for(
+                self._delivery_gate.acquire(), timeout=self.settings.timeout_seconds
+            )
+        except asyncio.TimeoutError as exc:
+            raise DeliveryError(FailureCode.TIMEOUT) from exc
+        try:
+            delivery_task = asyncio.create_task(
+                asyncio.to_thread(self._deliver_sync, event)
+            )
+            try:
+                await asyncio.shield(delivery_task)
+            except asyncio.CancelledError:
+                # A running thread cannot be cancelled safely. Wait for its
+                # socket-bounded operation so no late send follows a receipt.
+                # Repeated cancellation must not release the single-flight gate.
+                while not delivery_task.done():
+                    try:
+                        await asyncio.shield(delivery_task)
+                    except asyncio.CancelledError:
+                        continue
+                try:
+                    delivery_task.result()
+                except BaseException:
+                    # The original cancellation remains the public outcome.
+                    pass
+                raise
+        finally:
+            self._delivery_gate.release()
 
     def _deliver_sync(self, event: IntegrationEvent) -> None:
         if self.settings.from_address is None or self.settings.to_address is None:

@@ -121,7 +121,12 @@ API 컨테이너에는 Slack incoming webhook, Notion API, SMTP TLS 어댑터가
 HTTP endpoint는 HTTPS와 exact-host allowlist를 모두 통과해야 하고 redirect를 따르지 않는다.
 Slack과 Notion의 기본 allowlist는 각각 `hooks.slack.com`, `api.notion.com`이다. SMTP는
 `SMTP_ALLOWED_HOSTS`를 명시해야 하며 `implicit` TLS(기본 465) 또는 인증서 검증을 수행하는
-`starttls`만 지원한다. 공통 timeout은 0.05~30초 범위다.
+`starttls`만 지원한다. HTTP 요청과 SMTP 연결·소켓 작업 timeout은 0.05~30초 범위다. SMTP
+transaction 전체 시간은 서버 응답 단계 수에 따라 이 값보다 길어질 수 있어 process마다 한 건만
+동시에 처리한다. 대기 중인 추가 요청은 같은 timeout 안에 시작하지 못하면 전송 전에 종료된다.
+
+외부 전송 전에는 같은 `idempotency_ref`로 감사 요청을 먼저 저장한다. 감사 저장소를 사용할 수
+없으면 전송을 시작하지 않으며, 전송 결과도 같은 참조값으로 기록해 요청과 결과를 연결한다.
 
 중복 억제는 provider와 key 범위의 process-local TTL cache다. 같은 event의 재시도는 원래
 receipt를 `replayed=true`로 반환하고 외부 전송을 반복하지 않는다. 컨테이너 재시작이나 다중

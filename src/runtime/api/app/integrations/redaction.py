@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import logging
 import re
+import threading
 from collections.abc import Iterable, Mapping
 from typing import Any
 
@@ -72,3 +74,50 @@ def contains_sensitive_text(value: str) -> bool:
     """Detect obvious credentials and direct contact fields in outbound text."""
 
     return redact_text(value) != value
+
+
+def _redact_log_argument(value: object, *, secrets: Iterable[str] = ()) -> object:
+    rendered = str(value)
+    redacted = redact_text(rendered, secrets=secrets)
+    return redacted if redacted != rendered else value
+
+
+class _HttpxCredentialFilter(logging.Filter):
+    """Redact credential-bearing URLs before httpx records reach any handler."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._secrets: set[str] = set()
+        self._lock = threading.RLock()
+
+    def register(self, secrets: Iterable[str]) -> None:
+        with self._lock:
+            self._secrets.update(item for item in secrets if item)
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        with self._lock:
+            secrets = tuple(self._secrets)
+        record.msg = _redact_log_argument(record.msg, secrets=secrets)
+        if isinstance(record.args, tuple):
+            record.args = tuple(
+                _redact_log_argument(item, secrets=secrets) for item in record.args
+            )
+        elif isinstance(record.args, Mapping):
+            record.args = {
+                key: _redact_log_argument(item, secrets=secrets)
+                for key, item in record.args.items()
+            }
+        return True
+
+
+def install_httpx_log_redaction(*, secrets: Iterable[str] = ()) -> None:
+    """Install the process-wide filter required for credential URLs used by httpx."""
+
+    logger = logging.getLogger("httpx")
+    marker = "_jcareer_credential_filter"
+    credential_filter = getattr(logger, marker, None)
+    if credential_filter is None:
+        credential_filter = _HttpxCredentialFilter()
+        logger.addFilter(credential_filter)
+        setattr(logger, marker, credential_filter)
+    credential_filter.register(secrets)

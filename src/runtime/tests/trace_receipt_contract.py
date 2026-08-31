@@ -103,7 +103,7 @@ def recommendation_response(
         "recommendation_status": "AVAILABLE",
         "matcher_version": "deterministic-0.2.0",
         "provider_config_fingerprint": "a" * 64,
-        "correlation_id": "00000000-0000-0000-0000-000000000001",
+        "correlation_id": "00000000-0000-0000-0000-abcdeffedcba",
         "cache": cache,
         "items": [
             {

@@ -7,7 +7,7 @@ import hashlib
 import json
 import ssl
 import time
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
@@ -50,6 +50,14 @@ class _IdempotencyEntry:
     task: asyncio.Task[DeliveryReceipt]
 
 
+@dataclass(frozen=True)
+class _IdempotencyOperation:
+    provider: DeliveryProvider
+    idempotency_key: str
+    event_fingerprint: str
+    operation: Callable[[], Awaitable[DeliveryReceipt]]
+
+
 class IdempotencyStore:
     def __init__(self, *, ttl_seconds: int, max_entries: int) -> None:
         self.ttl_seconds = ttl_seconds
@@ -63,32 +71,78 @@ class IdempotencyStore:
         provider: DeliveryProvider,
         idempotency_key: str,
         event_fingerprint: str,
-        operation,
+        operation: Callable[[], Awaitable[DeliveryReceipt]],
     ) -> DeliveryReceipt:
-        key_hash = hashlib.sha256(idempotency_key.encode("utf-8")).hexdigest()
-        scope = (provider, key_hash)
+        receipts = await self.execute_batch(
+            [
+                _IdempotencyOperation(
+                    provider=provider,
+                    idempotency_key=idempotency_key,
+                    event_fingerprint=event_fingerprint,
+                    operation=operation,
+                )
+            ]
+        )
+        return receipts[0]
+
+    async def execute_batch(
+        self, operations: list[_IdempotencyOperation]
+    ) -> list[DeliveryReceipt]:
+        """Atomically reserve a provider batch before starting any side effect."""
+
+        if not operations:
+            return []
         now = time.monotonic()
-        replayed = False
+        plans: list[
+            tuple[
+                asyncio.Task[DeliveryReceipt] | None,
+                bool,
+                _IdempotencyOperation,
+                tuple[DeliveryProvider, str],
+            ]
+        ] = []
         async with self._lock:
             self._prune(now)
-            entry = self._entries.get(scope)
-            if entry is not None:
-                if entry.event_fingerprint != event_fingerprint:
+            scopes: set[tuple[DeliveryProvider, str]] = set()
+            new_entries = 0
+            for operation_spec in operations:
+                key_hash = hashlib.sha256(
+                    operation_spec.idempotency_key.encode("utf-8")
+                ).hexdigest()
+                scope = (operation_spec.provider, key_hash)
+                if scope in scopes:
+                    raise ValueError("idempotency batch scopes must be unique")
+                scopes.add(scope)
+                entry = self._entries.get(scope)
+                if entry is not None and (
+                    entry.event_fingerprint != operation_spec.event_fingerprint
+                ):
                     raise IdempotencyConflict(
                         "idempotency key was already used for another event"
                     )
-                task = entry.task
-                replayed = True
-            else:
-                self._make_capacity()
-                task = asyncio.create_task(operation())
-                self._entries[scope] = _IdempotencyEntry(
-                    event_fingerprint=event_fingerprint,
-                    expires_at=now + self.ttl_seconds,
-                    task=task,
-                )
-        receipt = await asyncio.shield(task)
-        return receipt.model_copy(update={"replayed": replayed})
+                if entry is None:
+                    new_entries += 1
+                    plans.append((None, False, operation_spec, scope))
+                else:
+                    plans.append((entry.task, True, operation_spec, scope))
+
+            self._make_capacity(required=new_entries)
+            materialised: list[tuple[asyncio.Task[DeliveryReceipt], bool]] = []
+            for task, replayed, operation_spec, scope in plans:
+                if task is None:
+                    task = asyncio.create_task(operation_spec.operation())
+                    self._entries[scope] = _IdempotencyEntry(
+                        event_fingerprint=operation_spec.event_fingerprint,
+                        expires_at=now + self.ttl_seconds,
+                        task=task,
+                    )
+                materialised.append((task, replayed))
+
+        receipts: list[DeliveryReceipt] = []
+        for task, replayed in materialised:
+            receipt = await asyncio.shield(task)
+            receipts.append(receipt.model_copy(update={"replayed": replayed}))
+        return receipts
 
     def _prune(self, now: float) -> None:
         expired = [
@@ -99,8 +153,8 @@ class IdempotencyStore:
         for key in expired:
             self._entries.pop(key, None)
 
-    def _make_capacity(self) -> None:
-        if len(self._entries) >= self.max_entries:
+    def _make_capacity(self, *, required: int = 1) -> None:
+        if len(self._entries) + required > self.max_entries:
             raise IdempotencyCapacityError("idempotency store is at capacity")
 
 
@@ -173,9 +227,9 @@ class IntegrationService:
             raise ValueError("providers must be unique")
         event = synthetic_event(idempotency_key)
         fingerprint = _event_fingerprint(event)
-        results = await asyncio.gather(
-            *(
-                self.idempotency_store.execute(
+        receipts = await self.idempotency_store.execute_batch(
+            [
+                _IdempotencyOperation(
                     provider=provider,
                     idempotency_key=idempotency_key,
                     event_fingerprint=fingerprint,
@@ -184,18 +238,8 @@ class IntegrationService:
                     ),
                 )
                 for provider in providers
-            ),
-            return_exceptions=True,
+            ]
         )
-        receipts: list[DeliveryReceipt] = []
-        for result in results:
-            if isinstance(result, (IdempotencyConflict, IdempotencyCapacityError)):
-                raise result
-            if isinstance(result, BaseException):
-                raise RuntimeError(
-                    "integration dispatch orchestration failed"
-                ) from None
-            receipts.append(result)
         delivered = sum(
             receipt.state == DeliveryState.DELIVERED for receipt in receipts
         )
@@ -235,9 +279,14 @@ class IntegrationService:
         else:
             attempted = True
             try:
-                await asyncio.wait_for(
-                    adapter.deliver(event), timeout=status.timeout_seconds
-                )
+                if isinstance(adapter, SmtpTlsAdapter):
+                    # smtplib owns the socket timeout. Cancelling its worker thread
+                    # would allow a late send after a TIMEOUT receipt was returned.
+                    await adapter.deliver(event)
+                else:
+                    await asyncio.wait_for(
+                        adapter.deliver(event), timeout=status.timeout_seconds
+                    )
                 state = DeliveryState.DELIVERED
             except asyncio.TimeoutError:
                 failure_code = FailureCode.TIMEOUT
