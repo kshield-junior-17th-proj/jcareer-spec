@@ -152,18 +152,20 @@ const architectureFlows = {
     title: '전체 시스템 지도',
     status: '구현·설계 경계',
     tone: 'modelled',
-    summary: '업무망, GitHub 검사와 Pages 배포, AWS 기준 런타임, 별도 MLOps와 기본 비활성 로컬 확장을 한 장에서 보되 구현 상태를 섞지 않습니다.',
+    summary: '서비스 사용자, 업무망·외부 SaaS, GitHub delivery, AWS 기준 런타임과 별도 MLOps를 관계선까지 한 장에서 보되 구현 상태를 섞지 않습니다.',
     detailHref: 'index.html#section-14',
     detailLabel: '서비스·구성요소 명세 보기',
     stages: [
       { label: 'GitHub 저장소 → Actions 검사' },
       { label: '검사 통과 → GitHub Pages 배포' },
-      { label: '업무망 PC → Route 53·CloudFront·WAF' },
-      { label: 'ALB → ECS Fargate 앱 서비스' },
-      { label: 'RDS·Redis·S3·기록·탐지 설계' },
-      { label: '별도 MLOps → 사람 검토 대기' }
+      { label: '서비스 사용자 → Route 53·CloudFront·WAF' },
+      { label: 'ALB → ECS → RDS·Redis 기준 흐름' },
+      { label: '업무망 180대 → Slack·외부 업무도구 경계' },
+      { label: 'ECR·NAT·SSM·로그·탐지 의존 관계' },
+      { label: '합성 대역 MLOps → 사람 검토 대기' },
+      { label: '검토 → 향후 서비스 반영 · 현재 미구현' }
     ],
-    boundary: 'GitHub Actions는 검사와 Pages 배포까지 구현되어 있습니다. 서울 리전 2-AZ·6개 모듈·110개 항목은 AWS 미배포 기준 설계이고, MLOps 0/13/14는 분리된 계획입니다. CI에서 AWS로 이어지는 자동 배포선은 없습니다.'
+    boundary: 'GitHub Actions는 검사와 Pages 배포까지 구현되어 있습니다. AWS 2-AZ·110개와 MLOps 0/13/14는 미배포 계획입니다. 점선은 IaC 배포 대상, 합성 대역 입력, 승인 후 반영 같은 관계를 보이지만 자동 배포·운영 DB 연결·자동 승격을 뜻하지 않습니다.'
   },
   candidate: {
     title: '구직자 공고 추천',
@@ -302,9 +304,9 @@ const commonHead = `
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ko_KR">
   <meta property="og:image" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/assets/JCAREER_FULL_INFRA_ANIMATED.png">
-  <meta property="og:image:alt" content="업무망, GitHub CI와 Pages, AWS 기준 설계, 별도 MLOps를 함께 보여 주는 J-Career 전체 인프라 지도">
+  <meta property="og:image:alt" content="서비스 사용자, 업무망과 Slack, GitHub delivery, AWS 기준 설계와 별도 MLOps의 관계를 연결한 J-Career 전체 인프라 지도">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image:alt" content="업무망, GitHub CI와 Pages, AWS 기준 설계, 별도 MLOps를 함께 보여 주는 J-Career 전체 인프라 지도">
+  <meta name="twitter:image:alt" content="서비스 사용자, 업무망과 Slack, GitHub delivery, AWS 기준 설계와 별도 MLOps의 관계를 연결한 J-Career 전체 인프라 지도">
   <link rel="preconnect" href="https://api.fontshare.com">
   <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -794,8 +796,8 @@ ${commonCss}
     <div class="masthead__inner">
       <div class="utility"><a href="index.html">← 기술 명세</a><nav class="utility__links" aria-label="산출물"><a href="../../mlops/">MLOps 7단계</a><a href="JCAREER_FULL_INFRA.drawio">전체 편집 원본</a><a href="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg">전체 SVG</a><a href="JCAREER_ASIS_SYSTEM_SPEC.pdf">PDF</a><a href="validation-report.json">검증 JSON</a><button class="motion-toggle-doc" type="button" data-motion-toggle aria-pressed="false" hidden><span data-motion-label>움직임 줄이기</span></button></nav></div>
       <div class="doc-hero">
-        <div><p class="kicker">JC-ASIS-ARCH-001 · full system atlas</p><h1>J-Career 전체<br>인프라 지도</h1><p class="hero-copy">업무망, GitHub CI와 Pages, AWS 런타임 기준 설계, 서버리스 MLOps와 기본 비활성 TRACE·외부 업무도구 소스를 한 화면에서 탐색합니다. 선택 버튼에 따라 전체 지도·서비스 경로·MLOps 7단계 도면이 실제로 전환됩니다.</p></div>
-        <dl class="doc-control"><div><dt>GitHub delivery</dt><dd>검사 + Pages 배포 구현</dd></div><div><dt>업무망</dt><dd>180대 · Windows 100 / macOS 80</dd></div><div><dt>AWS 설계</dt><dd>2-AZ · 6개 모듈 · 계획 110개 · 미배포</dd></div><div><dt>MLOps</dt><dd>별도 7단계 · 계획 0 / 13 / 14</dd></div><div><dt>로컬 확장</dt><dd>TRACE·Slack·Notion·SMTP · default-off</dd></div><div><dt>CI / AWS</dt><dd>자동 배포선 없음</dd></div></dl>
+        <div><p class="kicker">JC-ASIS-ARCH-001 · full system atlas</p><h1>J-Career 전체<br>인프라 지도</h1><p class="hero-copy">서비스 사용자, 업무망과 Slack·외부 업무도구, GitHub CI·Pages, AWS 런타임 기준 설계와 별도 서버리스 MLOps를 한 연결 지도에서 탐색합니다. TRACE·JC-RECEIPT는 실행 컴포넌트에 섞지 않고 별도 보조 설명으로만 둡니다.</p></div>
+        <dl class="doc-control"><div><dt>GitHub delivery</dt><dd>검사 + Pages 배포 구현</dd></div><div><dt>업무망</dt><dd>180대 · Windows 100 / macOS 80</dd></div><div><dt>외부 업무도구</dt><dd>Slack·Notion·SMTP · default-off</dd></div><div><dt>AWS 설계</dt><dd>2-AZ · 6개 모듈 · 계획 110개 · 미배포</dd></div><div><dt>MLOps</dt><dd>별도 7단계 · 계획 0 / 13 / 14</dd></div><div><dt>관계 점선</dt><dd>의존 표시 · 자동 연결 아님</dd></div></dl>
       </div>
     </div>
   </header>
@@ -810,8 +812,8 @@ ${commonCss}
     <div class="architecture-workspace">
     <section class="flow-explorer" aria-labelledby="flow-explorer-title">
       <div class="flow-explorer__head">
-        <div><p class="kicker">전체 지도 1개 · 서비스·보조 경로 8개</p><h2 id="flow-explorer-title">버튼이 설명뿐 아니라 도면 자체를 바꿉니다.</h2></div>
-        <p>전체 시스템은 업무망·GitHub·AWS·MLOps를 함께 표시합니다. MLOps를 선택하면 빈 표식 대신 전용 7단계 도면으로 전환됩니다. 나머지 선택 경로는 AWS 기준 도면의 1·2·3 강조 화면으로 바뀝니다.</p>
+        <div><p class="kicker">전체 지도 1개 · 서비스·보조 경로 8개</p><h2 id="flow-explorer-title">흐름을 고르되 전체 맥락은 잃지 않습니다.</h2></div>
+        <p>전체 시스템은 사용자·업무망·Slack·GitHub·AWS·MLOps를 관계선으로 함께 표시합니다. MLOps를 선택해도 전체 지도를 유지해 입력과 검토 후 반영 경계를 같이 보여 주며, 7단계 상세는 별도 링크에서 엽니다.</p>
       </div>
       <div class="flow-selector" role="group" aria-label="표시할 서비스·보조 경로">
         <button class="flow-button" type="button" data-flow-button="overview" aria-pressed="true" aria-controls="flow-detail"><strong>전체 시스템 지도</strong><small>업무망 · GitHub · AWS · MLOps</small></button>
@@ -828,17 +830,17 @@ ${commonCss}
         <div>
           <span class="flow-detail__status status modelled" id="flow-status">구현·설계 경계</span>
           <h3 id="flow-title">전체 시스템 지도</h3>
-          <p class="flow-detail__summary" id="flow-summary">업무망, GitHub 검사와 Pages 배포, AWS 기준 런타임, 별도 MLOps와 기본 비활성 로컬 확장을 한 장에서 봅니다.</p>
+          <p class="flow-detail__summary" id="flow-summary">사용자, 업무망·외부 SaaS, GitHub delivery, AWS 기준 런타임과 별도 MLOps를 연결 관계까지 한 장에서 봅니다.</p>
         </div>
         <div class="flow-detail__route"><strong>순서대로 읽는 단계</strong><ol class="flow-steps" id="flow-steps" aria-label="전체 인프라 단계별 경로">${flowStepItems('overview')}</ol></div>
-        <div class="flow-detail__boundary"><strong>설계 범위</strong><p id="flow-boundary">GitHub Actions는 검사와 Pages 배포까지 구현되어 있습니다. 서울 리전 2-AZ·6개 모듈·110개 항목은 AWS 미배포 기준 설계이고, MLOps 0/13/14는 분리된 계획입니다. CI에서 AWS로 이어지는 자동 배포선은 없습니다.</p><a class="flow-detail__link" id="flow-detail-link" href="index.html#section-14">서비스·구성요소 명세 보기</a></div>
+        <div class="flow-detail__boundary"><strong>설계 범위</strong><p id="flow-boundary">GitHub Actions는 검사와 Pages 배포까지 구현되어 있습니다. AWS 2-AZ·110개와 MLOps 0/13/14는 미배포 계획입니다. 점선은 관계를 보이지만 자동 배포·운영 DB 연결·자동 승격을 뜻하지 않습니다.</p><a class="flow-detail__link" id="flow-detail-link" href="index.html#section-14">서비스·구성요소 명세 보기</a></div>
       </article>
-      <p class="flow-explorer__exclusion">TRACE·JC-RECEIPT와 Slack·Notion·SMTP 어댑터는 기본 비활성 로컬 소스입니다. 실제 외부 전송·AWS 배포·새 Terraform 리소스가 없으며, 전체 지도에서 AWS 서비스처럼 연결하지 않습니다.</p>
+      <p class="flow-explorer__exclusion">Slack·Notion·SMTP는 AWS 밖의 업무도구 경계로 표시하며 기본 비활성·실전송 미확인입니다. TRACE·JC-RECEIPT는 실행 컴포넌트에서 제외하고 보조 설명에만 남깁니다.</p>
     </section>
     <figure class="plate__frame" id="diagram-frame" aria-describedby="flow-boundary diagram-caption" data-active-media="overview">
       <div class="diagram-media" data-flow-media="overview" aria-hidden="false">
         <div class="diagram-stage diagram-stage--full" data-spatial-stage data-full-map>
-          <a href="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg" aria-label="업무망, GitHub CI, AWS와 MLOps 전체 인프라 SVG 원본 열기"><img src="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-animated-diagram data-motion-src="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-still-src="../../assets/JCAREER_FULL_INFRA_ANIMATED.png" width="1780" height="1160" fetchpriority="high" decoding="async" alt="업무망 PC 180대, GitHub 저장소와 Actions 검사 및 Pages 배포, CI와 AWS의 단절 경계, Route 53부터 ECS와 RDS까지의 AWS 기준 설계, 사람 검토에서 멈추는 별도 서버리스 MLOps 흐름을 표시한 전체 인프라 지도"></a>
+          <a href="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg" aria-label="업무망, Slack, GitHub CI, AWS와 MLOps 전체 인프라 SVG 원본 열기"><img src="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-animated-diagram data-motion-src="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-still-src="../../assets/JCAREER_FULL_INFRA_ANIMATED.png" width="1780" height="1240" fetchpriority="high" decoding="async" alt="서비스 사용자와 업무망 PC 180대, Slack·Notion·SMTP 외부 경계, GitHub Actions 검사와 Pages 배포, AWS 2-AZ 기준 설계, 합성 대역 MLOps와 사람 검토 후 미구현 서비스 반영 관계를 한 장에 연결한 전체 인프라 지도"></a>
         </div>
       </div>
       <div class="diagram-media" data-flow-media="asis" aria-hidden="true" hidden>
@@ -899,7 +901,7 @@ ${svgStepMarkers('operations', 'record')}
           <a href="../serverless-mlops/JCAREER_MLOPS_FLOW.svg" aria-label="서버리스 MLOps 7단계 SVG 원본 열기"><img src="../serverless-mlops/JCAREER_MLOPS_FLOW.svg" width="2400" height="1400" loading="eager" decoding="async" alt="합성 자료를 숫자 특징으로 바꾸고 S3에 보관한 뒤 사람이 Lambda 학습을 한 번 시작하고, 결과와 상태를 저장한 다음 사람 검토 대기에서 멈추는 서버리스 MLOps 7단계 흐름도"></a>
         </div>
       </div>
-      <figcaption class="diagram-legend" id="diagram-caption"><span><i class="legend-line"></i>현재 선택에 맞춰 전체 지도·AWS 서비스 경로·MLOps 7단계 원본으로 전환</span><span><i class="legend-line local"></i>GitHub 검사와 기본 비활성 로컬 소스</span><span><i class="legend-line missing"></i>AWS·MLOps는 미배포 설계</span><span><i class="legend-line record"></i>CI→AWS 자동 배포선 없음</span></figcaption>
+      <figcaption class="diagram-legend" id="diagram-caption"><span><i class="legend-line"></i>화살표·움직이는 점: 영역 안의 처리 순서</span><span><i class="legend-line local"></i>촘촘한 점선: 코드·관리·데이터·승인 관계</span><span><i class="legend-line missing"></i>AWS·MLOps는 미배포 설계</span><span><i class="legend-line record"></i>점선은 자동 배포·운영 DB 연결·자동 승격이 아님</span></figcaption>
     </figure>
     </div>
     <section class="plate__section plate__source" data-flow-source-sha256="${flowSourceHash}">${flowBody}</section>
@@ -929,7 +931,7 @@ ${svgStepMarkers('operations', 'record')}
       const key = Object.hasOwn(flowDefinitions, requestedKey) ? requestedKey : 'overview';
       const definition = flowDefinitions[key];
       const updateFlow = () => {
-        const mediaKey = key === 'overview' ? 'overview' : key === 'mlops' ? 'mlops' : 'asis';
+        const mediaKey = key === 'overview' || key === 'mlops' ? 'overview' : 'asis';
         flowButtons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.flowButton === key)));
         flowLayers.forEach((layer) => layer.classList.toggle('is-active', layer.dataset.flowLayer === key));
         flowMedia.forEach((media) => {

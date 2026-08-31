@@ -324,7 +324,7 @@ if ($flowDefinitionMatch.Success) {
                 $detailLinksOkay = $false
             }
         }
-        $flowDefinitionsOkay = @($flowDefinitionsObject.overview.stages).Count -eq 6 -and
+        $flowDefinitionsOkay = @($flowDefinitionsObject.overview.stages).Count -eq 8 -and
             $serviceStageCounts['mlops'] -eq 7 -and
             (@($threeStageFlowKeys | Where-Object { $serviceStageCounts[$_] -ne 3 }).Count -eq 0) -and
             $stageCoordinatesOkay
@@ -413,10 +413,11 @@ $interactiveFlowOkay = $flowButtonCount -eq 9 -and
     $architecture.Contains('updateAddress || requestedKey !== key') -and
     -not $architecture.Contains('<path class="flow-line local" d="M1600 582V920" />') -and
     $architecture.Contains('@media (prefers-reduced-motion: reduce)') -and
-    $architecture.Contains('TRACE·JC-RECEIPT와 Slack·Notion·SMTP 어댑터는 기본 비활성 로컬 소스') -and
-    $architecture.Contains('MLOps를 선택하면 빈 표식 대신 전용 7단계 도면으로 전환됩니다') -and
-    $architecture.Contains('실제 외부 전송·AWS 배포·새 Terraform 리소스가 없으며')
-Add-Check 'interactive_service_flow' $interactiveFlowOkay "controls $flowButtonCount, overlay layers $flowLayerCount, stages overview=6 MLOps=7 guarded/other=3, markers $stepMarkerCount; full/AS-IS/MLOps media switching, guarded-source separation, URL state, detail links 9 checked"
+    $architecture.Contains('Slack·Notion·SMTP는 AWS 밖의 업무도구 경계로 표시하며 기본 비활성·실전송 미확인입니다') -and
+    $architecture.Contains('TRACE·JC-RECEIPT는 실행 컴포넌트에서 제외하고 보조 설명에만 남깁니다') -and
+    $architecture.Contains('MLOps를 선택해도 전체 지도를 유지해') -and
+    $architecture.Contains("key === 'overview' || key === 'mlops' ? 'overview' : 'asis'")
+Add-Check 'interactive_service_flow' $interactiveFlowOkay "controls $flowButtonCount, overlay layers $flowLayerCount, stages overview=8 MLOps=7 guarded/other=3, markers $stepMarkerCount; integrated full-map MLOps context, guarded-source separation, URL state, detail links 9 checked"
 
 $normalizedFlowSource = (Get-Content -Raw -Encoding UTF8 (Join-Path $root 'JCAREER_ASIS_FLOW.md')).Replace("`r`n", "`n").Replace("`r", "`n")
 $flowSourceHasher = [System.Security.Cryptography.SHA256]::Create()
