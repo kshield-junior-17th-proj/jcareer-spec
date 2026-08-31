@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "verified_at": "2026-08-30T21:36:41+09:00",
+  "verified_at": "2026-08-31T10:35:05+09:00",
   "aws_api_calls": 0,
   "terraform_apply_destroy": false,
   "environment": {
@@ -89,7 +89,7 @@
       "renderer": "scripts/render_spec_pdf.mjs",
       "source": "mlops/index.html",
       "output": "mlops/JCAREER_MLOPS_SYSTEM_SPEC.pdf",
-      "source_sha256": "1977290ad576cb6c28bb2b0a63b16ca31d87222a32bdd622a59d7a87ebd02f78"
+      "source_sha256": "6a227553557f290662ce2d8f4de3990936681e4b5260c340077b6b046ceac474"
     },
     "animated_architecture": {
       "spec": "assets/JCAREER_PLATFORM_ANIMATED.spec.json",
@@ -120,12 +120,12 @@
     "assets/JCAREER_PLATFORM_ANIMATED.png": "ce8d11b6a2b073e6c0c0daf238ae81798a0d3e02a59524d10ba5da870fcd14ef",
     "assets/JCAREER_PLATFORM_ANIMATED.spec.json": "c880eb49599f6abd35ec618785abfe6013e8be05befb16ebcd1e99d639426aaa",
     "assets/JCAREER_PLATFORM_ANIMATED.svg": "71c6b3712f9e17a5fe3da753d0c263db71fc39d8950d024fafd9c1550190dae2",
-    "assets/motion.js": "d9c4c2c93c23d37c1a9f2f6a46176c46984f64e1ce86ac4097df077d3cf251bd",
-    "assets/site.css": "f7d9b1cdbc211623c4c2e6f05538edadfc15624c81c5284b6b4fa4f1e808ccb9",
-    "index.html": "45a59a79a85285508a5acc737996a6021236899e51dd258d0f7997c4321ce6c4",
+    "assets/motion.js": "b7cd41c2fb9067c8efa184efd1b9c90801e6e6355f586aabe95cb0aaa6227000",
+    "assets/site.css": "fb8b5e72eadad1f3054c472a8ce4769f7a9fb9a5d0a80f923e82fa0e96051e8e",
+    "index.html": "96b8eb370712dc5a12ade895391ce26447f4e690e33b8eff91eef0444f418835",
     "mlops/app.js": "8a566b644e3ba200f6dafda85a26cfc4cda826c90c20a68c2f02026aa6eba46d",
-    "mlops/index.html": "1977290ad576cb6c28bb2b0a63b16ca31d87222a32bdd622a59d7a87ebd02f78",
-    "mlops/JCAREER_MLOPS_SYSTEM_SPEC.pdf": "4ef9577e46d0a690bac10521fe27d3b010f6e455380af3fc7758d759db979295",
+    "mlops/index.html": "6a227553557f290662ce2d8f4de3990936681e4b5260c340077b6b046ceac474",
+    "mlops/JCAREER_MLOPS_SYSTEM_SPEC.pdf": "b1c43210badedb6767ce4791c55f781b5aeac7882ed98632e84655f4a07ccac5",
     "README.md": "7dcd8d75ddb9a785a1aa70edc6a618cbb3cbf27096cd21160370057415936a19",
     "scripts/browser_support.mjs": "725a0eef03fd97a2074b630c9b34b14e566f519da93f9ba2cc6eb587c5c70a22",
     "scripts/check_public_mlops.py": "32be0e9f86e56b44e96b87e257e1802ebe785fb15a907c0c3abba813d01dcc63",
@@ -150,9 +150,9 @@
     "src/runtime/contracts/mentor_feedback_2026_08_28.json": "44ccbe8f8a30c43c27f45d0aa0c87e79837df649eaea839d0d23086fdcce8f37",
     "src/runtime/tests/mentor_feedback_contract.py": "c42474fb939f15f753169e425e2bddd0abe543d6b8627b3670ff4ec76df6f806",
     "src/runtime/VERIFICATION.md": "e766208765ac906f48e7afd91d34fdcbc4ea8cffe7fb28a0996083c1c6770978",
-    "terraform/asis/architecture.html": "d89bb9b1955aa45fe8394c41c8e8c0b02e5481a484b453d823dae99694a56b3d",
-    "terraform/asis/build-spec.mjs": "14a043be56283d970777aaa240ff1c8e25b76a8b1226d1af02ab611b3f60f49c",
-    "terraform/asis/index.html": "f1a147fbbf04d18256cf391ee8a75cfd7c7afef1d9dfe785de1df1e4c8d5e554",
+    "terraform/asis/architecture.html": "7c4259454d2505a1b3b09d813c6888d16dbf9149676f6faf5cb847ac434eb5e9",
+    "terraform/asis/build-spec.mjs": "05bbd00768f082445c3727567f07272023613e9b5b2cb24556517652b5b0f81e",
+    "terraform/asis/index.html": "c237b1acd4c86766854e0aa047f819871e61fd58346889cdfcd1ba0666c06b98",
     "terraform/asis/JCAREER_ASIS_FLOW.md": "fcfef6269fe5ba638dddaa7f476107d39b8ffca8855955dc86be637d4e277c45",
     "terraform/asis/validate-spec.ps1": "6710738bf6c2da3aca772a99cc7058e88b766ae3c01b99336f2f5dab8709ea54",
     "terraform/lab/index.html": "ae8db94be6f3b505b78a46d308d520f4cd99a5e9af7883e49eae4fa161a4f858",

@@ -87,6 +87,27 @@
         });
       }
 
+      const spatialStage = document.querySelector('.spatial-stage');
+      if (spatialStage) {
+        gsap.from(spatialStage, {
+          y: 34,
+          opacity: 0,
+          duration: 1.05,
+          delay: 0.12,
+          ease: 'power3.out',
+          clearProps: 'transform,opacity',
+        });
+        gsap.from('.spatial-callout, .spatial-stage__status', {
+          y: 12,
+          opacity: 0,
+          duration: 0.6,
+          delay: 0.72,
+          stagger: 0.1,
+          ease: 'power2.out',
+          clearProps: 'transform,opacity',
+        });
+      }
+
       gsap.utils.toArray('.section-head, .plain-card, .data-shelf, .spec-block, .readiness-item').forEach((item) => {
         gsap.from(item, {
           y: 46,
@@ -218,6 +239,33 @@
 
   document.addEventListener('visibilitychange', () => {
     root.classList.toggle('document-hidden', document.hidden);
+  });
+
+  document.querySelectorAll('[data-spatial-stage]').forEach((stage) => {
+    let frame = 0;
+    const reset = () => {
+      stage.style.setProperty('--stage-rx', '0deg');
+      stage.style.setProperty('--stage-ry', '0deg');
+    };
+    const updateTilt = (event) => {
+      if (isReduced() || window.matchMedia('(pointer: coarse)').matches) {
+        reset();
+        return;
+      }
+      if (frame) window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => {
+        const bounds = stage.getBoundingClientRect();
+        const horizontal = ((event.clientX - bounds.left) / bounds.width) - 0.5;
+        const vertical = ((event.clientY - bounds.top) / bounds.height) - 0.5;
+        stage.style.setProperty('--stage-rx', `${(horizontal * 3.6).toFixed(2)}deg`);
+        stage.style.setProperty('--stage-ry', `${(-vertical * 3).toFixed(2)}deg`);
+      });
+    };
+    stage.addEventListener('pointermove', updateTilt);
+    stage.addEventListener('pointerleave', reset);
+    window.JCareerMotion.subscribe((reduced) => {
+      if (reduced) reset();
+    });
   });
 
   document.querySelectorAll('[data-perspective-carousel]').forEach((carousel) => {
