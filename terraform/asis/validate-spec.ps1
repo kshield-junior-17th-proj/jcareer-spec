@@ -27,7 +27,10 @@ $required = @(
     'architecture.html',
     'JCAREER_ASIS_SYSTEM_SPEC.pdf',
     'JCAREER_ASIS_FLOW.drawio',
-    'JCAREER_ASIS_FLOW.drawio.png'
+    'JCAREER_ASIS_FLOW.drawio.png',
+    '..\..\assets\JCAREER_PRODUCTION_ASSESSMENT_MAP.svg',
+    '..\..\assets\JCAREER_PRODUCTION_ASSESSMENT_MAP.spec.json',
+    '..\..\assets\JCAREER_PRODUCTION_ASSESSMENT_MAP.md'
 )
 $missing = @($required | Where-Object { -not (Test-Path -LiteralPath (Join-Path $root $_) -PathType Leaf) })
 Add-Check 'required_files' ($missing.Count -eq 0) $(if ($missing.Count) { $missing -join ', ' } else { "all $($required.Count) deliverables present" })
@@ -45,6 +48,8 @@ $readmeOkay = $readme.Contains('index.html') -and
     $readme.Contains('JCAREER_ASIS_FLOW.drawio') -and
     $readme.Contains('JCAREER_ASIS_2AZ.md') -and
     $readme.Contains('JCAREER_ASIS_2AZ.drawio') -and
+    $readme.Contains('JCAREER_PRODUCTION_ASSESSMENT_MAP.svg') -and
+    $readme.Contains('DEPLOYMENT EVIDENCE PENDING') -and
     $readme.Contains('보조 상세 draw.io 원본') -and
     $readme.Contains('60개 셀·14개 연결') -and
     $readme.Contains('구판(legacy)')
@@ -524,7 +529,17 @@ $secretPatterns = [ordered]@{
     generic_secret_assignment = '(?im)\b(?:password|passwd|secret|token|api[_-]?key|client[_-]?secret)\s*[:=]\s*["'']?[A-Za-z0-9+/_=-]{8,}'
 }
 $secretHits = [System.Collections.Generic.List[string]]::new()
-$textDeliverables = @('JCAREER_ASIS_SYSTEM_SPEC.md', 'index.html', 'architecture.html', 'JCAREER_ASIS_FLOW.md', 'JCAREER_ASIS_FLOW.drawio', 'validation-report.json')
+$textDeliverables = @(
+    'JCAREER_ASIS_SYSTEM_SPEC.md',
+    'index.html',
+    'architecture.html',
+    'JCAREER_ASIS_FLOW.md',
+    'JCAREER_ASIS_FLOW.drawio',
+    'validation-report.json',
+    '..\..\assets\JCAREER_PRODUCTION_ASSESSMENT_MAP.svg',
+    '..\..\assets\JCAREER_PRODUCTION_ASSESSMENT_MAP.spec.json',
+    '..\..\assets\JCAREER_PRODUCTION_ASSESSMENT_MAP.md'
+)
 foreach ($file in $textDeliverables) {
     $content = Get-Content -Raw -Encoding UTF8 (Join-Path $root $file)
     foreach ($entry in $secretPatterns.GetEnumerator()) {

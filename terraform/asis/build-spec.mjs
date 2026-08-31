@@ -407,6 +407,12 @@ const commonCss = `
   .diagram-link img { display: block; width: 100%; height: auto; transition: transform .35s ease; }
   .diagram-link:hover img { transform: scale(1.012); }
   .diagram-caption { display: flex; justify-content: space-between; gap: 20px; margin-top: 10px; color: var(--muted); font-size: .76rem; }
+  .production-slice { padding: 42px clamp(24px, 5vw, 60px); border-bottom: 1px solid var(--line); background: #e9f1ef; }
+  .production-slice__head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, .54fr); gap: 30px; align-items: end; margin-bottom: 20px; }
+  .production-slice h2 { max-width: 24ch; margin: 0; font-size: clamp(1.55rem, 2.3vw, 2.25rem); letter-spacing: -.035em; }
+  .production-slice__copy { margin: 0; color: var(--ink-2); font-size: .9rem; line-height: 1.65; }
+  .production-slice__status { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 0; }
+  .production-slice__status span { padding: 6px 9px; border: 1px solid #9bb9af; border-radius: 2px; background: rgba(255,255,255,.56); color: #1f5548; font: 700 10px/1.2 var(--mono); letter-spacing: .035em; }
   .mlops-bridge { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(330px, .92fr); gap: clamp(30px, 5vw, 72px); padding: clamp(38px, 6vw, 72px); color: #eef3f4; background: #25343d; border-bottom: 5px solid var(--accent); }
   .mlops-bridge .section-label { color: #f2a469; }
   .mlops-bridge h2 { max-width: 16ch; margin: 0; font-size: clamp(1.9rem, 3.4vw, 3.25rem); line-height: 1.08; letter-spacing: -.045em; text-wrap: balance; }
@@ -468,7 +474,7 @@ const commonCss = `
   .footer p { margin: 0; }
   .footer strong { color: var(--ink); }
   @media (max-width: 980px) {
-    .doc-hero, .executive, .mlops-bridge { grid-template-columns: 1fr; }
+    .doc-hero, .executive, .mlops-bridge, .production-slice__head { grid-template-columns: 1fr; }
     .status-strip__inner { grid-template-columns: repeat(3, 1fr); }
     .shell { grid-template-columns: 1fr; }
     .toc { position: static; max-height: none; }
@@ -511,7 +517,7 @@ const commonCss = `
     .doc-control div { border-color: #bbb; }
     .shell { display: block; margin: 0; }
     .document { border: 0; box-shadow: none; }
-    .executive, .architecture, .mlops-bridge, .content { padding-left: 0; padding-right: 0; }
+    .executive, .architecture, .production-slice, .mlops-bridge, .content { padding-left: 0; padding-right: 0; }
     .content { content-visibility: visible; contain-intrinsic-size: none; }
     .executive { background: #fff; }
     .architecture { break-before: page; }
@@ -556,6 +562,7 @@ ${commonHead}
         <nav class="utility__links" aria-label="산출물">
           <a href="../../mlops/">MLOps</a>
           <a href="architecture.html">인프라 도면</a>
+          <a href="#production-assessment-slice">핵심 평가 슬라이스</a>
           <a href="JCAREER_ASIS_SYSTEM_SPEC.pdf">PDF</a>
           <a href="JCAREER_ASIS_FLOW.drawio">DRAW.IO 원본</a>
           <a href="validation-report.json">검증 JSON</a>
@@ -599,6 +606,7 @@ ${commonHead}
         <a class="button button--accent" href="JCAREER_ASIS_SYSTEM_SPEC.pdf">PDF 내려받기</a>
         <a class="button" href="../../mlops/">MLOps 7단계</a>
         <a class="button" href="architecture.html">도면 크게 보기</a>
+        <a class="button" href="#production-assessment-slice">USD 50 실행 범위</a>
         <a class="button" href="JCAREER_ASIS_FLOW.drawio">편집 원본 받기</a>
         <a class="button" href="validation-report.json">검증 결과</a>
       </div>
@@ -628,6 +636,21 @@ ${commonHead}
           <img src="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg" width="2320" height="1500" loading="lazy" decoding="async" alt="업무망 PC 180대와 Slack·Notion·SMTP 경계, GitHub Actions 검사와 Pages 배포, AWS 2-AZ 런타임 기준 설계, LLM Gateway·Bedrock·OpenDART, 별도 서버리스 MLOps를 연결한 J-Career 전체 인프라 지도">
         </a>
         <div class="diagram-caption"><span>실선: 구성 확인 · 점선: 실제 연결 미구현</span><span>서비스별 강조 경로는 도면 페이지에서 확인 · 비밀정보 미표시</span></div>
+      </section>
+
+      <section id="production-assessment-slice" class="production-slice" aria-labelledby="production-assessment-title">
+        <div class="production-slice__head">
+          <div>
+            <p class="section-label">예산 승인형 실제 실행 범위</p>
+            <h2 id="production-assessment-title">기업 목표는 유지하고, 평가에 필요한 핵심 경로만 독립 배포합니다.</h2>
+            <div class="production-slice__status"><span>USD 50 CEILING</span><span>DEPLOYMENT EVIDENCE PENDING</span><span>NO DIRECT CUSTOMER-AWS BROWSER ACCESS</span></div>
+          </div>
+          <p class="production-slice__copy">CloudFront·S3, API Gateway, Lambda, SQS, DynamoDB on-demand로 요청·대기·처리·조회 경로를 구성하고 Bedrock 호출은 최소 권한 broker로 제한합니다. 컨설턴트용 Evidence Desk는 별도 인증·tenant 경계와 사람이 승인한 서명 snapshot만 사용합니다. ECS·RDS·Redis·NAT 2-AZ 구성과 Windows 100대·macOS 80대는 목표 설계이며 이 배포의 완료 주장에 포함하지 않습니다.</p>
+        </div>
+        <a class="diagram-link" href="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg" aria-label="기업 목표와 USD 50 핵심 평가 슬라이스 SVG 원본 열기">
+          <img src="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg" width="2320" height="1500" loading="lazy" decoding="async" alt="GitHub 승인형 OIDC 배포, 서버리스 AI 매칭 실행면, 별도 Evidence Desk, OpenDART와 MLOps의 분리된 수명주기, 미배포 기업 목표를 구분한 J-Career 핵심 평가 슬라이스">
+        </a>
+        <div class="diagram-caption"><span>현재 상태: 코드·배포 경로 구현 중 · AWS 배포 증적 전</span><span>적용 후에만 URL·commit SHA·plan digest·smoke receipt를 배포 증적으로 기록</span></div>
       </section>
 
       <section id="mlops-overview" class="mlops-bridge" aria-labelledby="mlops-overview-title">
@@ -798,7 +821,7 @@ ${commonCss}
   <a class="skip" href="#diagram">전체 인프라 지도로 건너뛰기</a>
   <header class="masthead">
     <div class="masthead__inner">
-      <div class="utility"><a href="index.html">← 기술 명세</a><nav class="utility__links" aria-label="산출물"><a href="../../mlops/">MLOps 7단계</a><a href="JCAREER_FULL_INFRA.drawio">전체 편집 원본</a><a href="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg">전체 SVG</a><a href="JCAREER_ASIS_SYSTEM_SPEC.pdf">PDF</a><a href="validation-report.json">검증 JSON</a><button class="motion-toggle-doc" type="button" data-motion-toggle aria-pressed="false" hidden><span data-motion-label>움직임 줄이기</span></button></nav></div>
+      <div class="utility"><a href="index.html">← 기술 명세</a><nav class="utility__links" aria-label="산출물"><a href="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg">USD 50 실행 범위</a><a href="../../mlops/">MLOps 7단계</a><a href="JCAREER_FULL_INFRA.drawio">전체 편집 원본</a><a href="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg">전체 SVG</a><a href="JCAREER_ASIS_SYSTEM_SPEC.pdf">PDF</a><a href="validation-report.json">검증 JSON</a><button class="motion-toggle-doc" type="button" data-motion-toggle aria-pressed="false" hidden><span data-motion-label>움직임 줄이기</span></button></nav></div>
       <div class="doc-hero">
         <div><p class="kicker">JC-ASIS-ARCH-001 · full system atlas</p><h1>J-Career 전체<br>인프라 지도</h1><p class="hero-copy">서비스 사용자, 업무망과 Slack·외부 업무도구, GitHub CI·Pages, AWS 비접속 런타임 기준 설계, LLM Gateway·Bedrock·OpenDART와 별도 서버리스 MLOps를 한 연결 지도에서 탐색합니다. TRACE·JC-RECEIPT는 실행 컴포넌트에 섞지 않고 별도 보조 설명으로만 둡니다.</p></div>
         <dl class="doc-control"><div><dt>GitHub delivery</dt><dd>Actions 검사 · branch Pages 배포</dd></div><div><dt>업무망</dt><dd>180대 · Windows 100 / macOS 80</dd></div><div><dt>외부 업무도구</dt><dd>Slack·Notion·SMTP · default-off</dd></div><div><dt>AWS 설계</dt><dd>2-AZ · 6개 모듈 · 계획 110개 · 미배포</dd></div><div><dt>MLOps</dt><dd>bootstrap 13개 적용 · runtime 미배포</dd></div><div><dt>관계 점선</dt><dd>의존 표시 · 자동 연결 아님</dd></div></dl>

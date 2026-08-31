@@ -1446,3 +1446,23 @@ IAM 역할 생성 권한이 없어 적용이 중단됐다. 그 과정에서 만�
 | 기계 판독 회귀검사 | PASS — `validate-spec.ps1` 25/25, FAIL 0. 상세 결과는 `validation-report.json`에 기록 |
 | account ID·비밀정보 패턴 | PASS — 공개용 UTF-8 원본 6개에서 12자리 account ID, access key, private key, 일반 secret assignment 패턴 0건. PDF·PNG는 raw byte sentinel 검사와 검사를 마친 원본의 생성 체인으로 확인 |
 | 쉬운 한국어와 문장 검토 | PASS — 처음 읽는 분을 위한 요약·숫자 설명·용어 풀이를 두고, 서비스별 설명을 3단계로 줄였다. 기술 명칭은 필요한 곳에만 원문을 함께 표시 |
+
+## 12. 예산 승인형 핵심 평가 슬라이스
+
+`JCAREER_FULL_INFRA`는 기업 규모의 목표 구조를 설명한다. USD 50 한도에서는 이 전체 구조를
+상시 운영했다고 주장하지 않고, 실제 평가와 시연에 필요한 경로를 별도 서버리스 스택으로 배포한다.
+
+| 구분 | 이번 배포 범위 | 완료 판단 |
+|---|---|---|
+| AI 매칭 실행면 | CloudFront·S3 → API Gateway → API Lambda → SQS → Agent Lambda → LLM Gateway → capability broker → Bedrock | GitHub OIDC로 동일 saved plan 적용 후 공개 HTTPS 요청, `202` 상태 전이, 결과·correlation receipt 확인 |
+| 데이터·관측 | DynamoDB on-demand, 증적 S3, CloudWatch Logs | tenant 격리, 암호화, 보존 정책과 redacted smoke artifact 확인 |
+| 컨설팅 증적면 | 별도 Cognito·API·저장소, 승인된 비식별 snapshot, 서명·만료·회수, 불변 감사기록 | 서비스 DB·고객 AWS/API 직접 조회가 없고 유효 snapshot만 역할별 조회 가능 |
+| OWASP LLM | 합성 입력 전용 실행 API와 결과 화면 | LLM01·02·08은 부분 통제, LLM07은 미통제 expected-fail을 실제 receipt와 함께 정직하게 표시 |
+| 별도 수명주기 | OpenDART, MLOps | 추천 자동 연결과 사람 검토 전 자동 승격 없음 |
+| 기업 목표·단말 | ECS·RDS·Redis·NAT 2-AZ, Windows 100·macOS 80 | 이번 적용 범위 아님. 설계·자산 모델을 실제 배포 증거로 사용하지 않음 |
+
+AWS 적용은 GitHub main 검사, plan 정책검사, plan digest, 다른 사람의 승인, OIDC 역할 획득,
+동일 saved plan 적용, smoke/evidence 순서로만 수행한다. GitHub Pages 배포는 AWS 배포 증거가
+아니다. 실제 적용 전 상태는 `DEPLOYMENT EVIDENCE PENDING`이며, 적용 후에도 URL·commit SHA·
+plan digest·CloudTrail OIDC 세션·smoke receipt가 모두 일치할 때만 핵심 평가 슬라이스 배포 완료로
+표기한다. 전체 기업 production 완료라는 표현은 사용하지 않는다.

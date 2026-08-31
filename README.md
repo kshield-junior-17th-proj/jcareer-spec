@@ -65,6 +65,8 @@ DynamoDB 실행 상태와 CloudWatch Logs를 기록하고 `TRAINED_PENDING_HUMAN
 - [대화형 아키텍처](terraform/asis/architecture.html): 전체 시스템 지도, 경로별 강조와 MLOps 7단계 도면 전환
 - [PDF 명세](terraform/asis/JCAREER_ASIS_SYSTEM_SPEC.pdf)
 - [전체 인프라 애니메이션 SVG](assets/JCAREER_FULL_INFRA_ANIMATED.svg)
+- [기업 목표·USD 50 핵심 평가 슬라이스 SVG](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg): 서비스 실행면, 별도 Evidence Desk, OpenDART·MLOps, 미배포 목표 구조를 상태별로 구분
+- [핵심 평가 슬라이스 해설](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.md)
 - [전체 인프라 draw.io 원본](terraform/asis/JCAREER_FULL_INFRA.drawio)
 - [PNG 도면](terraform/asis/JCAREER_ASIS_FLOW.drawio.png)
 - [쉽게 보는 draw.io 원본](terraform/asis/JCAREER_ASIS_FLOW.drawio)
