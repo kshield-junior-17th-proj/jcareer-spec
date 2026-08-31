@@ -7,14 +7,15 @@ J-Career는 구직자와 기업을 연결하는 채용 플랫폼입니다. 이 �
 ## 바로 보기
 
 - [서비스 아키텍처](https://kshield-junior-17th-proj.github.io/jcareer-spec/)
-- [전체 AWS 인프라 흐름도](https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/architecture.html)
+- [업무망·GitHub CI·AWS·MLOps 전체 인프라 지도](https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/architecture.html)
 - [MLOps 7단계 모델 검증](https://kshield-junior-17th-proj.github.io/jcareer-spec/mlops/)
 - [AWS 검증 환경](https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/lab/)
 
-![업무망 PC에서 J-Career AWS 기준 설계와 별도 MLOps 검증 경계로 이어지는 핵심 흐름](assets/JCAREER_PLATFORM_ANIMATED.png)
+![업무망 PC, GitHub Actions 검사와 Pages 배포, J-Career AWS 기준 설계, 별도 MLOps 사람 검토 경계를 함께 표시한 전체 인프라 지도](assets/JCAREER_FULL_INFRA_ANIMATED.png)
 
 움직이는 점은 설계상 데이터 이동 순서를 설명합니다. AWS에서 관측한 요청이나 배포 상태를
-뜻하지 않습니다. [움직이는 SVG 원본](assets/JCAREER_PLATFORM_ANIMATED.svg)은 별도 링크에서 열 수 있습니다.
+뜻하지 않습니다. [움직이는 SVG 원본](assets/JCAREER_FULL_INFRA_ANIMATED.svg)과
+[편집 가능한 전체 지도](terraform/asis/JCAREER_FULL_INFRA.drawio)를 별도 링크에서 열 수 있습니다.
 
 ## 구성 한눈에 보기
 
@@ -56,8 +57,10 @@ S3에서 읽습니다. Lambda는 후보 모델을 한 차례 학습한 뒤 결�
 
 - **브라우저용:** [전체 명세](https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/) · [대화형 아키텍처](https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/architecture.html)
 - [웹 명세](terraform/asis/index.html): 서비스, 기능, API, 데이터·이벤트 흐름, 보안·운영·장애 시나리오
-- [대화형 아키텍처](terraform/asis/architecture.html): 전체 구성과 경로별 1·2·3 단계 강조
+- [대화형 아키텍처](terraform/asis/architecture.html): 전체 시스템 지도, 경로별 강조와 MLOps 7단계 도면 전환
 - [PDF 명세](terraform/asis/JCAREER_ASIS_SYSTEM_SPEC.pdf)
+- [전체 인프라 애니메이션 SVG](assets/JCAREER_FULL_INFRA_ANIMATED.svg)
+- [전체 인프라 draw.io 원본](terraform/asis/JCAREER_FULL_INFRA.drawio)
 - [PNG 도면](terraform/asis/JCAREER_ASIS_FLOW.drawio.png)
 - [쉽게 보는 draw.io 원본](terraform/asis/JCAREER_ASIS_FLOW.drawio)
 - [보조 상세 draw.io 원본](terraform/asis/JCAREER_ASIS_2AZ.drawio): 원본 작업 트리의 별도 기술 기록이며 공개 기준 도면 수량에는 포함하지 않음

@@ -27,6 +27,11 @@ ASIS_ARCHITECTURE = ROOT / "terraform" / "asis" / "architecture.html"
 PLATFORM_SVG = ROOT / "assets" / "JCAREER_PLATFORM_ANIMATED.svg"
 PLATFORM_PNG = ROOT / "assets" / "JCAREER_PLATFORM_ANIMATED.png"
 PLATFORM_SPEC = ROOT / "assets" / "JCAREER_PLATFORM_ANIMATED.spec.json"
+FULL_INFRA_SVG = ROOT / "assets" / "JCAREER_FULL_INFRA_ANIMATED.svg"
+FULL_INFRA_PNG = ROOT / "assets" / "JCAREER_FULL_INFRA_ANIMATED.png"
+FULL_INFRA_SPEC = ROOT / "assets" / "JCAREER_FULL_INFRA_ANIMATED.spec.json"
+FULL_INFRA_DRAWIO = ROOT / "terraform" / "asis" / "JCAREER_FULL_INFRA.drawio"
+FULL_INFRA_GUIDE = ROOT / "terraform" / "asis" / "JCAREER_FULL_INFRA.md"
 
 EXPECTED_COMMANDS = [
     "python -B scripts/check_serverless_mlops_static.py --root .",
@@ -40,6 +45,7 @@ EXPECTED_COMMANDS = [
     "node --check mlops/app.js",
     "node --check assets/motion.js",
     "node scripts/finalize_animated_arch.mjs --check",
+    "node scripts/finalize_animated_arch.mjs assets/JCAREER_FULL_INFRA_ANIMATED.svg --spec=assets/JCAREER_FULL_INFRA_ANIMATED.spec.json --check",
     "node scripts/check_public_ui.mjs",
     "node scripts/render_spec_pdf.mjs mlops/index.html mlops/JCAREER_MLOPS_SYSTEM_SPEC.pdf",
     "python -B scripts/update_public_mlops_evidence.py",
@@ -52,11 +58,12 @@ EXPECTED_NOTES = [
     "Terraform init, validate, mock tests, and the disabled plan ran from a temporary source copy outside the repository.",
     "bootstrap/runtime counts were checked only with Terraform mock_provider tests.",
     "The disabled default plan used the ordinary provider configuration with AWS validation disabled by the configuration and planned zero managed resources.",
-    "All six architecture routes were opened and checked for the selected button, active diagram layer, detail link, and 390px overflow by scripts/check_public_ui.mjs.",
+    "All six architecture routes were opened and checked for the selected button, active diagram layer, visible diagram media, detail link, full-map asset, and 390px overflow by scripts/check_public_ui.mjs.",
     "Five public pages were checked at 390px and 1440px for overflow, canonical and Open Graph metadata, touch action, and keyboard focus; MLOps aria-controls was also checked.",
     "MLOps stage URL state, invalid-stage fallback, and browser history were checked by scripts/check_public_ui.mjs.",
     "Eight motion checks covered the carousel, MLOps stage rail, animated architecture, manual motion toggle, and reduced-motion fallback.",
     "The animated architecture source hash, 15 nodes, 11 edges, 17 motion dots, 1480x820 PNG, and manual visual review were recorded together.",
+    "The full infrastructure source hash, 27 nodes, 21 edges, 21 motion dots, 1780x1160 PNG, editable draw.io source, and manual visual review were recorded together.",
     "The MLOps PDF was rendered from mlops/index.html and carries that source file's SHA-256 marker.",
     "The recent three-logical-database outcome delta is documented as unmerged and is not included in these PASS results.",
 ]
@@ -156,6 +163,10 @@ def evidence_scope_files() -> list[Path]:
         ROOT / "assets" / "JCAREER_PLATFORM_ANIMATED.spec.json",
         ROOT / "assets" / "JCAREER_PLATFORM_ANIMATED.svg",
         ROOT / "assets" / "JCAREER_PLATFORM_ANIMATED.png",
+        FULL_INFRA_SPEC,
+        FULL_INFRA_SVG,
+        FULL_INFRA_PNG,
+        ROOT / ".github" / "workflows" / "public-release-check.yml",
         ROOT / "scripts" / "browser_support.mjs",
         ROOT / "scripts" / "check_public_ui.mjs",
         ROOT / "scripts" / "finalize_animated_arch.mjs",
@@ -171,6 +182,9 @@ def evidence_scope_files() -> list[Path]:
         ROOT / "terraform" / "asis" / "build-spec.mjs",
         ROOT / "terraform" / "asis" / "index.html",
         ROOT / "terraform" / "asis" / "JCAREER_ASIS_FLOW.md",
+        ROOT / "terraform" / "asis" / "README.md",
+        FULL_INFRA_DRAWIO,
+        FULL_INFRA_GUIDE,
         ROOT / "terraform" / "asis" / "validate-spec.ps1",
         ROOT / "src" / "runtime" / "ASIS_RUNTIME_SPEC.md",
         ROOT / "src" / "runtime" / "VERIFICATION.md",
@@ -210,9 +224,17 @@ def is_forbidden_artifact(path: Path) -> bool:
 
 def file_sha256(path: Path) -> str:
     digest = hashlib.sha256()
-    with path.open("rb") as stream:
-        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
-            digest.update(chunk)
+    if (
+        path.suffix.lower() in TEXT_SUFFIXES
+        or path.suffix.lower() == ".mjs"
+        or path.name.startswith("Dockerfile")
+    ):
+        normalized = path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+        digest.update(normalized)
+    else:
+        with path.open("rb") as stream:
+            for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                digest.update(chunk)
     return digest.hexdigest()
 
 
@@ -317,7 +339,9 @@ def check_evidence_report(errors: list[str]) -> None:
             "route_checks": [
                 "selected_button",
                 "active_diagram_layer",
+                "visible_diagram_media",
                 "detail_link",
+                "full_map_asset",
                 "horizontal_overflow",
             ],
             "motion_contracts": [
@@ -347,6 +371,21 @@ def check_evidence_report(errors: list[str]) -> None:
             "nodes": 15,
             "edges": 11,
             "motion_dots": 17,
+            "visual_review": "PASS",
+        },
+        "full_infrastructure_architecture": {
+            "spec": relative_name(FULL_INFRA_SPEC),
+            "spec_sha256": file_sha256(FULL_INFRA_SPEC),
+            "svg": relative_name(FULL_INFRA_SVG),
+            "svg_sha256": file_sha256(FULL_INFRA_SVG),
+            "png": relative_name(FULL_INFRA_PNG),
+            "png_sha256": file_sha256(FULL_INFRA_PNG),
+            "drawio": relative_name(FULL_INFRA_DRAWIO),
+            "drawio_sha256": file_sha256(FULL_INFRA_DRAWIO),
+            "canvas_css_px": [1780, 1160],
+            "nodes": 27,
+            "edges": 21,
+            "motion_dots": 21,
             "visual_review": "PASS",
         },
     }
@@ -383,6 +422,11 @@ def check() -> list[str]:
         PLATFORM_SVG,
         PLATFORM_PNG,
         PLATFORM_SPEC,
+        FULL_INFRA_SVG,
+        FULL_INFRA_PNG,
+        FULL_INFRA_SPEC,
+        FULL_INFRA_DRAWIO,
+        FULL_INFRA_GUIDE,
         DRAWIO,
         SVG,
         PNG,
@@ -470,7 +514,9 @@ def check() -> list[str]:
         and "기준 110개와 분리한 별도 계획이며 수치를 합산하지 않습니다" in asis_text
         and 'data-flow-button="mlops"' in architecture_text
         and 'data-flow-layer="mlops"' in architecture_text
-        and "MLOps는 합성 데이터 기반 모델 검증과 사람 검토 단계를 보여 줍니다" in architecture_text
+        and "MLOps를 선택하면 빈 표식 대신 전용 7단계 도면으로 전환됩니다" in architecture_text
+        and 'data-flow-media="mlops"' in architecture_text
+        and "JCAREER_MLOPS_FLOW.svg" in architecture_text
         and "history.replaceState" in architecture_text
     )
     if not asis_mlops_contract:
@@ -634,6 +680,95 @@ def check() -> list[str]:
             errors.append(f"unexpected animated architecture PNG size: {png_size(PLATFORM_PNG)}")
     except (OSError, ValueError, struct.error) as exc:
         errors.append(f"animated architecture PNG validation failed: {exc}")
+
+    full_tree: ET.ElementTree | None = None
+    full_drawio_tree: ET.ElementTree | None = None
+    try:
+        full_tree = ET.parse(FULL_INFRA_SVG)
+        full_drawio_tree = ET.parse(FULL_INFRA_DRAWIO)
+    except ET.ParseError as exc:
+        errors.append(f"full infrastructure diagram XML parse failed: {exc}")
+    try:
+        full_spec = json.loads(FULL_INFRA_SPEC.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        errors.append(f"full infrastructure specification is unreadable: {exc}")
+        full_spec = {}
+    full_svg_text = FULL_INFRA_SVG.read_text(encoding="utf-8")
+    full_ids = (
+        [element.attrib["id"] for element in full_tree.iter() if "id" in element.attrib]
+        if full_tree is not None
+        else []
+    )
+    full_nodes = full_spec.get("nodes", [])
+    full_edges = full_spec.get("edges", [])
+    full_journeys = full_spec.get("journeys", [])
+    full_motion_count = sum(len(journey.get("hops", [])) for journey in full_journeys)
+    full_spec_ids = {node.get("id") for node in full_nodes}
+    full_expected_text = [
+        full_spec.get("title", ""),
+        full_spec.get("subtitle", ""),
+        full_spec.get("footer", ""),
+        *(node.get("label", "") for node in full_nodes),
+        *(node.get("sub", "") for node in full_nodes),
+        *(group.get("label", "") for group in full_spec.get("groups", [])),
+    ]
+    full_visible_text = "".join(full_tree.getroot().itertext()) if full_tree else ""
+    full_boundary_text = " ".join(str(value) for value in full_expected_text)
+    if (
+        full_spec.get("canvas") != {"w": 1780, "h": 1160}
+        or len(full_nodes) != 27
+        or len(full_edges) != 21
+        or full_motion_count != 21
+        or len(full_ids) != len(set(full_ids))
+        or full_svg_text.count('<path class="flow"')
+        != sum(not edge.get("static", False) for edge in full_edges)
+        or any(value and value not in full_visible_text for value in full_expected_text)
+        or not all(
+            edge.get("from") in full_spec_ids and edge.get("to") in full_spec_ids
+            for edge in full_edges
+        )
+        or f'data-spec-sha256="{file_sha256(FULL_INFRA_SPEC)}"'
+        not in full_svg_text
+        or "GitHub Actions CI" not in full_boundary_text
+        or "CI / AWS 경계" not in full_boundary_text
+        or "업무망 PC 180대" not in full_boundary_text
+        or "TRAINED_PENDING_HUMAN_REVIEW" not in full_boundary_text
+        or "자동 배포 없음" not in full_boundary_text
+    ):
+        errors.append("full infrastructure spec-to-SVG contract is out of sync")
+    full_guarded_motion_count = len(
+        re.findall(r'<circle class="motion-dot"[^>]*><animateMotion ', full_svg_text)
+    )
+    if (
+        full_svg_text.count("<animateMotion ") != full_motion_count
+        or full_guarded_motion_count != full_motion_count
+        or "@media (prefers-reduced-motion: reduce){.motion-dot{display:none}}"
+        not in full_svg_text
+    ):
+        errors.append("full infrastructure reduced-motion contract is incomplete")
+    if full_drawio_tree is not None:
+        full_cells = list(full_drawio_tree.iter("mxCell"))
+        full_cell_ids = {cell.attrib.get("id") for cell in full_cells}
+        full_drawio_edges = [cell for cell in full_cells if cell.attrib.get("edge") == "1"]
+        full_drawio_bound = all(
+            edge.attrib.get("source") in full_cell_ids
+            and edge.attrib.get("target") in full_cell_ids
+            for edge in full_drawio_edges
+        )
+        if (
+            len(full_cell_ids) != len(full_cells)
+            or not full_drawio_edges
+            or not full_drawio_bound
+            or "mxgraph.aws4" not in FULL_INFRA_DRAWIO.read_text(encoding="utf-8")
+        ):
+            errors.append("full infrastructure draw.io topology contract is incomplete")
+    try:
+        if png_size(FULL_INFRA_PNG) != (1780, 1160):
+            errors.append(
+                f"unexpected full infrastructure PNG size: {png_size(FULL_INFRA_PNG)}"
+            )
+    except (OSError, ValueError, struct.error) as exc:
+        errors.append(f"full infrastructure PNG validation failed: {exc}")
 
     all_files = workspace_files()
     forbidden_artifacts = [path for path in all_files if is_forbidden_artifact(path)]

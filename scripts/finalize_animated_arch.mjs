@@ -11,7 +11,8 @@ const specArgument = process.argv.find((argument) => argument.startsWith('--spec
 const specPath = resolve(specArgument?.slice('--spec='.length) || 'assets/JCAREER_PLATFORM_ANIMATED.spec.json');
 const specBytes = readFileSync(specPath);
 const spec = JSON.parse(specBytes.toString('utf8'));
-const specHash = createHash('sha256').update(specBytes).digest('hex');
+const normalizedSpec = specBytes.toString('utf8').replace(/\r\n?/g, '\n');
+const specHash = createHash('sha256').update(normalizedSpec).digest('hex');
 const input = readFileSync(sourcePath, 'utf8');
 const reducedMotionRule = '@media (prefers-reduced-motion: reduce){.motion-dot{display:none}}';
 const sourceMetadata = `<metadata id="jcareer-animated-source" data-spec-sha256="${specHash}"/>`;
@@ -29,6 +30,10 @@ output = output.replace(
   /<circle(?![^>]*\bclass="motion-dot")([^>]*)><animateMotion\b/g,
   '<circle class="motion-dot"$1><animateMotion',
 );
+output = output.replace(/\bbegin="(?!-)([0-9]+(?:\.[0-9]+)?)s"/g, (match, rawSeconds) => {
+  const seconds = Number(rawSeconds);
+  return seconds > 0 ? `begin="-${rawSeconds}s"` : match;
+});
 output = output.replace(/\r\n?/g, '\n').replace(/[ \t]+$/gm, '');
 
 const motionCount = (output.match(/<animateMotion\b/g) || []).length;
