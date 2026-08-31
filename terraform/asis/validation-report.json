@@ -1,5 +1,5 @@
 {
-    "generated_at":  "2026-08-31T10:16:14+09:00",
+    "generated_at":  "2026-08-31T11:22:44+09:00",
     "scope":  "local static validation only; no AWS API or terraform apply",
     "passed":  25,
     "failed":  0,
@@ -12,12 +12,12 @@
                    {
                        "check":  "readme_current_deliverables",
                        "status":  "PASS",
-                       "detail":  "public 58/14 diagram linked; separate detailed and legacy diagrams marked"
+                       "detail":  "public 60/14 diagram linked; separate detailed and legacy diagrams marked"
                    },
                    {
                        "check":  "plain_language_reader_guide",
                        "status":  "PASS",
-                       "detail":  "spec guide Hangul 3126; flow guide Hangul 69; drawio Hangul 401; reader-first status labels checked"
+                       "detail":  "spec guide Hangul 3236; flow guide Hangul 69; drawio Hangul 431; reader-first status labels checked"
                    },
                    {
                        "check":  "render_temp_artifacts_absent",
@@ -27,7 +27,7 @@
                    {
                        "check":  "required_scope_terms",
                        "status":  "PASS",
-                       "detail":  "all 31 boundary terms in spec+index; architecture core 14"
+                       "detail":  "all 31 boundary terms in spec+index; architecture core 16"
                    },
                    {
                        "check":  "prohibited_live_claims",
@@ -52,12 +52,12 @@
                    {
                        "check":  "runtime_api_route_counts",
                        "status":  "PASS",
-                       "detail":  "api 30, agent 6, gateway 4; runner declares 6 checks including MLOps"
+                       "detail":  "api 39 = core 30 + guarded 9, agent 6, gateway 4; runner declares 6 checks including MLOps"
                    },
                    {
                        "check":  "runtime_screen_contract",
                        "status":  "PASS",
-                       "detail":  "React routes 20 including redirect/wildcard; candidate and recruiter home documented"
+                       "detail":  "React routes 23 including redirect/wildcard; core home and three TRACE routes documented"
                    },
                    {
                        "check":  "terraform_state_absent",
@@ -97,17 +97,17 @@
                    {
                        "check":  "interactive_service_flow",
                        "status":  "PASS",
-                       "detail":  "controls 7, overlay layers 7, six per-layer 3-step paths, markers 18; local/AWS data, MLOps and Slack separation, legend, URL state, detail links 7 checked"
+                       "detail":  "controls 9, overlay layers 9, eight per-layer 3-step paths, markers 24; local/AWS data, MLOps, workplace and guarded-source separation, legend, URL state, detail links 9 checked"
                    },
                    {
                        "check":  "flow_source_sync",
                        "status":  "PASS",
-                       "detail":  "index+architecture match generator inputs; flow 8c08c70ad061..."
+                       "detail":  "index+architecture match generator inputs; flow dd5ead041627..."
                    },
                    {
                        "check":  "drawio_xml",
                        "status":  "PASS",
-                       "detail":  "cells 58, edges 14, containers 9, duplicate IDs 0, bad edges 0, Slack edges 0, missing MLOps IDs/edges 0/0"
+                       "detail":  "cells 60, edges 14, containers 9, duplicate IDs 0, bad edges 0, Slack edges 0, official ECR icons 1, missing IDs/MLOps edges 0/0"
                    },
                    {
                        "check":  "png_dimensions",

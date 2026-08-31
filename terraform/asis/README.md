@@ -10,8 +10,8 @@
 - 이 기준선은 AWS에 적용하지 않았으며 현재 생성 리소스는 0개다.
 - 기준선에 애플리케이션 이미지와 실행 환경은 포함되어 있지 않다.
 - MLOps는 별도 default-off Terraform 루트의 0/13/14 계획이며 기준 110개와 합산하지 않는다.
-- Slack은 AWS 밖의 외부 업무 SaaS·자산대장 경계다. 바로가기 소스 외 실제 workspace 운영은 확인되지 않았다.
-- TRACE와 JC-RECEIPT 같은 신규 AI 서비스는 이번 범위에 넣지 않는다.
+- Slack은 AWS 밖의 외부 업무 SaaS·자산대장 경계다. 기본 비활성 webhook 어댑터 소스는 있으나 실제 workspace 운영·전송은 확인되지 않았다.
+- TRACE·JC-RECEIPT는 기존 API의 기본 비활성 로컬 소스로 구현됐다. Terraform 리소스와 AWS 실행은 없다.
 
 자세한 설명은 아래의 [웹 명세](index.html)부터 읽으면 된다. 첫 장에 핵심 숫자와 용어
 풀이가 있다.
@@ -40,20 +40,21 @@
 - [자동검사 결과](validation-report.json)
 
 `JCAREER_ASIS_2AZ.drawio`는 원본 작업 트리에서 관리한 별도 기술 기록이다. 공개 기준 도면의
-수량과 검증 결과에는 합치지 않는다. 공개 화면은 58개 셀·14개 연결의
+수량과 검증 결과에는 합치지 않는다. 공개 화면은 60개 셀·14개 연결의
 `JCAREER_ASIS_FLOW.drawio`와 같은 이름의 PNG를 기준으로 읽는다. `JCAREER_ASIS_2AZ.md`는
 초기 2-AZ 구판(legacy) 설명이다.
 
 공개 도면의 추가 여섯 연결은 기준 110개 Terraform과 분리된 `terraform/serverless-mlops`의
-왼쪽→오른쪽 계획 흐름만 설명한다. Slack 상자는 어떤 연결선도 갖지 않으며 webhook/token,
-Amazon Q Developer(AWS Chatbot), SNS, EventBridge를 만들거나 암시하지 않는다.
+왼쪽→오른쪽 계획 흐름만 설명한다. Slack 상자는 실제 workspace 운영과 AWS 통합을 나타내는
+연결선을 갖지 않는다. 기존 API의 Slack·Notion·SMTP 어댑터와 TRACE는 소스 구현 메모로만
+표시하며, 실계정·실전송·AWS 배포를 암시하지 않는다.
 
 ## 서비스 기획과의 경계
 
-사용자 결정(2026-08-26)에 따라 TRACE·JC-RECEIPT 등 신규 AI 서비스는 이 계층에
-구현하지 않는다. 이 디렉터리는 기존 채용 매칭 서비스의 2-AZ AS-IS만 재현한다.
-신규 서비스용 Lambda, EventBridge, Step Functions, DynamoDB 또는 애플리케이션 코드를
-추가하지 않으며, 향후 구현에는 별도 사람 승인과 별도 단계가 필요하다.
+이 디렉터리의 Terraform은 기존 채용 매칭 서비스의 2-AZ AS-IS만 재현한다. TRACE·JC-RECEIPT와
+외부 업무도구 어댑터는 `src/runtime`의 기본 비활성 애플리케이션 소스로 구현하되, 이 Terraform에
+Lambda, EventBridge, Step Functions, DynamoDB 같은 새 리소스를 추가하지 않는다. 실제 외부 연결과
+운영 활성화에는 별도 사람 승인과 검증 단계가 필요하다.
 
 ---
 

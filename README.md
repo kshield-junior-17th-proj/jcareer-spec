@@ -29,7 +29,9 @@ J-Career는 구직자와 기업을 연결하는 채용 플랫폼입니다. 이 �
 기준 설계의 110개는 AWS에 접속하지 않는 Terraform 계획에서 계산한 생성 예정 항목입니다.
 AWS 배포 결과와 애플리케이션 이미지는 별도 검증 기록으로 관리합니다. MLOps와 AWS 검증 환경은
 기준 설계와 분리된 Terraform 루트이며, 명시적인 확인값이 있어야 다음 단계가 열립니다.
-TRACE와 JC-RECEIPT 등 제안 단계 신규 서비스는 이 기준 설계에 포함하지 않습니다.
+TRACE·JC-RECEIPT와 Slack·Notion·SMTP 외부 업무도구 어댑터는 기존 API의 로컬 소스로
+구현되어 있으나 모두 기본 비활성입니다. 새 Terraform 리소스는 없고 실제 외부 계정 연결,
+메시지 전송, AWS 배포 결과도 확인하지 않았으므로 기준 110개에는 합산하지 않습니다.
 
 ## MLOps 명세 바로 보기
 
@@ -68,9 +70,10 @@ Terraform 자원 수나 동시 사용자 수로 바꾸어 해석하지 않습니
 Windows 3대와 macOS 3대 검토 표본도 아직 실행하지 않았습니다.
 
 Slack은 AWS 리소스가 아닌 외부 업무 SaaS·자산대장 경계입니다. Windows/macOS 이미지 소스의
-`app.slack.com` 바로가기와 macOS 종료 시 best-effort Slack 프로세스 종료만 확인했으며 실제
-workspace 사용·계정·보존 정책은 `SCENARIO_USE_UNVERIFIED`입니다. AWS 흐름선이나 webhook/token,
-Amazon Q Developer(AWS Chatbot), SNS, EventBridge 연동은 없습니다.
+`app.slack.com` 바로가기와 macOS 종료 시 best-effort Slack 프로세스 종료에 더해, API 컨테이너의
+기본 비활성 Incoming Webhook 어댑터 소스와 무통신 회귀시험을 확인했습니다. 실제 workspace
+사용·계정·보존 정책과 webhook 전송은 `SCENARIO_USE_UNVERIFIED`입니다. Notion API와 SMTP/TLS
+메일 어댑터도 소스만 구현됐으며 실제 workspace·메일 시스템 연결이나 AWS 리소스는 없습니다.
 
 ## 보안 서비스는 어디에 있나
 

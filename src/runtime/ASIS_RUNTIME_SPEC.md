@@ -111,13 +111,18 @@ DB에 구현됐거나 수집·전송이 승인됐다는 뜻은 아니다.
 ## 4. 외부 업무 API
 
 실행 시 FastAPI가 `/docs`와 `/openapi.json`을 생성한다. 아래 표는 코드 라우트의 역할 경계다.
-`contracts/api_surface.json`은 세 서비스의 35개 handler·40개 route tuple, 요청 model 선언,
+`contracts/api_surface.json`은 기존 core 세 서비스의 35개 handler·40개 route tuple, 요청 model 선언,
 인증 role source와 선택된 tenant selector, 기업 계정 수명주기·현재 지원자료 참조·추천 audit·
 cache payload 검증의 선택된 source state를 AST fingerprint와 대조한다. 상태는
 `SOURCE_DECLARATION_NOT_EXECUTION_EVIDENCE`·`AST_PARTIAL`이다. 현재 OpenAPI에는 security scheme과
 정밀 response/error model이 없고 operation별 완전한 DB read/write graph도 아니므로 이 inventory를
 완전한 wire API 계약이라고 부르지 않는다. operation의 legacy `required_calls` 필드는 handler AST에
 선택된 호출 symbol이 존재한다는 뜻일 뿐, cache hit 같은 모든 분기에서 실행된다는 뜻이 아니다.
+
+기존 core inventory와 별도로 TRACE·JC-RECEIPT router 7개와 외부 업무도구 admin router 2개가
+있다. 전자는 `tests/trace_receipt_contract.py`, 후자는 `tests/integrations_contract.py`에서 별도
+합성·무통신 계약으로 검사한다. 두 확장 모두 기본 비활성이며 운영 OpenAPI, 실제 외부 호출이나
+AWS 배포 증거가 아니다.
 
 `contracts/api_effects.json`은 35개 handler 전부에 대해 회원/기업/outcome DB, audit, Redis, agent,
 llm-gateway, prompt log, SQS와 DynamoDB 결과함 효과와 분기 설명을 별도로 고정한다. 전 handler와 20개 helper의 AST 지문,

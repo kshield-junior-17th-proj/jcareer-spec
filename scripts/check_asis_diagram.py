@@ -175,7 +175,7 @@ REQUIRED_CELLS = {
     "mlops-human": ("TRAINED_PENDING_HUMAN_REVIEW", "no agent wiring"),
     "mlops-note": ("SSE-S3", "no schedule", "no automatic activation"),
     "planning-boundary": ("Planning / evaluation boundary", "no resources"),
-    "trace-boundary": ("TRACE", "NOT IMPLEMENTED"),
+    "trace-boundary": ("TRACE", "LOCAL SOURCE", "DEFAULT OFF", "no Terraform/AWS resources", "not deployed"),
     "oauth-boundary": (
         "openai-oauth",
         "security / licensing evaluation only",

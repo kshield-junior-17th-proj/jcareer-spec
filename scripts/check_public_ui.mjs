@@ -42,6 +42,24 @@ const EXPECTED_ROUTES = [
     steps: 3,
   },
   {
+    href: 'terraform/asis/architecture.html?flow=workplace',
+    flow: 'workplace',
+    detailHref: 'index.html#section-15',
+    steps: 3,
+  },
+  {
+    href: 'terraform/asis/architecture.html?flow=trace',
+    flow: 'trace',
+    detailHref: 'index.html#section-25',
+    steps: 3,
+  },
+  {
+    href: 'terraform/asis/architecture.html?flow=integrations',
+    flow: 'integrations',
+    detailHref: 'index.html#section-25',
+    steps: 3,
+  },
+  {
     href: 'terraform/asis/architecture.html?flow=operations',
     flow: 'operations',
     detailHref: 'index.html#section-52',
@@ -305,7 +323,7 @@ async function runChecks(client, origin) {
   );
   assert(
     JSON.stringify(landing.routes) === JSON.stringify(EXPECTED_ROUTES.map((route) => route.href)),
-    'Landing routes do not match the six service paths.',
+    'Landing routes do not match the nine architecture states.',
   );
   assert(landing.innerWidth === 390, 'Mobile viewport width is not 390 CSS pixels.');
   assert(landing.scrollWidth <= landing.innerWidth, 'Landing page overflows horizontally at 390 CSS pixels.');
@@ -539,7 +557,7 @@ async function main() {
     const result = await runChecks(client, server.origin);
     console.log('public UI: PASS');
     console.log(
-      'landing routes: ' + result.landingRoutes + '/6; MLOps stage states: ' +
+      'landing routes: ' + result.landingRoutes + '/9; MLOps stage states: ' +
       result.stageStates + '/8; invalid stage: fail-closed; viewport: ' +
       result.viewport + 'px; page/viewport checks: ' +
       result.pageViewportChecks + '/10; motion checks: ' + result.motionChecks + '/8',

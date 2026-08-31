@@ -4,7 +4,7 @@
 > 기준일: 2026-08-30
 > 다루는 대상: 기존 자료를 바탕으로 다시 그린 Terraform 구성과 별도 로컬 예시 코드  
 > 문서 목적: 채용 서비스와 AWS 기준 설계, 데이터·보안·운영 검증 범위를 한 문서로 관리
-> 이번 범위 아님: TRACE, JC-RECEIPT, Decision Receipt, Recourse Twin 등 제안 단계 서비스
+> 운영 범위 아님: 실제 외부 업무도구 계정 연결·전송, TRACE 운영 활성화, 신규 AWS/Terraform 리소스
 
 ## 0. 처음 읽는 분을 위한 안내
 
@@ -19,9 +19,9 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 3. 서비스 기능은 웹·API 구현 범위와 AWS 인프라 기준선을 나누어 관리한다.
 4. 기준 Terraform의 애플리케이션 이미지와 AWS 실행 결과는 후속 배포 검증 항목이다.
 5. MLOps는 기준 110개와 분리한 7단계 모델 검증 경로다. 기본 잠금 0개, 보관함 준비 13개, 한 번 실행 준비 14개 계획으로 나뉜다.
-6. Slack은 AWS 리소스가 아닌 외부 업무 SaaS·자산대장 경계다. 두 운영체제 이미지의 바로가기 소스와 macOS 종료 시 best-effort 프로세스 종료만 확인했으며 실제 workspace 운영은 확인하지 못했다.
+6. Slack은 AWS 리소스가 아닌 외부 업무 SaaS·자산대장 경계다. 이미지 바로가기와 세션 정리 소스 외에 Slack·Notion·SMTP 어댑터가 기존 API에 기본 비활성으로 구현됐지만 실제 계정 연결·전송은 확인하지 못했다.
 7. 컨설턴트 대시보드는 J-Career 고객사 AWS에 직접 연결하지 않는다. 외부 미리보기에는 민감한 내용을 지운 복사본만 쓴다.
-8. TRACE와 JC-RECEIPT 같은 신규 AI 서비스는 아이디어 단계다. 이번 명세에 구현 내용으로 넣지 않았다.
+8. TRACE·JC-RECEIPT는 결정 근거와 정정·사람 검토를 잇는 기본 비활성 로컬 소스로 구현됐다. 합격·이의·ISO 충족·잔여위험을 자동 판정하지 않으며 AWS에는 배포하지 않았다.
 
 > 핵심 기준은 **업무망 PC 180대, 서울 리전 2-AZ, Terraform 6개 모듈과 110개 계획 항목**이다.
 
@@ -44,14 +44,14 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 | 구분 | 현재 확인된 내용 | 아직 확인되지 않은 내용 |
 |---|---|---|
 | 업무망 PC | 전체 180대, Windows 100대, macOS 80대 | 버전, 보안 프로그램, 인증, 실제 접속 경로 |
-| 업무 시스템·Slack | Windows/macOS 이미지 소스의 `app.slack.com` 바로가기와 macOS 종료 시 best-effort Slack 프로세스 종료 | 실제 workspace 사용, 계정·보존 정책, webhook/token, AWS 연동 |
+| 업무 시스템·외부 연동 | Windows/macOS의 Slack 바로가기·세션 정리와 API의 기본 비활성 Slack·Notion·SMTP 어댑터 소스 | 실제 workspace·메일 시스템 사용, 계정·보존 정책, 실전송, AWS 연동 |
 | AWS 설계 | 2-AZ, 6개 모듈, 기록된 계획 항목 110개 | 고객사 AWS 배포 결과와 실행 상태 |
 | AWS 검증 Lab | 별도 24개 생성 계획과 Bedrock 직접 합성 호출 통과, 권한 차단 뒤 부분 자원 정리 완료 | 원격 여섯 서비스, HTTPS 인증 경계, Bedrock 전체 애플리케이션 경로 |
 | 기준 애플리케이션 | 배치할 자리와 서비스 이름 | 실행 이미지, 실제 기동, 사용자 통합 시험 |
 | 서비스 구현 범위 | 합성 데이터용 소스, 공개 릴리스 검사 6단계(정적 검사 3개·단위시험 묶음 3개) | 실제 사용자 데이터 처리와 장기 운영 관찰 |
 | MLOps 전용 구성 | 7단계 흐름, 별도 Terraform 단계별 계획 0/13/14, 소스 경계 검사 19건과 합성 파이프라인 시험 22건 | AWS 배포, 이미지 등록, Lambda 실행, 모델 품질·공정성 판단 |
 | 컨설턴트 대시보드 | 별도 소스와 제한적인 미리보기 응답 | 사용자별 로그인, 고객사 분리, 운영 감사 기록, 승인된 데이터 반입 |
-| 신규 AI 서비스 | 제안 이름과 아이디어 | 구현, 승인, Terraform 반영, 운영 배포 |
+| TRACE·JC-RECEIPT | 기본 비활성 receipt·정정 요청·사람 검토 API와 역할별 화면, 무통신 합성 회귀시험 | 사람 승인, 운영 활성화, 실제 데이터, Terraform 반영, AWS 배포 |
 
 ### 0.4 낯선 말을 쉽게 풀면
 
@@ -84,7 +84,7 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 | 항목 | 값 |
 |---|---|
 | 문서 번호 | `JC-ASIS-SPEC-001` |
-| 개정 | 3.14 |
+| 개정 | 3.15 |
 | 기준일 | 2026-08-31 |
 | 작성 기준 | 기존 기획, AWS에 접속하지 않는 Terraform 계획, 별도 서비스 구현 범위 |
 | 승인 상태 | 기준 설계 · 기술 검토 진행. `docs/current` 승인 문서 0건 |
@@ -109,6 +109,7 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 | 3.12 | 2026-08-30 | AWS 검증 Lab과 AS-IS 모의 기준선을 분리하고, MLOps·대시보드의 최신 검사 수와 쉬운 한국어 상태표를 반영 |
 | 3.13 | 2026-08-30 | 공개 문서 정합성 재검토. PDF 소스 결속, 시점별 Lab 관찰, 공개 도면 39셀·8연결, 서비스별 관찰 상태를 분리하고 고정 검사 추가 |
 | 3.14 | 2026-08-31 | 공개 AS-IS 도면과 페이지에 기준선과 분리된 MLOps 0/13/14 실행 경계, 외부 Slack 자산대장 경계, 업무망 선언·구현·미확정 상태를 분리해 반영 |
+| 3.15 | 2026-08-31 | 기본 비활성 TRACE·JC-RECEIPT와 Slack·Notion·SMTP 어댑터의 로컬 소스 구현, 무통신 시험, 실계정·AWS 미연결 경계를 공개 명세와 도면에 동기화 |
 
 ### 0.7 상태를 읽는 법
 
@@ -174,13 +175,15 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 - 기업 공개정보를 별도 복사본으로 저장하는 OpenDART 보조 기능과 합성 MLOps 로컬 학습·평가 코드
 - 기준 110개와 분리된 MLOps 7단계 서버리스 경로, Terraform 0/13/14 계획과 사람 검토 대기 경계
 - 기존 `llm-gateway` 내부 Bedrock Converse 어댑터와 별도 관리형 실험 브랜치의 경계
+- 기본 비활성 TRACE·JC-RECEIPT receipt·정정·사람 검토 소스와 역할별 로컬 화면
+- 기본 비활성 Slack Incoming Webhook·Notion API·SMTP/TLS 외부 업무도구 어댑터 소스
 - 컨설턴트 소유 대시보드의 데이터 수신 경계와 운영 전제
 
 ### 1.2 제외 범위
 
-- TRACE, JC-RECEIPT 및 이에 준하는 제안 단계 신규 서비스의 구현 또는 AS-IS 편입
+- TRACE·JC-RECEIPT의 운영 활성화, 실제 지원자 자료 처리, 자동 합격·이의·ISO·잔여위험 판정
 - 기준 Terraform에 신규 Lambda, EventBridge, Step Functions, DynamoDB를 추가하는 작업
-- Slack webhook/token, Amazon Q Developer(AWS Chatbot), SNS, EventBridge 등 AWS 연동의 생성 또는 암시
+- 실제 Slack·Notion·메일 계정 자격증명 반입과 실전송, Amazon Q Developer(AWS Chatbot)·SNS·EventBridge 등 AWS 업무도구 연동
 - J-Career client 기준선 컨테이너 이미지 게시, AWS 런타임 배포, 공급자 실호출
 - 실제 지원자 데이터, 실제 고객 계정, 실제 자격증명
 - AWS 적용, 상태 변경, 실제 서비스 연결
@@ -197,6 +200,8 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 |---|---|---|
 | 업무망 PC | `USER_CONFIRMED` | `REQ-PC-01`: 총 180대, Windows 100대와 macOS 80대. 관리 방식과 AWS 접속 경로는 확인하지 못함 |
 | Slack 업무 시스템 | `SCENARIO_USE_UNVERIFIED` | 외부 업무 SaaS·자산대장 경계다. Windows/macOS 이미지 소스의 `https://app.slack.com/client` 바로가기와 macOS 종료 시 best-effort 프로세스 종료만 확인했으며 실제 workspace 사용·소유·보존 정책은 확인하지 못함 |
+| 외부 업무도구 어댑터 | `IMPLEMENTED_GUARDED_NOT_ACTIVE` | 기존 API에 Slack Incoming Webhook·Notion API·SMTP/TLS 어댑터, admin 상태·합성 전송 API와 감사·멱등·redaction 경계가 있음. 모두 기본 비활성이며 실제 credential·외부 전송·AWS 배포는 확인하지 않음 |
+| TRACE·JC-RECEIPT | `IMPLEMENTED_GUARDED_NOT_ACTIVE` | receipt·정정 요청·원본-정정 관찰·사람 검토 기록과 역할별 React 경로가 있음. 기본값 `disabled`; 자동 채용·이의·적합성·잔여위험 판정과 AWS/Terraform 리소스는 없음 |
 | 기준 AWS 설계(Terraform) | `MODELLED` | 여섯 모듈로 구성됨. 기록된 AWS 비접속 계획은 생성 예정 110개, 변경 0개, 삭제 0개임. 별도 로컬 변경분을 넣어 다시 계산하지는 않음 |
 | J-Career 고객사 AWS 리소스 | 생성 안 함 | AWS에 접속하지 않는 모의 방식이므로 실제 AWS 상태를 나타내지 않음 |
 | 별도 AWS 검증 Lab | 권한 보완 대기 | HTTPS·Bedrock 포함 24개 생성 계획은 통과. 적용은 IAM 역할 생성 권한 부족으로 중단됐고 부분 생성 16개를 정리해 현재 0개. Bedrock 직접 합성 호출은 통과했으나 전체 경로는 미확인 |
@@ -244,13 +249,17 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 선언된 업무망 통제이며 구현·배치·운영 관찰 결과가 아니다. 흐름도에서는 업무망과 선언 통제를
 별도 영역으로 표시하고 사용자 요청 흐름과 직접 연결하지 않는다.
 
-Slack은 AWS 리소스나 J-Career 런타임 구성요소가 아니라 AWS 밖의 외부 업무 SaaS·자산대장
-경계다. 확인된 구현 소스는 Windows와 macOS 이미지 정의의 자격증명 없는
-`https://app.slack.com/client` 바로가기, 그리고 macOS 세션 정리에서 Slack 프로세스 종료를
-best-effort로 시도하는 코드뿐이다. 이 종료 시도는 인증 cookie 삭제를 증명하지 않는다. 실제
-workspace 사용, 소유자, 로그인, 개인정보 입력, 보존·삭제 설정은 `SCENARIO_USE_UNVERIFIED`로
-남긴다. 따라서 Slack과 AWS 사이에 흐름선을 그리지 않으며 webhook/token, Amazon Q Developer
-(AWS Chatbot), SNS, EventBridge 연동을 만들거나 현재 구성처럼 암시하지 않는다.
+Slack은 AWS 밖의 외부 업무 SaaS·자산대장 경계다. Windows와 macOS 이미지 정의에는 자격증명
+없는 `https://app.slack.com/client` 바로가기가 있고, macOS 세션 정리는 Slack 프로세스 종료를
+best-effort로 시도한다. 기존 API에는 별도의 기본 비활성 Slack Incoming Webhook 어댑터도 있다.
+Notion API와 SMTP/TLS 메일 어댑터 역시 같은 opt-in 경계로 구현됐으며 admin의 고정 합성·비개인
+이벤트만 보낼 수 있다. HTTPS exact-host allowlist, TLS, timeout, redaction, 감사 선기록과
+process-local 멱등을 무통신 대역으로 검사했다.
+
+이 소스 존재는 실제 Slack workspace, Notion page, 메일 시스템 사용·소유·로그인·보존 설정이나
+메시지 전송을 증명하지 않는다. credential을 반입하거나 외부 서비스를 호출한 기록도 없고,
+Amazon Q Developer(AWS Chatbot)·SNS·EventBridge 같은 AWS 연동이나 새 Terraform 리소스도 없다.
+실제 workspace 운영은 계속 `SCENARIO_USE_UNVERIFIED`로 남긴다.
 
 ### 2.2 Terraform 구성을 나눈 여섯 부분
 
@@ -424,9 +433,9 @@ metadata를 검사하지만 승인자 진위나 선언 해시의 정본 여부�
 
 | 변경 항목 | 구현 내용 | 경계와 미완료 사항 | 상태 |
 |---|---|---|---|
-| React/Nginx 화면 | 업무 동적 경로 16개와 `/privacy`, `/terms` 정적 안내 | 로컬 127.0.0.1 바인딩; ECR 게시·ECS 기동 미확인 | `LOCAL_SYNTHETIC_IMPLEMENTED` |
+| React/Nginx 화면 | 핵심 업무 동적 경로 16개, 역할별 TRACE 경로 3개와 `/privacy`, `/terms` 정적 안내 | 로컬 소스·합성 시험 범위; ECR 게시·ECS 기동 미확인 | `LOCAL_SYNTHETIC_IMPLEMENTED` |
 | FastAPI 업무 API | 가입·인증·동의·이력서·지원·기업 프로필·추천·감사 | 합성 seed 전용; 운영 키·migration·service discovery 미완료 | `LOCAL_SYNTHETIC_IMPLEMENTED` |
-| API 소스·효과 계약 | API 라우트 30개 + agent 별칭 6개 + gateway 별칭 4개, 합계 40개 경로를 35개 처리 함수로 정리. 같은 작업의 저장·감사·외부 호출 효과를 소스 지문으로 고정 | 소스 구조를 보는 부분 검사다. 실제 분기 실행, 횟수, 원자성, 후속 서비스 수신과 완전한 OpenAPI 계약은 증명하지 않음 | `STATIC_CHECKED` |
+| API 소스·효과 계약 | 기존 API 라우트 30개 + agent 별칭 6개 + gateway 별칭 4개는 40개 기준 계약으로 유지. TRACE 7개와 외부 업무도구 2개는 별도 guarded router·회귀시험으로 관리 | 두 검사군 모두 소스·합성 대역 범위다. 실제 분기 횟수, 후속 서비스 수신, 외부 전송과 완전한 OpenAPI 계약은 증명하지 않음 | `STATIC_CHECKED` |
 | 결정론적 matcher | 기술 70, 경력 20, 희망 직무 10의 버전 고정 산식 | 실제 모델 품질·편향·설명 충실도 평가를 대신하지 않음 | `LOCAL_SYNTHETIC_IMPLEMENTED` |
 | 설명 생성기 | 점수·정렬을 바꾸지 않는 설명과 `company_alignment` 생성 | 의미 grounding과 금칙 결론 검증 없음; alignment의 `score_effect=NONE` | `LOCAL_SYNTHETIC_IMPLEMENTED` |
 | OpenDART 공개정보 보조 기능 | 회사 개황과 최근 1년 공시 최대 5건을 별도 복사본으로 저장하고 출처 시각을 표시 | 기본은 합성 예시를 바로 읽는다. 선택적인 SQS FIFO→Lambda 작업자 소스도 있으나 패키지·키·DB 권한·AWS 자원·실행 증거는 없음. 등록 기업명 불일치·조회 실패 때 기존 정상 복사본을 유지하며 점수 영향은 없음 | 로컬 `LOCAL_SYNTHETIC_IMPLEMENTED`, 작업자 `PROTOTYPE_UNDEPLOYED` |
@@ -436,15 +445,18 @@ metadata를 검사하지만 승인자 진위나 선언 해시의 정본 여부�
 | 회원/기업 데이터 경계 | 같은 PostgreSQL의 두 논리 DB와 서로 다른 role | 동일 RDS 장애·백업 경계 공유; 기업 DB bootstrap 미구현; 교차 쓰기 비원자적 | 로컬 `LOCAL_SYNTHETIC_IMPLEMENTED`, AWS 계약 `MODELLED` |
 | Redis 추천 캐시 | 응답을 24시간 저장. 지원자 경로는 이력서·공고 재료를 key에 묶지만 기업 경로는 cache hit를 회원 DB보다 먼저 반환 | 기업 경로 key에는 지원자 집합·이력서 version이 없고 탈퇴 시 cache와 raw prompt도 즉시 삭제되지 않음 | `LOCAL_SYNTHETIC_IMPLEMENTED` |
 | 관리형 Bedrock 실험 | 별도 브랜치에 API Gateway, Lambda, Guardrail/Version과 `apac.amazon.nova-micro-v1:0` profile | 기준 서비스에 미병합. 과거 `DELETE_COMPLETE` 2건, 현재 관련 리소스 0으로 관찰됐으며 성공 추론 증거는 미확인. RAG 없음, 기준 110개에 미포함; 서울 외 APAC destination 허용 정책 선언 | `BRANCH_PROTOTYPE_UNDEPLOYED` |
-| TRACE·JC-RECEIPT 계열 | 비교용 권고안에서 TRACE는 서비스 브랜드, Decision Receipt는 사용자 경험, JC-RECEIPT는 기술적 증적 형식, Recourse Twin은 권리 여정으로 구분 | 명칭 관계도 미확정이며 구현·승인·Terraform/API 연동 0건. AS-IS 구성요소로 세지 않음 | `OUT_OF_SCOPE` |
+| 외부 업무도구 어댑터 | Slack Incoming Webhook, Notion API, SMTP/TLS와 admin 상태·합성 전송 API. exact-host/TLS/timeout/redaction, 감사 선기록·결과 결속, provider별 실패 격리와 process-local 멱등을 구현 | 전역+provider opt-in 기본 비활성. 고정 `SYNTHETIC_NON_PERSONAL` 이벤트만 지원하며 실제 credential·workspace·메일 시스템·전송·durable cross-worker 멱등·AWS 배포는 없음 | `IMPLEMENTED_GUARDED_NOT_ACTIVE` |
+| TRACE·JC-RECEIPT 계열 | 기존 70·20·10 결과에 최소 개인정보 receipt, canonical JSON SHA-256, 역할별 조회, 정정 요청·원본-정정 관찰, admin 사람 처분을 연결. `disabled`·`shadow`·`enforced` 모드 제공 | 기본값 `disabled`. 합격·이의·ISO 충족·잔여위험을 자동 판정하지 않고, 실제 데이터·사람 승인·AWS 배포·새 Terraform 리소스가 없음 | `IMPLEMENTED_GUARDED_NOT_ACTIVE` |
 
 관리형 Bedrock 실험 템플릿의 리소스 선언은 12개다. Guardrail과 그 버전 두 개는 항상
 선언되며, 로그 그룹·IAM·Lambda·HTTP API·통합·라우트·스테이지·호출 권한 열 개에는
 런타임 활성화 조건이 붙는다. 이 수치는 CloudFormation 소스의 선언 수이며 Terraform mock plan의
 110개에 더하지 않는다. 배포 수량이나 실제 AWS 자원 수로도 읽지 않는다.
 
-JC-RECEIPT 제안의 fail-closed 동작과 기존 외부 공급자 흐름 사이에는 미해소 충돌이 있다.
-사람이 채택 여부를 정하기 전에는 제안 문구를 현재 추천 응답 계약이나 TO-BE gate로 옮기지 않는다.
+TRACE의 `enforced` 모드는 receipt 영속화에 실패하면 추천 반환을 막도록 구현했지만 기본값은
+`disabled`다. 어떤 환경에서 `shadow` 또는 `enforced`를 활성화할지, 기존 외부 공급자 장애와
+어떤 순서로 다룰지는 사람의 운영 결정으로 남긴다. 소스 구현을 승인된 AS-IS 운영 정책이나
+TO-BE gate로 확대하지 않는다.
 
 원시 설계 자료의 `screening`, `chatbot`, `detector`, `harness` 명칭은 현재 Compose와
 런타임 소스에 없다. 해당 항목은 `RAW_DRAFT_ONLY`로 분류한다.
@@ -516,8 +528,8 @@ PASS로 적혀 있다. 이는 코드와 계획의 정해진 조건만 확인한 
 
 ### 3.2 우선 구현 대상(P0) 화면 계획
 
-기존 계획의 P0 동적 화면 14개에 기업 overview와 지원자 홈이 추가되어 로컬 합성 런타임에는 동적
-경로 16개가 있다. 아래 경로는 로컬 React/Nginx 소스 기준이며 기준 ECR 이미지나 AWS
+기존 계획의 P0 동적 화면 14개에 기업 overview와 지원자 홈, 역할별 TRACE 화면 3개가 추가되어
+로컬 합성 런타임에는 동적 경로 19개가 있다. 아래 경로는 로컬 React/Nginx 소스 기준이며 기준 ECR 이미지나 AWS
 서비스의 동작을 뜻하지 않는다.
 
 | 영역 | 경로 | 계획 기능 |
@@ -531,13 +543,16 @@ PASS로 적혀 있다. 이는 코드와 계획의 정해진 조건만 확인한 
 | 구직자 | `/candidate/resume` | 구조화 이력서와 자유서술 입력 |
 | 구직자 | `/candidate/applications` | 지원 현황 |
 | 구직자 | `/candidate/recommendations` | AI 추천 공고 |
+| 구직자 | `/candidate/trace` | 자기 Decision Receipt 확인과 구조화 정정 요청 |
 | 구직자 | `/candidate/withdraw` | 동의 철회와 탈퇴 |
 | 기업 | `/recruiter/signup` | 기업 회원 가입 |
 | 기업 | `/recruiter/overview` | 공고·지원 단계 집계와 최근 공고 조회 |
 | 기업 | `/recruiter/jobs` | 공고 등록, 수정, 마감 |
 | 기업 | `/recruiter/jobs/:id/pipeline` | 지원자 pipeline |
 | 기업 | `/recruiter/jobs/:id/recommendations` | 해당 공고 지원자 안에서 검색·필터, 점수 근거, 최대 3명 임시 비교 |
+| 기업 | `/recruiter/trace` | 자기 회사 공고 범위의 receipt·정정 case 조회 |
 | 운영자 | `/admin/audit` | audit event 조회 |
+| 운영자 | `/admin/trace` | 정정 case에 사람 처분 기록. 자동 이의판정은 하지 않음 |
 
 `/privacy`와 `/terms`는 기존 계획에서 정적 페이지로 분리한다. 근거:
 `context/raw/Orca-범위확정-EnterpriseMVP.md#P0 — 14화면 (측정 5건이 나오는 최소 경로 · 절대 불가침)`.
@@ -547,13 +562,14 @@ PASS로 적혀 있다. 이는 코드와 계획의 정해진 조건만 확인한 
 
 P1 원문 제목은 12화면이라고 적지만 열거 항목은 동적 화면 11개와 Mailpit 비화면 기능
 1개다. 이 명세는 열거된 기능의 성격에 따라 11개 화면과 비화면 기능으로 분리한다.
-feature flag, 라우트, 어댑터는 구현되지 않았다.
+아래 P1 기능의 feature flag·화면·GitHub/Kakao/Mailpit 어댑터는 구현되지 않았다. 별도로 구현된
+admin 외부 업무도구 상태 API와 Slack·Notion·SMTP 합성 전송 어댑터를 이 P1 완료로 세지 않는다.
 
 | 기능군 | 계획 항목 | 상태 |
 |---|---|---|
 | 공개/구직자 | landing, profile, GitHub portfolio | `PLANNED_UNIMPLEMENTED` |
 | 기업 | Kakao 주소, 합성 증빙, 후보 저장 목록, 후보 조회 기록 | `PLANNED_UNIMPLEMENTED` |
-| 운영자 | company review, consent history, AI call history, integration status | `PLANNED_UNIMPLEMENTED` |
+| 운영자 | company review, consent history, AI call history, integration status 화면 | `PLANNED_UNIMPLEMENTED`; 상태 API 소스만 별도 구현 |
 | 알림 | Mailpit 기반 가입/지원/상태 알림 | `PLANNED_UNIMPLEMENTED` |
 
 P1 외부 연계인 GitHub, Kakao, Mailpit에 대해 timeout, cache, schema validation,
@@ -947,7 +963,9 @@ persistence를 막고 `EXTERNAL_PREVIEW` 입력을 거부한다. 같은 파일 �
 | TB-10 | 로컬 API → OpenDART | API 키, 기업명 일치, 최소 필드, 오류·속도 제한, 복사본 출처 시각 | 합성 예시와 소스 계약만 확인. 외부 호출·운영 키·AWS 경로는 미확인 |
 | TB-11 | 합성 DB exporter → MLOps S3 입력 | 합성 표식, 허용 특징 5개, 원문 제거, 파일 해시와 보존기간 | 소스·단위시험 확인. 출처를 독립 증명하는 서명과 AWS 실행은 미확인 |
 | TB-12 | MLOps 결과 → 향후 추천 런타임 | 모델 승인, 버전 결속, 그림자 비교, 되돌리기 | 사람 검토 대기에서 멈춤. 현재 추천 연결·자동 승격 없음 |
-| TB-13 | 업무망 단말 → Slack 외부 SaaS | workspace 소유·사용, 계정, 개인정보 입력, 보존·삭제, 연동 | 두 OS 이미지의 바로가기 소스와 macOS best-effort 종료만 확인. 실제 운영은 `SCENARIO_USE_UNVERIFIED`; AWS 흐름선·webhook/token·Amazon Q Developer(AWS Chatbot)·SNS·EventBridge 없음 |
+| TB-13 | 업무망 단말 → Slack 외부 SaaS | workspace 소유·사용, 계정, 개인정보 입력, 보존·삭제 | 두 OS 이미지의 바로가기 소스와 macOS best-effort 종료를 확인. 실제 운영은 `SCENARIO_USE_UNVERIFIED` |
+| TB-14 | admin API → Slack·Notion·SMTP | opt-in, exact host/TLS, 최소 payload, timeout, redaction, audit, idempotency | 기본 비활성 소스와 무통신 회귀시험만 확인. 고정 합성·비개인 이벤트 전용이며 실제 credential·전송·AWS 연동 없음 |
+| TB-15 | 추천 결과 → TRACE receipt·정정·사람 검토 | 최소 개인정보, canonical hash, 역할 범위, 동시 갱신, 원본-정정 분리 | 기본 `disabled` 소스와 합성 회귀시험만 확인. 자동 채용·이의·적합성·잔여위험 판정, 운영 승인·AWS 배포 없음 |
 
 ## 6. 보안 및 운영 명세
 
@@ -1253,9 +1271,10 @@ fallback 또는 운영 SLA로 표현하지 않는다.
     보장한다는 뜻이 아니다. 합격 가능성·인재 품질·공정성·출시 가능성을 판정하는 모델로 읽지 않는다.
 21. OpenDART 온디맨드 작업자 소스는 있지만 SQS FIFO, Lambda, SSM 키, VPC·DB 권한과 배포 묶음은
     기준 Terraform에 없다. 소스 존재를 서버리스 경로 배포나 비용 측정 결과로 읽지 않는다.
-22. Slack은 외부 업무 SaaS·자산대장 경계다. 바로가기와 macOS best-effort 종료 소스는 실제
-    workspace 사용, 로그인·cookie 제거, 보존 정책이나 AWS 통합을 증명하지 않는다. VPN+MFA·UTM도
-    시나리오 선언이며 이번 공개 저장소에서 구현·운영을 확인한 통제가 아니다.
+22. Slack은 외부 업무 SaaS·자산대장 경계다. 바로가기·macOS best-effort 종료와 기본 비활성
+    Slack·Notion·SMTP 어댑터 소스는 실제 workspace·메일 시스템 사용, 로그인·cookie 제거,
+    보존 정책, 메시지 전송이나 AWS 통합을 증명하지 않는다. TRACE·JC-RECEIPT도 기본 비활성
+    합성 소스이며 자동 채용·이의·적합성·잔여위험 판정이나 운영 승인을 뜻하지 않는다.
 
 ### 8.2 확인 전 임시로 둔 값
 
@@ -1287,8 +1306,9 @@ fallback 또는 운영 SLA로 표현하지 않는다.
 - 제공된 Artifact는 업무망 180대를 모두 Windows로 표시하고 AD domain, UTM, VPN MFA,
   전통 백신을 함께 그린다. 이 명세는 사용자의 후속 정정값인 Windows 100대와 macOS 80대를
   사용한다. VPN+MFA·UTM은 `SCENARIO_DECLARED`, 실제 구현·운영 관찰은 `UNKNOWN`으로 분리한다.
-- Slack은 멘토 요청 자산대장과 Windows/macOS 이미지 소스에 이름이 있으나 실제 workspace 사용은
-  `SCENARIO_USE_UNVERIFIED`다. AWS 자원이나 알림 경로로 승격하지 않고 외부 SaaS 경계로만 둔다.
+- Slack은 멘토 요청 자산대장과 Windows/macOS 이미지 소스에 이름이 있고 기본 비활성 webhook
+  어댑터도 구현됐지만 실제 workspace 사용·전송은 `SCENARIO_USE_UNVERIFIED`다. Notion·SMTP도
+  실계정 연결 없이 합성 대역으로만 검사했다. 이를 AWS 자원이나 운영 알림 경로로 승격하지 않는다.
 - 제공된 Artifact는 AZ 2a 단면만 표시해 2c subnet, NAT-C, RDS standby가 보이지 않는다.
   AS-IS Terraform과 이 명세의 흐름도는 2a/2c를 모두 전개한다.
 - 제공된 Artifact의 독립 `matcher` 상자는 논리 구성이다. Terraform에는 matcher 서비스가
@@ -1305,8 +1325,9 @@ fallback 또는 운영 SLA로 표현하지 않는다.
 - 기존 gateway 내부 Bedrock adapter의 기본 잠금과 별도 관리형 Bedrock 실험 브랜치는 서로
   다른 코드 경계다. 전자는 Nova Lite, 후자는 Nova Micro APAC 교차 리전 profile을 기본으로
   둔다. 둘 다 실제 AWS 통합이나 J-Career 운영 서비스를 뜻하지 않는다.
-- TRACE·JC-RECEIPT 관련 세션은 비교용 명칭·흐름 제안만 포함한다. 구현·승인·Terraform 변경은
-  없고, 제안된 fail-closed와 기존 외부 공급자 흐름의 충돌도 사람 결정 전이다.
+- TRACE·JC-RECEIPT는 비교 기획을 바탕으로 기존 API와 React에 기본 비활성 소스로 구현됐다.
+  receipt 영속화·정정·사람 처분 경계를 합성 시험으로 확인했지만 운영 승인·실데이터·AWS 배포와
+  Terraform 변경은 없다. `enforced` fail-closed 활성화와 외부 공급자 장애 순서는 사람 결정 전이다.
 
 ### 8.4 이렇게 단정하면 안 되는 내용
 
@@ -1341,19 +1362,20 @@ fallback 또는 운영 SLA로 표현하지 않는다.
 | 명시된 candidate API 경로 | `context/raw/C플러스-범위델타-구직자흐름.md#1.5` |
 | 파기와 저장면 계획 | `context/raw/Jcareer-흐름과-기술취약점.md#2.5` |
 | 로컬 네 서비스·두 논리 DB·Redis | 별도 `asis-runtime-mvp/src/runtime/README.md`, `compose.yaml` |
-| 업무 API 30개 경로 선언 | `src/runtime/api/app/main.py` |
-| 전체 API 라우트 40개·처리 함수 35개 | `src/runtime/contracts/api_surface.json`, `scripts/check_api_surface_contract.py` |
+| 기존 업무 API 30개 경로 선언 | `src/runtime/api/app/main.py` |
+| 기존 core 라우트 40개·처리 함수 35개 계약 | `src/runtime/contracts/api_surface.json`, `scripts/check_api_surface_contract.py`; guarded router 9개는 별도 계약 |
 | 35개 처리 함수의 효과와 선택 순서 | `src/runtime/contracts/api_effects.json`, `scripts/check_api_effects_contract.py` |
 | OpenDART 공개정보 보조 기능 | 별도 `asis-runtime-mvp/src/runtime/api/app/opendart.py`, `api/app/opendart_dispatch.py`, `api/app/main.py`, `opendart_worker/handler.py`, `web/src/App.jsx`, `tests/opendart_*_contract.py` |
 | 합성 MLOps 로컬 학습·평가 | `src/mlops/README.md`, `generate_synthetic_training.py`, `run_runtime_pipeline.py`, `tests/test_synthetic_pipeline.py`; 운영 추천 연결 없음 |
 | 합성 MLOps 서버리스 경로 | `terraform/serverless-mlops/README.md`, `main.tf`, `tests/stages.tftest.hcl`, `src/mlops/lambda_handler.py`; 기준 110개와 별도인 0/13/14 계획, AWS 배포 결과는 없음 |
+| 외부 업무도구 어댑터 | `src/runtime/api/app/integrations/`, `src/runtime/tests/integrations_contract.py`, `src/runtime/.env.example`; Slack·Notion·SMTP 기본 비활성, 실제 credential·전송·AWS 리소스 없음 |
+| TRACE·JC-RECEIPT 로컬 소스 | `src/runtime/api/app/trace_receipts.py`, `src/runtime/web/src/trace-workspace.jsx`, `src/runtime/TRACE.md`, `src/runtime/tests/trace_receipt_contract.py`; 기본 `disabled`, 합성 시험 범위, 새 Terraform 리소스 없음 |
 | 70/20/10 matcher와 양방향 내부 API | 별도 `asis-runtime-mvp/src/runtime/agent/app/main.py`, `AI_MATCHING_FLOW.md` |
 | 설명 장애 격리·alignment·Bedrock 내부 adapter | 별도 `asis-runtime-mvp/src/runtime/llm_gateway/app/main.py` |
 | 로컬 실행 관찰값과 한계 | 별도 `asis-runtime-mvp/src/runtime/VERIFICATION.md`; 과거 실행값은 승계하지 않고 소스 정적 검사만 별도 재실행 |
 | 컨설턴트 AIMS Desk preview | 별도 `feat/iso-dashboard`의 `dashboard/README.md`, `backend/README.md`, `backend/template.yaml`, `docs/USER_GUIDE.md`, `dist/release-manifest.json`; 2026-08-28 동료 세션 읽기 전용 관찰 |
 | 로컬 Evidence Desk의 무통신·tenant_ref 내용 결속 | 별도 `asis-runtime-mvp/dashboard/README.md`, `snapshot.schema.json`, `src/snapshot.js`, `src/view-model.js` |
 | 관리형 Bedrock 실험 | 별도 `feat/bedrock-managed-runtime`의 `src/bedrock-ai-service/template.yaml`, `handler.py`, 단위시험; 2026-08-28 동료 세션의 삭제 이력·현재 0 관찰 |
-| TRACE·JC-RECEIPT 미구현 | Orca로 조회한 관련 세션 답변과 runtime/Terraform 명칭 검색. 제안 내용은 AS-IS 근거에서 제외 |
 | 승인 문서 0건 | `docs/current/README.md` |
 | 기본 5개 GAP 미선언 대장 | `terraform/asis/ABSENCE_MANIFEST.md` |
 | CloudTrail data event·resume lifecycle 미선언 | `terraform/asis/observability/main.tf`, `terraform/asis/data/s3_resume.tf` |
@@ -1369,7 +1391,8 @@ fallback 또는 운영 SLA로 표현하지 않는다.
 - PNG: [`JCAREER_ASIS_FLOW.drawio.png`](JCAREER_ASIS_FLOW.drawio.png)
 - 보조 상세 도면은 원본 작업 트리에 별도로 보관한다. 공개 기준 도면의 수량과 검증에는 포함하지 않는다.
 - 상호작용 도면 설명: [`architecture.html`](architecture.html). 전체 보기 1개와 구직자 추천,
-  기업용 인재 찾기, AI 설명, MLOps 학습·평가, 기록·탐지의 서비스·보조 경로 5개가 있다. 항목을
+  기업용 인재 찾기, AI 설명, MLOps 학습·평가, 업무망·Slack, TRACE·JC-RECEIPT,
+  외부 업무도구, 기록·탐지의 서비스·보조 경로 8개가 있다. 항목을
   누르면 관련 구간과 번호가 붙은 3단계 설명, 확인 수준, 해당 상세 명세 바로가기가 함께 바뀐다.
   해설 본문은 `JCAREER_ASIS_FLOW.md`에서 생성하며 source hash를 회귀검사한다.
 - MLOps 전용 웹 명세: [`../../mlops/index.html`](../../mlops/index.html). 합성 자료부터 사람 검토
@@ -1400,18 +1423,20 @@ IAM 역할 생성 권한이 없어 적용이 중단됐다. 그 과정에서 만�
 | 기대 GAP 대조 | 미완료 — 17건 중 PASS 5, FAIL 5, 문서 판정 7. FAIL은 `GAP-TRAIL-01`, `GAP-LOG-01`, `GAP-RDS-01`, `GAP-S3-01`, `GAP-CACHE-01`; 빈 scanner `rule_id`와 조건 범위 충돌을 해소하지 않음 |
 | 스캐너 결과 분류 | `PROVISIONAL` — 중복 정규화 후 117건을 보존했으나 사람 판정 전이며 통과로 읽지 않음 |
 | 인용 anchor | PASS — strict mode 55개, broken 0개 |
-| 공개 합성 런타임 소스 | PASS(정적·단위시험 범위) — 현재 공개 릴리스 검사 6단계가 통과했다. API/agent/gateway 라우트 30/6/4개와 70·20·10 점수식, `score_effect=NONE`을 정적 대조했다. 단말·성능·장기 운영 결과는 포함하지 않는다. |
+| 공개 합성 런타임 소스 | PASS(정적·단위시험 범위) — 현재 공개 릴리스 검사 6단계가 통과했다. 기존 API/agent/gateway 라우트 30/6/4개와 별도 guarded API 라우트 9개, React 라우트 23개, 70·20·10 점수식과 `score_effect=NONE`을 정적 대조했다. 단말·성능·장기 운영 결과는 포함하지 않는다. |
 | AWS 검증 계정 Bedrock 직접 호출 | PASS(직접 호출 범위) — APAC Nova Lite에 합성 문장 한 건을 보내 입력 39·출력 53토큰 응답을 확인했다. 응답 본문과 계정 식별자는 기록하지 않았다. API→gateway→broker 전체 경로의 성공을 뜻하지 않는다. |
 | AWS 검증 Lab 재배포 | BLOCKED 후 정리 완료 — 24개 생성 계획은 통과했으나 IAM 역할 생성 권한 부족으로 적용이 중단됐다. 부분 생성된 16개 항목만 지우는 저장 계획을 적용해 현재 Lab 상태를 0개로 되돌렸다. |
 | MLOps 합성 파이프라인 | PASS(단위시험 범위) — `python -m unittest src/mlops/tests/test_synthetic_pipeline.py`를 실행해 22/22, FAIL 0을 확인했다. 합성 SQLite와 테스트 대역 S3·DynamoDB로 원문 잔류, 중복 실행과 실패 경계를 확인한 결과이며 AWS 자원·모델 품질 판정은 포함하지 않음 |
 | MLOps 전용 Terraform | PASS(코드·계획 범위) — 전용 루트 경계 시험 19/19, mock 단계 시험 3/3과 `disabled 0`, `bootstrap 13`, `runtime 14` 계획을 확인했다. 기준 110개와 별도이며 AWS API, apply/destroy, 이미지 등록과 Lambda 실행은 하지 않음 |
 | API 소스·효과 계약 | PASS(정적 범위) — `api_surface.json` 라우트 40개와 처리 함수 35개, 효과 회귀 17/17, 도우미 20개·선택 순서 9개 확인. `AST_PARTIAL`이며 제어 흐름 지배·실행 횟수·원자성·실제 후속 서비스 수신을 증명하지 않음 |
+| 외부 업무도구 어댑터 | PASS(무통신 합성 범위) — Slack·Notion·SMTP 계약 18/18 통과. 기본 비활성, admin 전용 고정 합성 event, exact-host/TLS/timeout/redaction, 감사 선기록·결과 결속, 일괄 멱등 예약과 provider 실패 격리를 대역으로 확인. 실제 계정·전송·외부 SaaS·AWS 실행 증거는 아님 |
+| TRACE·JC-RECEIPT | PASS(합성 SQLite·정적 UI 범위) — API 계약 6/6과 UI 계약 11/11 통과. canonical hash·변조 탐지·최소 개인정보·역할 범위·정정·사람 처분·shadow/enforced 경계를 확인. 운영 활성화·실제 지원자·자동 채용/이의/적합성/잔여위험 판정·AWS 배포 증거는 아님 |
 | 로컬 Evidence Desk | PASS(정적 범위) — validator·view-model·artifact 결속 시험 28건과 무통신·무브라우저저장·무자동판정 경계를 확인했다. 승인된 복사본 반입이나 운영 배포를 확인한 결과는 아님 |
 | 별도 Bedrock 실험 브랜치 | PASS(단위시험 범위) — mock client 기반 7/7 통과. 실제 Bedrock 호출, AWS 배포, 기준 API 통합을 검증한 결과가 아님 |
-| Orca 교차 세션 대조 | PASS — 런타임 Run, TRACE 기획, Terraform 독립 검증, AIMS Desk UX 세션을 분리 조회. TRACE·JC-RECEIPT는 제안 상태이고 신규 AS-IS 서비스가 아니며, 확인된 변화는 기존 API/gateway/cache와 두 대시보드의 소스 계약임을 재확인 |
+| Orca 교차 세션 대조 | PASS — 런타임·Terraform·AWS 검증·AIMS Desk 세션과 구현 경계를 대조. TRACE·외부 업무도구는 기존 API의 기본 비활성 소스 확장이며, `jcareer-aws-lab/main`이 실제 AWS 작업의 별도 운영 기준이라는 경계를 유지 |
 | Claude/Codex/Orca 검토 | 독립 검토 의견을 문서 보완에 반영했다. 목록 구조, 수량 근거, Bedrock 관찰 범위, MLOps 경계와 쉬운 한국어 표현을 교차 확인했다. 공개 승인 여부와 통제 충족 여부는 사람이 별도로 결정한다. |
 | draw.io XML 구조 | PASS — XML 형식, ID 중복, 연결선 양 끝, 그룹 구조를 자동 검사 |
-| PNG 크기 및 시각 검토 | PASS — 2400×1400, 왼쪽에서 오른쪽으로 이어지는 6단계 기준 흐름, 독립 MLOps 실행 경로, AWS 흐름선이 없는 Slack 외부 SaaS·업무망 선언 경계를 눈으로 확인 |
+| PNG 크기 및 시각 검토 | PASS — 2400×1400, 왼쪽에서 오른쪽으로 이어지는 6단계 기준 흐름, 독립 MLOps 실행 경로, Slack 외부 SaaS·업무망 선언과 기본 비활성 TRACE·외부 업무도구 소스 메모를 눈으로 확인. 실제 외부 전송선이나 새 AWS 리소스는 표시하지 않음 |
 | HTML 구조 및 로컬 링크 | PASS — HTML 2개, 내부 anchor·로컬 산출물 링크 broken 0, duplicate ID 0 |
 | HTML 목록 의미 구조 | PASS — AS-IS 한계 22개와 도면 요청 흐름 6개가 각각 하나의 연속 `<ol>`로 생성되며 들여쓴 문장이 같은 `<li>` 안에 유지됨 |
 | PDF 인쇄본 | PASS — PDF 1.4 헤더, A4 인쇄 스타일, HTML 원본 지문 결속과 페이지 객체 확인 |

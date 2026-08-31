@@ -233,7 +233,35 @@ const architectureFlows = {
       { label: 'VPN+MFA·UTM · 시나리오 선언', x: 170, y: 625 },
       { label: 'Slack 외부 SaaS · 운영 미확인', x: 260, y: 625 }
     ],
-    boundary: '두 OS 이미지의 app.slack.com 바로가기와 macOS 종료 시 best-effort Slack 프로세스 종료만 확인했습니다. 실제 workspace·계정·보존 정책과 AWS 연동은 미확인이며 AWS 흐름선, webhook/token, Amazon Q Developer(AWS Chatbot), SNS, EventBridge는 없습니다.'
+    boundary: '두 OS의 Slack 바로가기와 macOS best-effort 종료 소스를 확인했습니다. 별도 webhook 어댑터는 기본 비활성 로컬 소스이며 실제 workspace·계정·보존 정책·전송은 미확인입니다. Amazon Q Developer(AWS Chatbot), SNS, EventBridge 같은 AWS 통합은 없습니다.'
+  },
+  trace: {
+    title: 'TRACE·JC-RECEIPT',
+    status: '코드 있으나 잠금',
+    tone: 'guarded',
+    summary: '기존 추천 결과의 근거 receipt와 구조화 정정 요청, 원본-정정 관찰, 사람 검토 처분을 잇는 권리·증적 흐름입니다.',
+    detailHref: 'index.html#section-25',
+    detailLabel: 'TRACE·JC-RECEIPT 구현 경계 보기',
+    stages: [
+      { label: '최소 개인정보 Decision Receipt', x: 1480, y: 610 },
+      { label: '정정 요청·원본-정정 관찰', x: 1650, y: 610 },
+      { label: '관리자 사람 검토 기록', x: 1820, y: 610 }
+    ],
+    boundary: 'TRACE_MODE 기본값은 disabled입니다. 합성 소스·시험만 확인했으며 실제 지원자 자료, 운영 승인, AWS 배포와 새 Terraform 리소스는 없습니다. 합격·이의·ISO 충족·잔여위험을 자동 판정하지 않습니다.'
+  },
+  integrations: {
+    title: '외부 업무도구',
+    status: '코드 있으나 잠금',
+    tone: 'guarded',
+    summary: '관리자가 고정 합성 이벤트로 Slack·Notion·SMTP 어댑터의 격리·감사 경계를 확인하는 opt-in 경로입니다.',
+    detailHref: 'index.html#section-25',
+    detailLabel: '외부 업무도구 구현 경계 보기',
+    stages: [
+      { label: 'admin 상태·합성 요청', x: 1450, y: 610 },
+      { label: '감사 선기록·멱등 예약', x: 1600, y: 610 },
+      { label: 'opt-in provider 경계', x: 1750, y: 610 }
+    ],
+    boundary: '전역과 provider별 기본값이 모두 꺼져 있습니다. 무통신 계약 시험만 확인했으며 실제 credential, Slack·Notion workspace, 메일 시스템, 메시지 전송 또는 AWS 리소스는 없습니다. SMTP 소스는 그룹웨어 연동 증거가 아닙니다.'
   },
   operations: {
     title: '기록·탐지 경로',
@@ -527,7 +555,7 @@ ${commonHead}
         <div>
           <p class="kicker">JC-ASIS-SPEC-001 · 2026.08 기준 설계</p>
           <h1>J-Career 서비스·인프라<br>시스템 명세</h1>
-          <p class="hero-copy">채용 서비스의 기능과 데이터, AWS 인프라와 운영 통제, MLOps 모델 검증을 한 문서로 정리했습니다. 업무망 PC 180대와 서울 리전 2-AZ, 6개 Terraform 모듈, 110개 계획 항목을 기준으로 읽을 수 있습니다.</p>
+          <p class="hero-copy">채용 서비스의 기능과 데이터, AWS 인프라와 운영 통제, MLOps 모델 검증을 한 문서로 정리했습니다. 업무망 PC 180대와 서울 리전 2-AZ, 6개 Terraform 모듈, 110개 계획 항목을 기준으로 읽고, TRACE·외부 업무도구는 기본 비활성 로컬 확장으로 구분합니다.</p>
           <p class="hero-links"><a href="#mlops-overview">MLOps 7단계 바로 보기 ↓</a><a href="../../mlops/">MLOps 전용 페이지 ↗</a></p>
         </div>
         <dl class="doc-control">
@@ -536,7 +564,7 @@ ${commonHead}
           <div><dt>문서 상태</dt><dd>기준 설계 · 기술 검토 진행</dd></div>
           <div><dt>배포 단계</dt><dd>AS-IS 미적용 · 검증 Lab 별도</dd></div>
           <div><dt>MLOps</dt><dd>별도 7단계 · 계획 0 / 13 / 14</dd></div>
-          <div><dt>별도 검토</dt><dd>TRACE, JC-RECEIPT 등 제안 단계 서비스</dd></div>
+          <div><dt>로컬 확장</dt><dd>TRACE·Slack·Notion·SMTP · 기본 비활성</dd></div>
         </dl>
       </div>
     </div>
@@ -583,11 +611,11 @@ ${commonHead}
 
       <section class="architecture" aria-labelledby="architecture-title">
         <div class="architecture__head">
-          <div><p class="section-label">상호작용 전체 흐름도</p><h2 id="architecture-title">전체 구성에서 서비스별 경로까지</h2><p>전체 보기와 서비스 경로 5개를 제공합니다. 서비스를 누르면 관련 구간, 번호와 확인 수준이 함께 바뀝니다.</p></div>
+          <div><p class="section-label">상호작용 전체 흐름도</p><h2 id="architecture-title">전체 구성에서 서비스별 경로까지</h2><p>전체 보기와 서비스·보조 경로 8개를 제공합니다. 항목을 누르면 관련 구간, 번호와 확인 수준이 함께 바뀝니다.</p></div>
           <a class="button" href="architecture.html">서비스 경로 탐색</a>
         </div>
         <a class="diagram-link" href="architecture.html" aria-label="서비스별로 탐색할 수 있는 AWS 인프라 흐름도 열기">
-          <img src="JCAREER_ASIS_FLOW.drawio.png" width="2400" height="1400" loading="lazy" decoding="async" alt="업무망 Windows 100대와 macOS 80대, 사용자 요청 6단계, 데이터 저장소, 독립 MLOps와 AWS 흐름선 없는 Slack 외부 SaaS 경계를 표시한 J-Career 기존 설계 흐름도">
+          <img src="JCAREER_ASIS_FLOW.drawio.png" width="2400" height="1400" loading="lazy" decoding="async" alt="업무망 Windows 100대와 macOS 80대, 사용자 요청 6단계, AWS 서비스 아이콘, 독립 MLOps, Slack 외부 SaaS와 기본 비활성 TRACE·외부 업무도구 소스 경계를 표시한 J-Career 기존 설계 흐름도">
         </a>
         <div class="diagram-caption"><span>실선: 구성 확인 · 점선: 실제 연결 미구현</span><span>서비스별 강조 경로는 도면 페이지에서 확인 · 비밀정보 미표시</span></div>
       </section>
@@ -752,8 +780,8 @@ ${commonCss}
     <div class="masthead__inner">
       <div class="utility"><a href="index.html">← 기술 명세</a><nav class="utility__links" aria-label="산출물"><a href="../../mlops/">MLOps 7단계</a><a href="JCAREER_ASIS_FLOW.drawio">DRAW.IO</a><a href="JCAREER_ASIS_FLOW.drawio.png">PNG</a><a href="JCAREER_ASIS_SYSTEM_SPEC.pdf">PDF</a><a href="validation-report.json">검증 JSON</a><button class="motion-toggle-doc" type="button" data-motion-toggle aria-pressed="false" hidden><span data-motion-label>움직임 줄이기</span></button></nav></div>
       <div class="doc-hero">
-        <div><p class="kicker">JC-ASIS-ARCH-001 · 서비스별 경로 탐색</p><h1>J-Career AWS<br>인프라 흐름도</h1><p class="hero-copy">업무망, 채용 서비스 AWS 기준 설계, 독립 MLOps와 외부 Slack 업무 시스템 경계를 한 장에 담았습니다. 서비스 버튼을 누르면 관련 경로와 1·2·3 단계 설명이 함께 바뀝니다.</p></div>
-        <dl class="doc-control"><div><dt>도면 성격</dt><dd>서비스·인프라 기준 설계</dd></div><div><dt>업무망</dt><dd>180대 · Windows 100 / macOS 80</dd></div><div><dt>AWS 설계</dt><dd>2-AZ · 6개 모듈 · 계획 110개</dd></div><div><dt>MLOps</dt><dd>독립 default-off · 계획 0 / 13 / 14</dd></div><div><dt>Slack</dt><dd>외부 SaaS · 실제 사용 미확인</dd></div><div><dt>검증 단계</dt><dd>AWS 배포 결과 별도 관리</dd></div></dl>
+        <div><p class="kicker">JC-ASIS-ARCH-001 · 서비스별 경로 탐색</p><h1>J-Career AWS<br>인프라 흐름도</h1><p class="hero-copy">업무망, AWS 기준 설계, 독립 MLOps와 기본 비활성 TRACE·외부 업무도구 소스를 한 장에 구분했습니다. 서비스 버튼을 누르면 관련 경로와 1·2·3 단계 설명이 함께 바뀝니다.</p></div>
+        <dl class="doc-control"><div><dt>도면 성격</dt><dd>서비스·인프라 기준 설계</dd></div><div><dt>업무망</dt><dd>180대 · Windows 100 / macOS 80</dd></div><div><dt>AWS 설계</dt><dd>2-AZ · 6개 모듈 · 계획 110개</dd></div><div><dt>MLOps</dt><dd>독립 default-off · 계획 0 / 13 / 14</dd></div><div><dt>로컬 확장</dt><dd>TRACE·Slack·Notion·SMTP · default-off</dd></div><div><dt>실행 상태</dt><dd>외부 전송·AWS 배포 미확인</dd></div></dl>
       </div>
     </div>
   </header>
@@ -762,8 +790,8 @@ ${commonCss}
     <div class="architecture-workspace">
     <section class="flow-explorer" aria-labelledby="flow-explorer-title">
       <div class="flow-explorer__head">
-        <div><p class="kicker">전체 보기 1개 · 서비스·보조 경로 6개</p><h2 id="flow-explorer-title">전체는 ①~⑥, 선택 경로는 1·2·3으로 읽습니다.</h2></div>
-        <p>전체 인프라는 바탕 도면의 ①~⑥을 따라갑니다. 나머지 여섯 선택 화면은 1·2·3 표시와 왼쪽 단계 목록이 같은 순서입니다.</p>
+        <div><p class="kicker">전체 보기 1개 · 서비스·보조 경로 8개</p><h2 id="flow-explorer-title">전체는 ①~⑥, 선택 경로는 1·2·3으로 읽습니다.</h2></div>
+        <p>전체 인프라는 바탕 도면의 ①~⑥을 따라갑니다. 나머지 여덟 선택 화면은 1·2·3 표시와 왼쪽 단계 목록이 같은 순서입니다.</p>
       </div>
       <div class="flow-selector" role="group" aria-label="표시할 서비스·보조 경로">
         <button class="flow-button" type="button" data-flow-button="overview" aria-pressed="true" aria-controls="flow-detail"><strong>전체 인프라</strong><small>기준 설계</small></button>
@@ -772,6 +800,8 @@ ${commonCss}
         <button class="flow-button" type="button" data-flow-button="explanation" aria-pressed="false" aria-controls="flow-detail"><strong>AI 설명 만들기</strong><small>점수와 분리</small></button>
         <button class="flow-button" type="button" data-flow-button="mlops" aria-pressed="false" aria-controls="flow-detail"><strong>MLOps 학습·평가</strong><small>모델 검증 · 검토 대기</small></button>
         <button class="flow-button" type="button" data-flow-button="workplace" aria-pressed="false" aria-controls="flow-detail"><strong>업무망·Slack</strong><small>외부 SaaS · 운영 미확인</small></button>
+        <button class="flow-button" type="button" data-flow-button="trace" aria-pressed="false" aria-controls="flow-detail"><strong>TRACE·JC-RECEIPT</strong><small>권리·증적 · 기본 비활성</small></button>
+        <button class="flow-button" type="button" data-flow-button="integrations" aria-pressed="false" aria-controls="flow-detail"><strong>외부 업무도구</strong><small>Slack·Notion·SMTP · 기본 비활성</small></button>
         <button class="flow-button" type="button" data-flow-button="operations" aria-pressed="false" aria-controls="flow-detail"><strong>기록·탐지</strong><small>운영 보조 경로</small></button>
       </div>
       <article class="flow-detail" id="flow-detail" aria-live="polite" aria-atomic="false">
@@ -783,11 +813,11 @@ ${commonCss}
         <div class="flow-detail__route"><strong>순서대로 읽는 단계</strong><ol class="flow-steps" id="flow-steps" aria-label="전체 인프라 단계별 경로">${flowStepItems('overview')}</ol></div>
         <div class="flow-detail__boundary"><strong>설계 범위</strong><p id="flow-boundary">서울 리전 2-AZ, 6개 Terraform 모듈, 110개 계획 항목을 기준선으로 사용합니다. AWS 배포 상태와 실행 결과는 별도 검증 기록에서 관리합니다.</p><a class="flow-detail__link" id="flow-detail-link" href="index.html#section-14">서비스·구성요소 명세 보기</a></div>
       </article>
-      <p class="flow-explorer__exclusion">MLOps는 기준 110개와 분리한 별도 계획입니다. Slack은 AWS 흐름선이 없는 외부 SaaS입니다. TRACE·JC-RECEIPT 등 제안 단계 신규 서비스는 선택 경로에서 제외했습니다.</p>
+      <p class="flow-explorer__exclusion">MLOps는 기준 110개와 분리한 별도 계획입니다. TRACE·JC-RECEIPT와 Slack·Notion·SMTP 어댑터는 기본 비활성 로컬 소스이며 실제 외부 전송·AWS 배포·새 Terraform 리소스가 없습니다.</p>
     </section>
     <figure class="plate__frame" id="diagram-frame" aria-describedby="flow-boundary">
       <div class="diagram-stage" data-scale-reveal>
-        <a href="JCAREER_ASIS_FLOW.drawio.png" aria-label="AWS 인프라 흐름도 PNG 원본 열기"><img src="JCAREER_ASIS_FLOW.drawio.png" width="2400" height="1400" fetchpriority="high" decoding="async" alt="업무망 PC 180대, 사용자 요청 6단계, 가용 영역 두 곳, 데이터 저장소, 기록·탐지, 독립 MLOps와 AWS 흐름선 없는 Slack 외부 SaaS 경계를 표시한 J-Career 기존 설계 흐름도"></a>
+        <a href="JCAREER_ASIS_FLOW.drawio.png" aria-label="AWS 인프라 흐름도 PNG 원본 열기"><img src="JCAREER_ASIS_FLOW.drawio.png" width="2400" height="1400" fetchpriority="high" decoding="async" alt="업무망 PC 180대, 사용자 요청 6단계, 공식 AWS 서비스 아이콘, 독립 MLOps, Slack 외부 SaaS와 기본 비활성 TRACE·외부 업무도구 소스 경계를 표시한 J-Career 기존 설계 흐름도"></a>
         <svg class="flow-overlay" viewBox="0 0 2400 1400" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
           <g class="flow-layer is-active" data-flow-layer="overview">
             <path class="flow-line" d="M165 455H382 M490 455H628 M734 455H870 M980 455H1120V510H1216 M1348 510H1535" />
@@ -822,6 +852,18 @@ ${svgStepMarkers('mlops', 'missing')}
           <g class="flow-layer" data-flow-layer="workplace">
             <rect class="flow-callout unknown" x="25" y="640" width="290" height="710" rx="18" />
 ${svgStepMarkers('workplace', 'unknown')}
+          </g>
+          <g class="flow-layer" data-flow-layer="trace">
+            <path class="flow-line local" d="M1500 565H1870" />
+            <circle class="flow-node local" cx="1600" cy="510" r="82" />
+            <rect class="flow-callout" x="1360" y="650" width="520" height="62" rx="12" /><text class="flow-callout-text" x="1620" y="690">기본 비활성 · receipt와 사람 검토 소스</text>
+${svgStepMarkers('trace', 'local')}
+          </g>
+          <g class="flow-layer" data-flow-layer="integrations">
+            <path class="flow-line local" d="M1450 610H1850" />
+            <circle class="flow-node local" cx="1600" cy="510" r="82" />
+            <rect class="flow-callout" x="1360" y="650" width="520" height="62" rx="12" /><text class="flow-callout-text" x="1620" y="690">opt-in 소스 · 실제 외부 전송 미확인</text>
+${svgStepMarkers('integrations', 'local')}
           </g>
           <g class="flow-layer" data-flow-layer="operations">
             <path class="flow-line record" d="M1290 505V742 M1630 505V742" />
@@ -906,7 +948,9 @@ if (process.argv.includes('--check')) {
   let synchronized = true;
   for (const [name, expected] of generatedOutputs) {
     const outputPath = path.join(root, name);
-    const actual = fs.existsSync(outputPath) ? fs.readFileSync(outputPath, 'utf8') : '';
+    const actual = fs.existsSync(outputPath)
+      ? fs.readFileSync(outputPath, 'utf8').replace(/\r\n?/g, '\n')
+      : '';
     const matches = actual === expected;
     synchronized &&= matches;
     console.log(`${matches ? 'in-sync' : 'stale'} ${name} (${Buffer.byteLength(expected)} bytes expected)`);

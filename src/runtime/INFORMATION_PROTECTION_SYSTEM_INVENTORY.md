@@ -60,7 +60,7 @@
 | 관찰 자산 | 백업 서버 | 화이트보드 관찰값 · 기준선 아님 · 존재 확인 전 |
 | 데이터 | 회원DB·기업DB | 합성 논리 DB 구현 · 필드 경계는 `src/runtime/DB_FIELD_CATALOG.md#4. 현재 matcher와 LLM 설명 payload` |
 | 물리 | 랙 장비 | 멘토 요청 후보 · 존재 확인 전 |
-| SaaS | Slack | 멘토 요청 후보 · 사용·workspace·보존 범위 확인 전 |
+| SaaS | Slack | 멘토 요청 후보. 바로가기·기본 비활성 webhook adapter 소스와 실제 사용·workspace·보존·전송 확인은 별도 |
 | 단말 | 업무용 PC·프린터 | 시나리오/화이트보드 기록 · 실제 lab 조달로 읽지 않음 |
 
 그룹웨어 서버와 사내DB는 과거 기록을 삭제한 것이 아니라 **이번 8/28 멘토 제안 대장 범위에서만**
@@ -73,7 +73,7 @@
 3. GuardDuty·CloudTrail·Flow Logs·CloudWatch의 활성 화면과 보존 설정
 4. VPN·MFA·SSM·IAM의 계정·역할·승인·회수 흐름
 5. Windows/macOS별 백신 적용 범위와 EDR 도입 여부
-6. Slack workspace 사용 여부, 개인정보 입력 정책, 앱 연동, 보존·삭제 설정
+6. Slack workspace 사용 여부, 개인정보 입력 정책, 앱 연동, 보존·삭제 설정. adapter 소스 존재를 운영 증거로 쓰지 않음
 7. 회원DB·기업DB에서 matcher와 Bedrock 설명기로 나가는 필드 allowlist
 
 이 자료가 들어오기 전에는 제품 존재, 배포 상태, 운영 효과, 담당 조직을 자동 확정하지 않는다.

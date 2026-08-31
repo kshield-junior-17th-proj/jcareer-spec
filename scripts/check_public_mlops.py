@@ -52,7 +52,7 @@ EXPECTED_NOTES = [
     "Terraform init, validate, mock tests, and the disabled plan ran from a temporary source copy outside the repository.",
     "bootstrap/runtime counts were checked only with Terraform mock_provider tests.",
     "The disabled default plan used the ordinary provider configuration with AWS validation disabled by the configuration and planned zero managed resources.",
-    "All six architecture routes were opened and checked for the selected button, active diagram layer, detail link, and 390px overflow by scripts/check_public_ui.mjs.",
+    "All nine architecture states were opened and checked for the selected button, active diagram layer, detail link, and 390px overflow by scripts/check_public_ui.mjs.",
     "Five public pages were checked at 390px and 1440px for overflow, canonical and Open Graph metadata, touch action, and keyboard focus; MLOps aria-controls was also checked.",
     "MLOps stage URL state, invalid-stage fallback, and browser history were checked by scripts/check_public_ui.mjs.",
     "Eight motion checks covered the carousel, MLOps stage rail, animated architecture, manual motion toggle, and reduced-motion fallback.",
@@ -295,7 +295,7 @@ def check_evidence_report(errors: list[str]) -> None:
         "disabled_plan_resources": 0,
         "terraform_boundary_tests": "19/19 PASS",
         "synthetic_pipeline_tests": "22/22 PASS",
-        "public_ui": "6/6 routes, 8/8 stage states, 5 pages at 390/1440px, motion 8/8 PASS",
+        "public_ui": "9/9 routes, 8/8 stage states, 5 pages at 390/1440px, motion 8/8 PASS",
         "pdf_source_binding": "PASS",
         "public_integrity": "PASS",
     }
@@ -309,7 +309,7 @@ def check_evidence_report(errors: list[str]) -> None:
     expected_evidence = {
         "public_ui": {
             "checker": "scripts/check_public_ui.mjs",
-            "landing_routes": 6,
+            "landing_routes": 9,
             "stage_states": 8,
             "viewports_css_px": [390, 1440],
             "page_viewport_checks": 10,
@@ -542,6 +542,9 @@ def check() -> list[str]:
         "terraform/asis/architecture.html?flow=recruiter",
         "terraform/asis/architecture.html?flow=explanation",
         "terraform/asis/architecture.html?flow=mlops",
+        "terraform/asis/architecture.html?flow=workplace",
+        "terraform/asis/architecture.html?flow=trace",
+        "terraform/asis/architecture.html?flow=integrations",
         "terraform/asis/architecture.html?flow=operations",
     )
     if landing_text.count('class="flow-shortcuts"') != 1 or any(

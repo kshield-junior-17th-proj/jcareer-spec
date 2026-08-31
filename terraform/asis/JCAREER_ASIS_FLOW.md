@@ -5,7 +5,7 @@
 > 핵심 수치: 업무망 PC 180대, 2-AZ, 6개 모듈, Terraform 계획 항목 110개
 
 이 문서는 [JCAREER_ASIS_FLOW.drawio](JCAREER_ASIS_FLOW.drawio)의 짧은 해설이다.
-[웹 도면](architecture.html)에서는 전체 인프라의 ①~⑥을 보거나 서비스·보조 경로 6개 중
+[웹 도면](architecture.html)에서는 전체 인프라의 ①~⑥을 보거나 서비스·보조 경로 8개 중
 하나를 눌러 1·2·3 순서와 한계를 함께 볼 수 있다.
 선택한 설명 아래의 바로가기를 누르면 관련 상세 명세로 이어진다. 자세한 기능과 API,
 보안, 장애 내용은 [웹 명세](index.html)에 있다.
@@ -48,6 +48,8 @@
 | AI 설명 만들기 | 확정된 점수와 근거를 읽기 쉬운 문장으로 바꾸는 흐름 | 점수·순위와 설명 생성 권한 분리 |
 | MLOps 학습·평가 | 합성 자료 준비부터 사람 검토 대기까지의 모델 검증 흐름 | 서비스 연계 전 별도 검증 단계 |
 | 업무망·Slack | PC 수량, VPN+MFA·UTM 선언과 외부 업무 SaaS 자산대장 경계 | Slack 실제 workspace 운영과 AWS 연동은 확인되지 않음 |
+| TRACE·JC-RECEIPT | 추천 당시 근거 receipt, 구조화 정정 요청과 사람 검토 기록 | 기본 비활성 로컬 소스이며 자동 채용·이의판정 없음 |
+| 외부 업무도구 | admin의 고정 합성 이벤트를 Slack·Notion·SMTP로 보내는 opt-in 경로 | 실제 credential·외부 전송·AWS 리소스 없음 |
 | 기록·탐지 | 위협 탐지, 파일·앱 로그 목적지, AWS 작업 기록을 왼쪽부터 확인 | 운영 효과는 별도 관찰 기록에서 확인 |
 
 기업용 인재 찾기 화면은 현재 응답 안에서 이름·직무·기술과 최소 표시 점수로 좁혀 보고,
@@ -76,11 +78,31 @@ MLOps 경로는 기준 110개와 분리된 서버리스 모델 검증 루트를 
 1. 업무망 수량은 Windows 100대와 macOS 80대, 합계 180대로 사용자 확인됐다.
 2. VPN+MFA와 UTM은 시나리오 선언이다. 이 저장소에서 구현·배치·운영 관찰을 확인한 상태가 아니다.
 3. Slack은 AWS 밖의 외부 업무 SaaS·자산대장 경계다. Windows/macOS 이미지 소스의
-   `app.slack.com` 바로가기와 macOS 종료 시 best-effort Slack 프로세스 종료만 확인됐다.
+   `app.slack.com` 바로가기와 macOS 종료 시 best-effort Slack 프로세스 종료를 확인했다.
 
-실제 workspace 사용, 계정, 보존·삭제 정책은 `SCENARIO_USE_UNVERIFIED`다. Slack과 AWS 사이에는
-흐름선이 없으며 webhook/token, Amazon Q Developer(AWS Chatbot), SNS, EventBridge를 만들거나
-현재 구성처럼 암시하지 않는다.
+기존 API에는 기본 비활성 Slack webhook 어댑터가 있지만 실제 workspace 사용, 계정,
+보존·삭제 정책과 전송은 `SCENARIO_USE_UNVERIFIED`다. Amazon Q Developer(AWS Chatbot), SNS,
+EventBridge나 새 Terraform 리소스는 없다.
+
+### 3.3 TRACE·JC-RECEIPT 경계
+
+1. 기존 70·20·10 추천 결과가 성공하면 최소 개인정보 receipt를 만들 수 있다.
+2. 지원자는 구조화 정정 요청을 내고, 원본과 정정 입력의 점수 관찰값을 분리해 볼 수 있다.
+3. 관리자는 `UPHOLD`, `CHANGE`, `REQUEST_INFO`, `ESCALATE` 중 사람 처분만 기록한다.
+
+`TRACE_MODE` 기본값은 `disabled`다. 로컬 API·역할별 화면과 합성 회귀시험이 있으나 실제 지원자
+자료, 운영 승인, AWS 배포와 새 Terraform 리소스는 없다. 합격, 이의, ISO 충족 또는 잔여위험을
+자동 판정하지 않는다.
+
+### 3.4 외부 업무도구 경계
+
+1. admin 상태 API는 Slack·Notion·SMTP 설정의 활성 가능 여부만 확인하고 외부 probe를 하지 않는다.
+2. admin 합성 전송 API는 고정 `SYNTHETIC_NON_PERSONAL` 이벤트만 받고 감사 요청을 먼저 기록한다.
+3. 명시적으로 opt-in된 provider만 exact-host/TLS/timeout/redaction과 멱등 경계를 거쳐 시도한다.
+
+세 어댑터는 전역과 provider별 기본값이 모두 꺼져 있다. 현재 확인된 것은 외부 네트워크를 대역으로
+바꾼 18건의 계약 시험뿐이며 실제 credential, Slack/Notion workspace, 메일 시스템, 메시지 전송,
+AWS 리소스는 확인하지 않았다. SMTP 소스 존재를 조직 그룹웨어 연동 완료로 읽지 않는다.
 
 ## 4. AWS 안의 세 구역
 
@@ -99,7 +121,8 @@ MLOps 경로는 기준 110개와 분리된 서버리스 모델 검증 루트를 
 - OpenDART 공개정보 기능의 기본값은 합성 예시다. SQS·Lambda 작업자 소스는 있으나 AWS 자원과 실행 증거는 없다.
 - MLOps 전용 루트는 합성 특징 파일만 받도록 작성됐고 현재 추천 점수나 순위를 바꾸지 않는다. 0/13/14는 별도 계획 수이며 AWS 배포 수량이 아니다.
 - MLOps 전용 경계 시험 19건과 합성 파이프라인 시험 22건을 통과했다. AWS 배포와 모델 품질 평가는 포함하지 않는다.
-- Slack은 외부 SaaS다. 이미지 바로가기와 macOS 종료 소스는 workspace 운영이나 인증 cookie 삭제를 증명하지 않는다.
+- Slack·Notion·SMTP 어댑터는 기본 비활성 소스와 무통신 시험만 있으며 workspace·메일 시스템 운영이나 실제 전송을 증명하지 않는다.
+- TRACE·JC-RECEIPT는 기본 비활성 로컬 소스다. 운영 승인·실데이터·자동 채용/이의/적합성/잔여위험 판정 증거가 아니다.
 - Bedrock 직접 합성 호출은 별도 AWS 검증 계정에서 확인했다. API→gateway→broker→Bedrock 전체 경로는 별도 항목이며 아직 확인하지 못했다.
 - AWS 검증 Lab은 생성 예정 24개 계획을 두 차례 확인했지만 모두 같은 IAM 권한에서 중단됐다. 각 실패의 부분 생성 16개를 지웠고, 2026-08-30 21:17 KST에 관련 자원과 상태가 모두 0개임을 다시 확인했다. 계획 24개·부분 생성 16개·AS-IS 기준선 110개는 서로 합산하지 않는다.
 - 컨설턴트 대시보드는 고객사 AWS에 직접 연결하지 않는다. 승인된 비식별본만 받아야 한다.
@@ -112,4 +135,4 @@ MLOps 경로는 기준 110개와 분리된 서버리스 모델 검증 루트를 
 - 기준 애플리케이션이 실행 중이라는 뜻이 아니다. 실행 이미지가 없다.
 - 업무망 PC가 AWS에 연결됐다는 뜻이 아니다. 실제 접속 경로는 확인하지 못했다.
 - Slack workspace가 운영 중이거나 AWS 알림·이벤트와 연결됐다는 뜻이 아니다.
-- 제안 단계 신규 서비스는 이번 구성에 구현하지 않았다.
+- TRACE·JC-RECEIPT와 외부 업무도구 소스가 실제 운영 또는 AWS에 배포됐다는 뜻이 아니다.

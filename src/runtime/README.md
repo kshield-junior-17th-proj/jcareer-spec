@@ -67,8 +67,9 @@ python tests/two_sided_asis_observations.py
 잡는다. legacy `required_calls`는 handler AST의 선택된 symbol 존재 목록이며 분기 실행 증거가 아니다.
 완전한 DB read/write graph는 아니다. OpenAPI security scheme, 완전한 response schema,
 dependency/downstream의 전체 오류 조건은 아직 제품 wire 계약으로 고정하지 않았다.
-기본 비활성 통합 router의 두 admin route는 기존 AS-IS inventory 범위 밖의 additive surface이며
-`tests/integrations_contract.py`에서 별도로 role·wire·무네트워크 동작을 검사한다.
+기본 비활성 통합 router의 두 admin route와 TRACE·JC-RECEIPT router의 일곱 route는 기존 AS-IS
+core inventory 범위 밖의 additive surface다. 각각 `tests/integrations_contract.py`와
+`tests/trace_receipt_contract.py`에서 별도로 role·wire·무네트워크/합성 동작을 검사한다.
 `contracts/api_effects.json`은 35개 handler 전부의 세 DB·감사·Redis·agent·gateway·prompt-log·SQS·DynamoDB 결과함
 효과와 주요 분기를 별도로 선언하고 함수 지문과 선택된 lexical 순서를 검사한다. 이 역시 완전한
 CFG 또는 실행 trace가 아니다.

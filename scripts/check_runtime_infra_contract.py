@@ -956,7 +956,7 @@ def check(root: Path) -> list[str]:
             "회원 DB 소유": 'member_database  = ["identity", "consent", "resume", "application", "audit"]',
             "기업 DB 소유": 'company_database = ["company", "company-profile", "job"]',
             "점수·설명 분리": "explanation_changes_score    = false",
-            "독립 TRACE 미구현": "independent_trace_service    = false",
+            "독립 TRACE 서비스 없음": "independent_trace_service    = false",
             "Bedrock provider 요청값": 'bedrock_provider_requested    = var.llm_provider == "bedrock"',
             "Bedrock live 요청값": "bedrock_live_requested        = var.allow_bedrock_live",
             "이력서 객체 저장 간극": 'resume_object_storage    = "terraform-model-only-runtime-upload-not-implemented"',
