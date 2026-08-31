@@ -396,7 +396,14 @@ $interactiveFlowOkay = $flowButtonCount -eq 7 -and
     $architecture.Contains('TRACE·JC-RECEIPT 등 제안 단계 신규 서비스는 선택 경로에서 제외했습니다')
 Add-Check 'interactive_service_flow' $interactiveFlowOkay "controls $flowButtonCount, overlay layers $flowLayerCount, six per-layer 3-step paths, markers $stepMarkerCount; local/AWS data, MLOps and Slack separation, legend, URL state, detail links 7 checked"
 
-$flowSourceHash = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $root 'JCAREER_ASIS_FLOW.md')).Hash.ToLowerInvariant()
+$flowSourceText = (Get-Content -Raw -Encoding UTF8 (Join-Path $root 'JCAREER_ASIS_FLOW.md')).Replace("`r`n", "`n").Replace("`r", "`n")
+$flowSourceBytes = [System.Text.Encoding]::UTF8.GetBytes($flowSourceText)
+$flowSourceHasher = [System.Security.Cryptography.SHA256]::Create()
+try {
+    $flowSourceHash = ([System.BitConverter]::ToString($flowSourceHasher.ComputeHash($flowSourceBytes))).Replace('-', '').ToLowerInvariant()
+} finally {
+    $flowSourceHasher.Dispose()
+}
 $generationOutput = @(& node (Join-Path $root 'build-spec.mjs') --check 2>&1)
 $generationExitCode = $LASTEXITCODE
 $flowHashOkay = $architecture.Contains("flow-source-sha256`" content=`"$flowSourceHash`"") -and

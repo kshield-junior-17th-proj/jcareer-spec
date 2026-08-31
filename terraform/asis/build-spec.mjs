@@ -145,7 +145,8 @@ function renderMarkdown(markdown, { includeLeadingQuote = false } = {}) {
 
 const { body, toc } = renderMarkdown(source);
 const { body: flowBody } = renderMarkdown(flowSource, { includeLeadingQuote: true });
-const flowSourceHash = crypto.createHash('sha256').update(flowSource, 'utf8').digest('hex');
+const canonicalFlowSource = flowSource.replace(/\r\n?/g, '\n');
+const flowSourceHash = crypto.createHash('sha256').update(canonicalFlowSource, 'utf8').digest('hex');
 const architectureFlows = {
   overview: {
     title: '전체 인프라',

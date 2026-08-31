@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "verified_at": "2026-08-31T10:42:14+09:00",
+  "verified_at": "2026-08-31T10:45:37+09:00",
   "aws_api_calls": 0,
   "terraform_apply_destroy": false,
   "environment": {
@@ -150,11 +150,11 @@
     "src/runtime/contracts/mentor_feedback_2026_08_28.json": "44ccbe8f8a30c43c27f45d0aa0c87e79837df649eaea839d0d23086fdcce8f37",
     "src/runtime/tests/mentor_feedback_contract.py": "c42474fb939f15f753169e425e2bddd0abe543d6b8627b3670ff4ec76df6f806",
     "src/runtime/VERIFICATION.md": "023dd4ffc256bf024093dbb1aefaa74c1f3c7e6f825f41e1a8f8949d8111db2f",
-    "terraform/asis/architecture.html": "b8c81499c6fe99807954e3628266da02a36d3050832745bb0634af242ddcf169",
-    "terraform/asis/build-spec.mjs": "be55edae07a9323e0cfb69a813c32d64529dcc5d17ecd6a118633c0d991b5032",
+    "terraform/asis/architecture.html": "cf06175dbe37aa7839bc127faa4849c17ec15f9c8174f6e9a8006768a8c9c3a1",
+    "terraform/asis/build-spec.mjs": "f7ba6a58d4030cdb1277bc8a86767797902c938b2d6d801519761a890c3c1903",
     "terraform/asis/index.html": "0b42c0d881ed7ba48fe323653e2f4e30235dec2e4681c9624585e905949d2c84",
     "terraform/asis/JCAREER_ASIS_FLOW.md": "26e8f45ab7c02be9bcac455a0fad2f8572dffb9373eb3d5982ddc9b2dc9d3aee",
-    "terraform/asis/validate-spec.ps1": "937bd3771f4c42ee3df28acc66a2e33fc7b39c50c14f8c96a4a4b787684f4439",
+    "terraform/asis/validate-spec.ps1": "aaa16f96e08e0c5204fb599b54742013b1658474002383bb0938592721f24b4f",
     "terraform/lab/index.html": "ae8db94be6f3b505b78a46d308d520f4cd99a5e9af7883e49eae4fa161a4f858",
     "terraform/README.md": "112cd8098daf80d550e448a5de02700707e08357e9e1091b4ffff95da885c262",
     "terraform/serverless-mlops/.terraform.lock.hcl": "7f14935929888c7309fbe8ce2ac32b5c2f6d3f6a40d9771ce8d83f5a6cfd84ba",
