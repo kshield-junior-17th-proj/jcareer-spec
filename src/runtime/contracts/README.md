@@ -15,7 +15,7 @@
   Windows 3대·macOS 3대 시험표본. 현재 `NOT_EXECUTED`다.
 - `application_artifacts.yaml`: `web`, `api`, `agent`, `llm-gateway` 네 앱의 source와
   Terraform model 참조. 현재 모두 `UNBUILT`, `UNPUBLISHED`다.
-- `api_surface.json`: 세 FastAPI source의 35개 handler·40개 decorator route, 역할·선택된
+- `api_surface.json`: 기존 core 세 FastAPI source의 35개 handler·40개 decorator route, 역할·선택된
   tenant marker, Pydantic model 선언과 선택된 기업 계정·현재 지원자료·audit·cache·공개 마감 공고·
   거부 audit tenant shape·동의/설명 필드 matrix·설명 provider 구성 source state, 브라우저
   localStorage 신원 복원과 API의 회원 DB 권한원·custom token/세션 철회 공백을
@@ -23,6 +23,10 @@
   response/error wire 계약 또는 OpenAPI security scheme 증거가 아니다. legacy `required_calls`는
   선택된 AST 호출 symbol 목록으로, 모든 분기에서 실제 호출된다는 뜻이 아니다. 브라우저 역할
   source가 취약한 UI 상태를 만들 수 있다는 기록은 서버 BOLA 성공을 뜻하지 않는다.
+- TRACE·JC-RECEIPT router 7개와 외부 업무도구 admin router 2개는 additive guarded surface다.
+  각각 `../tests/trace_receipt_contract.py`와 `../tests/integrations_contract.py`에서 별도로 검사하며,
+  기존 core inventory 40개에 자동 합산하지 않는다. 기본 비활성 소스·합성 대역 결과일 뿐 실제
+  외부 호출, 운영 OpenAPI 또는 AWS 배포 증거가 아니다.
 - `api_effects.json`: 같은 35개 handler의 회원/기업/outcome DB·감사·Redis·agent·gateway·prompt·SQS·DynamoDB 결과함
   효과와 주요 분기를 source review 선언으로 정리하고, 전 handler와 20개 helper의 AST 지문 및
   추천·기업 가입·열람 감사·gateway의 선택된 9개 lexical 순서를 검사한다. CFG dominance,

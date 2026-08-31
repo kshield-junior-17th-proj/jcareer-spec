@@ -22,6 +22,7 @@ from sqlalchemy import String, cast, delete, func, or_, select, text, update
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session, joinedload
 
+from . import trace_receipts
 from .database import (
     CompanyBase,
     MemberBase,
@@ -34,6 +35,7 @@ from .database import (
     outcome_engine,
 )
 from .decision_support import build_qualitative_evidence
+from .integrations.router import router as integrations_router
 from .models import Application, AuditEvent, Company, ConsentEvent, Job, Resume, User
 from .outcome_store import DATASET_VERSION as OUTCOME_DATASET_VERSION
 from .outcome_store import candidate_historical_observation
@@ -508,6 +510,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.include_router(integrations_router)
 
 
 @app.middleware("http")
@@ -3182,3 +3185,6 @@ def admin_audit(
     )
     db.commit()
     return response
+
+
+trace_receipts.install_trace(app, matcher_runner=run_matcher)

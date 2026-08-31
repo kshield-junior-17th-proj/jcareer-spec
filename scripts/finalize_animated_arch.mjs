@@ -9,11 +9,11 @@ const sourceArgument = process.argv.slice(2).find((argument) => !argument.starts
 const sourcePath = resolve(sourceArgument || 'assets/JCAREER_PLATFORM_ANIMATED.svg');
 const specArgument = process.argv.find((argument) => argument.startsWith('--spec='));
 const specPath = resolve(specArgument?.slice('--spec='.length) || 'assets/JCAREER_PLATFORM_ANIMATED.spec.json');
-const specBytes = readFileSync(specPath);
+const specBytes = Buffer.from(readFileSync(specPath, 'utf8').replace(/\r\n?/g, '\n'), 'utf8');
 const spec = JSON.parse(specBytes.toString('utf8'));
-const normalizedSpec = specBytes.toString('utf8').replace(/\r\n?/g, '\n');
-const specHash = createHash('sha256').update(normalizedSpec).digest('hex');
-const input = readFileSync(sourcePath, 'utf8');
+const specHash = createHash('sha256').update(specBytes).digest('hex');
+const sourceInput = readFileSync(sourcePath, 'utf8');
+const input = sourceInput.replace(/\r\n?/g, '\n');
 const reducedMotionRule = '@media (prefers-reduced-motion: reduce){.motion-dot{display:none}}';
 const sourceMetadata = `<metadata id="jcareer-animated-source" data-spec-sha256="${specHash}"/>`;
 
@@ -55,7 +55,7 @@ if (/(?:href|src)="https?:\/\//.test(output) || /<image\b/.test(output)) {
 
 if (checkOnly) {
   if (output !== input) throw new Error('Animated SVG is not finalized.');
-} else if (output !== input) {
+} else if (output !== sourceInput) {
   writeFileSync(sourcePath, output, 'utf8');
 }
 

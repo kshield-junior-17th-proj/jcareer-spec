@@ -67,6 +67,9 @@ python tests/two_sided_asis_observations.py
 잡는다. legacy `required_calls`는 handler AST의 선택된 symbol 존재 목록이며 분기 실행 증거가 아니다.
 완전한 DB read/write graph는 아니다. OpenAPI security scheme, 완전한 response schema,
 dependency/downstream의 전체 오류 조건은 아직 제품 wire 계약으로 고정하지 않았다.
+기본 비활성 통합 router의 두 admin route와 TRACE·JC-RECEIPT router의 일곱 route는 기존 AS-IS
+core inventory 범위 밖의 additive surface다. 각각 `tests/integrations_contract.py`와
+`tests/trace_receipt_contract.py`에서 별도로 role·wire·무네트워크/합성 동작을 검사한다.
 `contracts/api_effects.json`은 35개 handler 전부의 세 DB·감사·Redis·agent·gateway·prompt-log·SQS·DynamoDB 결과함
 효과와 주요 분기를 별도로 선언하고 함수 지문과 선택된 lexical 순서를 검사한다. 이 역시 완전한
 CFG 또는 실행 trace가 아니다.
@@ -82,6 +85,7 @@ AWS·Docker를 시작하지 않는 웹 정적 회귀 검사는 다음처럼 실�
 npm run verify --prefix src/runtime/web
 npm run build --prefix src/runtime/web
 python -B src/runtime/tests/api_boundary_contract.py
+python -B src/runtime/tests/integrations_contract.py
 python -B scripts/check_runtime_infra_contract.py .
 python -B tests/test_runtime_infra_contract.py
 python -B scripts/check_runtime_manifests.py --root .
@@ -97,6 +101,41 @@ python -B tests/test_runtime_evidence_contracts.py
 node src/runtime/web/tests/contrast-contract.mjs
 python -m unittest src/runtime/tests/mentor_feedback_contract.py
 node --check src/runtime/mentor-brief/app.js
+```
+
+## 외부 업무도구 어댑터 (기본 비활성)
+
+API 컨테이너에는 Slack incoming webhook, Notion API, SMTP TLS 어댑터가 포함된다. 세
+어댑터는 모두 기본 비활성이며 `INTEGRATIONS_ENABLED=true`와 각 provider의
+`*_ENABLED=true`를 함께 지정하고 나머지 구성이 유효할 때만 외부 연결을 시도한다. 기존 추천
+요청과 seed 결과는 이 경로를 호출하지 않는다.
+
+- `GET /api/v1/admin/integrations/status`는 admin 역할에만 구성 상태를 반환한다. 외부 health
+  probe를 실행하지 않으며 URL, token, password, page ID, 메일 주소를 반환하지 않는다.
+- `POST /api/v1/admin/integrations/synthetic-send`는 admin 역할에만 고정된
+  `SYNTHETIC_NON_PERSONAL` event를 전송한다. `Idempotency-Key` header 또는 body의
+  `idempotency_key` 중 하나가 필요하며 둘을 함께 쓰면 값이 같아야 한다.
+- provider별 receipt는 `DELIVERED`, `DISABLED`, `FAILED`와 제한된 failure code만 담는다.
+  응답 본문, 예외 문자열, endpoint와 credential은 보존하지 않는다. 한 provider의 실패나
+  timeout은 다른 provider receipt를 취소하지 않는다.
+
+HTTP endpoint는 HTTPS와 exact-host allowlist를 모두 통과해야 하고 redirect를 따르지 않는다.
+Slack과 Notion의 기본 allowlist는 각각 `hooks.slack.com`, `api.notion.com`이다. SMTP는
+`SMTP_ALLOWED_HOSTS`를 명시해야 하며 `implicit` TLS(기본 465) 또는 인증서 검증을 수행하는
+`starttls`만 지원한다. HTTP 요청과 SMTP 연결·소켓 작업 timeout은 0.05~30초 범위다. SMTP
+transaction 전체 시간은 서버 응답 단계 수에 따라 이 값보다 길어질 수 있어 process마다 한 건만
+동시에 처리한다. 대기 중인 추가 요청은 같은 timeout 안에 시작하지 못하면 전송 전에 종료된다.
+
+외부 전송 전에는 같은 `idempotency_ref`로 감사 요청을 먼저 저장한다. 감사 저장소를 사용할 수
+없으면 전송을 시작하지 않으며, 전송 결과도 같은 참조값으로 기록해 요청과 결과를 연결한다.
+
+중복 억제는 provider와 key 범위의 process-local TTL cache다. 같은 event의 재시도는 원래
+receipt를 `replayed=true`로 반환하고 외부 전송을 반복하지 않는다. 컨테이너 재시작이나 다중
+worker 사이의 durable idempotency를 증명하지 않으므로 운영 배포 전 공유 저장소 설계가 별도로
+필요하다. 네트워크를 사용하지 않는 단위 회귀는 다음과 같이 실행한다.
+
+```powershell
+python -B src/runtime/tests/integrations_contract.py
 ```
 
 종료:

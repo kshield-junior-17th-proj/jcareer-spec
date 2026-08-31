@@ -18,4 +18,4 @@
 
 ## 포함하지 않은 것
 
-TRACE와 JC-RECEIPT는 이 AS-IS 인프라 및 MLOps 구현 범위에 포함하지 않습니다. Slack 또는 별도 업무시스템 연동도 구현 근거가 없어 흐름선으로 추가하지 않았습니다.
+전체 인프라 지도는 TRACE·JC-RECEIPT와 Slack·Notion·SMTP를 AWS 또는 MLOps 실행 경로처럼 연결하지 않습니다. 다만 저장소에는 기본 비활성 로컬 소스와 합성 회귀시험이 있으며, 9개 상태를 제공하는 웹 화면에서 별도 보조 경로로 확인할 수 있습니다. 실제 자격 증명·외부 호출·AWS 배포·새 Terraform 리소스는 없고 Slack workspace 사용 여부는 `SCENARIO_USE_UNVERIFIED`입니다.

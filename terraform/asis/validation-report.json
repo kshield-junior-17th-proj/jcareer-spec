@@ -1,5 +1,5 @@
 {
-    "generated_at":  "2026-08-30T21:31:16+09:00",
+    "generated_at":  "2026-08-31T11:43:32+09:00",
     "scope":  "local static validation only; no AWS API or terraform apply",
     "passed":  25,
     "failed":  0,
@@ -12,12 +12,12 @@
                    {
                        "check":  "readme_current_deliverables",
                        "status":  "PASS",
-                       "detail":  "public 39/8 diagram linked; separate detailed and legacy diagrams marked"
+                       "detail":  "public 60/14 diagram linked; separate detailed and legacy diagrams marked"
                    },
                    {
                        "check":  "plain_language_reader_guide",
                        "status":  "PASS",
-                       "detail":  "spec guide Hangul 2939; flow guide Hangul 51; drawio Hangul 238; reader-first status labels checked"
+                       "detail":  "spec guide Hangul 3236; flow guide Hangul 135; drawio Hangul 431; reader-first status labels checked"
                    },
                    {
                        "check":  "render_temp_artifacts_absent",
@@ -27,7 +27,7 @@
                    {
                        "check":  "required_scope_terms",
                        "status":  "PASS",
-                       "detail":  "all 28 boundary terms in spec+index; architecture core 10"
+                       "detail":  "all 31 boundary terms in spec+index; architecture core 16"
                    },
                    {
                        "check":  "prohibited_live_claims",
@@ -52,12 +52,12 @@
                    {
                        "check":  "runtime_api_route_counts",
                        "status":  "PASS",
-                       "detail":  "api 30, agent 6, gateway 4; runner declares 6 checks including MLOps"
+                       "detail":  "api 39 = core 30 + guarded 9, agent 6, gateway 4; runner declares 6 checks including MLOps"
                    },
                    {
                        "check":  "runtime_screen_contract",
                        "status":  "PASS",
-                       "detail":  "React routes 20 including redirect/wildcard; candidate and recruiter home documented"
+                       "detail":  "React routes 23 including redirect/wildcard; core home and three TRACE routes documented"
                    },
                    {
                        "check":  "terraform_state_absent",
@@ -82,7 +82,7 @@
                    {
                        "check":  "html_list_semantics",
                        "status":  "PASS",
-                       "detail":  "AS-IS limits ol 1/items 21; architecture flow ol 1/items 6"
+                       "detail":  "AS-IS limits ol 1/items 22; architecture flow ol 1/items 6"
                    },
                    {
                        "check":  "html_ui_accessibility_contract",
@@ -97,22 +97,22 @@
                    {
                        "check":  "interactive_service_flow",
                        "status":  "PASS",
-                       "detail":  "controls 6, overlay layers 6, per-layer stages 3/3/3/3/3, markers 15; local/AWS data and MLOps separation, legend, URL state, detail links 6 checked"
+                       "detail":  "controls 9, overlay layers 9, stages overview=6 MLOps=7 guarded/other=3, markers 21; full/AS-IS/MLOps media switching, guarded-source separation, URL state, detail links 9 checked"
                    },
                    {
                        "check":  "flow_source_sync",
                        "status":  "PASS",
-                       "detail":  "index+architecture match generator inputs; flow fcfef6269fe5..."
+                       "detail":  "index+architecture match generator inputs; flow 59c58ed0b6da..."
                    },
                    {
                        "check":  "drawio_xml",
                        "status":  "PASS",
-                       "detail":  "cells 39, edges 8, containers 7, duplicate IDs 0, bad edges 0, isolated MLOps proposal cells 1"
+                       "detail":  "cells 60, edges 14, containers 9, duplicate IDs 0, bad edges 0, Slack edges 0, official ECR icons 1, missing IDs/MLOps edges 0/0"
                    },
                    {
                        "check":  "png_dimensions",
                        "status":  "PASS",
-                       "detail":  "2400x1400; PNG signature/IHDR=True; rendered after drawio=True"
+                       "detail":  "2400x1400; PNG signature/IHDR=True; rendered after drawio=True; embedded draw.io XML=True"
                    },
                    {
                        "check":  "pdf_header",
@@ -122,7 +122,7 @@
                    {
                        "check":  "pdf_page_objects",
                        "status":  "PASS",
-                       "detail":  "46 page objects; checkout mtime advisory=True; HTML source bound=True; loopback links=0"
+                       "detail":  "47 page objects; checkout mtime advisory=True; HTML source bound=True; loopback links=0"
                    },
                    {
                        "check":  "deliverable_secret_patterns",

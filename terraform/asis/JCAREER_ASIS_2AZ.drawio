@@ -151,7 +151,7 @@
         <mxCell id="planning-boundary" value="Planning / evaluation boundary · no resources" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#94A3B8;fontColor=#475569;fontSize=12;fontStyle=1;align=left;verticalAlign=top;spacingTop=14;spacingLeft=10;dashed=1;container=1;dropTarget=1;" vertex="1" parent="1">
           <mxGeometry x="1920" y="1040" width="450" height="310" as="geometry" />
         </mxCell>
-        <mxCell id="trace-boundary" value="&lt;b&gt;TRACE / JC-RECEIPT / Decision Receipt / Recourse Twin&lt;/b&gt;&lt;br&gt;NOT IMPLEMENTED · no Terraform resources" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#94A3B8;fontColor=#475569;fontSize=9;align=left;verticalAlign=middle;spacing=8;dashed=1;" vertex="1" parent="planning-boundary">
+        <mxCell id="trace-boundary" value="&lt;b&gt;TRACE / JC-RECEIPT / Decision Receipt / Recourse Twin&lt;/b&gt;&lt;br&gt;LOCAL SOURCE · DEFAULT OFF · no Terraform/AWS resources · not deployed" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#94A3B8;fontColor=#475569;fontSize=9;align=left;verticalAlign=middle;spacing=8;dashed=1;" vertex="1" parent="planning-boundary">
           <mxGeometry x="20" y="60" width="410" height="62" as="geometry" />
         </mxCell>
         <mxCell id="oauth-boundary" value="&lt;b&gt;openai-oauth&lt;/b&gt;&lt;br&gt;security / licensing evaluation only · NO INTEGRATION" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#94A3B8;fontColor=#475569;fontSize=9;align=left;verticalAlign=middle;spacing=8;dashed=1;" vertex="1" parent="planning-boundary">

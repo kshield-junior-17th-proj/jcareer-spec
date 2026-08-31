@@ -46,8 +46,8 @@ Fargate 서비스마다 `desired_count = 2`를 사용한다. 별도의 task plac
 - PNG 단일-AZ 축약본이나 아직 존재하지 않는 2-AZ 그림을 근거로 사용하지 않았다.
 - AWS Config, 고객 관리형 KMS 키, Secrets Manager 등 원문상 없는 통제를 임의로
   채우지 않았다.
-- J-Career TRACE, JC-RECEIPT, Decision Receipt, Recourse Twin은 제안 단계다. 이
-  다이어그램과 Terraform에는 구현하지 않았다.
+- J-Career TRACE·JC-RECEIPT는 기존 API의 기본 비활성 로컬 소스로 구현됐지만 이
+  다이어그램의 Terraform과 AWS 리소스에는 추가하지 않았다. 실제 운영 활성화·배포도 확인하지 않았다.
 - Terraform plan 결과는 `110 add / 0 change / 0 destroy`이며 apply하지 않았다.
 
 스캐너 결과와 사람이 판단할 명세 상충은

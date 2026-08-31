@@ -64,6 +64,9 @@ def main() -> None:
     assert outcome_tables == {
         "outcome_datasets",
         "synthetic_document_outcomes",
+        "trace_decision_receipts",
+        "trace_human_review_records",
+        "trace_recourse_cases",
     }, outcome_tables
     assert member_tables.isdisjoint(company_tables)
     assert member_tables.isdisjoint(outcome_tables)
@@ -154,7 +157,7 @@ def main() -> None:
         assert company_residue.returncode == 0 and company_residue.stdout.strip() == "0"
 
     print("J-Career member/company/outcome database boundary: PASS")
-    print("member tables=5, company tables=2, outcome tables=2, all six cross-role CONNECT attempts denied, exact logical link verified, synthetic rows cleaned")
+    print("member tables=5, company tables=2, outcome tables=5, all six cross-role CONNECT attempts denied, exact logical link verified, synthetic rows cleaned")
 
 
 if __name__ == "__main__":

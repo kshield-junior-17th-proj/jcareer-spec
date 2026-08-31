@@ -16,6 +16,7 @@ import {
 import { api, jsonBody } from "./api.js";
 import { CandidateHomePage, CandidateJobComparison } from "./candidate-workspace.jsx";
 import { isValidRecruiterEvidenceClaim } from "./recruiter-evidence.js";
+import { TraceWorkspace } from "./trace-workspace.jsx";
 
 const AuthContext = createContext(null);
 const UnsavedContext = createContext(null);
@@ -38,6 +39,8 @@ const roleHome = {
 const authLayoutPaths = new Set(["/login", "/signup", "/recruiter/signup"]);
 
 function routeTitle(pathname) {
+  if (["/candidate/trace", "/recruiter/trace"].includes(pathname)) return "Decision Receipt";
+  if (pathname === "/admin/trace") return "Recourse Review";
   if (/^\/jobs\/[^/]+$/.test(pathname)) return "채용공고 상세";
   if (pathname === "/jobs" || pathname === "/") return "채용공고";
   if (pathname === "/login") return "로그인";
@@ -175,6 +178,11 @@ function useAuth() {
 function CandidateHomeRoute() {
   const { user } = useAuth();
   return <CandidateHomePage user={user} />;
+}
+
+function TraceWorkspaceRoute() {
+  const { user } = useAuth();
+  return <TraceWorkspace role={user?.role} />;
 }
 
 function UnsavedProvider({ children }) {
@@ -339,6 +347,7 @@ function Shell({ children }) {
             <NavLink to="/jobs">채용공고</NavLink>
             {!user && <NavLink to="/recruiter/signup">기업회원</NavLink>}
             {nav.map(([label, href]) => <NavLink key={href} to={href}>{label}</NavLink>)}
+            {user && <NavLink to={`/${user.role}/trace`}>{user.role === "admin" ? "Recourse Review" : "Decision Receipt"}</NavLink>}
           </nav>
           <div className="account-area">
             {user ? (
@@ -2397,13 +2406,16 @@ const router = createBrowserRouter([
       { path: "/candidate/resume", element: <Protected roles={["candidate"]}><ResumePage /></Protected> },
       { path: "/candidate/applications", element: <Protected roles={["candidate"]}><CandidateApplicationsPage /></Protected> },
       { path: "/candidate/recommendations", element: <Protected roles={["candidate"]}><CandidateRecommendationsPage /></Protected> },
+      { path: "/candidate/trace", element: <Protected roles={["candidate"]}><TraceWorkspaceRoute /></Protected> },
       { path: "/candidate/withdraw", element: <Protected roles={["candidate"]}><WithdrawPage /></Protected> },
       { path: "/recruiter/signup", element: <RecruiterSignupPage /> },
       { path: "/recruiter/overview", element: <Protected roles={["recruiter"]}><RecruiterOverviewPage /></Protected> },
       { path: "/recruiter/jobs", element: <Protected roles={["recruiter"]}><RecruiterJobsPage /></Protected> },
       { path: "/recruiter/jobs/:id/pipeline", element: <Protected roles={["recruiter"]}><RecruiterPipelinePage /></Protected> },
       { path: "/recruiter/jobs/:id/recommendations", element: <Protected roles={["recruiter"]}><RecruiterRecommendationsPage /></Protected> },
+      { path: "/recruiter/trace", element: <Protected roles={["recruiter"]}><TraceWorkspaceRoute /></Protected> },
       { path: "/admin/audit", element: <Protected roles={["admin"]}><AdminAuditPage /></Protected> },
+      { path: "/admin/trace", element: <Protected roles={["admin"]}><TraceWorkspaceRoute /></Protected> },
       { path: "/privacy", element: <LegalPage type="privacy" /> },
       { path: "/terms", element: <LegalPage type="terms" /> },
       { path: "*", element: <NotFoundPage /> }

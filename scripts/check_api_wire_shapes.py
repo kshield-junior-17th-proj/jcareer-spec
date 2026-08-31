@@ -104,7 +104,10 @@ def _exact_keys(value: dict[str, Any], expected: set[str], label: str) -> None:
 
 
 def _sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    # Contracts are text artifacts. Hash their canonical LF representation so a
+    # Windows checkout cannot report drift against the same Git blob on Linux CI.
+    canonical = path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return hashlib.sha256(canonical).hexdigest()
 
 
 def _expression_reference(node: ast.AST) -> str:

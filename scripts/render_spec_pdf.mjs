@@ -178,7 +178,7 @@ async function main() {
     throw new Error('Source and output paths must differ.');
   }
 
-  const sourceBytes = await readFile(sourcePath);
+  const sourceBytes = Buffer.from((await readFile(sourcePath, 'utf8')).replace(/\r\n?/g, '\n'), 'utf8');
   const sourceName = repositoryName(sourcePath);
   const profileDirectory = await mkdtemp(path.join(os.tmpdir(), 'jcareer-pdf-'));
   const server = await startStaticServer();
