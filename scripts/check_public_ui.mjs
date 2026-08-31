@@ -15,7 +15,7 @@ const EXPECTED_ROUTES = [
     href: 'terraform/asis/architecture.html',
     flow: 'overview',
     detailHref: 'index.html#section-14',
-    steps: 8,
+    steps: 10,
     media: 'overview',
   },
   {
@@ -36,8 +36,8 @@ const EXPECTED_ROUTES = [
     href: 'terraform/asis/architecture.html?flow=explanation',
     flow: 'explanation',
     detailHref: 'index.html#section-33',
-    steps: 3,
-    media: 'asis',
+    steps: 4,
+    media: 'overview',
   },
   {
     href: 'terraform/asis/architecture.html?flow=mlops',
@@ -50,7 +50,7 @@ const EXPECTED_ROUTES = [
     href: 'terraform/asis/architecture.html?flow=workplace',
     flow: 'workplace',
     detailHref: 'index.html#section-15',
-    steps: 3,
+    steps: 4,
     media: 'asis',
   },
   {

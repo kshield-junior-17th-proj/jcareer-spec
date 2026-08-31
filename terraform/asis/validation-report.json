@@ -1,5 +1,5 @@
 {
-    "generated_at":  "2026-08-31T11:43:32+09:00",
+    "generated_at":  "2026-08-31T14:45:13+09:00",
     "scope":  "local static validation only; no AWS API or terraform apply",
     "passed":  25,
     "failed":  0,
@@ -17,7 +17,7 @@
                    {
                        "check":  "plain_language_reader_guide",
                        "status":  "PASS",
-                       "detail":  "spec guide Hangul 3236; flow guide Hangul 135; drawio Hangul 431; reader-first status labels checked"
+                       "detail":  "spec guide Hangul 3302; flow guide Hangul 148; drawio Hangul 431; reader-first status labels checked"
                    },
                    {
                        "check":  "render_temp_artifacts_absent",
@@ -97,12 +97,12 @@
                    {
                        "check":  "interactive_service_flow",
                        "status":  "PASS",
-                       "detail":  "controls 9, overlay layers 9, stages overview=6 MLOps=7 guarded/other=3, markers 21; full/AS-IS/MLOps media switching, guarded-source separation, URL state, detail links 9 checked"
+                       "detail":  "controls 9, overlay layers 9, stages overview=10, explanation/workplace=4, MLOps=7, other=3, markers 23; integrated full-map AI/MLOps context, guarded-source separation, URL state, detail links 9 checked"
                    },
                    {
                        "check":  "flow_source_sync",
                        "status":  "PASS",
-                       "detail":  "index+architecture match generator inputs; flow 59c58ed0b6da..."
+                       "detail":  "index+architecture match generator inputs; flow ce76bf379cde..."
                    },
                    {
                        "check":  "drawio_xml",
@@ -122,7 +122,7 @@
                    {
                        "check":  "pdf_page_objects",
                        "status":  "PASS",
-                       "detail":  "47 page objects; checkout mtime advisory=True; HTML source bound=True; loopback links=0"
+                       "detail":  "48 page objects; checkout mtime advisory=True; HTML source bound=True; loopback links=0"
                    },
                    {
                        "check":  "deliverable_secret_patterns",

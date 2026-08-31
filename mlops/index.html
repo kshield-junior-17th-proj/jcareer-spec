@@ -59,7 +59,7 @@
           </dl>
         </div>
 
-        <div class="spatial-stage" data-spatial-stage aria-label="합성 데이터 준비부터 사람 검토까지 일곱 단계를 입체적으로 표현한 MLOps 통제면">
+        <div class="spatial-stage" aria-label="합성 데이터 준비부터 사람 검토까지 일곱 단계를 평면 기술 도면으로 표현한 MLOps 통제면">
           <div class="spatial-stage__halo" aria-hidden="true"></div>
           <div class="spatial-stage__shadow" aria-hidden="true"></div>
           <div class="spatial-stage__deck spatial-stage__deck--mlops">
@@ -104,7 +104,7 @@
           <article class="plain-card"><span class="plain-number">01</span><h3>비교 목적</h3><p>기술 70%, 경력 20%, 직무 10%로 계산하는 현재 기준과 후보 모델을 나란히 비교하기 위한 구조입니다.</p></article>
           <article class="plain-card"><span class="plain-number">02</span><h3>데이터 범위</h3><p>검증용 합성 회원, 기업, 지원 데이터를 사용합니다. 원문은 모델에 넣기 전에 다섯 가지 비교 수치로 줄입니다.</p></article>
           <article class="plain-card"><span class="plain-number">03</span><h3>결과 상태</h3><p>학습 결과와 평가 기록을 저장한 뒤 “사람 검토 대기” 상태로 마칩니다. 자동 승격은 허용하지 않습니다.</p></article>
-          <article class="plain-card"><span class="plain-number">04</span><h3>검증 범위</h3><p>학습 코드와 Terraform 계획, 단위시험을 제공합니다. AWS 배포와 이미지 등록, 실행 관찰은 별도 검증 단계입니다.</p></article>
+          <article class="plain-card"><span class="plain-number">04</span><h3>검증 범위</h3><p>학습 코드와 Terraform 계획, 단위시험을 제공합니다. bootstrap 13개 기반 적용은 확인됐고 이미지 등록·Lambda 실행은 별도 검증 단계입니다.</p></article>
         </div>
       </div>
     </section>
@@ -264,15 +264,15 @@
       <div class="shell">
         <div class="section-head">
           <div><p class="section-label">단계별 AWS 구성</p><h2>기본값은 잠그고<br>필요한 단계만 엽니다</h2></div>
-          <p class="section-intro">아래 수치는 AWS에 접속하지 않고 Terraform으로 계산한 단계별 계획입니다. 기존 서비스 아키텍처의 110개와 분리된 MLOps 전용 구성입니다.</p>
+          <p class="section-intro">아래는 기존 서비스 아키텍처의 110개와 분리된 MLOps 전용 단계입니다. 0/13/14 계획을 검증했고, 2026-08-31 bootstrap 13개 기반 적용만 별도로 확인했습니다.</p>
         </div>
         <div class="table-wrap">
           <table>
             <thead><tr><th>설정</th><th>예상 수</th><th>무엇을 준비하나</th><th>다음 단계 조건</th></tr></thead>
             <tbody>
               <tr><td>기본 잠금 <code>disabled</code></td><td>0</td><td>생성 계획 없음</td><td>기본 시작점</td></tr>
-              <tr><td>보관함 준비 <code>bootstrap</code></td><td>13</td><td>파일·이미지·상태·로그 보관함과 경로·표 범위로 제한한 권한</td><td>확인값과 겹치지 않는 보관함 이름</td></tr>
-              <tr><td>한 번 실행 <code>runtime</code></td><td>14</td><td>위 13개와 작업 실행기 1개</td><td>내용 지문으로 고정한 실행 이미지</td></tr>
+              <tr><td>보관함 준비 <code>bootstrap</code></td><td>13</td><td>파일·이미지·상태·로그 보관함과 경로·표 범위로 제한한 권한</td><td>2026-08-31 적용 확인</td></tr>
+              <tr><td>한 번 실행 <code>runtime</code></td><td>14</td><td>위 13개와 작업 실행기 1개</td><td>이미지 미게시 · Lambda 미배포·미실행</td></tr>
             </tbody>
           </table>
         </div>
@@ -289,7 +289,7 @@
           <article class="spec-block"><h3>문맥 이해 범위</h3><p>현 단계의 두 가지 문서 비교값은 자소서와 공고에 같은 단어가 얼마나 겹치는지 계산합니다. 분석 범위는 단어 중복 정도까지입니다.</p></article>
           <article class="spec-block"><h3>채용 결과 예측</h3><p>지원 단계 표식은 모델 비교 실험에만 사용합니다. 합격 가능성과 채용 성공률 해석에서는 제외합니다.</p></article>
           <article class="spec-block"><h3>운영 데이터 관리</h3><p>현재 검증은 합성 데이터 표식과 검증용 연락처 형식을 확인합니다. 운영 데이터 반입에는 출처 확인, 별도 학습 동의와 고객사 분리 통제가 필요합니다.</p></article>
-          <article class="spec-block"><h3>AWS 배포 검증</h3><p>Terraform 계획과 단위시험은 통과했습니다. 이미지 등록과 Lambda 실행, 운영 관찰은 별도의 AWS 배포 검증 기록으로 관리합니다.</p></article>
+          <article class="spec-block"><h3>AWS 배포 검증</h3><p>Terraform 계획·단위시험과 bootstrap 13개 적용을 확인했습니다. 이미지 등록과 Lambda 배포·실행, 결과 생성·서비스 연결은 아직 없습니다.</p></article>
         </div>
       </div>
     </section>
@@ -306,6 +306,7 @@
             <tbody>
               <tr><td>Terraform 형식·구문</td><td>PASS</td><td><code>fmt -check</code>, <code>validate</code></td></tr>
               <tr><td>AWS 비접속 단계별 계획</td><td>3/3 PASS</td><td><code>disabled 0</code>, <code>bootstrap 13</code>, <code>runtime 14</code></td></tr>
+              <tr><td>MLOps bootstrap AWS 적용</td><td>13개 PASS</td><td>검토한 saved plan · runtime/Lambda 제외</td></tr>
               <tr><td>기본 잠금 계획</td><td>PASS · 관리 자원 0</td><td><code>-refresh=false</code>, 기존 state 없음</td></tr>
               <tr><td>서버리스 경계 시험</td><td>19/19 PASS</td><td>허용 주소, 삭제·금지 서비스, 실행 도구</td></tr>
               <tr><td>합성 MLOps 단위시험</td><td>22/22 PASS</td><td>테스트 대역 S3·DynamoDB, 원문 잔류·중복·실패 조건</td></tr>
@@ -314,7 +315,7 @@
             </tbody>
           </table>
         </div>
-        <p class="caption">서버리스 경계 시험 19/19, 합성 MLOps 단위시험 22/22를 확인했습니다. 모두 소스·시험 범위이며 AWS 실행 결과나 모델 품질 판정이 아닙니다.</p>
+        <p class="caption">서버리스 경계 시험 19/19, 합성 MLOps 단위시험 22/22와 bootstrap 13개 기반 적용을 확인했습니다. Lambda 실행 결과나 모델 품질 판정은 아닙니다.</p>
       </div>
     </section>
 

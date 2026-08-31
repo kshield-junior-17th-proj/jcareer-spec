@@ -12,7 +12,10 @@ reviewed one-EC2 inventory in `terraform/lab`, and does not use SageMaker.
 - a bounded CloudWatch log group and a path-scoped Lambda role; and
 - one on-demand, digest-pinned Lambda only in `runtime` stage.
 
-These are planned/creatable targets, not a statement that they currently exist.
+As of the redacted 2026-08-31 observation, the reviewed bootstrap saved plan was
+applied and its 13 foundation resources exist. The digest-pinned image was not
+published, the runtime Lambda was not deployed or invoked, and no result or
+service integration is claimed.
 
 There is no API endpoint, NAT Gateway, RDS instance, schedule, or automatic
 model activation. The Lambda concurrency is one. If a separately authorized one-shot run occurs, its result remains
@@ -162,5 +165,6 @@ The protected `.github/**` workflows do not currently deploy this independent
 root. A workflow owner must review and add that integration later; the human
 acknowledgement must not be hard-coded into CI.
 
-No AWS deployment or live invocation is claimed until a separately authorized operator run
-produces its own redacted receipt.
+The bootstrap-only AWS deployment has a separately authorized redacted receipt.
+No image publication, runtime Lambda deployment, live invocation, result production,
+human review, or recommendation-service integration is claimed.

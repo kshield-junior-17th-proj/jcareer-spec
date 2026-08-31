@@ -17,6 +17,19 @@ const input = sourceInput.replace(/\r\n?/g, '\n');
 const reducedMotionRule = '@media (prefers-reduced-motion: reduce){.motion-dot{display:none}}';
 const sourceMetadata = `<metadata id="jcareer-animated-source" data-spec-sha256="${specHash}"/>`;
 
+const escapeXml = (value) => String(value)
+  .replaceAll('&', '&amp;')
+  .replaceAll('<', '&lt;')
+  .replaceAll('>', '&gt;')
+  .replaceAll('"', '&quot;');
+
+const estimatedTextWidth = (value, fontSize) => [...String(value)].reduce((width, character) => {
+  if (/[ᄀ-ᇿ⺀-鿿가-힯]/u.test(character)) return width + fontSize;
+  if (/\s/u.test(character)) return width + fontSize * 0.34;
+  if (/[·/×→]/u.test(character)) return width + fontSize * 0.62;
+  return width + fontSize * 0.56;
+}, 0);
+
 let output = input;
 if (/<metadata id="jcareer-animated-source"[^>]*\/>/.test(output)) {
   output = output.replace(/<metadata id="jcareer-animated-source"[^>]*\/>/, sourceMetadata);
@@ -34,6 +47,24 @@ output = output.replace(/\bbegin="(?!-)([0-9]+(?:\.[0-9]+)?)s"/g, (match, rawSec
   const seconds = Number(rawSeconds);
   return seconds > 0 ? `begin="-${rawSeconds}s"` : match;
 });
+
+if (spec.labelBackplates === true) {
+  for (const node of spec.nodes) {
+    const marker = `data-node-label="${escapeXml(node.id)}"`;
+    if (output.includes(marker)) continue;
+    const labelWidth = estimatedTextWidth(node.label, 13);
+    const subWidth = estimatedTextWidth(node.sub, 9.5);
+    const width = Math.max(64, Math.ceil(Math.max(labelWidth, subWidth) + 14));
+    const x = (node.x - width / 2).toFixed(1);
+    const y = (node.y + 28).toFixed(1);
+    const labelText = `<text x="${node.x}" y="${node.y + 38}" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">${escapeXml(node.label)}</text>`;
+    const backdrop = `<rect class="node-label-backdrop" ${marker} x="${x}" y="${y}" width="${width}" height="31" rx="5" fill="#FBFCFE" fill-opacity="0.94"/>`;
+    if (!output.includes(labelText)) {
+      throw new Error(`Unable to locate node label for backdrop: ${node.id}`);
+    }
+    output = output.replace(labelText, `${backdrop}${labelText}`);
+  }
+}
 output = output.replace(/\r\n?/g, '\n').replace(/[ \t]+$/gm, '');
 
 const motionCount = (output.match(/<animateMotion\b/g) || []).length;
