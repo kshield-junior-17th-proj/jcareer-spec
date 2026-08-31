@@ -1,5 +1,5 @@
 {
-    "generated_at":  "2026-08-30T21:31:16+09:00",
+    "generated_at":  "2026-08-31T10:16:14+09:00",
     "scope":  "local static validation only; no AWS API or terraform apply",
     "passed":  25,
     "failed":  0,
@@ -12,12 +12,12 @@
                    {
                        "check":  "readme_current_deliverables",
                        "status":  "PASS",
-                       "detail":  "public 39/8 diagram linked; separate detailed and legacy diagrams marked"
+                       "detail":  "public 58/14 diagram linked; separate detailed and legacy diagrams marked"
                    },
                    {
                        "check":  "plain_language_reader_guide",
                        "status":  "PASS",
-                       "detail":  "spec guide Hangul 2939; flow guide Hangul 51; drawio Hangul 238; reader-first status labels checked"
+                       "detail":  "spec guide Hangul 3126; flow guide Hangul 69; drawio Hangul 401; reader-first status labels checked"
                    },
                    {
                        "check":  "render_temp_artifacts_absent",
@@ -27,7 +27,7 @@
                    {
                        "check":  "required_scope_terms",
                        "status":  "PASS",
-                       "detail":  "all 28 boundary terms in spec+index; architecture core 10"
+                       "detail":  "all 31 boundary terms in spec+index; architecture core 14"
                    },
                    {
                        "check":  "prohibited_live_claims",
@@ -82,7 +82,7 @@
                    {
                        "check":  "html_list_semantics",
                        "status":  "PASS",
-                       "detail":  "AS-IS limits ol 1/items 21; architecture flow ol 1/items 6"
+                       "detail":  "AS-IS limits ol 1/items 22; architecture flow ol 1/items 6"
                    },
                    {
                        "check":  "html_ui_accessibility_contract",
@@ -97,22 +97,22 @@
                    {
                        "check":  "interactive_service_flow",
                        "status":  "PASS",
-                       "detail":  "controls 6, overlay layers 6, per-layer stages 3/3/3/3/3, markers 15; local/AWS data and MLOps separation, legend, URL state, detail links 6 checked"
+                       "detail":  "controls 7, overlay layers 7, six per-layer 3-step paths, markers 18; local/AWS data, MLOps and Slack separation, legend, URL state, detail links 7 checked"
                    },
                    {
                        "check":  "flow_source_sync",
                        "status":  "PASS",
-                       "detail":  "index+architecture match generator inputs; flow fcfef6269fe5..."
+                       "detail":  "index+architecture match generator inputs; flow 8c08c70ad061..."
                    },
                    {
                        "check":  "drawio_xml",
                        "status":  "PASS",
-                       "detail":  "cells 39, edges 8, containers 7, duplicate IDs 0, bad edges 0, isolated MLOps proposal cells 1"
+                       "detail":  "cells 58, edges 14, containers 9, duplicate IDs 0, bad edges 0, Slack edges 0, missing MLOps IDs/edges 0/0"
                    },
                    {
                        "check":  "png_dimensions",
                        "status":  "PASS",
-                       "detail":  "2400x1400; PNG signature/IHDR=True; rendered after drawio=True"
+                       "detail":  "2400x1400; PNG signature/IHDR=True; rendered after drawio=True; embedded draw.io XML=True"
                    },
                    {
                        "check":  "pdf_header",
@@ -122,7 +122,7 @@
                    {
                        "check":  "pdf_page_objects",
                        "status":  "PASS",
-                       "detail":  "46 page objects; checkout mtime advisory=True; HTML source bound=True; loopback links=0"
+                       "detail":  "47 page objects; checkout mtime advisory=True; HTML source bound=True; loopback links=0"
                    },
                    {
                        "check":  "deliverable_secret_patterns",

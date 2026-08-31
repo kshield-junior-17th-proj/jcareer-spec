@@ -9,6 +9,8 @@
 - Terraform은 여섯 부분으로 나뉘며, 기록된 모의 계획에는 생성 예정 항목이 110개다.
 - 이 기준선은 AWS에 적용하지 않았으며 현재 생성 리소스는 0개다.
 - 기준선에 애플리케이션 이미지와 실행 환경은 포함되어 있지 않다.
+- MLOps는 별도 default-off Terraform 루트의 0/13/14 계획이며 기준 110개와 합산하지 않는다.
+- Slack은 AWS 밖의 외부 업무 SaaS·자산대장 경계다. 바로가기 소스 외 실제 workspace 운영은 확인되지 않았다.
 - TRACE와 JC-RECEIPT 같은 신규 AI 서비스는 이번 범위에 넣지 않는다.
 
 자세한 설명은 아래의 [웹 명세](index.html)부터 읽으면 된다. 첫 장에 핵심 숫자와 용어
@@ -38,9 +40,13 @@
 - [자동검사 결과](validation-report.json)
 
 `JCAREER_ASIS_2AZ.drawio`는 원본 작업 트리에서 관리한 별도 기술 기록이다. 공개 기준 도면의
-수량과 검증 결과에는 합치지 않는다. 공개 화면은 39개 셀·8개 연결의
+수량과 검증 결과에는 합치지 않는다. 공개 화면은 58개 셀·14개 연결의
 `JCAREER_ASIS_FLOW.drawio`와 같은 이름의 PNG를 기준으로 읽는다. `JCAREER_ASIS_2AZ.md`는
 초기 2-AZ 구판(legacy) 설명이다.
+
+공개 도면의 추가 여섯 연결은 기준 110개 Terraform과 분리된 `terraform/serverless-mlops`의
+왼쪽→오른쪽 계획 흐름만 설명한다. Slack 상자는 어떤 연결선도 갖지 않으며 webhook/token,
+Amazon Q Developer(AWS Chatbot), SNS, EventBridge를 만들거나 암시하지 않는다.
 
 ## 서비스 기획과의 경계
 

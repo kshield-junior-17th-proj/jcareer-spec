@@ -2,7 +2,7 @@
 
 J-Career는 구직자와 기업을 연결하는 채용 플랫폼입니다. 이 저장소는 공고 추천, 기업용 인재
 탐색, 지원 관리와 AI 설명을 뒷받침하는 AWS 기준 설계와 MLOps 모델 검증 체계를 함께 제공합니다.
-서비스 구조부터 데이터, 보안·관측, 검증 환경까지 같은 기준으로 살펴볼 수 있습니다.
+서비스 구조부터 데이터, 보안·관측, 검증 환경과 외부 업무 시스템 경계까지 같은 기준으로 살펴볼 수 있습니다.
 
 ## 바로 보기
 
@@ -45,7 +45,8 @@ MLOps는 기존 110개 기준 설계와 별도입니다. 기본 `disabled` 계�
 `runtime`은 14개를 계획합니다. 세 단계의 수치는 AWS 비접속 계획 결과이며 배포 결과와 구분합니다.
 
 현재 배치 경로는 합성 DB 옆 내보내기 도구가 만든 비교 수치 CSV 1개와 검증용 JSON 2개를
-S3에서 읽습니다. Lambda는 후보 모델을 한 차례 학습한 뒤 결과 파일 6개와 실행 상태를 기록합니다.
+feature-only 입력으로 S3에서 읽습니다. Lambda는 후보 모델을 한 차례 학습한 뒤 S3 결과 파일 6개,
+DynamoDB 실행 상태와 CloudWatch Logs를 기록하고 `TRAINED_PENDING_HUMAN_REVIEW`에서 멈춥니다.
 자동 일정, 공개 API, SageMaker, 자동 승격과 기존 추천 점수 연결은 현재 범위에서 분리했습니다.
 두 가지 문서 비교값은 단어 중복 정도만 나타내며, 합격 가능성이나 인재 수준 판단에는 사용하지 않습니다.
 
@@ -65,6 +66,11 @@ S3에서 읽습니다. Lambda는 후보 모델을 한 차례 학습한 뒤 결�
 업무망 PC 180대는 Windows 100대와 macOS 80대로 구분합니다. 이 수량은 사용자 확정 입력이며
 Terraform 자원 수나 동시 사용자 수로 바꾸어 해석하지 않습니다. 실물 배치는 관찰하지 않았고,
 Windows 3대와 macOS 3대 검토 표본도 아직 실행하지 않았습니다.
+
+Slack은 AWS 리소스가 아닌 외부 업무 SaaS·자산대장 경계입니다. Windows/macOS 이미지 소스의
+`app.slack.com` 바로가기와 macOS 종료 시 best-effort Slack 프로세스 종료만 확인했으며 실제
+workspace 사용·계정·보존 정책은 `SCENARIO_USE_UNVERIFIED`입니다. AWS 흐름선이나 webhook/token,
+Amazon Q Developer(AWS Chatbot), SNS, EventBridge 연동은 없습니다.
 
 ## 보안 서비스는 어디에 있나
 

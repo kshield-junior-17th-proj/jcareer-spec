@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mxfile host="app.diagrams.net" modified="2026-08-30T11:20:00.000Z" agent="Codex" version="24.7.17" type="device">
+<mxfile host="app.diagrams.net" modified="2026-08-31T03:00:00.000Z" agent="Codex" version="24.7.17" type="device">
   <diagram id="jcareer-asis-overview" name="J-Career 기존 구성">
     <mxGraphModel dx="2800" dy="1600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="1400" math="0" shadow="0">
       <root>
@@ -8,35 +8,41 @@
         <mxCell id="bg" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=none;" vertex="1" parent="1">
           <mxGeometry x="0" y="0" width="2400" height="1400" as="geometry" />
         </mxCell>
-        <mxCell id="title" value="&lt;b&gt;J-Career 기존 구성 한눈에 보기&lt;/b&gt;&lt;br&gt;업무망과 AWS 설계 · 2026-08-30 · v3.13" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=24;spacing=8;fontColor=#232F3E;" vertex="1" parent="1">
-          <mxGeometry x="40" y="24" width="1080" height="78" as="geometry" />
+        <mxCell id="title" value="&lt;b&gt;J-Career 기존 구성 한눈에 보기&lt;/b&gt;&lt;br&gt;업무망 · AWS 기준 설계 · 독립 MLOps · 2026-08-31 · v3.14" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=24;spacing=8;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="40" y="24" width="960" height="78" as="geometry" />
         </mxCell>
         <mxCell id="status" value="&lt;b&gt;검토용 설계&lt;/b&gt;&lt;br&gt;모의 계획 110개 · 실제 생성 0개" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF7E6;strokeColor=#ED7100;strokeWidth=2;fontColor=#232F3E;fontSize=16;align=left;verticalAlign=middle;spacing=14;" vertex="1" parent="1">
-          <mxGeometry x="1300" y="28" width="450" height="78" as="geometry" />
+          <mxGeometry x="1010" y="28" width="400" height="78" as="geometry" />
         </mxCell>
-        <mxCell id="mlops_status" value="&lt;b&gt;MLOps 확장 예정 · 승인 전&lt;/b&gt;&lt;br&gt;합성 자료 → 학습·평가 → 승인 대기&lt;br&gt;&lt;font color=&quot;#8C2E8F&quot;&gt;기준 110개·현재 런타임에 미포함&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8FF;strokeColor=#BD22BF;strokeWidth=2;dashed=1;fontColor=#232F3E;fontSize=14;align=left;verticalAlign=middle;spacing=12;" vertex="1" parent="1">
-          <mxGeometry x="1770" y="28" width="590" height="78" as="geometry" />
+        <mxCell id="mlops_status" value="&lt;b&gt;독립 MLOps · default off&lt;/b&gt;&lt;br&gt;별도 terraform/serverless-mlops · 계획 0 / 13 / 14&lt;br&gt;&lt;font color=&quot;#8C2E8F&quot;&gt;기준 110개와 분리 · 배포/호출 없음&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8FF;strokeColor=#BD22BF;strokeWidth=2;dashed=1;fontColor=#232F3E;fontSize=14;align=left;verticalAlign=middle;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="1430" y="28" width="930" height="78" as="geometry" />
         </mxCell>
 
         <mxCell id="user" value="&lt;b&gt;서비스 사용자&lt;/b&gt;&lt;br&gt;지원자 · 채용 담당자" style="sketch=0;outlineConnect=0;fontColor=#232F3E;fillColor=#232F3D;strokeColor=#ffffff;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=17;shape=mxgraph.aws4.client;" vertex="1" parent="1">
           <mxGeometry x="65" y="380" width="100" height="100" as="geometry" />
         </mxCell>
 
-        <mxCell id="office" value="&lt;b&gt;업무망 PC 180대&lt;/b&gt;" style="rounded=1;fontColor=#5A6C86;fillColor=none;strokeColor=#5A6C86;strokeWidth=2;dashed=1;verticalAlign=top;align=left;html=1;whiteSpace=wrap;fontSize=18;fontStyle=1;container=1;dropTarget=1;spacingTop=14;spacingLeft=14;" vertex="1" parent="1">
-          <mxGeometry x="35" y="750" width="270" height="330" as="geometry" />
+        <mxCell id="office" value="&lt;b&gt;업무망 · AWS 밖&lt;/b&gt;" style="rounded=1;fontColor=#5A6C86;fillColor=none;strokeColor=#5A6C86;strokeWidth=2;dashed=1;verticalAlign=top;align=left;html=1;whiteSpace=wrap;fontSize=18;fontStyle=1;container=1;dropTarget=1;spacingTop=14;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="35" y="650" width="270" height="690" as="geometry" />
         </mxCell>
         <mxCell id="office_windows" value="Windows&lt;br&gt;&lt;b&gt;100대&lt;/b&gt;" style="sketch=0;outlineConnect=0;fontColor=#232F3E;fillColor=#232F3D;strokeColor=#ffffff;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=15;shape=mxgraph.aws4.client;" vertex="1" parent="office">
-          <mxGeometry x="32" y="82" width="78" height="78" as="geometry" />
+          <mxGeometry x="32" y="68" width="78" height="78" as="geometry" />
         </mxCell>
         <mxCell id="office_macos" value="macOS&lt;br&gt;&lt;b&gt;80대&lt;/b&gt;" style="sketch=0;outlineConnect=0;fontColor=#232F3E;fillColor=#ED7100;strokeColor=#ffffff;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=15;shape=mxgraph.aws4.client;" vertex="1" parent="office">
-          <mxGeometry x="160" y="82" width="78" height="78" as="geometry" />
+          <mxGeometry x="160" y="68" width="78" height="78" as="geometry" />
         </mxCell>
-        <mxCell id="office_note" value="접속 경로 · 보안 상태 미확인" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#AAB7C4;fontColor=#3B4A57;fontSize=15;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="office">
-          <mxGeometry x="22" y="235" width="226" height="54" as="geometry" />
+        <mxCell id="office_note" value="&lt;b&gt;USER_CONFIRMED&lt;/b&gt;&lt;br&gt;Windows 100 · macOS 80" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECFDF3;strokeColor=#388E3C;fontColor=#1F5132;fontSize=13;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="office">
+          <mxGeometry x="22" y="185" width="226" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="office_declared" value="&lt;b&gt;SCENARIO_DECLARED&lt;/b&gt;&lt;br&gt;VPN + MFA · UTM&lt;br&gt;&lt;font color=&quot;#5A6C86&quot;&gt;구현·운영 관찰 미확정&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EFF6FF;strokeColor=#5A6C86;strokeWidth=2;dashed=1;fontColor=#334155;fontSize=13;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="office">
+          <mxGeometry x="22" y="270" width="226" height="112" as="geometry" />
+        </mxCell>
+        <mxCell id="office_slack" value="&lt;b&gt;Slack · 외부 업무 SaaS&lt;/b&gt;&lt;br&gt;자산대장 경계 · AWS 리소스 아님&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#067647&quot;&gt;소스 확인&lt;/font&gt;: 두 OS의 app.slack.com 바로가기&lt;br&gt;macOS 종료 시 best-effort 프로세스 종료&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#B42318&quot;&gt;SCENARIO_USE_UNVERIFIED&lt;/font&gt;&lt;br&gt;workspace·계정·보존·AWS 연동 미확인&lt;br&gt;&lt;b&gt;AWS 흐름선 없음&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#7C3AED;strokeWidth=2;dashed=1;fontColor=#334155;fontSize=12;align=left;verticalAlign=middle;spacing=10;" vertex="1" parent="office">
+          <mxGeometry x="22" y="410" width="226" height="240" as="geometry" />
         </mxCell>
 
         <mxCell id="cloud" value="&lt;b&gt;J-Career 고객사 AWS 설계&lt;/b&gt; · 서울 지역 · 실제 AWS 조회 결과 아님" style="rounded=1;fontColor=#232F3E;fillColor=none;strokeColor=#232F3E;strokeWidth=3;verticalAlign=top;align=left;html=1;whiteSpace=wrap;fontSize=19;fontStyle=1;container=1;dropTarget=1;spacingTop=16;spacingLeft=18;" vertex="1" parent="1">
-          <mxGeometry x="330" y="140" width="2030" height="1110" as="geometry" />
+          <mxGeometry x="330" y="140" width="2030" height="790" as="geometry" />
         </mxCell>
         <mxCell id="entry_label" value="&lt;b&gt;공개 진입&lt;/b&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=17;fontColor=#5A6C86;" vertex="1" parent="cloud">
           <mxGeometry x="55" y="110" width="650" height="34" as="geometry" />
@@ -52,53 +58,87 @@
         </mxCell>
 
         <mxCell id="vpc" value="&lt;b&gt;내부 네트워크(VPC)&lt;/b&gt; · 가용 영역 2곳 · 서브넷 6개" style="rounded=1;fontColor=#8C4FFF;fillColor=none;strokeColor=#8C4FFF;strokeWidth=3;verticalAlign=top;align=left;html=1;whiteSpace=wrap;fontSize=19;fontStyle=1;container=1;dropTarget=1;spacingTop=16;spacingLeft=18;" vertex="1" parent="cloud">
-          <mxGeometry x="780" y="75" width="1200" height="560" as="geometry" />
+          <mxGeometry x="780" y="75" width="1200" height="455" as="geometry" />
         </mxCell>
         <mxCell id="public_zone" value="&lt;b&gt;공개 구역&lt;/b&gt;&lt;br&gt;가용 영역 2a · 2c" style="rounded=1;fontColor=#6D8F12;fillColor=none;strokeColor=#7AA116;strokeWidth=2;dashed=1;verticalAlign=top;align=left;html=1;whiteSpace=wrap;fontSize=16;fontStyle=1;container=1;dropTarget=1;spacingTop=14;spacingLeft=14;" vertex="1" parent="vpc">
-          <mxGeometry x="30" y="100" width="300" height="390" as="geometry" />
+          <mxGeometry x="30" y="90" width="300" height="300" as="geometry" />
         </mxCell>
         <mxCell id="alb" value="&lt;b&gt;요청 분배&lt;/b&gt;&lt;br&gt;ALB" style="sketch=0;outlineConnect=0;fontColor=#232F3E;fillColor=#8C4FFF;strokeColor=#ffffff;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=17;shape=mxgraph.aws4.application_load_balancer;" vertex="1" parent="public_zone">
-          <mxGeometry x="100" y="120" width="100" height="100" as="geometry" />
+          <mxGeometry x="100" y="100" width="100" height="100" as="geometry" />
         </mxCell>
 
         <mxCell id="app_zone" value="&lt;b&gt;앱 구역&lt;/b&gt;&lt;br&gt;가용 영역 2a · 2c" style="rounded=1;fontColor=#147EBA;fillColor=none;strokeColor=#147EBA;strokeWidth=2;dashed=1;verticalAlign=top;align=left;html=1;whiteSpace=wrap;fontSize=16;fontStyle=1;container=1;dropTarget=1;spacingTop=14;spacingLeft=14;" vertex="1" parent="vpc">
-          <mxGeometry x="370" y="100" width="300" height="390" as="geometry" />
+          <mxGeometry x="370" y="90" width="300" height="300" as="geometry" />
         </mxCell>
         <mxCell id="ecs" value="&lt;b&gt;앱 서비스 4종&lt;/b&gt;&lt;br&gt;ECS Fargate&lt;br&gt;&lt;font color=&quot;#B42318&quot;&gt;&lt;b&gt;실행 이미지 없음&lt;/b&gt;&lt;/font&gt;" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#ED7100;strokeColor=#ffffff;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=16;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.fargate;" vertex="1" parent="app_zone">
-          <mxGeometry x="100" y="120" width="100" height="100" as="geometry" />
+          <mxGeometry x="100" y="100" width="100" height="100" as="geometry" />
         </mxCell>
 
         <mxCell id="data_zone" value="&lt;b&gt;데이터 구역&lt;/b&gt;&lt;br&gt;가용 영역 2a · 2c" style="rounded=1;fontColor=#C925D1;fillColor=none;strokeColor=#C925D1;strokeWidth=2;dashed=1;verticalAlign=top;align=left;html=1;whiteSpace=wrap;fontSize=16;fontStyle=1;container=1;dropTarget=1;spacingTop=14;spacingLeft=14;" vertex="1" parent="vpc">
-          <mxGeometry x="710" y="100" width="450" height="390" as="geometry" />
+          <mxGeometry x="710" y="90" width="450" height="300" as="geometry" />
         </mxCell>
         <mxCell id="rds" value="&lt;b&gt;주 데이터&lt;/b&gt;&lt;br&gt;RDS PostgreSQL" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#C925D1;strokeColor=#ffffff;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=16;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.rds;" vertex="1" parent="data_zone">
-          <mxGeometry x="55" y="120" width="100" height="100" as="geometry" />
+          <mxGeometry x="55" y="100" width="100" height="100" as="geometry" />
         </mxCell>
         <mxCell id="redis" value="&lt;b&gt;임시 저장&lt;/b&gt;&lt;br&gt;Redis" style="sketch=0;outlineConnect=0;fontColor=#232F3E;fillColor=#C925D1;strokeColor=#ffffff;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=16;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.elasticache;" vertex="1" parent="data_zone">
-          <mxGeometry x="295" y="120" width="100" height="100" as="geometry" />
+          <mxGeometry x="295" y="100" width="100" height="100" as="geometry" />
         </mxCell>
 
         <mxCell id="logs" value="&lt;b&gt;기록과 탐지&lt;/b&gt;" style="rounded=1;fontColor=#5A6C86;fillColor=none;strokeColor=#AAB7C4;strokeWidth=2;dashed=1;verticalAlign=top;align=left;html=1;whiteSpace=wrap;fontSize=18;fontStyle=1;container=1;dropTarget=1;spacingTop=14;spacingLeft=14;" vertex="1" parent="cloud">
-          <mxGeometry x="50" y="700" width="1930" height="300" as="geometry" />
+          <mxGeometry x="50" y="545" width="1930" height="175" as="geometry" />
         </mxCell>
         <mxCell id="guardduty" value="&lt;b&gt;위협 탐지&lt;/b&gt;&lt;br&gt;GuardDuty" style="sketch=0;outlineConnect=0;fontColor=#232F3E;fillColor=#DD344C;strokeColor=#ffffff;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=16;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.guardduty;" vertex="1" parent="logs">
-          <mxGeometry x="160" y="95" width="90" height="90" as="geometry" />
+          <mxGeometry x="160" y="58" width="65" height="65" as="geometry" />
         </mxCell>
         <mxCell id="access_note" value="&lt;b&gt;권한과 관리&lt;/b&gt;&lt;br&gt;IAM · SSM" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#AAB7C4;fontColor=#3B4A57;fontSize=16;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="logs">
-          <mxGeometry x="390" y="110" width="310" height="78" as="geometry" />
+          <mxGeometry x="390" y="62" width="310" height="65" as="geometry" />
         </mxCell>
         <mxCell id="s3" value="&lt;b&gt;파일과 로그&lt;/b&gt;&lt;br&gt;Amazon S3" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#7AA116;strokeColor=#ffffff;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=16;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;" vertex="1" parent="logs">
-          <mxGeometry x="880" y="95" width="90" height="90" as="geometry" />
+          <mxGeometry x="880" y="58" width="65" height="65" as="geometry" />
         </mxCell>
         <mxCell id="cloudwatch" value="&lt;b&gt;앱과 통신 로그&lt;/b&gt;&lt;br&gt;CloudWatch" style="sketch=0;outlineConnect=0;fontColor=#232F3E;fillColor=#E7157B;strokeColor=#ffffff;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=16;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cloudwatch;" vertex="1" parent="logs">
-          <mxGeometry x="1220" y="95" width="90" height="90" as="geometry" />
+          <mxGeometry x="1220" y="58" width="65" height="65" as="geometry" />
         </mxCell>
         <mxCell id="cloudtrail" value="&lt;b&gt;AWS 작업 기록&lt;/b&gt;&lt;br&gt;CloudTrail" style="sketch=0;outlineConnect=0;fontColor=#232F3E;fillColor=#E7157B;strokeColor=#ffffff;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=16;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cloudtrail;" vertex="1" parent="logs">
-          <mxGeometry x="1580" y="95" width="90" height="90" as="geometry" />
+          <mxGeometry x="1580" y="58" width="65" height="65" as="geometry" />
         </mxCell>
 
         <mxCell id="legend" value="&lt;b&gt;선 읽는 법&lt;/b&gt;　━ 구성 확인　┄ 연결 미구현" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontColor=#5A6C86;" vertex="1" parent="cloud">
-          <mxGeometry x="55" y="1030" width="850" height="42" as="geometry" />
+          <mxGeometry x="55" y="735" width="1100" height="42" as="geometry" />
+        </mxCell>
+
+        <mxCell id="mlops_root" value="&lt;b&gt;독립 합성 MLOps · terraform/serverless-mlops&lt;/b&gt; · default off · NOT DEPLOYED / NOT INVOKED" style="rounded=1;fontColor=#8C2E8F;fillColor=none;strokeColor=#BD22BF;strokeWidth=3;dashed=1;verticalAlign=top;align=left;html=1;whiteSpace=wrap;fontSize=18;fontStyle=1;container=1;dropTarget=1;spacingTop=14;spacingLeft=16;" vertex="1" parent="1">
+          <mxGeometry x="330" y="960" width="2030" height="380" as="geometry" />
+        </mxCell>
+        <mxCell id="mlops_plan" value="&lt;b&gt;MLOPS_PLANNED_NOT_DEPLOYED&lt;/b&gt;&lt;br&gt;기본 0 · 기반 준비 13 · 일회성 실행 14 · 기준 110과 합산 안 함" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8FF;strokeColor=#BD22BF;fontColor=#6B236F;fontSize=12;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="mlops_root">
+          <mxGeometry x="40" y="48" width="700" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="mlops_exporter" value="&lt;b&gt;합성 DB 옆 exporter&lt;/b&gt;&lt;br&gt;숫자 특징 5개 · 원문 제거&lt;br&gt;&lt;font color=&quot;#067647&quot;&gt;소스 구현&lt;/font&gt;" style="sketch=0;outlineConnect=0;fontColor=#232F3E;fillColor=#232F3D;strokeColor=#ffffff;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;shape=mxgraph.aws4.traditional_server;" vertex="1" parent="mlops_root">
+          <mxGeometry x="75" y="145" width="65" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="mlops_input_s3" value="&lt;b&gt;feature-only 입력&lt;/b&gt;&lt;br&gt;S3 · 파일 3개" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#7AA116;strokeColor=#ffffff;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;" vertex="1" parent="mlops_root">
+          <mxGeometry x="350" y="145" width="65" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="mlops_lambda" value="&lt;b&gt;일회성 학습&lt;/b&gt;&lt;br&gt;AWS Lambda · 동시성 1" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#ED7100;strokeColor=#ffffff;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="mlops_root">
+          <mxGeometry x="625" y="145" width="65" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="mlops_outputs" value="&lt;b&gt;결과·상태·로그&lt;/b&gt;" style="rounded=1;fontColor=#5A6C86;fillColor=none;strokeColor=#AAB7C4;strokeWidth=2;dashed=1;verticalAlign=top;align=left;html=1;whiteSpace=wrap;fontSize=13;fontStyle=1;container=1;dropTarget=1;spacingTop=8;spacingLeft=10;" vertex="1" parent="mlops_root">
+          <mxGeometry x="860" y="72" width="600" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="mlops_result_s3" value="&lt;b&gt;S3 결과 6개&lt;/b&gt;&lt;br&gt;입력 복사 3 + 산출 3" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#7AA116;strokeColor=#ffffff;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;" vertex="1" parent="mlops_outputs">
+          <mxGeometry x="270" y="20" width="65" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="mlops_dynamodb" value="&lt;b&gt;실행 상태&lt;/b&gt;&lt;br&gt;DynamoDB" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#C925D1;strokeColor=#ffffff;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.dynamodb;" vertex="1" parent="mlops_outputs">
+          <mxGeometry x="50" y="70" width="65" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="mlops_cloudwatch" value="&lt;b&gt;실행 로그&lt;/b&gt;&lt;br&gt;CloudWatch Logs" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#E7157B;strokeColor=#ffffff;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cloudwatch;" vertex="1" parent="mlops_outputs">
+          <mxGeometry x="270" y="120" width="65" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="mlops_human" value="&lt;b&gt;TRAINED_PENDING_&lt;br&gt;HUMAN_REVIEW&lt;/b&gt;&lt;br&gt;사람 검토 대기에서 멈춤&lt;br&gt;&lt;font color=&quot;#B42318&quot;&gt;추천 런타임 배선 없음&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF7E6;strokeColor=#ED7100;strokeWidth=2;fontColor=#232F3E;fontSize=13;align=center;verticalAlign=middle;spacing=10;" vertex="1" parent="mlops_root">
+          <mxGeometry x="1640" y="115" width="330" height="128" as="geometry" />
+        </mxCell>
+        <mxCell id="mlops_note" value="수동 1회 · 자동 일정 없음 · 자동 승격 없음 · API Gateway/EventBridge/SageMaker/Bedrock 없음 · AWS 배포·호출 증거 없음" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CBD5E1;fontColor=#475569;fontSize=12;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="mlops_root">
+          <mxGeometry x="40" y="315" width="1930" height="42" as="geometry" />
         </mxCell>
 
         <mxCell id="e1" value="①" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#5A6C86;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=18;fontStyle=1;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="user" target="route53">
@@ -123,6 +163,24 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#E7157B;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="ecs" target="cloudwatch">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" value="특징" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#147EBA;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;labelBackgroundColor=#F5F5F5;" edge="1" parent="mlops_root" source="mlops_exporter" target="mlops_input_s3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" value="수동 1회" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#147EBA;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;labelBackgroundColor=#F5F5F5;" edge="1" parent="mlops_root" source="mlops_input_s3" target="mlops_lambda">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#7AA116;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="mlops_lambda" target="mlops_result_s3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e12" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#C925D1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="mlops_lambda" target="mlops_dynamodb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e13" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#E7157B;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="mlops_lambda" target="mlops_cloudwatch">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e14" value="검토 대기" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#ED7100;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;labelBackgroundColor=#F5F5F5;" edge="1" parent="1" source="mlops_dynamodb" target="mlops_human">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
       </root>

@@ -19,8 +19,9 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 3. 서비스 기능은 웹·API 구현 범위와 AWS 인프라 기준선을 나누어 관리한다.
 4. 기준 Terraform의 애플리케이션 이미지와 AWS 실행 결과는 후속 배포 검증 항목이다.
 5. MLOps는 기준 110개와 분리한 7단계 모델 검증 경로다. 기본 잠금 0개, 보관함 준비 13개, 한 번 실행 준비 14개 계획으로 나뉜다.
-6. 컨설턴트 대시보드는 J-Career 고객사 AWS에 직접 연결하지 않는다. 외부 미리보기에는 민감한 내용을 지운 복사본만 쓴다.
-7. TRACE와 JC-RECEIPT 같은 신규 AI 서비스는 아이디어 단계다. 이번 명세에 구현 내용으로 넣지 않았다.
+6. Slack은 AWS 리소스가 아닌 외부 업무 SaaS·자산대장 경계다. 두 운영체제 이미지의 바로가기 소스와 macOS 종료 시 best-effort 프로세스 종료만 확인했으며 실제 workspace 운영은 확인하지 못했다.
+7. 컨설턴트 대시보드는 J-Career 고객사 AWS에 직접 연결하지 않는다. 외부 미리보기에는 민감한 내용을 지운 복사본만 쓴다.
+8. TRACE와 JC-RECEIPT 같은 신규 AI 서비스는 아이디어 단계다. 이번 명세에 구현 내용으로 넣지 않았다.
 
 > 핵심 기준은 **업무망 PC 180대, 서울 리전 2-AZ, Terraform 6개 모듈과 110개 계획 항목**이다.
 
@@ -43,6 +44,7 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 | 구분 | 현재 확인된 내용 | 아직 확인되지 않은 내용 |
 |---|---|---|
 | 업무망 PC | 전체 180대, Windows 100대, macOS 80대 | 버전, 보안 프로그램, 인증, 실제 접속 경로 |
+| 업무 시스템·Slack | Windows/macOS 이미지 소스의 `app.slack.com` 바로가기와 macOS 종료 시 best-effort Slack 프로세스 종료 | 실제 workspace 사용, 계정·보존 정책, webhook/token, AWS 연동 |
 | AWS 설계 | 2-AZ, 6개 모듈, 기록된 계획 항목 110개 | 고객사 AWS 배포 결과와 실행 상태 |
 | AWS 검증 Lab | 별도 24개 생성 계획과 Bedrock 직접 합성 호출 통과, 권한 차단 뒤 부분 자원 정리 완료 | 원격 여섯 서비스, HTTPS 인증 경계, Bedrock 전체 애플리케이션 경로 |
 | 기준 애플리케이션 | 배치할 자리와 서비스 이름 | 실행 이미지, 실제 기동, 사용자 통합 시험 |
@@ -82,8 +84,8 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 | 항목 | 값 |
 |---|---|
 | 문서 번호 | `JC-ASIS-SPEC-001` |
-| 개정 | 3.13 |
-| 기준일 | 2026-08-30 |
+| 개정 | 3.14 |
+| 기준일 | 2026-08-31 |
 | 작성 기준 | 기존 기획, AWS에 접속하지 않는 Terraform 계획, 별도 서비스 구현 범위 |
 | 승인 상태 | 기준 설계 · 기술 검토 진행. `docs/current` 승인 문서 0건 |
 | 배포 상태 | `terraform/asis`는 미적용. 별도 AWS 검증 Lab의 배포·호출 결과는 별도 기록으로 관리 |
@@ -106,6 +108,7 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 | 3.11 | 2026-08-29 | 서비스별 인프라 경로에 기능·보안·MLOps 상세 명세 바로가기를 추가하고 링크 자동 검사를 보강 |
 | 3.12 | 2026-08-30 | AWS 검증 Lab과 AS-IS 모의 기준선을 분리하고, MLOps·대시보드의 최신 검사 수와 쉬운 한국어 상태표를 반영 |
 | 3.13 | 2026-08-30 | 공개 문서 정합성 재검토. PDF 소스 결속, 시점별 Lab 관찰, 공개 도면 39셀·8연결, 서비스별 관찰 상태를 분리하고 고정 검사 추가 |
+| 3.14 | 2026-08-31 | 공개 AS-IS 도면과 페이지에 기준선과 분리된 MLOps 0/13/14 실행 경계, 외부 Slack 자산대장 경계, 업무망 선언·구현·미확정 상태를 분리해 반영 |
 
 ### 0.7 상태를 읽는 법
 
@@ -120,6 +123,7 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 | 서비스 구현 범위 | LOCAL_SYNTHETIC_IMPLEMENTED | 합성 데이터용 소스와 자동 검사가 있음. AWS 배포 결과는 별도 관리 |
 | 합성 실험·런타임 미연결 | EXPERIMENT_UNWIRED_NOT_APPROVED | 완전 생성형 오프라인 코드가 있음. 이 경로에는 AWS 자원과 추천 서비스 연결이 없음 |
 | MLOps 소스·계획 | MLOPS_PLANNED_NOT_DEPLOYED | 별도 Terraform의 0/13/14 계획과 일회성 Lambda 소스가 있음. AWS 배포·호출과 모델 승인은 확인하지 않음 |
+| 시나리오 사용 미확인 | SCENARIO_USE_UNVERIFIED | 자산대장 후보나 이미지 소스는 있으나 실제 조직·workspace 사용과 운영 정책은 확인하지 못함 |
 | 코드만 검사 | STATIC_CHECKED | 서버를 켜지 않고 소스와 예상 결과만 대조함 |
 | 코드 있으나 잠금 | IMPLEMENTED_GUARDED_NOT_ACTIVE | 호출 코드는 있지만 기본 잠금 상태이며 실제 외부 호출은 확인하지 않음 |
 | 별도 실험·현재 미배포 | BRANCH_PROTOTYPE_UNDEPLOYED | 기준 구성에 합쳐지지 않은 실험 코드. 현재 관련 리소스는 없지만 과거 이력까지 없다는 뜻은 아님 |
@@ -159,6 +163,7 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 
 - 서울 리전 모델의 2-AZ, 6개 Terraform 모듈
 - 업무망 단말 180대의 운영 맥락: Windows 100대, macOS 80대
+- AWS 밖의 외부 업무 SaaS·자산대장 경계로 둔 Slack과 VPN+MFA·UTM 선언 상태
 - Route 53, CloudFront, AWS WAF, ALB를 통한 공개 진입 경로
 - ECS Fargate의 `web`, `api`, `agent`, `llm-gateway` 네 배포 단위
 - RDS PostgreSQL, ElastiCache Redis, S3 세 버킷
@@ -175,6 +180,7 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 
 - TRACE, JC-RECEIPT 및 이에 준하는 제안 단계 신규 서비스의 구현 또는 AS-IS 편입
 - 기준 Terraform에 신규 Lambda, EventBridge, Step Functions, DynamoDB를 추가하는 작업
+- Slack webhook/token, Amazon Q Developer(AWS Chatbot), SNS, EventBridge 등 AWS 연동의 생성 또는 암시
 - J-Career client 기준선 컨테이너 이미지 게시, AWS 런타임 배포, 공급자 실호출
 - 실제 지원자 데이터, 실제 고객 계정, 실제 자격증명
 - AWS 적용, 상태 변경, 실제 서비스 연결
@@ -190,6 +196,7 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 | 확인 대상 | 상태 | 현재 알 수 있는 내용 |
 |---|---|---|
 | 업무망 PC | `USER_CONFIRMED` | `REQ-PC-01`: 총 180대, Windows 100대와 macOS 80대. 관리 방식과 AWS 접속 경로는 확인하지 못함 |
+| Slack 업무 시스템 | `SCENARIO_USE_UNVERIFIED` | 외부 업무 SaaS·자산대장 경계다. Windows/macOS 이미지 소스의 `https://app.slack.com/client` 바로가기와 macOS 종료 시 best-effort 프로세스 종료만 확인했으며 실제 workspace 사용·소유·보존 정책은 확인하지 못함 |
 | 기준 AWS 설계(Terraform) | `MODELLED` | 여섯 모듈로 구성됨. 기록된 AWS 비접속 계획은 생성 예정 110개, 변경 0개, 삭제 0개임. 별도 로컬 변경분을 넣어 다시 계산하지는 않음 |
 | J-Career 고객사 AWS 리소스 | 생성 안 함 | AWS에 접속하지 않는 모의 방식이므로 실제 AWS 상태를 나타내지 않음 |
 | 별도 AWS 검증 Lab | 권한 보완 대기 | HTTPS·Bedrock 포함 24개 생성 계획은 통과. 적용은 IAM 역할 생성 권한 부족으로 중단됐고 부분 생성 16개를 정리해 현재 0개. Bedrock 직접 합성 호출은 통과했으나 전체 경로는 미확인 |
@@ -232,9 +239,18 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 | macOS PC | 80대 | 44.4% | `USER_CONFIRMED` | macOS 버전, MDM 등록, FileVault·EDR 상태 |
 | 합계 | 180대 | 100.0% | `USER_CONFIRMED` | 사용자 수, 동시 접속 수, 소유·대여 구분 |
 
-단말에서 J-Career 공개 진입점까지의 실제 접속 방식, 사내 DNS·proxy·VPN·NAC·IdP 구성,
-단말 관리 주체와 로그 수집 경로는 현재 근거로 확인되지 않았다. 흐름도에서는 업무망을
+단말에서 J-Career 공개 진입점까지의 실제 접속 방식, 사내 DNS·proxy·NAC·IdP 구성,
+단말 관리 주체와 로그 수집 경로는 현재 근거로 확인되지 않았다. VPN+MFA와 UTM은 시나리오에
+선언된 업무망 통제이며 구현·배치·운영 관찰 결과가 아니다. 흐름도에서는 업무망과 선언 통제를
 별도 영역으로 표시하고 사용자 요청 흐름과 직접 연결하지 않는다.
+
+Slack은 AWS 리소스나 J-Career 런타임 구성요소가 아니라 AWS 밖의 외부 업무 SaaS·자산대장
+경계다. 확인된 구현 소스는 Windows와 macOS 이미지 정의의 자격증명 없는
+`https://app.slack.com/client` 바로가기, 그리고 macOS 세션 정리에서 Slack 프로세스 종료를
+best-effort로 시도하는 코드뿐이다. 이 종료 시도는 인증 cookie 삭제를 증명하지 않는다. 실제
+workspace 사용, 소유자, 로그인, 개인정보 입력, 보존·삭제 설정은 `SCENARIO_USE_UNVERIFIED`로
+남긴다. 따라서 Slack과 AWS 사이에 흐름선을 그리지 않으며 webhook/token, Amazon Q Developer
+(AWS Chatbot), SNS, EventBridge 연동을 만들거나 현재 구성처럼 암시하지 않는다.
 
 ### 2.2 Terraform 구성을 나눈 여섯 부분
 
@@ -415,7 +431,7 @@ metadata를 검사하지만 승인자 진위나 선언 해시의 정본 여부�
 | 설명 생성기 | 점수·정렬을 바꾸지 않는 설명과 `company_alignment` 생성 | 의미 grounding과 금칙 결론 검증 없음; alignment의 `score_effect=NONE` | `LOCAL_SYNTHETIC_IMPLEMENTED` |
 | OpenDART 공개정보 보조 기능 | 회사 개황과 최근 1년 공시 최대 5건을 별도 복사본으로 저장하고 출처 시각을 표시 | 기본은 합성 예시를 바로 읽는다. 선택적인 SQS FIFO→Lambda 작업자 소스도 있으나 패키지·키·DB 권한·AWS 자원·실행 증거는 없음. 등록 기업명 불일치·조회 실패 때 기존 정상 복사본을 유지하며 점수 영향은 없음 | 로컬 `LOCAL_SYNTHETIC_IMPLEMENTED`, 작업자 `PROTOTYPE_UNDEPLOYED` |
 | 오프라인 학습 비교 실험 | seed 고정 합성 자료로 단순 도전자 모델과 관찰값을 파일로 생성 | 실제 회원·고객사 자료를 읽지 않음. `runtime_wired=false`, 자동 승격·채용 판정·AWS 자원 생성 없음 | `EXPERIMENT_UNWIRED_NOT_APPROVED` |
-| 서버리스 MLOps 경로 | 합성 DB 옆 exporter가 숫자 특징 5개를 만들고, S3의 세 입력 파일을 일회성 Lambda가 검사·학습해 S3 결과와 DynamoDB 상태를 남김 | 별도 Terraform 0/13/14 계획. 기본 잠금, 수동 시작, 동시성 1. 실제 AWS 배포·호출, 자동 일정·승격·추천 연결 없음 | `MLOPS_PLANNED_NOT_DEPLOYED` |
+| 서버리스 MLOps 경로 | 합성 DB 옆 exporter가 원문 없는 숫자 특징 5개를 만들고, feature-only S3 입력 세 파일을 일회성 Lambda가 검사·학습해 S3 결과 6개, DynamoDB 상태와 CloudWatch Logs를 남김 | 별도 Terraform 0/13/14 계획. 기본 잠금, 수동 시작, 동시성 1. 실제 AWS 배포·호출, 자동 일정·승격·추천 런타임 배선 없음 | `MLOPS_PLANNED_NOT_DEPLOYED` |
 | Bedrock 내부 어댑터 | 기존 `llm-gateway`에서 Converse 호출 코드와 `apac.amazon.nova-lite-v1:0` 기본 profile 제공 | 기본 provider는 합성 stub, 실호출 잠금 유지, 기준 task IAM 권한 없음; APAC 교차 리전 처리 가능성 미승인 | `IMPLEMENTED_GUARDED_NOT_ACTIVE` |
 | 회원/기업 데이터 경계 | 같은 PostgreSQL의 두 논리 DB와 서로 다른 role | 동일 RDS 장애·백업 경계 공유; 기업 DB bootstrap 미구현; 교차 쓰기 비원자적 | 로컬 `LOCAL_SYNTHETIC_IMPLEMENTED`, AWS 계약 `MODELLED` |
 | Redis 추천 캐시 | 응답을 24시간 저장. 지원자 경로는 이력서·공고 재료를 key에 묶지만 기업 경로는 cache hit를 회원 DB보다 먼저 반환 | 기업 경로 key에는 지원자 집합·이력서 version이 없고 탈퇴 시 cache와 raw prompt도 즉시 삭제되지 않음 | `LOCAL_SYNTHETIC_IMPLEMENTED` |
@@ -444,16 +460,18 @@ MLOps는 추천 모델을 바로 교체하는 기능이 아니라, 합성 자료
 `MEASURED_SYNTHETIC_NOT_ASSESSED`다. 서버리스 경로는 이를 그대로 쓰지 않고 `RUNNING` 뒤
 `TRAINED_PENDING_HUMAN_REVIEW` 또는 `FAILED_SAFE`로 기록한다. 두 경로의 상태를 섞어 읽지 않는다.
 
-서버리스 경로는 다음 일곱 단계로 읽는다.
+서버리스 경로는 다음 일곱 단계로 읽는다. 도면에서 합성 DB와 exporter는 소스 구현 범위,
+S3·Lambda·DynamoDB·CloudWatch는 별도 Terraform 계획 범위, 마지막 상태는 미승인 사람 검토
+경계로 구분한다.
 
 | 단계 | 하는 일 | 자료 또는 AWS 구성 | 멈추는 지점 |
 |---|---|---|---|
 | 1. 합성 자료 읽기 | 별도 EC2 랩의 합성 회원·기업 DB를 exporter가 읽음 | DB 연결은 exporter 안에서만 사용 | 운영 자료 표식이나 합성 형식이 맞지 않으면 중단 |
 | 2. 비교 수치 만들기 | 기술·경력·직무, 자소서와 공고의 단어 겹침, 기업 방향과 공고의 단어 겹침을 숫자 5개로 바꿈 | 이름·이메일·전화·원문은 입력 파일에 보관하지 않음 | 허용되지 않은 항목이 생기면 중단 |
-| 3. 입력 파일 보관 | CSV 1개와 검증 JSON 2개를 실행 번호별 경로에 둠 | Amazon S3, 버전 관리, SSE-S3 | 필수 세 파일이 없거나 크기·상호 해시가 다르면 중단 |
+| 3. 입력 파일 보관 | 원문 없는 feature CSV 1개와 검증 JSON 2개를 실행 번호별 경로에 둠 | Amazon S3, 버전 관리, SSE-S3 | 필수 세 파일이 없거나 크기·상호 해시가 다르면 중단 |
 | 4. 담당자가 한 번 시작 | 확인값, 실행 번호와 내용 지문으로 고정한 이미지 주소를 입력 | 공개 API와 자동 일정 없음 | 확인값이나 이미지 조건이 맞지 않으면 시작하지 않음 |
 | 5. 파일 검사·후보 학습 | 파일 사이 해시와 허용 항목을 확인하고 후보 모델을 한 번 학습 | AWS Lambda, 동시 실행 1 | 검사나 학습 실패 시 안전 실패 기록을 시도 |
-| 6. 결과와 상태 기록 | 결과 파일 6개와 실행 상태를 실행 번호별로 남김 | Amazon S3, DynamoDB, CloudWatch Logs | 같은 실행 번호로 기존 결과를 덮어쓰지 않음 |
+| 6. 결과와 상태 기록 | S3 결과 파일 6개, DynamoDB 실행 상태와 CloudWatch Logs를 실행 번호별로 남김 | Amazon S3, DynamoDB, CloudWatch Logs | 같은 실행 번호로 기존 결과를 덮어쓰지 않음 |
 | 7. 사람 검토 대기 | 결과를 `TRAINED_PENDING_HUMAN_REVIEW`로 끝냄 | 자동 모델 등록·승격·배포 없음 | 승인 전 추천 서비스에 연결하지 않음 |
 
 Terraform은 기본값에서 닫히고, 필요한 단계만 따로 계획하도록 나뉜다.
@@ -466,7 +484,7 @@ Terraform은 기본값에서 닫히고, 필요한 단계만 따로 계획하도�
 
 이 수치는 AWS에 접속하지 않은 Terraform 검증 결과이며 기준 AS-IS의 110개와 합산하지 않는다.
 MLOps 전용 루트에는 RDS, NAT Gateway, API Gateway, EventBridge 일정, SageMaker와 Bedrock 임베딩이
-없다. Lambda는 회원·기업 DB에 직접 연결하지 않고 S3의 정해진 세 파일만 읽는다. 확인값은 실수로
+없다. Lambda는 회원·기업 DB에 직접 연결하지 않고 S3의 정해진 feature-only 세 파일만 읽는다. 확인값은 실수로
 켜는 것을 막는 절차 장치이지 사용자 인증이나 조직 승인 증거는 아니다. 저장 암호화는 현재
 SSE-S3이며 별도 KMS 키는 연결하지 않았다.
 
@@ -820,15 +838,15 @@ Terraform이 확인하는 것은 NAT/IGW egress, unrestricted ECS egress, task�
 
 ### 5.3.1 MLOps 학습·평가 데이터 흐름
 
-전체 인프라 도면은 MLOps를 기준 서비스와 분리된 세 구간으로 줄여 보여 주고, MLOps 전용
-페이지는 실제 자료 이동을 일곱 단계로 보여 준다.
+전체 인프라 도면은 MLOps를 기준 110개 AWS 설계와 분리된 왼쪽→오른쪽 경로로 보여 주고,
+MLOps 전용 페이지는 같은 자료 이동을 일곱 단계로 설명한다.
 
 1. 별도 EC2 랩 안의 exporter가 합성 회원 DB와 합성 기업 DB를 읽는다.
 2. 원문을 기술·경력·직무, 자소서와 공고의 단어 겹침, 기업 방향과 공고의 단어 겹침까지 다섯 숫자 특징으로 줄인다.
-3. CSV 1개, manifest와 source receipt JSON 각 1개를 `mlops/sources/{run_id}/`에 둔다.
+3. 원문 없는 feature CSV 1개, manifest와 source receipt JSON 각 1개를 `mlops/sources/{run_id}/`에 둔다.
 4. 담당자가 확인값과 실행 정보를 넣어 일회성 Lambda를 직접 시작한다.
 5. Lambda가 필수 세 파일의 존재·크기·허용 항목과 파일 사이 해시를 확인한 뒤 후보 모델을 학습한다.
-6. 원본 특징 3개와 결과 3개를 `mlops/runs/{run_id}/`에 저장하고 DynamoDB에 실행 상태를 남긴다.
+6. 입력 특징 복사본 3개와 결과 3개, 합계 6개를 `mlops/runs/{run_id}/`에 저장하고 DynamoDB에 실행 상태, CloudWatch Logs에 실행 로그를 남긴다.
 7. 상태를 `TRAINED_PENDING_HUMAN_REVIEW`로 끝내고 사람의 결정을 기다린다.
 
 Lambda는 DB URL이나 비밀번호를 받지 않고 VPC에 붙지 않는다. 이름·이메일·전화·자소서와 기업·공고
@@ -929,6 +947,7 @@ persistence를 막고 `EXTERNAL_PREVIEW` 입력을 거부한다. 같은 파일 �
 | TB-10 | 로컬 API → OpenDART | API 키, 기업명 일치, 최소 필드, 오류·속도 제한, 복사본 출처 시각 | 합성 예시와 소스 계약만 확인. 외부 호출·운영 키·AWS 경로는 미확인 |
 | TB-11 | 합성 DB exporter → MLOps S3 입력 | 합성 표식, 허용 특징 5개, 원문 제거, 파일 해시와 보존기간 | 소스·단위시험 확인. 출처를 독립 증명하는 서명과 AWS 실행은 미확인 |
 | TB-12 | MLOps 결과 → 향후 추천 런타임 | 모델 승인, 버전 결속, 그림자 비교, 되돌리기 | 사람 검토 대기에서 멈춤. 현재 추천 연결·자동 승격 없음 |
+| TB-13 | 업무망 단말 → Slack 외부 SaaS | workspace 소유·사용, 계정, 개인정보 입력, 보존·삭제, 연동 | 두 OS 이미지의 바로가기 소스와 macOS best-effort 종료만 확인. 실제 운영은 `SCENARIO_USE_UNVERIFIED`; AWS 흐름선·webhook/token·Amazon Q Developer(AWS Chatbot)·SNS·EventBridge 없음 |
 
 ## 6. 보안 및 운영 명세
 
@@ -1234,6 +1253,9 @@ fallback 또는 운영 SLA로 표현하지 않는다.
     보장한다는 뜻이 아니다. 합격 가능성·인재 품질·공정성·출시 가능성을 판정하는 모델로 읽지 않는다.
 21. OpenDART 온디맨드 작업자 소스는 있지만 SQS FIFO, Lambda, SSM 키, VPC·DB 권한과 배포 묶음은
     기준 Terraform에 없다. 소스 존재를 서버리스 경로 배포나 비용 측정 결과로 읽지 않는다.
+22. Slack은 외부 업무 SaaS·자산대장 경계다. 바로가기와 macOS best-effort 종료 소스는 실제
+    workspace 사용, 로그인·cookie 제거, 보존 정책이나 AWS 통합을 증명하지 않는다. VPN+MFA·UTM도
+    시나리오 선언이며 이번 공개 저장소에서 구현·운영을 확인한 통제가 아니다.
 
 ### 8.2 확인 전 임시로 둔 값
 
@@ -1264,7 +1286,9 @@ fallback 또는 운영 SLA로 표현하지 않는다.
 - RDS/cache/security group의 실제 운영 동작은 plan만으로 검증할 수 없다.
 - 제공된 Artifact는 업무망 180대를 모두 Windows로 표시하고 AD domain, UTM, VPN MFA,
   전통 백신을 함께 그린다. 이 명세는 사용자의 후속 정정값인 Windows 100대와 macOS 80대를
-  사용하며, 단말 관리·인증·접속 통제는 근거가 없어 `UNKNOWN`으로 남긴다.
+  사용한다. VPN+MFA·UTM은 `SCENARIO_DECLARED`, 실제 구현·운영 관찰은 `UNKNOWN`으로 분리한다.
+- Slack은 멘토 요청 자산대장과 Windows/macOS 이미지 소스에 이름이 있으나 실제 workspace 사용은
+  `SCENARIO_USE_UNVERIFIED`다. AWS 자원이나 알림 경로로 승격하지 않고 외부 SaaS 경계로만 둔다.
 - 제공된 Artifact는 AZ 2a 단면만 표시해 2c subnet, NAT-C, RDS standby가 보이지 않는다.
   AS-IS Terraform과 이 명세의 흐름도는 2a/2c를 모두 전개한다.
 - 제공된 Artifact의 독립 `matcher` 상자는 논리 구성이다. Terraform에는 matcher 서비스가
@@ -1304,6 +1328,7 @@ fallback 또는 운영 SLA로 표현하지 않는다.
 | 명세 주장 | 저장소 근거 |
 |---|---|
 | 업무망 PC 180대: Windows 100, macOS 80 | 현재 대화 사용자 원문 “업무망 pc 180대가 윈도우 100대, mac 80대인거라고”를 `REQ-PC-01`로 식별. 이 산출물의 사용자 확정 입력이며 저장소·Terraform·조직 승인 근거 아님 |
+| Slack 외부 업무 SaaS 경계 | `fleet/images/windows/build-component.yaml`, `fleet/images/macos/prepare-consultant.sh`, `fleet/images/macos/remove-jcareer-session.sh`, `fleet/images/endpoint_image_contract.yaml`, `src/runtime/contracts/mentor_feedback_2026_08_28.json`; 바로가기·macOS best-effort 종료 외 운영은 `SCENARIO_USE_UNVERIFIED` |
 | 2-AZ, 6 subnet, AZ별 NAT | `terraform/asis/network/main.tf`, `terraform/asis/network/variables.tf` |
 | 네 ECS 서비스와 path/port | `terraform/asis/compute/locals.tf`, `terraform/asis/compute/main.tf` |
 | 110 planned resources | `context/findings/PHASE1_ASIS_EVIDENCE.md`, sanitized structural count |
@@ -1359,7 +1384,7 @@ fallback 또는 운영 SLA로 표현하지 않는다.
 > 아래 PASS는 해당 행에 적힌 검사만 통과했다는 뜻이다. AWS 배포나 실제 서비스 운영을
 > 통과했다는 뜻은 아니다.
 
-2026-08-27~30에 원본 대조, 로컬 정적 검사, 문서 렌더링 검사를 수행했다.
+2026-08-27~31에 원본 대조, 로컬 정적 검사, 문서 렌더링 검사를 수행했다.
 기준 설계인 `terraform/asis`에는 AWS 변경이나 `terraform apply`를 수행하지 않았다.
 별도 검증용 `terraform/lab`에서는 24개 생성 계획과 Bedrock 직접 호출을 확인했지만,
 IAM 역할 생성 권한이 없어 적용이 중단됐다. 그 과정에서 만들어진 16개 항목은 같은 저장
@@ -1386,9 +1411,9 @@ IAM 역할 생성 권한이 없어 적용이 중단됐다. 그 과정에서 만�
 | Orca 교차 세션 대조 | PASS — 런타임 Run, TRACE 기획, Terraform 독립 검증, AIMS Desk UX 세션을 분리 조회. TRACE·JC-RECEIPT는 제안 상태이고 신규 AS-IS 서비스가 아니며, 확인된 변화는 기존 API/gateway/cache와 두 대시보드의 소스 계약임을 재확인 |
 | Claude/Codex/Orca 검토 | 독립 검토 의견을 문서 보완에 반영했다. 목록 구조, 수량 근거, Bedrock 관찰 범위, MLOps 경계와 쉬운 한국어 표현을 교차 확인했다. 공개 승인 여부와 통제 충족 여부는 사람이 별도로 결정한다. |
 | draw.io XML 구조 | PASS — XML 형식, ID 중복, 연결선 양 끝, 그룹 구조를 자동 검사 |
-| PNG 크기 및 시각 검토 | PASS — 2400×1400, 왼쪽에서 오른쪽으로 이어지는 6단계 기준 흐름과 승인 전 MLOps 안내 영역의 분리 상태를 눈으로 확인 |
+| PNG 크기 및 시각 검토 | PASS — 2400×1400, 왼쪽에서 오른쪽으로 이어지는 6단계 기준 흐름, 독립 MLOps 실행 경로, AWS 흐름선이 없는 Slack 외부 SaaS·업무망 선언 경계를 눈으로 확인 |
 | HTML 구조 및 로컬 링크 | PASS — HTML 2개, 내부 anchor·로컬 산출물 링크 broken 0, duplicate ID 0 |
-| HTML 목록 의미 구조 | PASS — AS-IS 한계 21개와 도면 요청 흐름 6개가 각각 하나의 연속 `<ol>`로 생성되며 들여쓴 문장이 같은 `<li>` 안에 유지됨 |
+| HTML 목록 의미 구조 | PASS — AS-IS 한계 22개와 도면 요청 흐름 6개가 각각 하나의 연속 `<ol>`로 생성되며 들여쓴 문장이 같은 `<li>` 안에 유지됨 |
 | PDF 인쇄본 | PASS — PDF 1.4 헤더, A4 인쇄 스타일, HTML 원본 지문 결속과 페이지 객체 확인 |
 | 웹 품질 계측 | 이전 PASS(로컬 모바일) — Lighthouse 12.8.2 기준 본문 96/100/100/100, 도면 98/100/100/100(성능/접근성/권장사항/검색). v3.10에서는 데스크톱·모바일 화면과 MLOps 영역의 배치를 확인했다. v3.11에서는 가로 390px의 휴대전화 화면으로 다시 확인했다. 도면 안쪽의 좌우 이동 영역을 제외하면 페이지 바깥으로 튀어나온 내용은 없었다. MLOps 버튼을 눌렀을 때 설명과 전용 명세 링크가 함께 바뀌는지도 확인했다. Lighthouse 점수는 다시 측정하지 않아 이전 값을 유지함 |
 | 기계 판독 회귀검사 | PASS — `validate-spec.ps1` 25/25, FAIL 0. 상세 결과는 `validation-report.json`에 기록 |

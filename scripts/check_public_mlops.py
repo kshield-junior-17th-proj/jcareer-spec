@@ -209,11 +209,10 @@ def is_forbidden_artifact(path: Path) -> bool:
 
 
 def file_sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as stream:
-        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+    value = path.read_bytes()
+    if path.suffix.lower() in TEXT_SUFFIXES:
+        value = value.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return hashlib.sha256(value).hexdigest()
 
 
 def check_pdf_source_binding(errors: list[str]) -> None:
@@ -470,7 +469,9 @@ def check() -> list[str]:
         and "기준 110개와 분리한 별도 계획이며 수치를 합산하지 않습니다" in asis_text
         and 'data-flow-button="mlops"' in architecture_text
         and 'data-flow-layer="mlops"' in architecture_text
-        and "MLOps는 합성 데이터 기반 모델 검증과 사람 검토 단계를 보여 줍니다" in architecture_text
+        and "MLOps는 기준 110개와 분리한 별도 계획입니다" in architecture_text
+        and "feature-only S3" in architecture_text
+        and "TRAINED_PENDING_HUMAN_REVIEW" in architecture_text
         and "history.replaceState" in architecture_text
     )
     if not asis_mlops_contract:
