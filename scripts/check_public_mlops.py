@@ -63,7 +63,7 @@ EXPECTED_NOTES = [
     "MLOps stage URL state, invalid-stage fallback, and browser history were checked by scripts/check_public_ui.mjs.",
     "Eight motion checks covered the carousel, MLOps stage rail, animated architecture, manual motion toggle, and reduced-motion fallback.",
     "The animated architecture source hash, 15 nodes, 11 edges, 17 motion dots, 1480x820 PNG, and manual visual review were recorded together.",
-    "The full infrastructure source hash, 27 nodes, 21 edges, 21 motion dots, 1780x1160 PNG, editable draw.io source, and manual visual review were recorded together.",
+    "The full infrastructure source hash, 32 nodes, 32 edges, 21 motion dots, 1780x1240 PNG, editable draw.io source, and manual visual review were recorded together.",
     "The MLOps PDF was rendered from mlops/index.html and carries that source file's SHA-256 marker.",
     "The recent three-logical-database outcome delta is documented as unmerged and is not included in these PASS results.",
 ]
@@ -386,9 +386,9 @@ def check_evidence_report(errors: list[str]) -> None:
             "png_sha256": file_sha256(FULL_INFRA_PNG),
             "drawio": relative_name(FULL_INFRA_DRAWIO),
             "drawio_sha256": file_sha256(FULL_INFRA_DRAWIO),
-            "canvas_css_px": [1780, 1160],
-            "nodes": 27,
-            "edges": 21,
+            "canvas_css_px": [1780, 1240],
+            "nodes": 32,
+            "edges": 32,
             "motion_dots": 21,
             "visual_review": "PASS",
         },
@@ -518,7 +518,8 @@ def check() -> list[str]:
         and "기준 110개와 분리한 별도 계획이며 수치를 합산하지 않습니다" in asis_text
         and 'data-flow-button="mlops"' in architecture_text
         and 'data-flow-layer="mlops"' in architecture_text
-        and "MLOps를 선택하면 빈 표식 대신 전용 7단계 도면으로 전환됩니다" in architecture_text
+        and "MLOps를 선택해도 전체 지도를 유지해" in architecture_text
+        and "key === 'overview' || key === 'mlops' ? 'overview' : 'asis'" in architecture_text
         and 'data-flow-media="mlops"' in architecture_text
         and "JCAREER_MLOPS_FLOW.svg" in architecture_text
         and "feature-only S3" in architecture_text
@@ -720,13 +721,29 @@ def check() -> list[str]:
         *(node.get("label", "") for node in full_nodes),
         *(node.get("sub", "") for node in full_nodes),
         *(group.get("label", "") for group in full_spec.get("groups", [])),
+        *(edge.get("label", "") for edge in full_edges),
     ]
     full_visible_text = "".join(full_tree.getroot().itertext()) if full_tree else ""
     full_boundary_text = " ".join(str(value) for value in full_expected_text)
+    full_adjacency = {node_id: set() for node_id in full_spec_ids}
+    for edge in full_edges:
+        source = edge.get("from")
+        target = edge.get("to")
+        if source in full_adjacency and target in full_adjacency:
+            full_adjacency[source].add(target)
+            full_adjacency[target].add(source)
+    full_connected: set[str] = set()
+    pending = [next(iter(full_spec_ids))] if full_spec_ids else []
+    while pending:
+        node_id = pending.pop()
+        if node_id in full_connected:
+            continue
+        full_connected.add(node_id)
+        pending.extend(full_adjacency[node_id] - full_connected)
     if (
-        full_spec.get("canvas") != {"w": 1780, "h": 1160}
-        or len(full_nodes) != 27
-        or len(full_edges) != 21
+        full_spec.get("canvas") != {"w": 1780, "h": 1240}
+        or len(full_nodes) != 32
+        or len(full_edges) != 32
         or full_motion_count != 21
         or len(full_ids) != len(set(full_ids))
         or full_svg_text.count('<path class="flow"')
@@ -736,13 +753,18 @@ def check() -> list[str]:
             edge.get("from") in full_spec_ids and edge.get("to") in full_spec_ids
             for edge in full_edges
         )
+        or full_connected != full_spec_ids
         or f'data-spec-sha256="{file_sha256(FULL_INFRA_SPEC)}"'
         not in full_svg_text
         or "GitHub Actions CI" not in full_boundary_text
         or "CI / AWS 경계" not in full_boundary_text
         or "업무망 PC 180대" not in full_boundary_text
+        or "Slack · 외부 업무도구" not in full_boundary_text
+        or "런타임 Amazon ECR" not in full_boundary_text
+        or "IAM · Systems Manager" not in full_boundary_text
         or "TRAINED_PENDING_HUMAN_REVIEW" not in full_boundary_text
         or "자동 배포 없음" not in full_boundary_text
+        or "검토 → 서비스 반영 · 미구현" not in full_boundary_text
     ):
         errors.append("full infrastructure spec-to-SVG contract is out of sync")
     full_guarded_motion_count = len(
@@ -769,10 +791,11 @@ def check() -> list[str]:
             or not full_drawio_edges
             or not full_drawio_bound
             or "mxgraph.aws4" not in FULL_INFRA_DRAWIO.read_text(encoding="utf-8")
+            or not {"user", "office_slack", "runtime_ecr", "public_zone", "app_zone", "data_zone"}.issubset(full_cell_ids)
         ):
             errors.append("full infrastructure draw.io topology contract is incomplete")
     try:
-        if png_size(FULL_INFRA_PNG) != (1780, 1160):
+        if png_size(FULL_INFRA_PNG) != (1780, 1240):
             errors.append(
                 f"unexpected full infrastructure PNG size: {png_size(FULL_INFRA_PNG)}"
             )

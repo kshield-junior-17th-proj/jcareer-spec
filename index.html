@@ -11,9 +11,9 @@
   <meta property="og:description" content="채용 서비스 구조와 AWS 기준 설계, MLOps 검증 흐름을 한곳에서 확인합니다.">
   <meta property="og:url" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/">
   <meta property="og:image" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/assets/JCAREER_FULL_INFRA_ANIMATED.png">
-  <meta property="og:image:alt" content="업무망, GitHub CI와 Pages, AWS 기준 설계, 별도 MLOps를 함께 보여 주는 J-Career 전체 인프라 지도">
+  <meta property="og:image:alt" content="서비스 사용자, 업무망과 Slack, GitHub delivery, AWS 기준 설계와 별도 MLOps의 관계를 연결한 J-Career 전체 인프라 지도">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image:alt" content="업무망, GitHub CI와 Pages, AWS 기준 설계, 별도 MLOps를 함께 보여 주는 J-Career 전체 인프라 지도">
+  <meta name="twitter:image:alt" content="서비스 사용자, 업무망과 Slack, GitHub delivery, AWS 기준 설계와 별도 MLOps의 관계를 연결한 J-Career 전체 인프라 지도">
   <link rel="canonical" href="https://kshield-junior-17th-proj.github.io/jcareer-spec/">
   <link rel="preconnect" href="https://api.fontshare.com">
   <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
@@ -63,7 +63,7 @@
           <div class="spatial-stage__shadow" aria-hidden="true"></div>
           <div class="spatial-stage__deck">
             <div class="spatial-stage__edge" aria-hidden="true"></div>
-            <img class="hero-blueprint spatial-stage__map" src="assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-animated-diagram data-motion-src="assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-still-src="assets/JCAREER_FULL_INFRA_ANIMATED.png" width="1780" height="1160" loading="lazy" decoding="async" alt="" aria-hidden="true">
+            <img class="hero-blueprint spatial-stage__map" src="assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-animated-diagram data-motion-src="assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-still-src="assets/JCAREER_FULL_INFRA_ANIMATED.png" width="1780" height="1240" loading="lazy" decoding="async" alt="" aria-hidden="true">
             <span class="spatial-stage__scan" aria-hidden="true"></span>
           </div>
           <div class="spatial-callout spatial-callout--service"><span>SERVICE PLANE</span><strong>request → data</strong></div>
@@ -195,7 +195,7 @@
             <p class="section-label">전체 인프라</p>
             <h2>서비스별 경로를<br>한 장에서 확인합니다</h2>
           </div>
-          <p class="section-intro">서비스 버튼을 누르면 전체 인프라에서 관련 경로만 강조됩니다. 서비스별 경로는 1·2·3, 전체 기준 흐름은 1~6 순서로 보여 주며 AWS 서비스명보다 맡은 역할을 먼저 표시했습니다.</p>
+          <p class="section-intro">서비스 사용자와 업무망·Slack, GitHub delivery, AWS 런타임, MLOps를 한 연결 지도에 놓았습니다. 실선은 영역 안의 순서, 촘촘한 점선은 자동화되지 않은 배포·데이터·승인 관계입니다.</p>
         </div>
         <nav class="flow-shortcuts" aria-label="서비스별 인프라 경로 바로가기">
           <a href="terraform/asis/architecture.html"><span aria-hidden="true">전체</span><strong>전체 인프라</strong><small>①~⑥ 기준 흐름</small></a>
@@ -209,9 +209,9 @@
           <a href="terraform/asis/architecture.html?flow=operations"><span aria-hidden="true">운영</span><strong>기록·탐지</strong><small>로그·위협 탐지</small></a>
         </nav>
         <a class="architecture-frame" href="terraform/asis/architecture.html" aria-label="대화형 전체 인프라 도면 열기" data-scale-reveal>
-          <img src="assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-animated-diagram data-motion-src="assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-still-src="assets/JCAREER_FULL_INFRA_ANIMATED.png" width="1780" height="1160" loading="lazy" decoding="async" alt="업무망 PC 180대, GitHub Actions 검사와 Pages 배포, AWS 기준 설계, 별도 MLOps 사람 검토 경계를 함께 보여 주는 전체 인프라 지도">
+          <img src="assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-animated-diagram data-motion-src="assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-still-src="assets/JCAREER_FULL_INFRA_ANIMATED.png" width="1780" height="1240" loading="lazy" decoding="async" alt="서비스 사용자, 업무망 PC 180대와 Slack·Notion·SMTP 외부 경계, GitHub Actions 검사와 Pages 배포, AWS 2-AZ 기준 설계, 합성 대역 MLOps와 사람 검토 후 미구현 서비스 반영 관계를 연결한 전체 인프라 지도">
         </a>
-        <p class="caption">움직이는 점은 요청과 기록의 이동 순서를 설명합니다. AWS에서 관측한 요청이나 배포 상태를 뜻하지 않습니다.</p>
+        <p class="caption">움직이는 점은 영역 안의 처리 순서, 촘촘한 점선은 코드·관리·데이터·승인 관계입니다. 점선은 자동 배포나 운영 데이터 연결을 뜻하지 않습니다.</p>
       </div>
     </section>
 

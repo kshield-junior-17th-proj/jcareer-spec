@@ -5,11 +5,11 @@
 > 핵심 수치: 업무망 PC 180대, 2-AZ, 6개 모듈, Terraform 계획 항목 110개
 
 이 문서는 [JCAREER_ASIS_FLOW.drawio](JCAREER_ASIS_FLOW.drawio)의 짧은 해설이다.
-[웹 도면](architecture.html)에서는 업무망·GitHub CI와 Pages·AWS 기준 설계·별도 MLOps를
+[웹 도면](architecture.html)에서는 서비스 사용자·업무망과 Slack·GitHub CI와 Pages·AWS 기준 설계·별도 MLOps를
 합친 [전체 지도 편집 원본](JCAREER_FULL_INFRA.drawio)과
 [애니메이션 SVG](../../assets/JCAREER_FULL_INFRA_ANIMATED.svg)를 먼저 볼 수 있다. 여덟 개
-서비스·보조 경로를 누르면 AWS 상세 강조 도면 또는 MLOps 7단계 전용 도면으로 실제 화면이
-바뀌고, 각 경로의 단계와 한계를 함께 확인할 수 있다.
+서비스·보조 경로를 누르면 AWS 상세 강조 도면으로 바뀐다. MLOps를 누르면 전체 연결 지도를
+유지해 입력과 검토 후 반영 경계를 함께 보여 주고, 별도 링크에서 7단계 전용 도면을 연다.
 선택한 설명 아래의 바로가기를 누르면 관련 상세 명세로 이어진다. 자세한 기능과 API,
 보안, 장애 내용은 [웹 명세](index.html)에 있다.
 
@@ -23,8 +23,8 @@
 - 별도 MLOps: 기본 0개, 기반 준비 13개, 일회성 실행 준비 14개
 
 GitHub Actions는 저장소 단위시험과 공개 문서 검사를 수행하고 통과한 공개 명세를 GitHub Pages에
-배포한다. AWS 또는 MLOps를 자동 배포하는 워크플로는 없으며 전체 지도에서도 CI/AWS 경계에서
-선을 끝낸다.
+배포한다. AWS 또는 MLOps를 자동 배포하는 워크플로는 없다. 전체 지도의 CI/AWS 점선은 IaC와
+배포 대상의 관계만 표시하며 실행선을 뜻하지 않는다.
 
 ## 1. 선 읽는 법
 
