@@ -595,7 +595,7 @@ def check() -> list[str]:
     ):
         errors.append("landing service-to-infrastructure shortcuts are incomplete")
     architecture_image = re.search(
-        r'<img[^>]+src="assets/JCAREER_PLATFORM_ANIMATED\.svg"[^>]*>',
+        r'<img[^>]+src="assets/JCAREER_FULL_INFRA_ANIMATED\.svg"[^>]*>',
         landing_text,
     )
     if architecture_image is None or 'loading="lazy"' not in architecture_image.group(0):

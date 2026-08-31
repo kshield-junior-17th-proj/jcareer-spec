@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "verified_at": "2026-08-31T11:48:36+09:00",
+  "verified_at": "2026-08-31T11:49:52+09:00",
   "aws_api_calls": 0,
   "terraform_apply_destroy": false,
   "environment": {
@@ -148,13 +148,13 @@
     "assets/JCAREER_PLATFORM_ANIMATED.svg": "8726d5c67e88b9fbb70aa3d1ce23a2bc421bd1ef418e3f0a405fe24e875856a6",
     "assets/motion.js": "b7cd41c2fb9067c8efa184efd1b9c90801e6e6355f586aabe95cb0aaa6227000",
     "assets/site.css": "fb8b5e72eadad1f3054c472a8ce4769f7a9fb9a5d0a80f923e82fa0e96051e8e",
-    "index.html": "8bdbb572af28021407b56dd6fe02e6c4cc37ca5d275789492c6500efa8900a26",
+    "index.html": "bdd899be6eb49e0c6b87335f382e2cba975937a89582e91665a7ce346436be0e",
     "mlops/app.js": "8a566b644e3ba200f6dafda85a26cfc4cda826c90c20a68c2f02026aa6eba46d",
     "mlops/index.html": "6a227553557f290662ce2d8f4de3990936681e4b5260c340077b6b046ceac474",
     "mlops/JCAREER_MLOPS_SYSTEM_SPEC.pdf": "5b95e940e4846e420fef05174549bd3fa97a599baaff6226bf2c0b49d634dda7",
     "README.md": "d17df4c0ba684e4adfe8c5b3629b0fac85742d23b4afa09175f41c083c69bc83",
     "scripts/browser_support.mjs": "725a0eef03fd97a2074b630c9b34b14e566f519da93f9ba2cc6eb587c5c70a22",
-    "scripts/check_public_mlops.py": "fe7424c463fc311aaefd055f48500c9eae3921e0fb976937ffe67a95b9b411da",
+    "scripts/check_public_mlops.py": "c3baffdaeaa67fc1c0ab0c313262c3b2de832be5a8ef0410a2f53f6251f4ef2f",
     "scripts/check_public_ui.mjs": "0a775a3a39e307bd2dc3d49ca82e5cb54cdc03224ce9a077641cf4d251a4e717",
     "scripts/check_serverless_mlops_static.py": "f5935cbdf61dfcda864cd50f117fbfefae881f5c9fb9499ab7b675f244bf4d7c",
     "scripts/finalize_animated_arch.mjs": "a5d701346cde27a68c627433faaba9c96e83c7ee8b3cb8a41ab8d0b4255b64a0",
