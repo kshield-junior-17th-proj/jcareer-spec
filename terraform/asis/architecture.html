@@ -93,8 +93,8 @@
   .button:active { transform: translateY(0); }
   .button.button--accent { color: #fff; background: var(--accent); border-color: var(--accent); }
   .button.button--accent[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); box-shadow: inset 0 -4px 0 var(--accent); }
-  .document { min-width: 0; background: var(--surface); border: 1px solid var(--line); box-shadow: 12px 12px 0 rgba(118,108,92,.09), var(--shadow); }
-  .executive { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(270px, .65fr); gap: 28px; padding: clamp(28px, 5vw, 60px); background: linear-gradient(120deg, #fffdf8 0 72%, #f1e9dc 72%); border-bottom: 1px solid var(--line); }
+  .document { min-width: 0; background: var(--surface); border: 1px solid var(--line); box-shadow: 0 16px 42px rgba(45,49,47,.08); }
+  .executive { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(270px, .65fr); gap: 28px; padding: clamp(28px, 5vw, 60px); background: #fffdf8; border-bottom: 1px solid var(--line); }
   .section-label { margin: 0 0 12px; color: var(--accent); font: 700 11px/1.2 var(--mono); letter-spacing: .09em; text-transform: uppercase; }
   .executive h2 { margin: 0; font-size: clamp(1.65rem, 3vw, 2.6rem); line-height: 1.16; letter-spacing: -.035em; }
   .executive p { max-width: 65ch; margin: 18px 0 0; color: var(--ink-2); }
@@ -251,74 +251,74 @@
     .motion-toggle-doc:hover { color: var(--ink); background: #fff; border-color: var(--ink); }
     .motion-toggle-doc:active { transform: translateY(1px); }
     .motion-toggle-doc[aria-pressed="true"]::before { background: #9ba8af; box-shadow: none; animation: none; }
-    .axis-rail { margin: 0 0 18px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: #fff; border: 1px solid var(--line); box-shadow: 0 18px 44px rgba(45,49,47,.08); }
+    .axis-rail { margin: 0 0 18px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: rgba(255,255,255,.46); border: 1px solid var(--line); box-shadow: none; }
     .axis-rail > div { min-height: 96px; padding: 17px 19px; display: grid; align-content: space-between; gap: 11px; border-left: 1px solid var(--line); }
     .axis-rail > div:first-child { border-left: 0; }
     .axis-rail dt { color: var(--muted); font: 700 10px/1.25 var(--mono); letter-spacing: .075em; text-transform: uppercase; }
     .axis-rail dd { margin: 0; color: var(--ink); font-size: .88rem; font-weight: 800; line-height: 1.35; }
     .axis-rail code { color: var(--accent); background: transparent; font-size: .66rem; }
-    .architecture-workspace { display: grid; grid-template-columns: minmax(370px, .62fr) minmax(0, 1.38fr); gap: 18px; align-items: start; }
-    .flow-explorer { margin: 0; padding: 30px; background: var(--ink); color: white; border-top: 5px solid var(--accent); box-shadow: var(--shadow); }
+    .architecture-workspace { display: grid; grid-template-columns: minmax(330px, .52fr) minmax(0, 1.48fr); gap: 18px; align-items: start; }
+    .flow-explorer { margin: 0; padding: 25px; color: var(--ink); background: #f4f0e7; border: 1px solid var(--line); border-top: 2px solid var(--ink); box-shadow: none; }
     .flow-explorer__head { display: grid; grid-template-columns: 1fr; gap: 12px; align-items: end; }
-    .flow-explorer__head h2 { max-width: 760px; margin: 0; font-size: clamp(1.7rem, 3.5vw, 2.75rem); line-height: 1.12; letter-spacing: -.04em; text-wrap: balance; }
-    .flow-explorer__head > p { margin: 0; color: #cfd8de; font-size: .9rem; line-height: 1.65; }
-    .flow-selector { margin-top: 22px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-    .flow-button { min-height: 72px; padding: 12px 14px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 4px; border: 1px solid #69757e; color: #f7f9fa; background: transparent; font-family: inherit; text-align: left; cursor: pointer; transition: border-color .18s, background .18s, transform .18s; }
-    .flow-button:hover { border-color: #f2a469; background: rgba(255,255,255,.06); transform: translateY(-2px); }
-    .flow-button[aria-pressed="true"] { border-color: #f2a469; background: #fff; color: var(--ink); box-shadow: inset 0 -4px 0 var(--accent); }
+    .flow-explorer__head h2 { max-width: 760px; margin: 0; font-size: clamp(1.55rem, 2.7vw, 2.2rem); line-height: 1.12; letter-spacing: -.04em; text-wrap: balance; }
+    .flow-explorer__head > p { margin: 0; color: #59666e; font-size: .82rem; line-height: 1.65; }
+    .flow-selector { margin-top: 20px; display: grid; grid-template-columns: 1fr; gap: 0; border-top: 1px solid var(--line); }
+    .flow-button { min-height: 51px; padding: 9px 10px 9px 12px; display: grid; grid-template-columns: minmax(0, 1fr) auto; justify-content: stretch; align-items: baseline; gap: 10px; border: 0; border-bottom: 1px solid var(--line); color: var(--ink); background: transparent; font-family: inherit; text-align: left; cursor: pointer; transition: color .16s, background .16s, box-shadow .16s; }
+    .flow-button:hover { color: var(--accent); background: rgba(255,255,255,.46); transform: none; }
+    .flow-button[aria-pressed="true"] { color: var(--ink); background: #fffdf8; box-shadow: inset 3px 0 0 var(--accent); }
     .flow-button strong { font-size: .88rem; line-height: 1.25; }
-    .flow-button small { color: #aebbc4; font-size: .68rem; line-height: 1.25; }
+    .flow-button small { color: #748087; font: 700 .62rem/1.25 var(--mono); text-align: right; }
     .flow-button[aria-pressed="true"] small { color: #65717a; }
-    .flow-detail { margin-top: 12px; padding: 22px; display: grid; grid-template-columns: 1fr; gap: 20px; background: #fff; color: var(--ink); border-left: 4px solid var(--accent); view-transition-name: flow-detail; }
+    .flow-detail { margin-top: 18px; padding: 19px 0 0; display: grid; grid-template-columns: 1fr; gap: 18px; color: var(--ink); background: transparent; border-top: 2px solid var(--ink); view-transition-name: flow-detail; }
     .flow-detail__status { margin-bottom: 10px; }
     .flow-detail h3 { margin: 0; font-size: 1.35rem; letter-spacing: -.025em; }
     .flow-detail__summary { margin: 9px 0 0; color: var(--ink-2); font-size: .84rem; line-height: 1.65; text-wrap: pretty; }
     .flow-detail__route { min-width: 0; }
     .flow-detail__route > strong, .flow-detail__boundary strong { display: block; margin-bottom: 9px; font: 700 11px/1.3 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
-    .flow-steps { margin: 0; padding: 0; display: grid; gap: 6px; list-style: none; }
-    .flow-steps li { min-height: 42px; display: grid; grid-template-columns: 30px minmax(0, 1fr); align-items: center; gap: 10px; padding: 7px 11px; color: #364650; background: #f2f0e9; border: 1px solid #d8d2c6; font-size: .78rem; font-weight: 700; }
-    .flow-step__number { width: 28px; height: 28px; display: inline-grid; place-items: center; color: white; background: var(--accent); border-radius: 50%; font: 800 12px/1 var(--mono); font-variant-numeric: tabular-nums; }
+    .flow-steps { margin: 0; padding: 0; display: grid; gap: 0; list-style: none; border-top: 1px solid var(--line); }
+    .flow-steps li { min-height: 38px; display: grid; grid-template-columns: 25px minmax(0, 1fr); align-items: center; gap: 9px; padding: 7px 2px; color: #364650; background: transparent; border-bottom: 1px solid var(--line); font-size: .76rem; font-weight: 700; }
+    .flow-step__number { width: 22px; height: 22px; display: inline-grid; place-items: center; color: var(--accent); background: transparent; border: 1px solid rgba(189,77,30,.52); border-radius: 0; font: 800 10px/1 var(--mono); font-variant-numeric: tabular-nums; }
     .flow-detail__boundary { padding-top: 14px; border-top: 1px solid var(--line); }
     .flow-detail__boundary p { margin: 0; color: #59666e; font-size: .78rem; line-height: 1.6; }
     .flow-detail__link { display: inline-flex; align-items: center; margin-top: 13px; padding-bottom: 2px; color: var(--ink); border-bottom: 2px solid var(--accent); font-size: .78rem; font-weight: 800; text-decoration: none; transition: color .18s, border-color .18s; }
     .flow-detail__link::after { content: ' →'; margin-left: 4px; }
     .flow-detail__link:hover { color: var(--accent); border-color: var(--accent); }
-    .flow-explorer__exclusion { margin: 13px 0 0; color: #aebbc4; font-size: .72rem; }
-    .plate__frame { position: relative; margin: 0 12px 12px 0; padding: 18px; overflow: auto; background: var(--surface); border: 1px solid var(--line); box-shadow: 12px 12px 0 #d4cdc0, 0 34px 72px rgba(45,49,47,.14); }
+    .flow-explorer__exclusion { margin: 17px 0 0; padding-top: 13px; color: #68747b; border-top: 1px solid var(--line); font-size: .7rem; }
+    .plate__frame { position: relative; margin: 0; padding: 12px; overflow: auto; background: #ece8df; border: 1px solid var(--line); box-shadow: 0 18px 46px rgba(45,49,47,.1); }
     .diagram-media[hidden] { display: none !important; }
     .diagram-stage { position: relative; width: 100%; min-width: 720px; }
     .diagram-stage--full { min-width: 880px; }
     .diagram-stage > a, .diagram-stage img { display: block; width: 100%; }
-    .diagram-stage img { height: auto; border: 1px solid var(--line); filter: saturate(.82) contrast(1.02); transition: filter .35s ease; }
-    .diagram-stage--full img { filter: saturate(.94) contrast(1.02); box-shadow: 0 20px 50px rgba(24,34,41,.12); }
-    .plate__frame:hover .diagram-stage img { filter: saturate(1) contrast(1.04); }
+    .diagram-stage img { height: auto; border: 1px solid var(--line); filter: saturate(.88) contrast(1.02); transition: filter .25s ease; }
+    .diagram-stage--full img { filter: saturate(.94) contrast(1.02); box-shadow: none; }
+    .plate__frame:hover .diagram-stage img { filter: saturate(.94) contrast(1.03); }
     .flow-overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
     .flow-layer { opacity: 0; transition: opacity .25s ease; }
     .flow-layer.is-active { opacity: 1; }
-    .flow-line { fill: none; stroke: #e87928; stroke-width: 16; stroke-linecap: round; stroke-linejoin: round; opacity: .82; filter: drop-shadow(0 2px 2px rgba(32,43,53,.28)); stroke-dasharray: 34 18; animation: flowMarch 1.05s linear infinite; }
-    .flow-line.local { stroke: #0d7f9b; stroke-dasharray: 18 16; }
-    .flow-line.missing { stroke: #bd22bf; stroke-dasharray: 7 18; }
-    .flow-line.record { stroke: #8a5a00; stroke-dasharray: 34 18; }
-    .flow-node { fill: rgba(255,255,255,.22); stroke: #e87928; stroke-width: 10; }
+    .flow-line { fill: none; stroke: #c9541f; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; opacity: .7; stroke-dasharray: 28 22; animation: flowMarch 2.4s linear infinite; }
+    .flow-line.local { stroke: #0d748c; stroke-dasharray: 16 18; }
+    .flow-line.missing { stroke: #9b4b8f; stroke-dasharray: 6 20; }
+    .flow-line.record { stroke: #7a5b1e; stroke-dasharray: 28 22; }
+    .flow-node { fill: rgba(255,255,255,.08); stroke: #c9541f; stroke-width: 5; }
     .flow-node.local { stroke: #0d7f9b; }
-    .flow-node.missing { stroke: #bd22bf; stroke-dasharray: 12 9; }
-    .flow-node.record { stroke: #8a5a00; stroke-dasharray: 12 9; }
-    .flow-marker { fill: var(--ink); stroke: #fff; stroke-width: 4; }
+    .flow-node.missing { stroke: #9b4b8f; stroke-dasharray: 9 10; }
+    .flow-node.record { stroke: #7a5b1e; stroke-dasharray: 9 10; }
+    .flow-marker { fill: var(--ink); stroke: #fff; stroke-width: 2; }
     .flow-marker.local { fill: #0d7f9b; }
     .flow-marker.missing { fill: #8c2e8f; }
     .flow-marker.record { fill: #765313; }
     .flow-marker.unknown { fill: #5a6c86; }
-    .flow-marker-text { fill: #fff; font: 800 22px/1 var(--sans); text-anchor: middle; dominant-baseline: central; }
-    .flow-step-marker { filter: drop-shadow(0 2px 3px rgba(32,43,53,.34)); transform-box: fill-box; transform-origin: center; }
-    .flow-callout { fill: #fff; stroke: #0d7f9b; stroke-width: 4; }
-    .flow-callout.missing { stroke: #bd22bf; stroke-dasharray: 12 9; }
-    .flow-callout.unknown { fill: rgba(255,255,255,.18); stroke: #5a6c86; stroke-dasharray: 12 9; }
-    .flow-callout-text { fill: var(--ink); font: 800 24px/1.2 var(--sans); text-anchor: middle; }
+    .flow-marker-text { fill: #fff; font: 800 16px/1 var(--sans); text-anchor: middle; dominant-baseline: central; }
+    .flow-step-marker { transform-box: fill-box; transform-origin: center; }
+    .flow-callout { fill: rgba(255,255,255,.9); stroke: #0d748c; stroke-width: 2; }
+    .flow-callout.missing { stroke: #9b4b8f; stroke-dasharray: 9 10; }
+    .flow-callout.unknown { fill: none; stroke: #5a6c86; stroke-width: 2; stroke-dasharray: 9 10; }
+    .flow-callout-text { fill: var(--ink); font: 750 18px/1.2 var(--sans); text-anchor: middle; }
     .plate__frame.is-zoomed .diagram-stage { width: 2400px; }
     .plate__frame.is-zoomed .diagram-stage--full { width: 2320px; }
     .diagram-legend { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 10px 22px; color: var(--muted); font-size: .74rem; }
     .diagram-legend span { display: inline-flex; align-items: center; gap: 7px; }
-    .legend-line { width: 32px; border-top: 4px solid #e87928; }
+    .legend-line { width: 32px; border-top: 2px solid #c9541f; }
     .legend-line.local { border-color: #0d7f9b; border-top-style: dashed; }
     .legend-line.missing { border-color: #c61bc9; border-top-style: dashed; }
     .legend-line.record { border-color: #8a5a00; }
@@ -341,10 +341,10 @@
     html[data-motion="reduced"] .flow-line, html[data-motion="reduced"] .motion-toggle-doc::before, html.document-hidden .flow-line { animation: none; }
     html[data-motion="reduced"] .scroll-progress { display: none; }
     html[data-motion="reduced"] *, html[data-motion="reduced"] *::before, html[data-motion="reduced"] *::after { animation: none !important; transition-duration: .01ms !important; }
-    @media (max-width: 1200px) { .architecture-workspace { grid-template-columns: 1fr; } .flow-explorer__head { grid-template-columns: minmax(0, 1fr) minmax(260px, .46fr); gap: 36px; } .flow-selector { grid-template-columns: repeat(3, minmax(0, 1fr)); } .flow-detail { grid-template-columns: minmax(250px, .65fr) minmax(0, 1.35fr); gap: 30px; } .flow-detail__boundary { grid-column: 1 / -1; } }
+    @media (max-width: 1200px) { .architecture-workspace { grid-template-columns: 1fr; } .flow-explorer__head { grid-template-columns: minmax(0, 1fr) minmax(260px, .46fr); gap: 36px; } .flow-selector { grid-template-columns: repeat(3, minmax(0, 1fr)); border-left: 1px solid var(--line); } .flow-button { grid-template-columns: 1fr; align-content: center; gap: 3px; border-right: 1px solid var(--line); } .flow-button small { text-align: left; } .flow-detail { grid-template-columns: minmax(250px, .65fr) minmax(0, 1.35fr); gap: 30px; } .flow-detail__boundary { grid-column: 1 / -1; } }
     @media (max-width: 1060px) { .flow-selector { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
     @media (max-width: 880px) { .plate__nav, .flow-explorer__head { align-items: flex-start; grid-template-columns: 1fr; } .plate__nav { flex-direction: column; } .axis-rail { grid-template-columns: 1fr 1fr; } .axis-rail > div:nth-child(3) { border-left: 0; border-top: 1px solid var(--line); } .axis-rail > div:nth-child(4) { border-top: 1px solid var(--line); } .flow-detail { grid-template-columns: 1fr; } }
-    @media (max-width: 640px) { .plate { width: calc(100% - 24px); margin-top: 20px; } .plate__frame { padding: 6px; } .flow-explorer { padding: 24px 18px; } .flow-selector { grid-template-columns: 1fr 1fr; } .flow-button { min-height: 64px; } .flow-detail { padding: 19px; gap: 20px; } .flow-detail__boundary { grid-column: auto; } .diagram-stage { min-width: 900px; } .diagram-stage--full { min-width: 980px; } }
+    @media (max-width: 640px) { .plate { width: calc(100% - 24px); margin-top: 20px; } .plate__frame { padding: 6px; } .flow-explorer { padding: 22px 16px; } .flow-selector { grid-template-columns: 1fr 1fr; } .flow-button { min-height: 60px; } .flow-detail { padding-top: 18px; gap: 20px; } .flow-detail__boundary { grid-column: auto; } .diagram-stage { min-width: 900px; } .diagram-stage--full { min-width: 980px; } }
     @media (max-width: 410px) { .flow-selector { grid-template-columns: 1fr; } }
     @media print { .flow-selector, .flow-overlay, .plate__nav button { display: none !important; } .flow-explorer { color: #111; background: #fff; border: 1pt solid #555; box-shadow: none; } .flow-explorer__head > p, .flow-explorer__exclusion { color: #333; } .flow-detail { border: 1pt solid #777; } .diagram-stage, .diagram-stage--full { min-width: 0; transform: none; } }
   </style>
@@ -410,63 +410,63 @@
               <path class="flow-line" d="M165 455H382 M490 455H628 M734 455H870 M980 455H1120V510H1216 M1348 510H1535" />
               <path class="flow-line missing" d="M1664 510H1822" />
               <path class="flow-line record" d="M1280 582V922 M1600 582V922" />
-              <circle class="flow-node" cx="435" cy="435" r="68" /><circle class="flow-node" cx="680" cy="435" r="68" /><circle class="flow-node" cx="925" cy="455" r="70" /><circle class="flow-node" cx="1280" cy="510" r="68" /><circle class="flow-node" cx="1600" cy="510" r="70" />
+              <circle class="flow-node" cx="435" cy="435" r="44" /><circle class="flow-node" cx="680" cy="435" r="44" /><circle class="flow-node" cx="925" cy="455" r="46" /><circle class="flow-node" cx="1280" cy="510" r="44" /><circle class="flow-node" cx="1600" cy="510" r="46" />
             </g>
             <g class="flow-layer" data-flow-layer="candidate">
               <path class="flow-line" d="M165 455H382 M490 455H628 M734 455H870 M980 455H1120V510H1216 M1348 510H1535" />
-              <circle class="flow-node local" cx="1600" cy="510" r="76" />
-              <rect class="flow-callout" x="1370" y="330" width="460" height="62" rx="12" /><text class="flow-callout-text" x="1600" y="370">서비스 구현 범위 · 데이터 연계 검토</text>
+              <circle class="flow-node local" cx="1600" cy="510" r="50" />
+              <rect class="flow-callout" x="1370" y="337" width="460" height="48" rx="2" /><text class="flow-callout-text" x="1600" y="368">서비스 구현 범위 · 데이터 연계 검토</text>
 
             <g class="flow-step-marker local" data-flow-step="1" transform="translate(1450 300)">
-              <circle class="flow-marker local" r="24" />
+              <circle class="flow-marker local" r="18" />
               <text class="flow-marker-text" y="1">1</text>
             </g>
             <g class="flow-step-marker local" data-flow-step="2" transform="translate(1600 300)">
-              <circle class="flow-marker local" r="24" />
+              <circle class="flow-marker local" r="18" />
               <text class="flow-marker-text" y="1">2</text>
             </g>
             <g class="flow-step-marker local" data-flow-step="3" transform="translate(1750 300)">
-              <circle class="flow-marker local" r="24" />
+              <circle class="flow-marker local" r="18" />
               <text class="flow-marker-text" y="1">3</text>
             </g>
             </g>
             <g class="flow-layer" data-flow-layer="recruiter">
               <path class="flow-line" d="M165 455H382 M490 455H628 M734 455H870 M980 455H1120V510H1216 M1348 510H1535" />
-              <circle class="flow-node local" cx="1600" cy="510" r="76" />
-              <rect class="flow-callout" x="1370" y="330" width="460" height="62" rx="12" /><text class="flow-callout-text" x="1600" y="370">서비스 구현 범위 · 데이터 연계 검토</text>
+              <circle class="flow-node local" cx="1600" cy="510" r="50" />
+              <rect class="flow-callout" x="1370" y="337" width="460" height="48" rx="2" /><text class="flow-callout-text" x="1600" y="368">서비스 구현 범위 · 데이터 연계 검토</text>
 
             <g class="flow-step-marker local" data-flow-step="1" transform="translate(1450 300)">
-              <circle class="flow-marker local" r="24" />
+              <circle class="flow-marker local" r="18" />
               <text class="flow-marker-text" y="1">1</text>
             </g>
             <g class="flow-step-marker local" data-flow-step="2" transform="translate(1600 300)">
-              <circle class="flow-marker local" r="24" />
+              <circle class="flow-marker local" r="18" />
               <text class="flow-marker-text" y="1">2</text>
             </g>
             <g class="flow-step-marker local" data-flow-step="3" transform="translate(1750 300)">
-              <circle class="flow-marker local" r="24" />
+              <circle class="flow-marker local" r="18" />
               <text class="flow-marker-text" y="1">3</text>
             </g>
             </g>
             <g class="flow-layer" data-flow-layer="explanation">
               <path class="flow-line" d="M165 455H382 M490 455H628 M734 455H870 M980 455H1120V510H1216 M1348 510H1535" />
-              <circle class="flow-node local" cx="1600" cy="510" r="76" />
-              <rect class="flow-callout" x="1405" y="330" width="390" height="62" rx="12" /><text class="flow-callout-text" x="1600" y="370">점수 고정 → 설명만 생성</text>
+              <circle class="flow-node local" cx="1600" cy="510" r="50" />
+              <rect class="flow-callout" x="1405" y="337" width="390" height="48" rx="2" /><text class="flow-callout-text" x="1600" y="368">점수 고정 → 설명만 생성</text>
 
             <g class="flow-step-marker local" data-flow-step="1" transform="translate(1300 290)">
-              <circle class="flow-marker local" r="24" />
+              <circle class="flow-marker local" r="18" />
               <text class="flow-marker-text" y="1">1</text>
             </g>
             <g class="flow-step-marker local" data-flow-step="2" transform="translate(1450 290)">
-              <circle class="flow-marker local" r="24" />
+              <circle class="flow-marker local" r="18" />
               <text class="flow-marker-text" y="1">2</text>
             </g>
             <g class="flow-step-marker local" data-flow-step="3" transform="translate(1600 290)">
-              <circle class="flow-marker local" r="24" />
+              <circle class="flow-marker local" r="18" />
               <text class="flow-marker-text" y="1">3</text>
             </g>
             <g class="flow-step-marker local" data-flow-step="4" transform="translate(1750 290)">
-              <circle class="flow-marker local" r="24" />
+              <circle class="flow-marker local" r="18" />
               <text class="flow-marker-text" y="1">4</text>
             </g>
             </g>
@@ -475,72 +475,72 @@
               <rect class="flow-callout unknown" x="25" y="640" width="290" height="710" rx="18" />
 
             <g class="flow-step-marker unknown" data-flow-step="1" transform="translate(80 625)">
-              <circle class="flow-marker unknown" r="24" />
+              <circle class="flow-marker unknown" r="18" />
               <text class="flow-marker-text" y="1">1</text>
             </g>
             <g class="flow-step-marker unknown" data-flow-step="2" transform="translate(170 625)">
-              <circle class="flow-marker unknown" r="24" />
+              <circle class="flow-marker unknown" r="18" />
               <text class="flow-marker-text" y="1">2</text>
             </g>
             <g class="flow-step-marker unknown" data-flow-step="3" transform="translate(260 625)">
-              <circle class="flow-marker unknown" r="24" />
+              <circle class="flow-marker unknown" r="18" />
               <text class="flow-marker-text" y="1">3</text>
             </g>
             <g class="flow-step-marker unknown" data-flow-step="4" transform="translate(350 625)">
-              <circle class="flow-marker unknown" r="24" />
+              <circle class="flow-marker unknown" r="18" />
               <text class="flow-marker-text" y="1">4</text>
             </g>
             </g>
             <g class="flow-layer" data-flow-layer="trace">
               <path class="flow-line local" d="M1500 565H1870" />
-              <circle class="flow-node local" cx="1600" cy="510" r="82" />
-              <rect class="flow-callout" x="1360" y="650" width="520" height="62" rx="12" /><text class="flow-callout-text" x="1620" y="690">기본 비활성 · receipt와 사람 검토 소스</text>
+              <circle class="flow-node local" cx="1600" cy="510" r="52" />
+              <rect class="flow-callout" x="1360" y="657" width="520" height="48" rx="2" /><text class="flow-callout-text" x="1620" y="688">기본 비활성 · receipt와 사람 검토 소스</text>
 
             <g class="flow-step-marker local" data-flow-step="1" transform="translate(1480 610)">
-              <circle class="flow-marker local" r="24" />
+              <circle class="flow-marker local" r="18" />
               <text class="flow-marker-text" y="1">1</text>
             </g>
             <g class="flow-step-marker local" data-flow-step="2" transform="translate(1650 610)">
-              <circle class="flow-marker local" r="24" />
+              <circle class="flow-marker local" r="18" />
               <text class="flow-marker-text" y="1">2</text>
             </g>
             <g class="flow-step-marker local" data-flow-step="3" transform="translate(1820 610)">
-              <circle class="flow-marker local" r="24" />
+              <circle class="flow-marker local" r="18" />
               <text class="flow-marker-text" y="1">3</text>
             </g>
             </g>
             <g class="flow-layer" data-flow-layer="integrations">
               <path class="flow-line local" d="M1450 610H1850" />
-              <circle class="flow-node local" cx="1600" cy="510" r="82" />
-              <rect class="flow-callout" x="1360" y="650" width="520" height="62" rx="12" /><text class="flow-callout-text" x="1620" y="690">opt-in 소스 · 실제 외부 전송 미확인</text>
+              <circle class="flow-node local" cx="1600" cy="510" r="52" />
+              <rect class="flow-callout" x="1360" y="657" width="520" height="48" rx="2" /><text class="flow-callout-text" x="1620" y="688">opt-in 소스 · 실제 외부 전송 미확인</text>
 
             <g class="flow-step-marker local" data-flow-step="1" transform="translate(1450 610)">
-              <circle class="flow-marker local" r="24" />
+              <circle class="flow-marker local" r="18" />
               <text class="flow-marker-text" y="1">1</text>
             </g>
             <g class="flow-step-marker local" data-flow-step="2" transform="translate(1600 610)">
-              <circle class="flow-marker local" r="24" />
+              <circle class="flow-marker local" r="18" />
               <text class="flow-marker-text" y="1">2</text>
             </g>
             <g class="flow-step-marker local" data-flow-step="3" transform="translate(1750 610)">
-              <circle class="flow-marker local" r="24" />
+              <circle class="flow-marker local" r="18" />
               <text class="flow-marker-text" y="1">3</text>
             </g>
             </g>
             <g class="flow-layer" data-flow-layer="operations">
               <path class="flow-line record" d="M1290 505V742 M1630 505V742" />
-              <circle class="flow-node record" cx="572" cy="775" r="54" /><circle class="flow-node record" cx="1292" cy="775" r="54" /><circle class="flow-node record" cx="1632" cy="775" r="54" /><circle class="flow-node record" cx="1992" cy="775" r="54" />
+              <circle class="flow-node record" cx="572" cy="775" r="38" /><circle class="flow-node record" cx="1292" cy="775" r="38" /><circle class="flow-node record" cx="1632" cy="775" r="38" /><circle class="flow-node record" cx="1992" cy="775" r="38" />
 
             <g class="flow-step-marker record" data-flow-step="1" transform="translate(540 725)">
-              <circle class="flow-marker record" r="24" />
+              <circle class="flow-marker record" r="18" />
               <text class="flow-marker-text" y="1">1</text>
             </g>
             <g class="flow-step-marker record" data-flow-step="2" transform="translate(1450 725)">
-              <circle class="flow-marker record" r="24" />
+              <circle class="flow-marker record" r="18" />
               <text class="flow-marker-text" y="1">2</text>
             </g>
             <g class="flow-step-marker record" data-flow-step="3" transform="translate(1960 725)">
-              <circle class="flow-marker record" r="24" />
+              <circle class="flow-marker record" r="18" />
               <text class="flow-marker-text" y="1">3</text>
             </g>
             </g>

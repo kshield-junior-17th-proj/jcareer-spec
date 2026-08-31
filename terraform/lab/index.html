@@ -10,10 +10,10 @@
   <meta property="og:title" content="J-Career AWS 검증 환경">
   <meta property="og:description" content="공개 포트 없이 관리하는 합성 데이터 기반 AWS 검증 환경을 설명합니다.">
   <meta property="og:url" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/lab/">
-  <meta property="og:image" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/JCAREER_ASIS_FLOW.drawio.png">
-  <meta property="og:image:alt" content="J-Career AWS 기준 설계의 전체 흐름도">
+  <meta property="og:image" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/assets/JCAREER_FULL_INFRA_ANIMATED.png">
+  <meta property="og:image:alt" content="업무망, GitHub, AWS 런타임과 MLOps를 연결한 J-Career 전체 인프라 지도">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image:alt" content="J-Career AWS 기준 설계의 전체 흐름도">
+  <meta name="twitter:image:alt" content="업무망, GitHub, AWS 런타임과 MLOps를 연결한 J-Career 전체 인프라 지도">
   <link rel="canonical" href="https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/lab/">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2318212b'/%3E%3Cpath d='M18 13h11v25c0 10-5 14-16 13v-9c4 0 5-1 5-5V13zm17 0h17v9h-7v29H35V13z' fill='%23ff7a1a'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="../../assets/site.css">
@@ -33,15 +33,26 @@
   </header>
 
   <main id="content">
-    <section class="hero">
-      <div class="shell">
-        <p class="eyebrow">AWS 검증 환경 · 통제된 접속</p>
-        <h1>AWS 검증 환경</h1>
-        <p class="hero-copy">공개 포트를 열지 않고 AWS Systems Manager로 관리하는 단기 검증 환경 설계입니다. 합성 데이터로 서비스 기능을 확인하도록 Terraform 실행 절차와 현재 관찰 결과를 함께 제공합니다.</p>
-        <div class="hero-actions">
-          <a class="button" href="https://github.com/kshield-junior-17th-proj/jcareer-spec/blob/main/terraform/lab/README.md">환경 구성 보기</a>
-          <a class="button button--line" href="DEPLOYMENT_OBSERVATION_2026-08-30.md">최근 실행 결과</a>
+    <section class="hero hero--lab">
+      <div class="shell lab-hero__grid">
+        <div>
+          <p class="eyebrow">AWS 검증 환경 · 통제된 접속</p>
+          <h1>AWS 검증 환경</h1>
+          <p class="hero-copy">공개 포트를 열지 않고 AWS Systems Manager로 관리하는 단기 검증 환경 설계입니다. 합성 데이터로 서비스 기능을 확인하도록 Terraform 실행 절차와 현재 관찰 결과를 함께 제공합니다.</p>
+          <div class="hero-actions">
+            <a class="button" href="https://github.com/kshield-junior-17th-proj/jcareer-spec/blob/main/terraform/lab/README.md">환경 구성 보기</a>
+            <a class="button button--line" href="DEPLOYMENT_OBSERVATION_2026-08-30.md">최근 실행 결과</a>
+          </div>
         </div>
+        <aside class="lab-ledger" aria-label="2026년 8월 30일 검증 관찰 요약">
+          <p class="lab-ledger__label">OBSERVATION / 2026-08-30</p>
+          <dl>
+            <div><dt>GENERATE PLAN</dt><dd><strong>24</strong>검토 완료</dd></div>
+            <div><dt>CURRENT LAB</dt><dd><strong>0</strong>리소스</dd></div>
+            <div><dt>BEDROCK DIRECT</dt><dd><strong>PASS</strong>합성 호출</dd></div>
+            <div><dt>END-TO-END</dt><dd><strong>WAIT</strong>권한 대기</dd></div>
+          </dl>
+        </aside>
       </div>
     </section>
 
