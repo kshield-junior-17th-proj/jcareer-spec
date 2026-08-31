@@ -11,7 +11,7 @@ J-Career는 구직자와 기업을 연결하는 채용 플랫폼입니다. 이 �
 - [MLOps 7단계 모델 검증](https://kshield-junior-17th-proj.github.io/jcareer-spec/mlops/)
 - [AWS 검증 환경](https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/lab/)
 
-![업무망 PC, GitHub Actions 검사와 Pages 배포, J-Career AWS 기준 설계, 별도 MLOps 사람 검토 경계를 함께 표시한 전체 인프라 지도](assets/JCAREER_FULL_INFRA_ANIMATED.png)
+![업무망 PC, GitHub Actions 검사와 별도 main branch Pages 배포, J-Career AWS 기준 설계, 별도 MLOps 사람 검토 경계를 함께 표시한 전체 인프라 지도](assets/JCAREER_FULL_INFRA_ANIMATED.png)
 
 움직이는 점은 설계상 데이터 이동 순서를 설명합니다. AWS에서 관측한 요청이나 배포 상태를
 뜻하지 않습니다. [움직이는 SVG 원본](assets/JCAREER_FULL_INFRA_ANIMATED.svg)과
@@ -22,17 +22,19 @@ J-Career는 구직자와 기업을 연결하는 채용 플랫폼입니다. 이 �
 | 구성 | 역할 | 현재 관리 기준 |
 |---|---|---|
 | [`terraform/asis`](terraform/asis/README.md) | J-Career 서비스·AWS 기준 설계 | 서울 리전 2-AZ, 6개 모듈, Terraform 계획 항목 110개 |
-| [`terraform/serverless-mlops`](terraform/serverless-mlops/README.md) | 합성 데이터 기반 후보 모델 검증 | 기본 잠금 0개, 기반 준비 13개, 한 차례 실행 14개 계획 |
+| [`terraform/serverless-mlops`](terraform/serverless-mlops/README.md) | 합성 데이터 기반 후보 모델 검증 | bootstrap 13개 적용 확인, runtime 14번째 Lambda 미배포·미실행 |
+| [`terraform/serverless-opendart`](terraform/serverless-opendart/README.md) | 기업 공개정보 온디맨드 갱신 | 기본 잠금 0개, bootstrap 8개, runtime 11개 source·미배포 |
 | [`terraform/lab`](terraform/lab/README.md) | 서비스와 데이터 흐름을 확인하는 AWS 검증 환경 | 모드별 13/14/23/24개, 외부 인바운드 0개, SSM 관리 접속 |
 
 ## 기술 상태와 검증 범위
 
-기준 설계의 110개는 AWS에 접속하지 않는 Terraform 계획에서 계산한 생성 예정 항목입니다.
-AWS 배포 결과와 애플리케이션 이미지는 별도 검증 기록으로 관리합니다. MLOps와 AWS 검증 환경은
-기준 설계와 분리된 Terraform 루트이며, 명시적인 확인값이 있어야 다음 단계가 열립니다.
-TRACE·JC-RECEIPT와 Slack·Notion·SMTP 외부 업무도구 어댑터는 기존 API의 로컬 소스로
-구현되어 있으나 모두 기본 비활성입니다. 새 Terraform 리소스는 없고 실제 외부 계정 연결,
-메시지 전송, AWS 배포 결과도 확인하지 않았으므로 기준 110개에는 합산하지 않습니다.
+기준 설계의 110개는 AWS에 접속하지 않는 Terraform 계획에서 계산한 생성 예정 항목이며 미배포입니다.
+MLOps, OpenDART와 AWS 검증 Lab은 기준 설계와 분리된 Terraform 루트입니다. 2026-08-31에는
+MLOps bootstrap 기반 13개와 serverless roots용 비공개 state S3 1개 생성이 확인됐지만,
+애플리케이션 이미지 게시·Lambda 실행·추천 서비스 연결은 확인되지 않았습니다.
+Slack·Notion·SMTP 외부 업무도구 어댑터는 기본 비활성 로컬 소스이며 실제 외부 계정 연결과
+메시지 전송은 미확인입니다. TRACE·JC-RECEIPT는 실행 인프라 구성요소가 아니므로 전체 지도에서
+제외하고 보조 검토 설명으로만 다룹니다.
 
 ## MLOps 명세 바로 보기
 
@@ -43,9 +45,9 @@ TRACE·JC-RECEIPT와 Slack·Notion·SMTP 외부 업무도구 어댑터는 기존
 - [학습·검증 소스](src/mlops/README.md)
 - [서버리스 Terraform](terraform/serverless-mlops/README.md)
 
-MLOps는 기존 110개 기준 설계와 별도입니다. 기본 `disabled` 계획은 관리 리소스 0개입니다.
-담당자가 확인 문자열을 넣은 `bootstrap`은 13개, 이미지 해시를 고정한 Lambda까지 포함한
-`runtime`은 14개를 계획합니다. 세 단계의 수치는 AWS 비접속 계획 결과이며 배포 결과와 구분합니다.
+MLOps는 기존 110개 기준 설계와 별도입니다. 기본 `disabled`는 0개, `bootstrap`은 13개,
+이미지 해시를 고정한 Lambda까지 포함한 `runtime`은 14개입니다. 2026-08-31 현재 bootstrap
+13개는 검토한 saved plan 그대로 적용됐고, runtime의 14번째 Lambda와 이미지 게시·실행은 아직 없습니다.
 
 현재 배치 경로는 합성 DB 옆 내보내기 도구가 만든 비교 수치 CSV 1개와 검증용 JSON 2개를
 feature-only 입력으로 S3에서 읽습니다. Lambda는 후보 모델을 한 차례 학습한 뒤 S3 결과 파일 6개,
@@ -105,11 +107,26 @@ terraform -chdir=terraform/asis plan -refresh=false -lock=false
 AS-IS 코드의 12자리 숫자는 가상 입력값과 AWS가 공개한 서비스 주체 값뿐이며, 조직 계정
 식별자는 포함하지 않습니다.
 
+## 현재 확인된 AWS 상태
+
+2026-08-31 비식별 관찰 기록을 기준으로 서로 다른 세 범위를 분리합니다.
+
+| 범위 | 확인된 상태 | 아직 확인되지 않은 것 |
+|---|---|---|
+| 기준 `terraform/asis` | 2-AZ·6모듈·110개 Terraform 모델 | apply, ECS 이미지 게시, 서비스 실행 |
+| Bedrock | 서울 리전 APAC Nova Lite 직접 합성 호출 1건 PASS(입력 39·출력 53토큰) | API → LLM Gateway → capability broker → Bedrock 전체 경로 |
+| MLOps | 비공개 state S3 1개와 bootstrap 13개 기반 자원 적용 | ECR 이미지 게시, Lambda 배포·실행, 결과 6종, 사람 검토·서비스 연결 |
+| OpenDART | 0/8/11 source와 승인 경계 | Terraform 적용, API key 준비, 외부 live 조회 |
+| AWS 검증 Lab | LabOnly 7개 신호 0 | 새 plan/apply, 원격 6서비스와 Bedrock end-to-end |
+
+MLOps 기반 13개는 GitHub Actions가 자동 배포한 것이 아닙니다. 실제 식별자·자격증명·state 내용은
+이 저장소와 공개 페이지에 기록하지 않습니다.
+
 ## AWS 검증 환경 배포
 
-2026-08-30 새 검증 계정에서 HTTPS와 Bedrock을 포함한 24개 생성 계획은 통과했습니다.
+다음은 2026-08-30의 역사적 Lab 시도 기록입니다. 새 검증 계정에서 HTTPS와 Bedrock을 포함한 24개 생성 계획은 통과했습니다.
 적용은 IAM 역할 생성 권한 부족으로 중단됐고, 부분 생성된 16개 항목은 검토된 삭제 계획으로
-정리했습니다. 현재 Lab 리소스는 0개입니다. Bedrock 직접 합성 호출은 통과했지만 원격
+정리했습니다. 이후 2026-08-31 LabOnly 재확인에서도 Lab 전용 신호는 0개였습니다. Bedrock 직접 합성 호출은 통과했지만 원격
 애플리케이션 전체 경로는 아직 다시 확인하지 못했습니다. 자세한 범위는
 [최근 배포 관찰 기록](terraform/lab/DEPLOYMENT_OBSERVATION_2026-08-30.md)에 있습니다.
 재시도에 필요한 최소 작업과 제한 조건은

@@ -1077,8 +1077,7 @@ html.document-hidden .motion-toggle::before { animation-play-state: paused; }
     linear-gradient(0deg, transparent 49.92%, rgba(23, 33, 41, .07) 50%, transparent 50.08%) 0 0 / 96px 96px;
   content: "";
   mask-image: linear-gradient(110deg, transparent 2%, #000 42%, rgba(0,0,0,.38) 82%, transparent 100%);
-  transform: perspective(900px) rotateX(58deg) scale(1.55) translateY(18%);
-  transform-origin: center bottom;
+  transform: none;
 }
 
 .hero--spatial::after {
@@ -1188,8 +1187,7 @@ html.document-hidden .motion-toggle::before { animation-play-state: paused; }
   --stage-ry: 0deg;
   position: relative;
   min-height: clamp(520px, 49vw, 680px);
-  perspective: 1500px;
-  perspective-origin: 54% 42%;
+  perspective: none;
   isolation: isolate;
 }
 
@@ -1198,56 +1196,48 @@ html.document-hidden .motion-toggle::before { animation-play-state: paused; }
   inset: 5% 2% 10% 5%;
   z-index: -3;
   border: 1px solid rgba(23, 33, 41, .12);
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,255,255,.9), rgba(255,255,255,0) 66%);
-  filter: blur(3px);
-  transform: rotate(-8deg);
+  border-radius: 2px;
+  background: rgba(255,255,255,.52);
+  filter: none;
+  transform: none;
 }
 
 .spatial-stage__shadow {
   position: absolute;
   inset: auto 4% 7% 9%;
   z-index: -2;
-  height: 28%;
-  border-radius: 50%;
-  background: rgba(40, 46, 47, .22);
-  filter: blur(38px);
-  transform: rotate(-5deg) scale(.88);
+  height: 18%;
+  border-radius: 2px;
+  background: rgba(40, 46, 47, .1);
+  filter: blur(28px);
+  transform: none;
 }
 
 .spatial-stage__deck {
   position: absolute;
-  top: 15%;
+  top: 12%;
   left: 0;
-  width: 112%;
+  width: 100%;
   aspect-ratio: 1480 / 820;
-  overflow: visible;
+  overflow: hidden;
   border: 1px solid rgba(49, 59, 62, .26);
   background: #fffef9;
-  box-shadow:
-    -4px 12px 0 #b6aea1,
-    -10px 26px 0 rgba(90, 81, 69, .12),
-    0 48px 88px rgba(51, 55, 53, .22);
-  transform: rotateX(calc(53deg + var(--stage-ry))) rotateZ(calc(-7deg + var(--stage-rx))) translate3d(-2%, -1%, 0);
-  transform-origin: 48% 55%;
-  transform-style: preserve-3d;
-  transition: transform 700ms cubic-bezier(.18,.8,.2,1), box-shadow 700ms ease;
+  box-shadow: 10px 10px 0 #c9c1b4, 0 28px 64px rgba(51, 55, 53, .14);
+  transform: none;
+  transform-style: flat;
+  transition: box-shadow 240ms ease, translate 240ms ease;
 }
 
 .spatial-stage:hover .spatial-stage__deck {
-  box-shadow: -4px 14px 0 #ada496, -12px 30px 0 rgba(90,81,69,.12), 0 62px 104px rgba(51,55,53,.27);
+  box-shadow: 10px 12px 0 #bdb4a6, 0 34px 72px rgba(51,55,53,.17);
+  translate: 0 -2px;
 }
 
 .spatial-stage__deck--mlops { top: 18%; aspect-ratio: 2400 / 1400; }
+.hero--platform .spatial-stage__deck { aspect-ratio: 2320 / 1500; }
 
 .spatial-stage__edge {
-  position: absolute;
-  inset: auto -1px -18px;
-  height: 18px;
-  border: 1px solid #8f877a;
-  background: linear-gradient(180deg, #c9c1b4, #9d9487);
-  transform: rotateX(-90deg);
-  transform-origin: top;
+  display: none;
 }
 
 .spatial-stage__map {
@@ -1255,12 +1245,12 @@ html.document-hidden .motion-toggle::before { animation-play-state: paused; }
   inset: auto;
   z-index: 1;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: .9;
-  filter: saturate(.7) contrast(.94);
+  height: auto;
+  object-fit: contain;
+  opacity: 1;
+  filter: saturate(.9) contrast(1.02);
   mix-blend-mode: normal;
-  transform: translateZ(4px);
+  transform: none;
 }
 
 .hero--mlops .spatial-stage__map {
@@ -1269,15 +1259,7 @@ html.document-hidden .motion-toggle::before { animation-play-state: paused; }
 }
 
 .spatial-stage__scan {
-  position: absolute;
-  inset: 0 0 auto;
-  z-index: 3;
-  height: 2px;
-  pointer-events: none;
-  background: linear-gradient(90deg, transparent, rgba(213,93,36,.2) 18%, rgba(213,93,36,.92) 50%, rgba(213,93,36,.2) 82%, transparent);
-  box-shadow: 0 0 18px rgba(213,93,36,.4);
-  animation: spatial-scan 5.8s cubic-bezier(.45,0,.55,1) infinite;
-  transform: translateZ(14px);
+  display: none;
 }
 
 .spatial-stage__runner {
@@ -1292,7 +1274,7 @@ html.document-hidden .motion-toggle::before { animation-play-state: paused; }
   background: var(--accent);
   box-shadow: 0 0 0 7px rgba(213,93,36,.14), 0 0 22px rgba(213,93,36,.7);
   animation: stage-runner 6.4s cubic-bezier(.45,0,.55,1) infinite;
-  transform: translateZ(20px);
+  transform: none;
 }
 
 .spatial-callout,
@@ -1430,7 +1412,7 @@ html.document-hidden .motion-toggle::before { animation-play-state: paused; }
   .hero-ledger div { padding: 11px 0; border-bottom: 1px solid rgba(23,33,41,.14); }
   .hero-ledger div + div { padding-left: 0; border-left: 0; }
   .spatial-stage { min-height: 360px; margin: -22px -4% 0; }
-  .spatial-stage__deck { top: 20%; left: -3%; width: 108%; transform: rotateX(55deg) rotateZ(-6deg) translate3d(0,0,0); }
+  .spatial-stage__deck { top: 20%; left: 0; width: 100%; transform: none; }
   .spatial-callout { min-width: 120px; padding: 9px 10px; }
   .spatial-callout--service { top: 9%; left: 3%; }
   .spatial-callout--mlops { top: 15%; right: 0; }
@@ -1476,7 +1458,7 @@ html[data-motion="reduced"] .scroll-progress { display: none; }
 html[data-motion="reduced"] *,
 html[data-motion="reduced"] *::before,
 html[data-motion="reduced"] *::after { animation: none !important; transition-duration: .001ms !important; }
-html[data-motion="reduced"] .spatial-stage__deck { transform: rotateX(53deg) rotateZ(-7deg) translate3d(-2%, -1%, 0); }
+html[data-motion="reduced"] .spatial-stage__deck { transform: none; translate: none; }
 
 @media print {
   .site-header, .hero-actions, .stage-tabs, .diagram-toolbar, .skip-link { display: none !important; }

@@ -152,20 +152,22 @@ const architectureFlows = {
     title: '전체 시스템 지도',
     status: '구현·설계 경계',
     tone: 'modelled',
-    summary: '서비스 사용자, 업무망·외부 SaaS, GitHub delivery, AWS 기준 런타임과 별도 MLOps를 관계선까지 한 장에서 보되 구현 상태를 섞지 않습니다.',
+    summary: '서비스 사용자, 업무망·외부 SaaS, GitHub delivery, AWS 기준 런타임, LLM Gateway·Bedrock·OpenDART와 별도 MLOps를 관계선까지 한 장에서 보되 구현 상태를 섞지 않습니다.',
     detailHref: 'index.html#section-14',
     detailLabel: '서비스·구성요소 명세 보기',
     stages: [
       { label: 'GitHub 저장소 → Actions 검사' },
-      { label: '검사 통과 → GitHub Pages 배포' },
+      { label: 'main / (root) → legacy GitHub Pages 배포' },
       { label: '서비스 사용자 → Route 53·CloudFront·WAF' },
-      { label: 'ALB → ECS → RDS·Redis 기준 흐름' },
+      { label: 'ALB → ECS 4서비스 → RDS·Redis 기준 흐름' },
+      { label: 'API → LLM Gateway → 조건부 broker → Bedrock' },
+      { label: 'OpenDART broker → SQS×2·Lambda·DDB + ECR·IAM·Logs(0/8/11) → 외부 API' },
       { label: '업무망 180대 → Slack·외부 업무도구 경계' },
-      { label: 'ECR·NAT·SSM·로그·탐지 의존 관계' },
-      { label: '합성 대역 MLOps → 사람 검토 대기' },
+      { label: 'ACM·Auto Scaling·ECR·NAT·SSM·로그·탐지 의존 관계' },
+      { label: 'MLOps bootstrap 13개 적용 → runtime 미실행' },
       { label: '검토 → 향후 서비스 반영 · 현재 미구현' }
     ],
-    boundary: 'GitHub Actions는 검사와 Pages 배포까지 구현되어 있습니다. AWS 2-AZ·110개와 MLOps 0/13/14는 미배포 계획입니다. 점선은 IaC 배포 대상, 합성 대역 입력, 승인 후 반영 같은 관계를 보이지만 자동 배포·운영 DB 연결·자동 승격을 뜻하지 않습니다.'
+    boundary: 'GitHub Actions는 PR/main 검사만 수행하고 Pages는 legacy main/(root) branch source로 배포됩니다. AWS 2-AZ·110개 기준선은 미배포입니다. Bedrock 직접 합성 호출 1건과 MLOps bootstrap 13개 적용만 별도 확인됐습니다. API→Gateway→Broker→Bedrock, OpenDART, MLOps Lambda·서비스 연결은 미확인 또는 미구현입니다.'
   },
   candidate: {
     title: '구직자 공고 추천',
@@ -199,33 +201,34 @@ const architectureFlows = {
     title: 'AI 설명 만들기',
     status: '설명 생성 검증',
     tone: 'guarded',
-    summary: '조건 비교 엔진이 확정한 점수와 근거를 설명 문장으로 바꾸는 보조 흐름입니다. 점수와 순위를 고칠 권한은 없습니다.',
+    summary: '조건 비교 엔진이 확정한 점수와 근거를 LLM Gateway가 설명 문장으로 바꾸는 보조 흐름입니다. 점수와 순위를 고칠 권한은 없습니다.',
     detailHref: 'index.html#section-33',
     detailLabel: 'AI 점수·설명 규칙 보기',
     stages: [
-      { label: '확정된 점수와 근거 받기', x: 1480, y: 290 },
-      { label: '점수와 분리해 설명 만들기', x: 1600, y: 290 },
-      { label: '형식 확인 후 상태와 함께 반환', x: 1720, y: 290 }
+      { label: 'ECS API가 확정 점수·근거 전달', x: 1300, y: 290 },
+      { label: 'LLM Gateway가 설명 전용 요청 구성', x: 1450, y: 290 },
+      { label: '조건부 Lab broker source 경계', x: 1600, y: 290 },
+      { label: 'Bedrock 직접 호출은 PASS · 전체 경로 미확인', x: 1750, y: 290 }
     ],
-    boundary: '점수와 순위는 추천 엔진이 확정하며 설명 생성은 이를 바꾸지 않습니다. Amazon Bedrock 호출은 기본 잠금 상태로 두고 별도 승인·평가 절차를 적용합니다.'
+    boundary: 'LLM Gateway source와 Bedrock adapter는 구현됐고 기본 provider는 합성 stub입니다. APAC Nova Lite 직접 합성 호출 한 건은 통과했지만 API→Gateway→Broker→Bedrock end-to-end, 기준 task IAM, 이미지 게시와 AWS 런타임 실행은 확인되지 않았습니다.'
   },
   mlops: {
     title: 'MLOps 학습·평가',
     status: '모델 검증 · 검토 대기',
     tone: 'guarded',
-    summary: '기준 110개와 분리된 서버리스 경로에서 합성 특징 파일을 검사하고 후보 모델과 상태를 남긴 뒤 사람 검토를 기다립니다.',
+    summary: '기준 110개와 분리된 서버리스 경로입니다. bootstrap 기반 13개는 적용됐고, 아직 배포하지 않은 Lambda가 합성 특징 파일을 검사·학습하는 runtime 단계는 사람 검토 전에서 멈춥니다.',
     detailHref: '../../mlops/',
     detailLabel: 'MLOps 7단계 상세 보기',
     stages: [
       { label: '합성 회원·기업 자료 읽기' },
       { label: '숫자 비교 특징 5개 만들기' },
-      { label: 'S3에 입력 파일 3개 보관' },
-      { label: '사람이 한 번 실행 시작' },
-      { label: 'Lambda가 후보 모델 만들기' },
-      { label: 'S3 결과 6개·DynamoDB 상태 저장' },
+      { label: 'S3·ECR·DynamoDB·IAM·Logs bootstrap 13개 적용' },
+      { label: 'ECR 이미지 게시 · 아직 없음' },
+      { label: '14번째 Lambda 배포·실행 · 아직 없음' },
+      { label: 'S3 결과 6개·DynamoDB run · 아직 없음' },
       { label: 'TRAINED_PENDING_HUMAN_REVIEW에서 정지' }
     ],
-    boundary: '별도 terraform/serverless-mlops 계획은 기본 0개, 기반 준비 13개, 일회성 실행 14개이며 기준 110개와 합산하지 않습니다. 자동 일정·자동 승격·추천 런타임 배선과 AWS 배포·호출 결과는 없습니다.'
+    boundary: '별도 terraform/serverless-mlops는 0/13/14 단계입니다. 2026-08-31 bootstrap 13개 적용만 확인했고 이미지 게시·14번째 Lambda·실행·결과 생성·추천 런타임 배선은 없습니다. GitHub CI가 자동 배포한 것이 아닙니다.'
   },
   workplace: {
     title: '업무망·Slack 경계',
@@ -237,17 +240,18 @@ const architectureFlows = {
     stages: [
       { label: 'PC 180대 · Windows 100 / macOS 80', x: 80, y: 625 },
       { label: 'VPN+MFA·UTM · 시나리오 선언', x: 170, y: 625 },
-      { label: 'Slack 외부 SaaS · 운영 미확인', x: 260, y: 625 }
+      { label: 'Slack 외부 SaaS · 운영 미확인', x: 260, y: 625 },
+      { label: 'Windows 3 + macOS 3 endpoint review · 실물 없음', x: 350, y: 625 }
     ],
     boundary: '두 OS의 Slack 바로가기와 macOS best-effort 종료 소스를 확인했습니다. 별도 webhook 어댑터는 기본 비활성 로컬 소스이며 실제 workspace·계정·보존 정책·전송은 미확인입니다. Amazon Q Developer(AWS Chatbot), SNS, EventBridge 같은 AWS 통합은 없습니다.'
   },
   trace: {
     title: 'TRACE·JC-RECEIPT',
-    status: '코드 있으나 잠금',
+    status: '보조 설명 · 인프라 제외',
     tone: 'guarded',
-    summary: '기존 추천 결과의 근거 receipt와 구조화 정정 요청, 원본-정정 관찰, 사람 검토 처분을 잇는 권리·증적 흐름입니다.',
+    summary: '추천 결과의 receipt·정정·사람 검토 source를 설명하는 보조 항목입니다. 전체 인프라 지도의 실행 컴포넌트나 구축 대상으로 넣지 않습니다.',
     detailHref: 'index.html#section-25',
-    detailLabel: 'TRACE·JC-RECEIPT 구현 경계 보기',
+    detailLabel: 'TRACE·JC-RECEIPT 보조 경계 보기',
     stages: [
       { label: '최소 개인정보 Decision Receipt', x: 1480, y: 610 },
       { label: '정정 요청·원본-정정 관찰', x: 1650, y: 610 },
@@ -304,9 +308,9 @@ const commonHead = `
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ko_KR">
   <meta property="og:image" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/assets/JCAREER_FULL_INFRA_ANIMATED.png">
-  <meta property="og:image:alt" content="서비스 사용자, 업무망과 Slack, GitHub delivery, AWS 기준 설계와 별도 MLOps의 관계를 연결한 J-Career 전체 인프라 지도">
+  <meta property="og:image:alt" content="서비스 사용자, 업무망과 Slack, GitHub delivery, AWS 기준 설계, LLM Gateway·Bedrock·OpenDART와 별도 MLOps의 관계를 연결한 J-Career 전체 인프라 지도">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image:alt" content="서비스 사용자, 업무망과 Slack, GitHub delivery, AWS 기준 설계와 별도 MLOps의 관계를 연결한 J-Career 전체 인프라 지도">
+  <meta name="twitter:image:alt" content="서비스 사용자, 업무망과 Slack, GitHub delivery, AWS 기준 설계, LLM Gateway·Bedrock·OpenDART와 별도 MLOps의 관계를 연결한 J-Career 전체 인프라 지도">
   <link rel="preconnect" href="https://api.fontshare.com">
   <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -561,7 +565,7 @@ ${commonHead}
         <div>
           <p class="kicker">JC-ASIS-SPEC-001 · 2026.08 기준 설계</p>
           <h1>J-Career 서비스·인프라<br>시스템 명세</h1>
-          <p class="hero-copy">채용 서비스의 기능과 데이터, AWS 인프라와 운영 통제, MLOps 모델 검증을 한 문서로 정리했습니다. 업무망 PC 180대와 서울 리전 2-AZ, 6개 Terraform 모듈, 110개 계획 항목을 기준으로 읽고, TRACE·외부 업무도구는 기본 비활성 로컬 확장으로 구분합니다.</p>
+          <p class="hero-copy">채용 서비스의 기능과 데이터, AWS 인프라와 운영 통제, LLM Gateway·Bedrock·OpenDART, MLOps 모델 검증을 한 문서로 정리했습니다. 업무망 PC 180대와 서울 리전 2-AZ, 6개 Terraform 모듈, 110개 기준 계획을 읽되 서로 다른 구현·적용 상태를 섞지 않습니다. TRACE·JC-RECEIPT는 실행 인프라가 아닌 보조 설명으로 구분합니다.</p>
           <p class="hero-links"><a href="#mlops-overview">MLOps 7단계 바로 보기 ↓</a><a href="../../mlops/">MLOps 전용 페이지 ↗</a></p>
         </div>
         <dl class="doc-control">
@@ -569,8 +573,8 @@ ${commonHead}
           <div><dt>기준일</dt><dd>2026-08-31</dd></div>
           <div><dt>문서 상태</dt><dd>기준 설계 · 기술 검토 진행</dd></div>
           <div><dt>배포 단계</dt><dd>AS-IS 미적용 · 검증 Lab 별도</dd></div>
-          <div><dt>MLOps</dt><dd>별도 7단계 · 계획 0 / 13 / 14</dd></div>
-          <div><dt>로컬 확장</dt><dd>TRACE·Slack·Notion·SMTP · 기본 비활성</dd></div>
+          <div><dt>MLOps</dt><dd>bootstrap 13개 적용 · runtime 미배포</dd></div>
+          <div><dt>외부·보조 경계</dt><dd>Slack·Notion·SMTP default-off · TRACE 인프라 제외</dd></div>
         </dl>
       </div>
     </div>
@@ -630,13 +634,13 @@ ${commonHead}
         <div>
           <p class="section-label">MLOps 모델 검증</p>
           <h2 id="mlops-overview-title">후보 모델은 사람 검토 전까지 추천에 쓰지 않습니다.</h2>
-          <p class="mlops-bridge__copy">합성 회원·기업 자료에서 다섯 가지 비교 수치만 뽑아 입력 파일을 만듭니다. 담당자가 작업을 한 번 시작하면 후보 모델과 비교 결과가 남습니다. 자동 일정과 자동 배포는 두지 않았습니다.</p>
+          <p class="mlops-bridge__copy">합성 회원·기업 자료에서 다섯 가지 비교 수치만 뽑아 입력 파일을 만드는 구조입니다. S3·ECR·DynamoDB·IAM·CloudWatch Logs 기반 13개는 적용됐지만 이미지 게시와 Lambda runtime 배포·실행은 하지 않았습니다. 자동 일정과 자동 승격도 없습니다.</p>
           <div class="mlops-plan" aria-label="MLOps Terraform 단계별 계획 수">
             <div data-mlops-plan="0"><strong>0</strong><span>기본 잠금</span><small>생성 계획 없음</small></div>
-            <div data-mlops-plan="13"><strong>13</strong><span>보관함 준비</span><small>파일·상태·로그·권한</small></div>
-            <div data-mlops-plan="14"><strong>14</strong><span>한 번 실행 준비</span><small>13개 + 작업 실행기</small></div>
+            <div data-mlops-plan="13"><strong>13</strong><span>기반 적용 확인</span><small>S3·ECR·상태·로그·권한</small></div>
+            <div data-mlops-plan="14"><strong>14</strong><span>runtime 미배포</span><small>13개 + Lambda Trainer</small></div>
           </div>
-          <p class="mlops-boundary">MLOps는 기준 110개와 분리한 별도 계획이며 수치를 합산하지 않습니다. AWS 배포와 모델 품질은 이 문서에서 확인하지 않았습니다.</p>
+          <p class="mlops-boundary">MLOps는 기준 110개와 분리하며 수치를 합산하지 않습니다. bootstrap 13개 적용은 확인했지만 ECR 이미지, Lambda 실행, 결과 6종, 모델 품질과 추천 서비스 연결은 확인되지 않았습니다.</p>
           <div class="mlops-actions"><a class="button button--accent" href="../../mlops/">7단계 자세히 보기</a><a class="button" href="../../mlops/JCAREER_MLOPS_SYSTEM_SPEC.pdf">MLOps PDF</a></div>
         </div>
         <div class="mlops-bridge__flow">
@@ -677,7 +681,7 @@ const architectureHtml = `<!doctype html>
 <head>
 ${commonHead}
   <meta property="og:title" content="J-Career 전체 인프라 지도">
-  <meta property="og:description" content="업무망, GitHub CI·Pages, AWS 기준 설계와 별도 serverless MLOps를 상태 경계와 함께 탐색합니다.">
+  <meta property="og:description" content="업무망, Slack, GitHub CI·Pages, AWS 기준 설계, LLM Gateway·Bedrock·OpenDART와 별도 serverless MLOps를 상태 경계와 함께 탐색합니다.">
   <meta property="og:url" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/architecture.html">
   <link rel="canonical" href="https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/architecture.html">
   <meta name="flow-source-sha256" content="${flowSourceHash}">
@@ -725,10 +729,10 @@ ${commonCss}
     .flow-detail__link::after { content: ' →'; margin-left: 4px; }
     .flow-detail__link:hover { color: var(--accent); border-color: var(--accent); }
     .flow-explorer__exclusion { margin: 13px 0 0; color: #aebbc4; font-size: .72rem; }
-    .plate__frame { position: relative; margin: 0 12px 12px 0; padding: 18px; overflow: auto; background: var(--surface); border: 1px solid var(--line); box-shadow: 12px 12px 0 #d4cdc0, 0 34px 72px rgba(45,49,47,.14); perspective: 1800px; }
+    .plate__frame { position: relative; margin: 0 12px 12px 0; padding: 18px; overflow: auto; background: var(--surface); border: 1px solid var(--line); box-shadow: 12px 12px 0 #d4cdc0, 0 34px 72px rgba(45,49,47,.14); }
     .diagram-media[hidden] { display: none !important; }
     .diagram-stage { position: relative; width: 100%; min-width: 720px; }
-    .diagram-stage--full { --stage-rx: 0deg; --stage-ry: 0deg; min-width: 880px; transform: rotateX(var(--stage-ry)) rotateY(var(--stage-rx)); transform-origin: 50% 55%; transition: transform .16s ease-out; }
+    .diagram-stage--full { min-width: 880px; }
     .diagram-stage > a, .diagram-stage img { display: block; width: 100%; }
     .diagram-stage img { height: auto; border: 1px solid var(--line); filter: saturate(.82) contrast(1.02); transition: filter .35s ease; }
     .diagram-stage--full img { filter: saturate(.94) contrast(1.02); box-shadow: 0 20px 50px rgba(24,34,41,.12); }
@@ -756,7 +760,7 @@ ${commonCss}
     .flow-callout.unknown { fill: rgba(255,255,255,.18); stroke: #5a6c86; stroke-dasharray: 12 9; }
     .flow-callout-text { fill: var(--ink); font: 800 24px/1.2 var(--sans); text-anchor: middle; }
     .plate__frame.is-zoomed .diagram-stage { width: 2400px; }
-    .plate__frame.is-zoomed .diagram-stage--full { width: 1780px; }
+    .plate__frame.is-zoomed .diagram-stage--full { width: 2320px; }
     .diagram-legend { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 10px 22px; color: var(--muted); font-size: .74rem; }
     .diagram-legend span { display: inline-flex; align-items: center; gap: 7px; }
     .legend-line { width: 32px; border-top: 4px solid #e87928; }
@@ -796,33 +800,33 @@ ${commonCss}
     <div class="masthead__inner">
       <div class="utility"><a href="index.html">← 기술 명세</a><nav class="utility__links" aria-label="산출물"><a href="../../mlops/">MLOps 7단계</a><a href="JCAREER_FULL_INFRA.drawio">전체 편집 원본</a><a href="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg">전체 SVG</a><a href="JCAREER_ASIS_SYSTEM_SPEC.pdf">PDF</a><a href="validation-report.json">검증 JSON</a><button class="motion-toggle-doc" type="button" data-motion-toggle aria-pressed="false" hidden><span data-motion-label>움직임 줄이기</span></button></nav></div>
       <div class="doc-hero">
-        <div><p class="kicker">JC-ASIS-ARCH-001 · full system atlas</p><h1>J-Career 전체<br>인프라 지도</h1><p class="hero-copy">서비스 사용자, 업무망과 Slack·외부 업무도구, GitHub CI·Pages, AWS 런타임 기준 설계와 별도 서버리스 MLOps를 한 연결 지도에서 탐색합니다. TRACE·JC-RECEIPT는 실행 컴포넌트에 섞지 않고 별도 보조 설명으로만 둡니다.</p></div>
-        <dl class="doc-control"><div><dt>GitHub delivery</dt><dd>검사 + Pages 배포 구현</dd></div><div><dt>업무망</dt><dd>180대 · Windows 100 / macOS 80</dd></div><div><dt>외부 업무도구</dt><dd>Slack·Notion·SMTP · default-off</dd></div><div><dt>AWS 설계</dt><dd>2-AZ · 6개 모듈 · 계획 110개 · 미배포</dd></div><div><dt>MLOps</dt><dd>별도 7단계 · 계획 0 / 13 / 14</dd></div><div><dt>관계 점선</dt><dd>의존 표시 · 자동 연결 아님</dd></div></dl>
+        <div><p class="kicker">JC-ASIS-ARCH-001 · full system atlas</p><h1>J-Career 전체<br>인프라 지도</h1><p class="hero-copy">서비스 사용자, 업무망과 Slack·외부 업무도구, GitHub CI·Pages, AWS 비접속 런타임 기준 설계, LLM Gateway·Bedrock·OpenDART와 별도 서버리스 MLOps를 한 연결 지도에서 탐색합니다. TRACE·JC-RECEIPT는 실행 컴포넌트에 섞지 않고 별도 보조 설명으로만 둡니다.</p></div>
+        <dl class="doc-control"><div><dt>GitHub delivery</dt><dd>Actions 검사 · branch Pages 배포</dd></div><div><dt>업무망</dt><dd>180대 · Windows 100 / macOS 80</dd></div><div><dt>외부 업무도구</dt><dd>Slack·Notion·SMTP · default-off</dd></div><div><dt>AWS 설계</dt><dd>2-AZ · 6개 모듈 · 계획 110개 · 미배포</dd></div><div><dt>MLOps</dt><dd>bootstrap 13개 적용 · runtime 미배포</dd></div><div><dt>관계 점선</dt><dd>의존 표시 · 자동 연결 아님</dd></div></dl>
       </div>
     </div>
   </header>
   <main class="plate" id="diagram">
-    <div class="plate__nav"><p>GitHub 검사는 <span class="status local">구현</span>, 업무망 수량은 <span class="status confirmed" title="내부 상태 코드: USER_CONFIRMED">사용자 확인</span>, AWS와 MLOps는 <span class="status modelled" title="내부 상태 코드: MODELLED">미배포 기준 설계</span>로 구분합니다.</p><div><button class="button button--accent" id="diagram-zoom" type="button" aria-pressed="false">원본 크기로 보기</button> <a class="button" href="JCAREER_FULL_INFRA.drawio">전체 편집 원본</a> <a class="button" href="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg">전체 SVG</a></div></div>
+    <div class="plate__nav"><p>GitHub 검사는 <span class="status local">구현</span>, 업무망 수량은 <span class="status confirmed" title="내부 상태 코드: USER_CONFIRMED">사용자 확인</span>, AWS 2-AZ 기준선은 <span class="status modelled" title="내부 상태 코드: MODELLED">미배포 설계</span>, MLOps는 <span class="status confirmed" title="내부 상태 코드: MLOPS_BOOTSTRAP_APPLIED_RUNTIME_NOT_DEPLOYED">bootstrap만 적용</span>으로 구분합니다.</p><div><button class="button button--accent" id="diagram-zoom" type="button" aria-pressed="false">원본 크기로 보기</button> <a class="button" href="JCAREER_FULL_INFRA.drawio">전체 편집 원본</a> <a class="button" href="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg">전체 SVG</a></div></div>
     <dl class="axis-rail" aria-label="전체 지도 네 영역의 상태">
       <div><dt>01 · workplace</dt><dd>업무망 PC 180대<br><code>USER_CONFIRMED · 실물 미관찰</code></dd></div>
-      <div><dt>02 · GitHub delivery</dt><dd>Actions 검사 → Pages<br><code>IMPLEMENTED · AWS 배포 없음</code></dd></div>
-      <div><dt>03 · AWS runtime</dt><dd>2-AZ · 계획 110개<br><code>MODELLED · NOT DEPLOYED</code></dd></div>
-      <div><dt>04 · serverless MLOps</dt><dd>0 / 13 / 14 · 사람 검토<br><code>GUARDED PLAN · UNWIRED</code></dd></div>
+      <div><dt>02 · GitHub delivery</dt><dd>Actions 검사 + main branch Pages<br><code>SEPARATE PATHS · AWS 배포 없음</code></dd></div>
+      <div><dt>03 · AWS runtime</dt><dd>4 ECS units · LLM Gateway · Bedrock 경계<br><code>2-AZ 110 MODELLED · NOT DEPLOYED</code></dd></div>
+      <div><dt>04 · serverless MLOps</dt><dd>S3·ECR·DynamoDB·IAM·Logs 기반<br><code>BOOTSTRAP 13 APPLIED · RUNTIME NOT DEPLOYED</code></dd></div>
     </dl>
     <div class="architecture-workspace">
     <section class="flow-explorer" aria-labelledby="flow-explorer-title">
       <div class="flow-explorer__head">
         <div><p class="kicker">전체 지도 1개 · 서비스·보조 경로 8개</p><h2 id="flow-explorer-title">흐름을 고르되 전체 맥락은 잃지 않습니다.</h2></div>
-        <p>전체 시스템은 사용자·업무망·Slack·GitHub·AWS·MLOps를 관계선으로 함께 표시합니다. MLOps를 선택해도 전체 지도를 유지해 입력과 검토 후 반영 경계를 같이 보여 주며, 7단계 상세는 별도 링크에서 엽니다.</p>
+        <p>전체 시스템은 사용자·업무망·Slack·GitHub·AWS·LLM Gateway·Bedrock·OpenDART·MLOps를 관계선으로 함께 표시합니다. AI 설명과 MLOps를 선택해도 전체 지도를 유지해 공급자·입력·검토 경계를 같이 보여 주며, MLOps 7단계 상세는 별도 링크에서 엽니다.</p>
       </div>
       <div class="flow-selector" role="group" aria-label="표시할 서비스·보조 경로">
-        <button class="flow-button" type="button" data-flow-button="overview" aria-pressed="true" aria-controls="flow-detail"><strong>전체 시스템 지도</strong><small>업무망 · GitHub · AWS · MLOps</small></button>
+        <button class="flow-button" type="button" data-flow-button="overview" aria-pressed="true" aria-controls="flow-detail"><strong>전체 시스템 지도</strong><small>업무망 · GitHub · AWS · AI · MLOps</small></button>
         <button class="flow-button" type="button" data-flow-button="candidate" aria-pressed="false" aria-controls="flow-detail"><strong>구직자 공고 추천</strong><small>AI · 구현 범위</small></button>
         <button class="flow-button" type="button" data-flow-button="recruiter" aria-pressed="false" aria-controls="flow-detail"><strong>기업용 인재 찾기</strong><small>AI · 공고 지원자 안에서</small></button>
-        <button class="flow-button" type="button" data-flow-button="explanation" aria-pressed="false" aria-controls="flow-detail"><strong>AI 설명 만들기</strong><small>점수와 분리</small></button>
-        <button class="flow-button" type="button" data-flow-button="mlops" aria-pressed="false" aria-controls="flow-detail"><strong>MLOps 학습·평가</strong><small>모델 검증 · 검토 대기</small></button>
+        <button class="flow-button" type="button" data-flow-button="explanation" aria-pressed="false" aria-controls="flow-detail"><strong>AI 설명 만들기</strong><small>LLM Gateway · Bedrock 경계</small></button>
+        <button class="flow-button" type="button" data-flow-button="mlops" aria-pressed="false" aria-controls="flow-detail"><strong>MLOps 학습·평가</strong><small>bootstrap 적용 · runtime 대기</small></button>
         <button class="flow-button" type="button" data-flow-button="workplace" aria-pressed="false" aria-controls="flow-detail"><strong>업무망·Slack</strong><small>외부 SaaS · 운영 미확인</small></button>
-        <button class="flow-button" type="button" data-flow-button="trace" aria-pressed="false" aria-controls="flow-detail"><strong>TRACE·JC-RECEIPT</strong><small>증적·정정 · 기본 비활성</small></button>
+        <button class="flow-button" type="button" data-flow-button="trace" aria-pressed="false" aria-controls="flow-detail"><strong>TRACE·JC-RECEIPT</strong><small>보조 설명 · 인프라 제외</small></button>
         <button class="flow-button" type="button" data-flow-button="integrations" aria-pressed="false" aria-controls="flow-detail"><strong>외부 업무도구</strong><small>Slack · Notion · SMTP</small></button>
         <button class="flow-button" type="button" data-flow-button="operations" aria-pressed="false" aria-controls="flow-detail"><strong>기록·탐지</strong><small>운영 보조 경로</small></button>
       </div>
@@ -830,17 +834,17 @@ ${commonCss}
         <div>
           <span class="flow-detail__status status modelled" id="flow-status">구현·설계 경계</span>
           <h3 id="flow-title">전체 시스템 지도</h3>
-          <p class="flow-detail__summary" id="flow-summary">사용자, 업무망·외부 SaaS, GitHub delivery, AWS 기준 런타임과 별도 MLOps를 연결 관계까지 한 장에서 봅니다.</p>
+          <p class="flow-detail__summary" id="flow-summary">사용자, 업무망·외부 SaaS, GitHub delivery, AWS 기준 런타임, LLM Gateway·Bedrock·OpenDART와 별도 MLOps를 연결 관계까지 한 장에서 봅니다.</p>
         </div>
         <div class="flow-detail__route"><strong>순서대로 읽는 단계</strong><ol class="flow-steps" id="flow-steps" aria-label="전체 인프라 단계별 경로">${flowStepItems('overview')}</ol></div>
-        <div class="flow-detail__boundary"><strong>설계 범위</strong><p id="flow-boundary">GitHub Actions는 검사와 Pages 배포까지 구현되어 있습니다. AWS 2-AZ·110개와 MLOps 0/13/14는 미배포 계획입니다. 점선은 관계를 보이지만 자동 배포·운영 DB 연결·자동 승격을 뜻하지 않습니다.</p><a class="flow-detail__link" id="flow-detail-link" href="index.html#section-14">서비스·구성요소 명세 보기</a></div>
+        <div class="flow-detail__boundary"><strong>설계 범위</strong><p id="flow-boundary">GitHub Actions는 PR/main 검사를 수행하고 Pages는 별도 legacy main/(root) branch source로 배포됩니다. AWS 2-AZ·110개 기준선은 미배포 설계입니다. Bedrock은 직접 합성 호출만 확인됐으며, MLOps는 bootstrap 13개만 적용되고 Lambda runtime·실행·추천 연결은 없습니다. 점선은 자동 배포나 운영 DB 연결을 뜻하지 않습니다.</p><a class="flow-detail__link" id="flow-detail-link" href="index.html#section-14">서비스·구성요소 명세 보기</a></div>
       </article>
-      <p class="flow-explorer__exclusion">Slack·Notion·SMTP는 AWS 밖의 업무도구 경계로 표시하며 기본 비활성·실전송 미확인입니다. TRACE·JC-RECEIPT는 실행 컴포넌트에서 제외하고 보조 설명에만 남깁니다.</p>
+      <p class="flow-explorer__exclusion">Slack·Notion·SMTP는 AWS 밖의 업무도구 경계로 표시하며 기본 비활성·실전송 미확인입니다. Bedrock은 직접 호출과 end-to-end를 분리하고, OpenDART는 source-only·미배포로 표시합니다. TRACE·JC-RECEIPT는 실행 컴포넌트에서 제외하고 보조 설명에만 남깁니다.</p>
     </section>
     <figure class="plate__frame" id="diagram-frame" aria-describedby="flow-boundary diagram-caption" data-active-media="overview">
       <div class="diagram-media" data-flow-media="overview" aria-hidden="false">
-        <div class="diagram-stage diagram-stage--full" data-spatial-stage data-full-map>
-          <a href="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg" aria-label="업무망, Slack, GitHub CI, AWS와 MLOps 전체 인프라 SVG 원본 열기"><img src="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-animated-diagram data-motion-src="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-still-src="../../assets/JCAREER_FULL_INFRA_ANIMATED.png" width="1780" height="1240" fetchpriority="high" decoding="async" alt="서비스 사용자와 업무망 PC 180대, Slack·Notion·SMTP 외부 경계, GitHub Actions 검사와 Pages 배포, AWS 2-AZ 기준 설계, 합성 대역 MLOps와 사람 검토 후 미구현 서비스 반영 관계를 한 장에 연결한 전체 인프라 지도"></a>
+        <div class="diagram-stage diagram-stage--full" data-full-map>
+          <a href="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg" aria-label="업무망, Slack, GitHub CI, AWS, LLM Gateway, Bedrock, OpenDART와 MLOps 전체 인프라 SVG 원본 열기"><img src="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-animated-diagram data-motion-src="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-still-src="../../assets/JCAREER_FULL_INFRA_ANIMATED.png" width="2320" height="1500" fetchpriority="high" decoding="async" alt="서비스 사용자와 업무망 PC 180대, Slack·Notion·SMTP 외부 경계, PR·main GitHub Actions 검사와 별도 main branch Pages 배포, AWS 2-AZ 기준 설계, LLM Gateway와 Bedrock 직접 호출·전체 경로 경계, OpenDART source-only 경로, bootstrap 13개만 적용된 MLOps와 미배포 runtime을 한 장에 연결한 전체 인프라 지도"></a>
         </div>
       </div>
       <div class="diagram-media" data-flow-media="asis" aria-hidden="true" hidden>
@@ -901,7 +905,7 @@ ${svgStepMarkers('operations', 'record')}
           <a href="../serverless-mlops/JCAREER_MLOPS_FLOW.svg" aria-label="서버리스 MLOps 7단계 SVG 원본 열기"><img src="../serverless-mlops/JCAREER_MLOPS_FLOW.svg" width="2400" height="1400" loading="eager" decoding="async" alt="합성 자료를 숫자 특징으로 바꾸고 S3에 보관한 뒤 사람이 Lambda 학습을 한 번 시작하고, 결과와 상태를 저장한 다음 사람 검토 대기에서 멈추는 서버리스 MLOps 7단계 흐름도"></a>
         </div>
       </div>
-      <figcaption class="diagram-legend" id="diagram-caption"><span><i class="legend-line"></i>화살표·움직이는 점: 영역 안의 처리 순서</span><span><i class="legend-line local"></i>촘촘한 점선: 코드·관리·데이터·승인 관계</span><span><i class="legend-line missing"></i>AWS·MLOps는 미배포 설계</span><span><i class="legend-line record"></i>점선은 자동 배포·운영 DB 연결·자동 승격이 아님</span></figcaption>
+      <figcaption class="diagram-legend" id="diagram-caption"><span><i class="legend-line"></i>화살표·움직이는 점: 영역 안의 처리 순서</span><span><i class="legend-line local"></i>촘촘한 점선: 코드·관리·데이터·승인 관계</span><span><i class="legend-line missing"></i>AWS 기준선 미배포 · MLOps bootstrap만 적용</span><span><i class="legend-line record"></i>점선은 자동 배포·운영 DB 연결·자동 승격이 아님</span></figcaption>
     </figure>
     </div>
     <section class="plate__section plate__source" data-flow-source-sha256="${flowSourceHash}">${flowBody}</section>
@@ -931,7 +935,7 @@ ${svgStepMarkers('operations', 'record')}
       const key = Object.hasOwn(flowDefinitions, requestedKey) ? requestedKey : 'overview';
       const definition = flowDefinitions[key];
       const updateFlow = () => {
-        const mediaKey = key === 'overview' || key === 'mlops' ? 'overview' : 'asis';
+        const mediaKey = ['overview', 'mlops', 'explanation'].includes(key) ? 'overview' : 'asis';
         flowButtons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.flowButton === key)));
         flowLayers.forEach((layer) => layer.classList.toggle('is-active', layer.dataset.flowLayer === key));
         flowMedia.forEach((media) => {

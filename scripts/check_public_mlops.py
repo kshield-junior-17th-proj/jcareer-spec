@@ -63,9 +63,9 @@ EXPECTED_NOTES = [
     "MLOps stage URL state, invalid-stage fallback, and browser history were checked by scripts/check_public_ui.mjs.",
     "Eight motion checks covered the carousel, MLOps stage rail, animated architecture, manual motion toggle, and reduced-motion fallback.",
     "The animated architecture source hash, 15 nodes, 11 edges, 17 motion dots, 1480x820 PNG, and manual visual review were recorded together.",
-    "The full infrastructure source hash, 32 nodes, 32 edges, 21 motion dots, 1780x1240 PNG, editable draw.io source, and manual visual review were recorded together.",
+    "The full infrastructure source hash, 45 nodes, 47 edges, 22 motion dots, 45 label backplates, 2320x1500 PNG, editable draw.io source, and manual visual review were recorded together.",
     "The MLOps PDF was rendered from mlops/index.html and carries that source file's SHA-256 marker.",
-    "The recent three-logical-database outcome delta is documented as unmerged and is not included in these PASS results.",
+    "The three logical databases, LLM Gateway, Bedrock, OpenDART, Slack/workplace, and MLOps IAM are included; TRACE and JC-RECEIPT remain outside the execution infrastructure.",
 ]
 
 GENERATED_RESULT_NAMES = {
@@ -386,10 +386,10 @@ def check_evidence_report(errors: list[str]) -> None:
             "png_sha256": file_sha256(FULL_INFRA_PNG),
             "drawio": relative_name(FULL_INFRA_DRAWIO),
             "drawio_sha256": file_sha256(FULL_INFRA_DRAWIO),
-            "canvas_css_px": [1780, 1240],
-            "nodes": 32,
-            "edges": 32,
-            "motion_dots": 21,
+            "canvas_css_px": [2320, 1500],
+            "nodes": 45,
+            "edges": 47,
+            "motion_dots": 22,
             "visual_review": "PASS",
         },
     }
@@ -515,11 +515,11 @@ def check() -> list[str]:
         'id="mlops-overview"' in asis_text
         and asis_text.count('data-mlops-stage="') == 7
         and all(f'data-mlops-plan="{count}"' in asis_text for count in (0, 13, 14))
-        and "기준 110개와 분리한 별도 계획이며 수치를 합산하지 않습니다" in asis_text
+        and "bootstrap 13개 적용은 확인했지만" in asis_text
         and 'data-flow-button="mlops"' in architecture_text
         and 'data-flow-layer="mlops"' in architecture_text
-        and "MLOps를 선택해도 전체 지도를 유지해" in architecture_text
-        and "key === 'overview' || key === 'mlops' ? 'overview' : 'asis'" in architecture_text
+        and "AI 설명과 MLOps를 선택해도 전체 지도를 유지해" in architecture_text
+        and "['overview', 'mlops', 'explanation'].includes(key) ? 'overview' : 'asis'" in architecture_text
         and 'data-flow-media="mlops"' in architecture_text
         and "JCAREER_MLOPS_FLOW.svg" in architecture_text
         and "feature-only S3" in architecture_text
@@ -570,7 +570,7 @@ def check() -> list[str]:
 
     landing_text = (ROOT / "index.html").read_text(encoding="utf-8")
     landing_phrases = (
-        "구직자와 기업을 연결하는 채용 플랫폼",
+        "업무망과 GitHub delivery부터 AWS 요청 경로",
         "Terraform 기준 설계 항목",
         "데이터 아키텍처 확장안",
         "논리 데이터베이스 3개",
@@ -741,10 +741,10 @@ def check() -> list[str]:
         full_connected.add(node_id)
         pending.extend(full_adjacency[node_id] - full_connected)
     if (
-        full_spec.get("canvas") != {"w": 1780, "h": 1240}
-        or len(full_nodes) != 32
-        or len(full_edges) != 32
-        or full_motion_count != 21
+        full_spec.get("canvas") != {"w": 2320, "h": 1500}
+        or len(full_nodes) != 45
+        or len(full_edges) != 47
+        or full_motion_count != 22
         or len(full_ids) != len(set(full_ids))
         or full_svg_text.count('<path class="flow"')
         != sum(not edge.get("static", False) for edge in full_edges)
@@ -757,14 +757,26 @@ def check() -> list[str]:
         or f'data-spec-sha256="{file_sha256(FULL_INFRA_SPEC)}"'
         not in full_svg_text
         or "GitHub Actions CI" not in full_boundary_text
+        or "PR/main 검사 · deploy job 없음" not in full_boundary_text
+        or "legacy · main/(root) 공개 배포" not in full_boundary_text
         or "CI / AWS 경계" not in full_boundary_text
         or "업무망 PC 180대" not in full_boundary_text
         or "Slack · 외부 업무도구" not in full_boundary_text
         or "런타임 Amazon ECR" not in full_boundary_text
         or "IAM · Systems Manager" not in full_boundary_text
+        or "LLM Gateway" not in full_boundary_text
+        or "Bedrock Capability Broker" not in full_boundary_text
+        or "Amazon Bedrock" not in full_boundary_text
+        or "Serverless OpenDART" not in full_boundary_text
+        or "SQS×2 · Lambda · DDB · ECR/IAM/Logs" not in full_boundary_text
+        or "3개 논리 DB" not in full_boundary_text
+        or "MLOps IAM" not in full_boundary_text
+        or "role + policy 2개 적용" not in full_boundary_text
         or "TRAINED_PENDING_HUMAN_REVIEW" not in full_boundary_text
         or "자동 배포 없음" not in full_boundary_text
-        or "검토 → 서비스 반영 · 미구현" not in full_boundary_text
+        or "검토 후 서비스 반영 · 미구현" not in full_boundary_text
+        or full_spec.get("labelBackplates") is not True
+        or full_svg_text.count('class="node-label-backdrop"') != len(full_nodes)
     ):
         errors.append("full infrastructure spec-to-SVG contract is out of sync")
     full_guarded_motion_count = len(
@@ -791,11 +803,11 @@ def check() -> list[str]:
             or not full_drawio_edges
             or not full_drawio_bound
             or "mxgraph.aws4" not in FULL_INFRA_DRAWIO.read_text(encoding="utf-8")
-            or not {"user", "office_slack", "runtime_ecr", "public_zone", "app_zone", "data_zone"}.issubset(full_cell_ids)
+            or not {"user", "office_slack", "runtime_ecr", "public_zone", "app_zone", "data_zone", "llm_gateway", "bedrock", "opendart_path", "logical_dbs", "mliam"}.issubset(full_cell_ids)
         ):
             errors.append("full infrastructure draw.io topology contract is incomplete")
     try:
-        if png_size(FULL_INFRA_PNG) != (1780, 1240):
+        if png_size(FULL_INFRA_PNG) != (2320, 1500):
             errors.append(
                 f"unexpected full infrastructure PNG size: {png_size(FULL_INFRA_PNG)}"
             )

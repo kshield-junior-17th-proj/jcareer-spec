@@ -5,7 +5,7 @@
 > 핵심 수치: 업무망 PC 180대, 2-AZ, 6개 모듈, Terraform 계획 항목 110개
 
 이 문서는 [JCAREER_ASIS_FLOW.drawio](JCAREER_ASIS_FLOW.drawio)의 짧은 해설이다.
-[웹 도면](architecture.html)에서는 서비스 사용자·업무망과 Slack·GitHub CI와 Pages·AWS 기준 설계·별도 MLOps를
+[웹 도면](architecture.html)에서는 서비스 사용자·업무망과 Slack·GitHub CI와 Pages·AWS 기준 설계·LLM Gateway·Bedrock·OpenDART·별도 MLOps를
 합친 [전체 지도 편집 원본](JCAREER_FULL_INFRA.drawio)과
 [애니메이션 SVG](../../assets/JCAREER_FULL_INFRA_ANIMATED.svg)를 먼저 볼 수 있다. 여덟 개
 서비스·보조 경로를 누르면 AWS 상세 강조 도면으로 바뀐다. MLOps를 누르면 전체 연결 지도를
@@ -20,11 +20,12 @@
 - 업무망 PC 180대: Windows 100대, macOS 80대
 - Terraform 구성: 가용 영역 2곳, 서브넷 6개, 모듈 6개
 - Terraform 기준선: 6개 모듈, 계획 항목 110개
-- 별도 MLOps: 기본 0개, 기반 준비 13개, 일회성 실행 준비 14개
+- 별도 MLOps: bootstrap 기반 13개 적용 확인, runtime 14번째 Lambda 미배포·미실행
 
-GitHub Actions는 저장소 단위시험과 공개 문서 검사를 수행하고 통과한 공개 명세를 GitHub Pages에
-배포한다. AWS 또는 MLOps를 자동 배포하는 워크플로는 없다. 전체 지도의 CI/AWS 점선은 IaC와
-배포 대상의 관계만 표시하며 실행선을 뜻하지 않는다.
+GitHub Actions는 PR과 `main` push에서 저장소 단위시험과 공개 문서 검사를 수행한다.
+GitHub Pages는 Actions deploy job이 아니라 legacy `main / (root)` branch source를 배포한다.
+AWS 또는 MLOps를 자동 배포하는 워크플로는 없다. 전체 지도의 CI/AWS 점선은 IaC와 배포 대상의
+관계만 표시하며 실행선을 뜻하지 않는다.
 
 ## 1. 선 읽는 법
 
@@ -52,10 +53,10 @@ GitHub Actions는 저장소 단위시험과 공개 문서 검사를 수행하고
 |---|---|---|
 | 구직자 공고 추천 | 이력서와 열린 공고의 조건을 비교하는 흐름 | 합격 예측이 아닌 조건 일치도 제공 |
 | 기업용 인재 찾기 | 자사 공고에 지원한 활성 후보자를 비교하는 흐름 | 최대 3명의 비교 선택은 현재 화면에서만 유지 |
-| AI 설명 만들기 | 확정된 점수와 근거를 읽기 쉬운 문장으로 바꾸는 흐름 | 점수·순위와 설명 생성 권한 분리 |
-| MLOps 학습·평가 | 합성 자료 준비부터 사람 검토 대기까지의 모델 검증 흐름 | 서비스 연계 전 별도 검증 단계 |
+| AI 설명 만들기 | API → LLM Gateway → 조건부 broker → Bedrock 관계 | LLM Gateway 로컬 구현, Bedrock 직접 호출 PASS, 전체 경로 미확인 |
+| MLOps 학습·평가 | 합성 자료 준비부터 사람 검토 대기까지의 모델 검증 흐름 | bootstrap 13개 적용, runtime/Lambda·서비스 연계 전 |
 | 업무망·Slack | PC 수량, VPN+MFA·UTM 선언과 외부 업무 SaaS 자산대장 경계 | Slack 실제 workspace 운영과 AWS 연동은 확인되지 않음 |
-| TRACE·JC-RECEIPT | 추천 당시 근거 receipt, 구조화 정정 요청과 사람 검토 기록 | 기본 비활성 로컬 소스이며 자동 채용·이의판정 없음 |
+| TRACE·JC-RECEIPT | 보조 설명에서만 다루는 receipt·정정·사람 검토 source | 실행 인프라·구현 대상으로 전체 지도에 넣지 않음 |
 | 외부 업무도구 | admin의 고정 합성 이벤트를 Slack·Notion·SMTP로 보내는 opt-in 경로 | 실제 credential·외부 전송·AWS 리소스 없음 |
 | 기록·탐지 | 위협 탐지, 파일·앱 로그 목적지, AWS 작업 기록을 왼쪽부터 확인 | 운영 효과는 별도 관찰 기록에서 확인 |
 
@@ -63,8 +64,9 @@ GitHub Actions는 저장소 단위시험과 공개 문서 검사를 수행하고
 최대 3명의 계산 내역을 나란히 보는 로컬 UI를 포함한다. 필터는 서버가 준 순서를 바꾸지
 않는다. 기업 선언문과 자소서의 문자열 대조도 기존 점수에 반영되지 않는다.
 
-OpenDART 기업 공개정보는 추천 점수와 분리된 보조 자료이므로 서비스 경로로 세지 않는다.
-MLOps를 선택하면 기준 110개와 분리된 서버리스 모델 검증 루트 7단계를 전용 도면으로 보여 준다.
+OpenDART 기업 공개정보는 추천 점수와 분리된 source-only 보조 경계로 전체 지도에 표시한다.
+SQS FIFO 2개·Lambda·DynamoDB·ECR·IAM·CloudWatch Logs의 0/8/11 source가 있지만 배포와 실호출은 확인되지 않았다.
+MLOps를 선택하면 기준 110개와 분리된 서버리스 모델 검증 루트 7단계를 전체 맥락 안에서 보여 준다.
 
 ### 3.1 MLOps 경로를 번호로 따라가기
 
@@ -76,15 +78,24 @@ MLOps를 선택하면 기준 110개와 분리된 서버리스 모델 검증 루�
 6. S3에 결과 파일 6개, DynamoDB에 실행 상태를 남긴다.
 7. `TRAINED_PENDING_HUMAN_REVIEW`에서 끝내고 사람의 결정을 기다린다.
 
-전용 Terraform은 기본 잠금 0개, 보관함 준비 13개, 한 번 실행 준비 14개 계획으로 나뉜다.
-기준 Terraform의 110개와 합산하지 않는다. 소스와 AWS 비접속 계획을 확인한 것이며 실제 AWS
-배포, Lambda 실행, 모델 승인이나 추천 서비스 연결을 확인한 결과는 아니다. 자세한 일곱 단계는
+전용 Terraform은 기본 잠금 0개, bootstrap 13개, runtime 14개로 나뉜다.
+2026-08-31 bootstrap 13개 기반 적용은 확인됐지만 이미지 게시·14번째 Lambda 배포·실행,
+결과 6종·모델 승인·추천 서비스 연결은 확인되지 않았다. 기준 Terraform의 110개와 합산하지 않는다. 자세한 일곱 단계는
 [MLOps 전용 명세](../../mlops/)에서 확인할 수 있다.
 
-자동 일정, 자동 모델 승격과 현재 추천 런타임 배선은 없다. 공개 도면의 MLOps 선은 이 별도 루트가
-명시적으로 활성화됐을 때의 계획 흐름이며 기준 110개 AWS 설계의 실행선이 아니다.
+자동 일정, 자동 모델 승격과 현재 추천 런타임 배선은 없다. 공개 도면의 MLOps 처리선은
+bootstrap 기반과 아직 실행하지 않은 runtime 단계를 함께 설명하며 기준 110개 AWS 설계의 실행선이 아니다.
 
-### 3.2 업무망과 Slack 경계
+### 3.2 LLM Gateway·Bedrock·OpenDART 경계
+
+1. ECS 기준선에는 `web`·`api`·`agent`·`llm-gateway` 네 서비스 정의가 있다.
+2. LLM Gateway는 설명 전용 로컬 소스가 구현됐지만 기준 ECR 이미지 게시와 AWS 실행은 미확인이다.
+3. Bedrock adapter는 Gateway 안에 있고 기본값은 `local-synthetic-stub`, `ALLOW_BEDROCK_LIVE=false`다.
+4. APAC Nova Lite 직접 합성 호출 한 건(입력 39·출력 53토큰)은 PASS다.
+5. 조건부 capability broker는 별도 Lab source이며 `API → Gateway → Broker → Bedrock` 전체 경로는 미확인이다.
+6. OpenDART는 별도 broker와 SQS 2개·Lambda·DynamoDB·ECR·IAM·Logs의 0/8/11 serverless source만 있으며 적용·API key·외부 실조회는 미확인이다.
+
+### 3.3 업무망과 Slack 경계
 
 1. 업무망 수량은 Windows 100대와 macOS 80대, 합계 180대로 사용자 확인됐다.
 2. VPN+MFA와 UTM은 시나리오 선언이다. 이 저장소에서 구현·배치·운영 관찰을 확인한 상태가 아니다.
@@ -95,7 +106,7 @@ MLOps를 선택하면 기준 110개와 분리된 서버리스 모델 검증 루�
 보존·삭제 정책과 전송은 `SCENARIO_USE_UNVERIFIED`다. Amazon Q Developer(AWS Chatbot), SNS,
 EventBridge나 새 Terraform 리소스는 없다.
 
-### 3.3 TRACE·JC-RECEIPT 경계
+### 3.4 TRACE·JC-RECEIPT 경계
 
 1. 기존 70·20·10 추천 결과가 성공하면 최소 개인정보 receipt를 만들 수 있다.
 2. 지원자는 구조화 정정 요청을 내고, 원본과 정정 입력의 점수 관찰값을 분리해 볼 수 있다.
@@ -105,7 +116,7 @@ EventBridge나 새 Terraform 리소스는 없다.
 자료, 운영 승인, AWS 배포와 새 Terraform 리소스는 없다. 합격, 이의, ISO 충족 또는 잔여위험을
 자동 판정하지 않는다.
 
-### 3.4 외부 업무도구 경계
+### 3.5 외부 업무도구 경계
 
 1. admin 상태 API는 Slack·Notion·SMTP 설정의 활성 가능 여부만 확인하고 외부 probe를 하지 않는다.
 2. admin 합성 전송 API는 고정 `SYNTHETIC_NON_PERSONAL` 이벤트만 받고 감사 요청을 먼저 기록한다.
@@ -129,13 +140,13 @@ AWS 리소스는 확인하지 않았다. SMTP 소스 존재를 조직 그룹웨�
 ## 5. 기준 설계 밖의 항목
 
 - 서비스 구현 코드는 검증용 합성 데이터를 사용한다. 전체 source/static/fixture 검사 115건을 통과했다. 이는 소스와 시험 자료의 예상 결과를 대조한 값이며 AWS 실행 결과가 아니다.
-- OpenDART 공개정보 기능의 기본값은 합성 예시다. SQS·Lambda 작업자 소스는 있으나 AWS 자원과 실행 증거는 없다.
-- MLOps 전용 루트는 합성 특징 파일만 받도록 작성됐고 현재 추천 점수나 순위를 바꾸지 않는다. 0/13/14는 별도 계획 수이며 AWS 배포 수량이 아니다.
-- MLOps 전용 경계 시험 19건과 합성 파이프라인 시험 22건을 통과했다. AWS 배포와 모델 품질 평가는 포함하지 않는다.
+- OpenDART 공개정보 기능의 기본값은 합성 예시다. 0/8/11 source는 있으나 Terraform 적용·API key·외부 실조회는 없다.
+- MLOps 전용 루트는 합성 특징 파일만 받도록 작성됐고 현재 추천 점수나 순위를 바꾸지 않는다. bootstrap 13개 기반만 적용됐고 runtime/Lambda는 미배포·미실행이다.
+- MLOps 전용 경계 시험 19건과 합성 파이프라인 시험 22건을 통과했다. 기반 적용은 모델 품질 평가나 운영 완료를 뜻하지 않는다.
 - Slack·Notion·SMTP 어댑터는 기본 비활성 소스와 무통신 시험만 있으며 workspace·메일 시스템 운영이나 실제 전송을 증명하지 않는다.
 - TRACE·JC-RECEIPT는 기본 비활성 로컬 소스다. 운영 승인·실데이터·자동 채용/이의/적합성/잔여위험 판정 증거가 아니다.
 - Bedrock 직접 합성 호출은 별도 AWS 검증 계정에서 확인했다. API→gateway→broker→Bedrock 전체 경로는 별도 항목이며 아직 확인하지 못했다.
-- AWS 검증 Lab은 생성 예정 24개 계획을 두 차례 확인했지만 모두 같은 IAM 권한에서 중단됐다. 각 실패의 부분 생성 16개를 지웠고, 2026-08-30 21:17 KST에 관련 자원과 상태가 모두 0개임을 다시 확인했다. 계획 24개·부분 생성 16개·AS-IS 기준선 110개는 서로 합산하지 않는다.
+- AWS 검증 Lab은 생성 예정 24개 계획을 두 차례 확인했지만 같은 IAM 권한에서 중단됐다. 각 실패의 부분 생성 16개를 지웠고 2026-08-31 LabOnly 7개 신호도 0이었다. 별도 MLOps 13개·state S3·계획 24개·AS-IS 기준선 110개를 서로 합산하지 않는다.
 - 컨설턴트 대시보드는 고객사 AWS에 직접 연결하지 않는다. 승인된 비식별본만 받아야 한다.
 - 외부 미리보기에는 민감정보 제거본만 쓴다.
 - 개선안(TO-BE)은 승인 전 리소스 0개를 유지한다. 승인 정보에 문제가 있으면 중단한다.

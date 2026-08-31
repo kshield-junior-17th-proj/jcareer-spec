@@ -3,17 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="J-Career의 채용 서비스 구조, AWS 기준 설계, 데이터 아키텍처와 AI 모델 검증 절차를 한눈에 보여 줍니다.">
+  <meta name="description" content="J-Career의 업무망·GitHub CI, AWS 기준 설계, LLM Gateway·Bedrock·OpenDART, 데이터 아키텍처와 MLOps 상태를 한눈에 보여 줍니다.">
   <meta name="theme-color" content="#172129">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ko_KR">
   <meta property="og:title" content="J-Career 서비스 아키텍처">
-  <meta property="og:description" content="채용 서비스 구조와 AWS 기준 설계, MLOps 검증 흐름을 한곳에서 확인합니다.">
+  <meta property="og:description" content="업무망·Slack, GitHub delivery, AWS 기준 설계, LLM Gateway·Bedrock·OpenDART와 MLOps 검증 흐름을 한곳에서 확인합니다.">
   <meta property="og:url" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/">
   <meta property="og:image" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/assets/JCAREER_FULL_INFRA_ANIMATED.png">
-  <meta property="og:image:alt" content="서비스 사용자, 업무망과 Slack, GitHub delivery, AWS 기준 설계와 별도 MLOps의 관계를 연결한 J-Career 전체 인프라 지도">
+  <meta property="og:image:alt" content="서비스 사용자, 업무망과 Slack, GitHub delivery, AWS 기준 설계, LLM Gateway·Bedrock·OpenDART와 별도 MLOps의 관계를 연결한 J-Career 전체 인프라 지도">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image:alt" content="서비스 사용자, 업무망과 Slack, GitHub delivery, AWS 기준 설계와 별도 MLOps의 관계를 연결한 J-Career 전체 인프라 지도">
+  <meta name="twitter:image:alt" content="서비스 사용자, 업무망과 Slack, GitHub delivery, AWS 기준 설계, LLM Gateway·Bedrock·OpenDART와 별도 MLOps의 관계를 연결한 J-Career 전체 인프라 지도">
   <link rel="canonical" href="https://kshield-junior-17th-proj.github.io/jcareer-spec/">
   <link rel="preconnect" href="https://api.fontshare.com">
   <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
@@ -46,29 +46,29 @@
           <div class="hero-coordinate"><span>37.5665° N · 126.9780° E</span><span>SEOUL / SYSTEM MAP 01</span></div>
           <p class="eyebrow">서비스·클라우드 아키텍처 · 2026.08</p>
           <h1><span>J-Career</span>서비스 시스템 맵</h1>
-          <p class="hero-copy">구직자와 기업을 연결하는 채용 플랫폼에서 요청이 AWS 서비스와 데이터 경계를 지나고, 후보 모델이 별도 검증면에서 멈추는 지점을 하나의 구조로 보여 줍니다.</p>
+          <p class="hero-copy">업무망과 GitHub delivery부터 AWS 요청 경로, LLM Gateway·Bedrock·OpenDART, 별도 MLOps까지 서로 닿는 지점을 한 장에 표시합니다. 구현·적용·미확인 상태는 같은 뜻으로 섞지 않습니다.</p>
           <div class="hero-actions">
             <a class="button" href="terraform/asis/architecture.html">시스템 맵 탐색</a>
             <a class="text-link" href="mlops/">MLOps 검증면 보기 <span aria-hidden="true">↗</span></a>
           </div>
           <dl class="hero-ledger" aria-label="설계 상태 요약">
             <div><dt>BASELINE</dt><dd>2-AZ · 계획 110</dd></div>
-            <div><dt>MODEL PLANE</dt><dd>0 → 13 → 14</dd></div>
-            <div><dt>RUNTIME</dt><dd>배포 관찰 아님</dd></div>
+            <div><dt>MODEL PLANE</dt><dd>bootstrap 13 적용</dd></div>
+            <div><dt>RUNTIME</dt><dd>Lambda 미배포</dd></div>
           </dl>
         </div>
 
-        <div class="spatial-stage" data-spatial-stage aria-label="서비스 기준 설계와 별도 MLOps 검증 경계를 입체적으로 표현한 시스템 맵">
+        <div class="spatial-stage" aria-label="서비스 기준 설계와 별도 MLOps 검증 경계를 평면 기술 도면으로 표현한 시스템 맵">
           <div class="spatial-stage__halo" aria-hidden="true"></div>
           <div class="spatial-stage__shadow" aria-hidden="true"></div>
           <div class="spatial-stage__deck">
             <div class="spatial-stage__edge" aria-hidden="true"></div>
-            <img class="hero-blueprint spatial-stage__map" src="assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-animated-diagram data-motion-src="assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-still-src="assets/JCAREER_FULL_INFRA_ANIMATED.png" width="1780" height="1240" loading="lazy" decoding="async" alt="" aria-hidden="true">
+            <img class="hero-blueprint spatial-stage__map" src="assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-animated-diagram data-motion-src="assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-still-src="assets/JCAREER_FULL_INFRA_ANIMATED.png" width="2320" height="1500" loading="lazy" decoding="async" alt="" aria-hidden="true">
             <span class="spatial-stage__scan" aria-hidden="true"></span>
           </div>
           <div class="spatial-callout spatial-callout--service"><span>SERVICE PLANE</span><strong>request → data</strong></div>
           <div class="spatial-callout spatial-callout--mlops"><span>MODEL PLANE</span><strong>human gate</strong></div>
-          <div class="spatial-stage__status"><span><i aria-hidden="true"></i> EXPLORABLE MODEL</span><strong>06 ROUTES</strong></div>
+          <div class="spatial-stage__status"><span><i aria-hidden="true"></i> CONNECTED SYSTEM MAP</span><strong>09 VIEWS</strong></div>
         </div>
       </div>
       <div class="shell hero-transit">
@@ -139,7 +139,7 @@
         <div class="workstream-stack" data-card-stack>
         <article class="workstream">
           <p class="workstream-kicker">01 · 기준 설계</p>
-          <div><h3>AWS 서비스 아키텍처</h3><p>서울 리전의 두 가용 영역에 네 애플리케이션 서비스와 데이터·보안·관측 구성을 배치합니다. Terraform 설계 항목은 110개입니다.</p></div>
+          <div><h3>AWS 서비스 아키텍처</h3><p>서울 리전의 두 가용 영역에 web·API·agent·LLM Gateway 네 서비스와 데이터·보안·관측 구성을 배치합니다. Terraform 기준 계획 110개는 미배포 설계입니다.</p></div>
           <a class="workstream-link" href="terraform/asis/">상세 명세 →</a>
         </article>
         <article class="workstream">
@@ -149,7 +149,7 @@
         </article>
         <article class="workstream">
           <p class="workstream-kicker">03 · 모델 검증</p>
-          <div><h3>MLOps 검증 체계</h3><p>다섯 가지 비교 수치로 후보 모델을 한 차례 학습하고 결과를 보관합니다. 서비스 반영 전에는 담당자 검토 단계에서 멈춥니다.</p></div>
+          <div><h3>MLOps 검증 체계</h3><p>S3·ECR·DynamoDB·IAM·CloudWatch Logs 기반 13개는 적용됐습니다. 이미지 게시와 Lambda runtime 실행은 없고 서비스 반영 전 사람 검토 경계를 유지합니다.</p></div>
           <a class="workstream-link" href="mlops/">7단계 흐름 →</a>
         </article>
         <article class="workstream">
@@ -195,21 +195,21 @@
             <p class="section-label">전체 인프라</p>
             <h2>서비스별 경로를<br>한 장에서 확인합니다</h2>
           </div>
-          <p class="section-intro">서비스 사용자와 업무망·Slack, GitHub delivery, AWS 런타임, MLOps를 한 연결 지도에 놓았습니다. 실선은 영역 안의 순서, 촘촘한 점선은 자동화되지 않은 배포·데이터·승인 관계입니다.</p>
+          <p class="section-intro">서비스 사용자와 업무망·Slack, GitHub delivery, AWS 런타임, LLM Gateway·Bedrock·OpenDART, MLOps를 한 연결 지도에 놓았습니다. 실선은 영역 안의 순서, 촘촘한 점선은 자동화되지 않은 배포·데이터·승인 관계입니다.</p>
         </div>
         <nav class="flow-shortcuts" aria-label="서비스별 인프라 경로 바로가기">
           <a href="terraform/asis/architecture.html"><span aria-hidden="true">전체</span><strong>전체 인프라</strong><small>①~⑥ 기준 흐름</small></a>
           <a href="terraform/asis/architecture.html?flow=candidate"><span aria-hidden="true">추천</span><strong>구직자 공고 추천</strong><small>조건 비교 흐름</small></a>
           <a href="terraform/asis/architecture.html?flow=recruiter"><span aria-hidden="true">기업</span><strong>기업용 인재 찾기</strong><small>자사 공고 지원자</small></a>
-          <a href="terraform/asis/architecture.html?flow=explanation"><span aria-hidden="true">설명</span><strong>AI 설명 만들기</strong><small>점수와 분리</small></a>
-          <a href="terraform/asis/architecture.html?flow=mlops"><span aria-hidden="true">검증</span><strong>MLOps 학습·평가</strong><small>사람 검토 대기</small></a>
+          <a href="terraform/asis/architecture.html?flow=explanation"><span aria-hidden="true">설명</span><strong>AI 설명 만들기</strong><small>Gateway·Bedrock 경계</small></a>
+          <a href="terraform/asis/architecture.html?flow=mlops"><span aria-hidden="true">검증</span><strong>MLOps 학습·평가</strong><small>기반 적용·runtime 대기</small></a>
           <a href="terraform/asis/architecture.html?flow=workplace"><span aria-hidden="true">업무망</span><strong>업무망·Slack</strong><small>운영 미확인 경계</small></a>
-          <a href="terraform/asis/architecture.html?flow=trace"><span aria-hidden="true">증적</span><strong>TRACE·JC-RECEIPT</strong><small>기본 비활성 소스</small></a>
+          <a href="terraform/asis/architecture.html?flow=trace"><span aria-hidden="true">보조</span><strong>TRACE·JC-RECEIPT</strong><small>인프라 대상에서 제외</small></a>
           <a href="terraform/asis/architecture.html?flow=integrations"><span aria-hidden="true">연동</span><strong>외부 업무도구</strong><small>Slack·Notion·SMTP</small></a>
           <a href="terraform/asis/architecture.html?flow=operations"><span aria-hidden="true">운영</span><strong>기록·탐지</strong><small>로그·위협 탐지</small></a>
         </nav>
         <a class="architecture-frame" href="terraform/asis/architecture.html" aria-label="대화형 전체 인프라 도면 열기" data-scale-reveal>
-          <img src="assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-animated-diagram data-motion-src="assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-still-src="assets/JCAREER_FULL_INFRA_ANIMATED.png" width="1780" height="1240" loading="lazy" decoding="async" alt="서비스 사용자, 업무망 PC 180대와 Slack·Notion·SMTP 외부 경계, GitHub Actions 검사와 Pages 배포, AWS 2-AZ 기준 설계, 합성 대역 MLOps와 사람 검토 후 미구현 서비스 반영 관계를 연결한 전체 인프라 지도">
+          <img src="assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-animated-diagram data-motion-src="assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-still-src="assets/JCAREER_FULL_INFRA_ANIMATED.png" width="2320" height="1500" loading="lazy" decoding="async" alt="서비스 사용자, 업무망 PC 180대와 Slack·Notion·SMTP 외부 경계, PR·main GitHub Actions 검사와 별도 main branch Pages 배포, AWS 2-AZ 기준 설계, LLM Gateway와 Bedrock 직접 호출·전체 경로 경계, OpenDART source-only 경로, bootstrap 13개가 적용된 MLOps와 미배포 runtime의 관계를 연결한 전체 인프라 지도">
         </a>
         <p class="caption">움직이는 점은 영역 안의 처리 순서, 촘촘한 점선은 코드·관리·데이터·승인 관계입니다. 점선은 자동 배포나 운영 데이터 연결을 뜻하지 않습니다.</p>
       </div>
@@ -257,12 +257,12 @@
           </div>
           <div class="callout">
             <strong>현재 공개본은 Terraform 기준 설계와 합성 데이터 검증 결과를 담습니다.</strong>
-            <p>AWS 계정 배포와 운영 성능은 후속 검증 기록으로 관리합니다.</p>
+            <p>AWS 2-AZ 기준선과 운영 성능은 후속 검증 기록으로 관리합니다. 별도 MLOps bootstrap 13개 적용은 runtime 배포와 분리해 표시합니다.</p>
           </div>
         </div>
         <div class="spec-grid">
           <article class="spec-block"><h3>인프라 기준선</h3><p>110개는 Terraform이 계산한 생성 예정 항목입니다. AWS 배포 여부와 실행 이미지는 별도 검증 대상입니다.</p></article>
-          <article class="spec-block"><h3>MLOps 기본 잠금</h3><p>기본 설정에서는 계획 자원이 0개입니다. 다음 단계는 담당자가 설정과 확인값을 직접 입력해야 열립니다.</p></article>
+          <article class="spec-block"><h3>MLOps 적용 경계</h3><p>기본 설정은 0개이고 bootstrap 13개는 적용됐습니다. 14번째 Lambda runtime과 이미지 게시·실행·자동 승격은 아직 없습니다.</p></article>
           <article class="spec-block"><h3>데이터 범위</h3><p>현재 검증은 합성 데이터를 기준으로 합니다. 운영 데이터 반입에는 별도의 승인 절차와 고객사 분리 통제가 필요합니다.</p></article>
           <article class="spec-block"><h3>모델 해석 범위</h3><p>현 단계의 비교 수치는 조건 일치도를 살펴보는 데 사용합니다. 합격 가능성이나 인재 수준을 자동 판정하는 값에서는 제외합니다.</p></article>
         </div>
@@ -280,7 +280,7 @@
             <li class="readiness-item" data-readiness="done"><span class="readiness-index">04</span><div><strong>Bedrock 직접 합성 호출</strong><p>합성 문장 한 건의 모델 응답은 확인했습니다. 애플리케이션을 거치지 않은 별도 시험입니다.</p></div><span class="readiness-tag">직접 호출 확인</span></li>
             <li class="readiness-item" data-readiness="pending"><span class="readiness-index">05</span><div><strong>Bedrock 전체 연결 경로</strong><p>API→설명 게이트웨이→권한 중계기→Bedrock 경로는 IAM 역할을 만들지 못해 실행하지 못했습니다.</p></div><span class="readiness-tag">권한 보완 대기</span></li>
             <li class="readiness-item" data-readiness="pending"><span class="readiness-index">06</span><div><strong>OpenDART</strong><p>외부 조회는 관찰하지 않았습니다. 합성 예시와 작업자 빌드·검사 준비는 실조회 증거가 아닙니다.</p></div><span class="readiness-tag">외부 조회 미관찰</span></li>
-            <li class="readiness-item" data-readiness="pending"><span class="readiness-index">07</span><div><strong>MLOps</strong><p>합성 소스와 0/13/14 계획을 확인했습니다. AWS 배포, Lambda 실행과 추천 연결은 관찰하지 않았습니다.</p></div><span class="readiness-tag">소스·계획 확인</span></li>
+            <li class="readiness-item" data-readiness="pending"><span class="readiness-index">07</span><div><strong>MLOps</strong><p>bootstrap 13개 기반은 적용됐습니다. ECR 이미지 게시, 14번째 Lambda 배포·실행, 결과 생성과 추천 연결은 없습니다.</p></div><span class="readiness-tag">기반 적용·runtime 대기</span></li>
             <li class="readiness-item" data-readiness="pending"><span class="readiness-index">08</span><div><strong>업무 단말</strong><p>180대는 시나리오 입력입니다. Windows 3대와 macOS 3대 검토 표본도 실제로 관찰하지 않았습니다.</p></div><span class="readiness-tag">실물 미관찰</span></li>
             <li class="readiness-item" data-readiness="pending"><span class="readiness-index">09</span><div><strong>컨설턴트 대시보드</strong><p>고객사 AWS에 직접 연결하지 않습니다. 운영 전에는 사용자별 인증, 고객사 분리, 감사 기록과 승인된 복사본 반입이 필요합니다.</p></div><span class="readiness-tag">운영 조건 필요</span></li>
           </ol>
