@@ -4,9 +4,9 @@ import crypto from 'node:crypto';
 
 const root = path.dirname(new URL(import.meta.url).pathname.replace(/^\/(?:([A-Za-z]):)/, '$1:'));
 const sourcePath = path.join(root, 'JCAREER_ASIS_SYSTEM_SPEC.md');
-const source = fs.readFileSync(sourcePath, 'utf8').replace(/^\uFEFF/, '');
+const source = fs.readFileSync(sourcePath, 'utf8').replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
 const flowSourcePath = path.join(root, 'JCAREER_ASIS_FLOW.md');
-const flowSource = fs.readFileSync(flowSourcePath, 'utf8').replace(/^\uFEFF/, '');
+const flowSource = fs.readFileSync(flowSourcePath, 'utf8').replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
 
 const escapeHtml = (value) => value
   .replaceAll('&', '&amp;')
