@@ -91,6 +91,14 @@ TEXT_SUFFIXES = {
 }
 
 
+def is_hash_text_artifact(path: Path) -> bool:
+    return (
+        path.suffix.lower() in TEXT_SUFFIXES
+        or path.suffix.lower() == ".mjs"
+        or path.name.startswith("Dockerfile.")
+    )
+
+
 class PageParser(HTMLParser):
     def __init__(self) -> None:
         super().__init__()
@@ -210,7 +218,7 @@ def is_forbidden_artifact(path: Path) -> bool:
 
 def file_sha256(path: Path) -> str:
     value = path.read_bytes()
-    if path.suffix.lower() in TEXT_SUFFIXES:
+    if is_hash_text_artifact(path):
         value = value.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
     return hashlib.sha256(value).hexdigest()
 
