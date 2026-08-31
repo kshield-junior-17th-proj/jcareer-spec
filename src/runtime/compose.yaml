@@ -92,6 +92,8 @@ services:
       SESSION_TTL_SECONDS: 43200
       AUTO_SEED: "true"
       DATASET_PROFILE: demo_not_for_measurement
+      TRACE_MODE: ${TRACE_MODE:-disabled}
+      TRACE_SUBJECT_KEY: ${TRACE_SUBJECT_KEY:-synthetic-local-trace-subject-key-change-me}
       OPENDART_DISPATCH_MODE: ${OPENDART_DISPATCH_MODE:-fixture_inline}
       OPENDART_REFRESH_QUEUE_URL: ${OPENDART_REFRESH_QUEUE_URL:-}
       OPENDART_RESULT_TABLE: ${OPENDART_RESULT_TABLE:-}

@@ -22,6 +22,7 @@ from sqlalchemy import String, cast, delete, func, or_, select, text, update
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session, joinedload
 
+from . import trace_receipts
 from .database import (
     CompanyBase,
     MemberBase,
@@ -3184,3 +3185,6 @@ def admin_audit(
     )
     db.commit()
     return response
+
+
+trace_receipts.install_trace(app, matcher_runner=run_matcher)

@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 const webRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const app = readFileSync(resolve(webRoot, "src/App.jsx"), "utf8");
 const main = readFileSync(resolve(webRoot, "src/main.jsx"), "utf8");
-const css = readFileSync(resolve(webRoot, "src/styles.css"), "utf8");
+const css = readFileSync(resolve(webRoot, "src/styles.css"), "utf8").replace(/\r\n/g, "\n");
 const index = readFileSync(resolve(webRoot, "index.html"), "utf8");
 const api = readFileSync(resolve(webRoot, "../api/app/main.py"), "utf8");
 const openDart = readFileSync(resolve(webRoot, "../api/app/opendart.py"), "utf8");
