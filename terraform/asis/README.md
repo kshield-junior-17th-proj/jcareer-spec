@@ -37,6 +37,8 @@
 - [업무망·GitHub CI·AWS·MLOps 전체 지도 원본](JCAREER_FULL_INFRA.drawio)
 - [전체 지도 해설](JCAREER_FULL_INFRA.md)
 - [웹용 애니메이션 전체 지도](../../assets/JCAREER_FULL_INFRA_ANIMATED.svg)
+- [기업 목표·USD 50 핵심 평가 슬라이스](../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg)
+- [핵심 평가 슬라이스 해설](../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.md)
 - [쉽게 보는 draw.io 원본](JCAREER_ASIS_FLOW.drawio)
 - [쉽게 보는 PNG 도면](JCAREER_ASIS_FLOW.drawio.png)
 - [보조 상세 draw.io 원본](JCAREER_ASIS_2AZ.drawio)
@@ -45,6 +47,11 @@
 `JCAREER_FULL_INFRA.drawio`는 업무망·Slack, GitHub 검사·Pages 배포, AWS 기준 설계,
 LLM Gateway·Bedrock·OpenDART와 별도 MLOps를 한 장에 합친 편집 원본이다. CI에서 AWS로
 이어지는 자동 배포선은 없으며 실제 구현처럼 그리지 않는다.
+
+별도 핵심 평가 슬라이스 지도는 전체 기업 목표를 대체하지 않는다. 고정비가 큰 목표 구조와
+USD 50 한도에서 실제 평가·시연에 사용할 서버리스 실행면, 사람이 승인한 snapshot만 읽는
+Evidence Desk를 구분한다. AWS 적용 전에는 `DEPLOYMENT EVIDENCE PENDING`으로 표시하며,
+GitHub Pages 배포를 AWS 서비스 배포 증거로 사용하지 않는다.
 
 `JCAREER_ASIS_2AZ.drawio`는 원본 작업 트리에서 관리한 별도 기술 기록이다. 공개 기준 도면의
 수량과 검증 결과에는 합치지 않는다. 공개 화면은 60개 셀·14개 연결의

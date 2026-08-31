@@ -158,3 +158,22 @@ AWS 리소스는 확인하지 않았다. SMTP 소스 존재를 조직 그룹웨�
 - 업무망 PC가 AWS에 연결됐다는 뜻이 아니다. 실제 접속 경로는 확인하지 못했다.
 - Slack workspace가 운영 중이거나 AWS 알림·이벤트와 연결됐다는 뜻이 아니다.
 - TRACE·JC-RECEIPT와 외부 업무도구 소스가 실제 운영 또는 AWS에 배포됐다는 뜻이 아니다.
+
+## 7. USD 50 핵심 평가 슬라이스와 컨설팅 경계
+
+기업 목표 설계를 없애거나 축소한 것이 아니다. 고정비가 큰 ECS·RDS·Redis·NAT 2-AZ 구성은
+목표 설계로 유지하고, 현재 예산에서 실제 OWASP LLM 시연과 증적 수집에 필요한 경로만 별도
+서버리스 스택으로 배포한다.
+
+1. 지원자·채용담당자는 CloudFront HTTPS 화면에서 AI 매칭 실행을 요청한다.
+2. API Gateway와 API Lambda는 tenant 경계와 입력 계약을 검사하고 `202 Accepted`를 반환한다.
+3. SQS가 요청을 보존하고 Agent Lambda가 결정식 점수와 근거를 만든다.
+4. LLM Gateway는 설명에 필요한 최소 필드만 만들며 capability broker만 허용된 Bedrock model ARN을 호출한다.
+5. 결과와 correlation ID는 DynamoDB·S3·CloudWatch에 남고 화면은 상태를 polling한다.
+6. 컨설턴트는 고객 DB나 AWS API를 브라우저에서 직접 조회하지 않는다. 사람이 승인한 비식별·서명·만료 snapshot만 별도 Evidence Desk로 반입한다.
+
+OpenDART와 MLOps는 별도 수명주기다. 두 경로는 추천 결과에 자동 연결하지 않으며 사람 검토 전
+승격하지 않는다. Redis는 필수 저장소가 아닌 선택형 성능 계층으로 두고, 없을 때도 cache miss로
+정상 처리해야 한다. Windows 100대와 macOS 80대는 자산 모델이며 현재 실제 배포 수량이 아니다.
+새 지도 원본은 [`../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg`](../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg)이며,
+AWS 적용 전에는 URL·실행 성공·production 완료를 주장하지 않는다.

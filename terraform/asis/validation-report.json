@@ -1,5 +1,5 @@
 {
-    "generated_at":  "2026-08-31T17:12:37+09:00",
+    "generated_at":  "2026-08-31T20:43:54+09:00",
     "scope":  "local static validation only; no AWS API or terraform apply",
     "passed":  25,
     "failed":  0,
@@ -7,7 +7,7 @@
                    {
                        "check":  "required_files",
                        "status":  "PASS",
-                       "detail":  "all 6 deliverables present"
+                       "detail":  "all 9 deliverables present"
                    },
                    {
                        "check":  "readme_current_deliverables",
@@ -102,7 +102,7 @@
                    {
                        "check":  "flow_source_sync",
                        "status":  "PASS",
-                       "detail":  "index+architecture match generator inputs; flow ce76bf379cde..."
+                       "detail":  "index+architecture match generator inputs; flow 6ec7f79a8e49..."
                    },
                    {
                        "check":  "drawio_xml",
@@ -122,12 +122,12 @@
                    {
                        "check":  "pdf_page_objects",
                        "status":  "PASS",
-                       "detail":  "48 page objects; checkout mtime advisory=True; HTML source bound=True; loopback links=0"
+                       "detail":  "50 page objects; checkout mtime advisory=True; HTML source bound=True; loopback links=0"
                    },
                    {
                        "check":  "deliverable_secret_patterns",
                        "status":  "PASS",
-                       "detail":  "0 patterns across 6 UTF-8 sources + 2 binary sentinels"
+                       "detail":  "0 patterns across 9 UTF-8 sources + 2 binary sentinels"
                    }
                ]
 }
