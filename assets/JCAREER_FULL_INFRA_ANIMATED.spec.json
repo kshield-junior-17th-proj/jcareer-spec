@@ -1,0 +1,84 @@
+{
+  "title": "J-Career 전체 인프라 · 업무망 × GitHub CI × AWS × MLOps",
+  "subtitle": "GitHub CI·Pages는 현재 동작 · AWS AS-IS는 2-AZ 기준 설계 110개(미배포) · serverless MLOps는 별도 0/13/14 계획",
+  "footer": "GitHub Actions는 검사와 Pages 배포만 수행하며 AWS·MLOps 자동 배포선은 없습니다 · 움직이는 점은 설계 흐름이며 AWS 실행 관측이 아닙니다",
+  "canvas": {"w": 1780, "h": 1160},
+
+  "nodes": [
+    {"id": "repo", "x": 82, "y": 170, "icon": "tile:generic", "label": "GitHub 저장소", "sub": "as-is · jcareer-spec"},
+    {"id": "actions", "x": 320, "y": 170, "icon": "tile:generic", "label": "GitHub Actions CI", "sub": "required gate · public checks"},
+    {"id": "pages", "x": 558, "y": 170, "icon": "tile:external", "label": "GitHub Pages", "sub": "공개 명세 배포"},
+    {"id": "deploygate", "x": 810, "y": 170, "icon": "tile:generic", "label": "CI / AWS 경계", "sub": "AWS·MLOps 자동 배포 없음"},
+
+    {"id": "office", "x": 82, "y": 440, "icon": "tile:generic", "label": "업무망 PC 180대", "sub": "Windows 100 · macOS 80 · 실물 미관찰"},
+    {"id": "route", "x": 310, "y": 440, "icon": "route53", "label": "Amazon Route 53", "sub": "서비스 주소 안내"},
+    {"id": "front", "x": 520, "y": 440, "icon": "cloudfront", "label": "Amazon CloudFront", "sub": "웹 콘텐츠 전달"},
+    {"id": "waf", "x": 730, "y": 440, "icon": "waf", "label": "AWS WAF", "sub": "CloudFront 요청 검사"},
+    {"id": "alb", "x": 940, "y": 440, "icon": "elb", "label": "Application LB", "sub": "공개 서브넷 · HTTPS"},
+    {"id": "ecs", "x": 1160, "y": 440, "icon": "ecs", "label": "Amazon ECS Fargate", "sub": "웹·API·추천·설명 4종"},
+    {"id": "rds", "x": 1450, "y": 440, "icon": "rds", "label": "Amazon RDS", "sub": "PostgreSQL · primary/replica"},
+    {"id": "nat", "x": 930, "y": 570, "icon": "nat", "label": "NAT Gateway ×2", "sub": "앱 서브넷 외부 연결"},
+    {"id": "endpoints", "x": 1080, "y": 570, "icon": "endpoints", "label": "VPC Endpoints ×3", "sub": "SSM 관리 경로"},
+    {"id": "redis", "x": 1450, "y": 570, "icon": "tile:generic", "label": "Amazon ElastiCache", "sub": "Redis 추천 결과"},
+
+    {"id": "guard", "x": 520, "y": 720, "icon": "guardduty", "label": "Amazon GuardDuty", "sub": "위협 탐지 기준"},
+    {"id": "flowlogs", "x": 730, "y": 720, "icon": "flowlogs", "label": "VPC Flow Logs", "sub": "ALL 트래픽 기록"},
+    {"id": "cloudwatch", "x": 940, "y": 720, "icon": "cloudwatch", "label": "CloudWatch Logs", "sub": "access · flow · prompt"},
+    {"id": "s3data", "x": 1160, "y": 720, "icon": "s3", "label": "Amazon S3 ×3", "sub": "resume · ALB · CloudTrail"},
+    {"id": "trail", "x": 1450, "y": 720, "icon": "tile:generic", "label": "AWS CloudTrail", "sub": "관리 이벤트 → S3"},
+
+    {"id": "snapshot", "x": 300, "y": 900, "icon": "tile:generic", "label": "합성 특징 스냅샷", "sub": "CSV 1 · JSON 2 · 특징 5개"},
+    {"id": "mls3", "x": 550, "y": 900, "icon": "tile:generic", "label": "S3 입력 보관", "sub": "버전 고정 source package"},
+    {"id": "trainer", "x": 990, "y": 900, "icon": "lambda", "label": "Lambda Trainer", "sub": "수동 1회 · 동시성 1"},
+    {"id": "results", "x": 1210, "y": 900, "icon": "tile:generic", "label": "S3 결과 6개", "sub": "hash · VersionId 결속"},
+    {"id": "runs", "x": 1430, "y": 900, "icon": "dynamodb", "label": "DynamoDB Run State", "sub": "TRAINED_PENDING_HUMAN_REVIEW"},
+    {"id": "review", "x": 1640, "y": 900, "icon": "tile:generic", "label": "사람 검토 대기", "sub": "자동 승격·서비스 연결 없음"},
+    {"id": "ecr", "x": 780, "y": 1010, "icon": "ecr", "label": "Amazon ECR", "sub": "digest-pinned image"},
+    {"id": "mllogs", "x": 990, "y": 1010, "icon": "tile:generic", "label": "MLOps Logs", "sub": "Lambda 실행 기록"}
+  ],
+
+  "groups": [
+    {"kind": "event", "x": 34, "y": 94, "w": 900, "h": 154, "label": "GitHub delivery · 현재 동작 · AWS 배포와 분리", "lx": 52, "ly": 112},
+    {"kind": "region", "x": 222, "y": 286, "w": 1510, "h": 790, "label": "AWS 기준 설계 · 전역 서비스 + ap-northeast-2 · AS-IS 미배포", "lx": 242, "ly": 306},
+    {"kind": "subnet", "x": 862, "y": 354, "w": 674, "h": 284, "label": "VPC · public/app/data 서브넷 × 2-AZ", "lx": 882, "ly": 374},
+    {"kind": "event", "x": 238, "y": 814, "w": 1450, "h": 244, "label": "별도 serverless MLOps · disabled 0 / bootstrap 13 / runtime 14 · 승인 전 잠금", "lx": 258, "ly": 834}
+  ],
+
+  "edges": [
+    {"from": "repo", "fs": "r", "to": "actions", "ts": "l", "flow": "schedule", "label": "push / PR", "lxy": [198, 157]},
+    {"from": "actions", "fs": "r", "to": "pages", "ts": "l", "flow": "schedule", "label": "검사 통과", "lxy": [438, 157]},
+    {"from": "actions", "fs": "r", "to": "deploygate", "ts": "l", "flow": "aux", "static": true, "label": "검증만", "lxy": [678, 192]},
+
+    {"from": "office", "fs": "r", "to": "route", "ts": "l", "flow": "request"},
+    {"from": "route", "fs": "r", "to": "front", "ts": "l", "flow": "request"},
+    {"from": "front", "fs": "r", "to": "waf", "ts": "l", "flow": "request"},
+    {"from": "waf", "fs": "r", "to": "alb", "ts": "l", "flow": "request"},
+    {"from": "alb", "fs": "r", "to": "ecs", "ts": "l", "flow": "request"},
+    {"from": "ecs", "fs": "r", "to": "rds", "ts": "l", "flow": "request"},
+    {"from": "ecs", "fs": "b", "to": "redis", "ts": "l", "flow": "tool", "label": "cache", "lxy": [1310, 556], "mids": [[1160, 570]]},
+    {"from": "ecs", "fs": "b", "to": "endpoints", "ts": "t", "flow": "aux", "static": true, "mids": [[1160, 520], [1080, 520]]},
+
+    {"from": "flowlogs", "fs": "r", "to": "cloudwatch", "ts": "l", "flow": "garden"},
+    {"from": "ecs", "fs": "b", "to": "s3data", "ts": "t", "flow": "tool", "label": "objects / logs", "lxy": [1178, 650]},
+    {"from": "trail", "fs": "l", "to": "s3data", "ts": "r", "flow": "garden", "label": "management", "lxy": [1304, 707]},
+
+    {"from": "snapshot", "fs": "r", "to": "mls3", "ts": "l", "flow": "ambient", "label": "3 files", "lxy": [422, 887]},
+    {"from": "mls3", "fs": "r", "to": "trainer", "ts": "l", "flow": "ambient", "label": "manual invoke", "lxy": [768, 887]},
+    {"from": "trainer", "fs": "r", "to": "results", "ts": "l", "flow": "ambient"},
+    {"from": "results", "fs": "r", "to": "runs", "ts": "l", "flow": "ambient"},
+    {"from": "runs", "fs": "r", "to": "review", "ts": "l", "flow": "ambient"},
+    {"from": "ecr", "fs": "t", "to": "trainer", "ts": "b", "flow": "aux", "static": true, "label": "image digest", "lxy": [882, 966], "mids": [[780, 960], [990, 960]]},
+    {"from": "trainer", "fs": "b", "to": "mllogs", "ts": "t", "flow": "aux", "static": true}
+  ],
+
+  "journeys": [
+    {"flow": "request", "dur": 3.2, "hops": [["office", "route"], ["route", "front"], ["front", "waf"], ["waf", "alb"], ["alb", "ecs"], ["ecs", "rds"]]},
+    {"flow": "reply", "dur": 3.5, "reverse": true, "hops": [["ecs", "rds"], ["alb", "ecs"], ["waf", "alb"], ["front", "waf"], ["route", "front"], ["office", "route"]]},
+    {"flow": "schedule", "dur": 2.4, "hops": [["repo", "actions"], ["actions", "pages"]]},
+    {"flow": "ambient", "dur": 3.0, "hops": [["snapshot", "mls3"], ["mls3", "trainer"], ["trainer", "results"], ["results", "runs"], ["runs", "review"]]},
+    {"flow": "garden", "dur": 2.4, "hops": [["flowlogs", "cloudwatch"], ["trail", "s3data"]]}
+  ],
+
+  "steps": [["office", "route", 1], ["route", "front", 2], ["front", "waf", 3], ["waf", "alb", 4], ["alb", "ecs", 5], ["ecs", "rds", 6]],
+  "legend": ["request", "reply", "schedule", "ambient", "garden", "tool"]
+}

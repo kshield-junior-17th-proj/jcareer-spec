@@ -280,6 +280,7 @@ $flowLayerKeys = @([regex]::Matches($architecture, 'data-flow-layer="(?<key>[^"]
 $flowKeysOkay = ($flowButtonKeys -join ',') -eq ($expectedFlowKeys -join ',') -and ($flowLayerKeys -join ',') -eq ($expectedFlowKeys -join ',')
 $flowDefinitionMatch = [regex]::Match($architecture, '(?s)const flowDefinitions = (?<json>\{.*?\});\s*const flowButtons')
 $serviceFlowKeys = @('candidate', 'recruiter', 'explanation', 'mlops', 'workplace', 'trace', 'integrations', 'operations')
+$threeStageFlowKeys = @('candidate', 'recruiter', 'explanation', 'workplace', 'trace', 'integrations', 'operations')
 $serviceStageCounts = @{}
 $stageCoordinatesOkay = $false
 $flowDefinitionsOkay = $false
@@ -291,7 +292,7 @@ if ($flowDefinitionMatch.Success) {
             $serviceStageCounts[$key] = @($flowDefinitionsObject.$key.stages).Count
         }
         $badCoordinateKeys = [System.Collections.Generic.List[string]]::new()
-        foreach ($key in $serviceFlowKeys) {
+        foreach ($key in $threeStageFlowKeys) {
             $positions = @($flowDefinitionsObject.$key.stages | ForEach-Object { [int]$_.x })
             if ($positions.Count -ne 3 -or $positions[0] -ge $positions[1] -or $positions[1] -ge $positions[2]) {
                 $badCoordinateKeys.Add($key)
@@ -324,7 +325,8 @@ if ($flowDefinitionMatch.Success) {
             }
         }
         $flowDefinitionsOkay = @($flowDefinitionsObject.overview.stages).Count -eq 6 -and
-            (@($serviceStageCounts.Values | Where-Object { $_ -ne 3 }).Count -eq 0) -and
+            $serviceStageCounts['mlops'] -eq 7 -and
+            (@($threeStageFlowKeys | Where-Object { $serviceStageCounts[$_] -ne 3 }).Count -eq 0) -and
             $stageCoordinatesOkay
     } catch {
         $flowDefinitionsOkay = $false
@@ -348,15 +350,16 @@ for ($layerIndex = 0; $layerIndex -lt $layerOrder.Count; $layerIndex++) {
     $region = if ($start -ge 0 -and $end -gt $start) { $architecture.Substring($start, $end - $start) } else { '' }
     $layerRegions[$key] = $region
     $numbers = @([regex]::Matches($region, 'data-flow-step="([123])"') | ForEach-Object { $_.Groups[1].Value })
-    $expectedNumbers = if ($key -eq 'overview') { '' } else { '1,2,3' }
+    $expectedNumbers = if ($key -in @('overview', 'mlops')) { '' } else { '1,2,3' }
     if (($numbers -join ',') -ne $expectedNumbers) { $layerMarkersOkay = $false }
 }
 $mlopsLayerRegion = $layerRegions['mlops']
 $workplaceLayerRegion = $layerRegions['workplace']
 $mlopsSeparated = $mlopsLayerRegion -and
-    $mlopsLayerRegion.Contains('<path class="flow-line missing" d="M438 1138H2135"') -and
-    $mlopsLayerRegion.Contains('x="330" y="960" width="2030" height="380"') -and
-    $mlopsLayerRegion.Contains('flow-node missing')
+    -not $mlopsLayerRegion.Contains('<path') -and
+    -not $mlopsLayerRegion.Contains('flow-node') -and
+    $architecture.Contains('data-flow-media="mlops"') -and
+    $architecture.Contains('../serverless-mlops/JCAREER_MLOPS_FLOW.svg')
 $workplaceNoAwsFlow = $workplaceLayerRegion -and
     -not $workplaceLayerRegion.Contains('<path') -and
     -not $workplaceLayerRegion.Contains('flow-node') -and
@@ -372,7 +375,7 @@ $guardedFlowsOkay = $layerRegions['trace'].Contains('flow-line local') -and
     $architecture.Contains('TRACE_MODE 기본값은 disabled') -and
     $architecture.Contains('실제 credential, Slack·Notion workspace, 메일 시스템, 메시지 전송 또는 AWS 리소스는 없습니다')
 $overlayLegendOkay = $architecture.Contains('legend-line record') -and
-    $architecture.Contains('기록·탐지 구성') -and
+    $architecture.Contains('기록·탐지 경로') -and
     $architecture.Contains('.flow-line.record { stroke: #8a5a00; stroke-dasharray: 34 18; }') -and
     $architecture.Contains('@keyframes flowMarch')
 $interactiveFlowOkay = $flowButtonCount -eq 9 -and
@@ -380,7 +383,7 @@ $interactiveFlowOkay = $flowButtonCount -eq 9 -and
     $flowKeysOkay -and
     $flowDefinitionsOkay -and
     $detailLinksOkay -and
-    $stepMarkerCount -eq 24 -and $stepOneCount -eq 8 -and $stepTwoCount -eq 8 -and $stepThreeCount -eq 8 -and
+    $stepMarkerCount -eq 21 -and $stepOneCount -eq 7 -and $stepTwoCount -eq 7 -and $stepThreeCount -eq 7 -and
     $layerMarkersOkay -and
     $mlopsSeparated -and
     $workplaceNoAwsFlow -and
@@ -392,7 +395,7 @@ $interactiveFlowOkay = $flowButtonCount -eq 9 -and
     $architecture.Contains('자사 공고에 지원한 활성 후보자를 대상으로 합니다') -and
     $architecture.Contains('AI 설명 만들기') -and
     $architecture.Contains('MLOps 학습·평가') -and
-    $architecture.Contains('전체 보기 1개 · 서비스·보조 경로 8개') -and
+    $architecture.Contains('전체 지도 1개 · 서비스·보조 경로 8개') -and
     $architecture.Contains('모델 검증 · 검토 대기') -and
     $architecture.Contains('class="flow-step__number"') -and
     $architecture.Contains('class="flow-selector" role="group"') -and
@@ -401,6 +404,9 @@ $interactiveFlowOkay = $flowButtonCount -eq 9 -and
     $architecture.Contains('id="flow-detail-link"') -and
     $architecture.Contains('flowDetailLink.href = definition.detailHref') -and
     $architecture.Contains('flowDetailLink.textContent = definition.detailLabel') -and
+    $architecture.Contains('const flowMedia = [...document.querySelectorAll(''[data-flow-media]'')]') -and
+    $architecture.Contains('flowMedia.forEach') -and
+    $architecture.Contains('data-full-map') -and
     $architecture.Contains('.flow-detail__link:hover { color: var(--accent); border-color: var(--accent); }') -and
     -not $architecture.Contains('var(--accent-2)') -and
     $architecture.Contains('history.replaceState') -and
@@ -408,17 +414,18 @@ $interactiveFlowOkay = $flowButtonCount -eq 9 -and
     -not $architecture.Contains('<path class="flow-line local" d="M1600 582V920" />') -and
     $architecture.Contains('@media (prefers-reduced-motion: reduce)') -and
     $architecture.Contains('TRACE·JC-RECEIPT와 Slack·Notion·SMTP 어댑터는 기본 비활성 로컬 소스') -and
-    $architecture.Contains('실제 외부 전송·AWS 배포·새 Terraform 리소스가 없습니다')
-Add-Check 'interactive_service_flow' $interactiveFlowOkay "controls $flowButtonCount, overlay layers $flowLayerCount, eight per-layer 3-step paths, markers $stepMarkerCount; local/AWS data, MLOps, workplace and guarded-source separation, legend, URL state, detail links 9 checked"
+    $architecture.Contains('MLOps를 선택하면 빈 표식 대신 전용 7단계 도면으로 전환됩니다') -and
+    $architecture.Contains('실제 외부 전송·AWS 배포·새 Terraform 리소스가 없으며')
+Add-Check 'interactive_service_flow' $interactiveFlowOkay "controls $flowButtonCount, overlay layers $flowLayerCount, stages overview=6 MLOps=7 guarded/other=3, markers $stepMarkerCount; full/AS-IS/MLOps media switching, guarded-source separation, URL state, detail links 9 checked"
 
-$flowSourceText = (Get-Content -Raw -Encoding UTF8 (Join-Path $root 'JCAREER_ASIS_FLOW.md')).Replace("`r`n", "`n").Replace("`r", "`n")
-$flowSourceBytes = [System.Text.Encoding]::UTF8.GetBytes($flowSourceText)
+$normalizedFlowSource = (Get-Content -Raw -Encoding UTF8 (Join-Path $root 'JCAREER_ASIS_FLOW.md')).Replace("`r`n", "`n").Replace("`r", "`n")
 $flowSourceHasher = [System.Security.Cryptography.SHA256]::Create()
 try {
-    $flowSourceHash = ([System.BitConverter]::ToString($flowSourceHasher.ComputeHash($flowSourceBytes))).Replace('-', '').ToLowerInvariant()
+    $flowSourceHashBytes = $flowSourceHasher.ComputeHash([System.Text.Encoding]::UTF8.GetBytes($normalizedFlowSource))
 } finally {
     $flowSourceHasher.Dispose()
 }
+$flowSourceHash = [BitConverter]::ToString($flowSourceHashBytes).Replace('-', '').ToLowerInvariant()
 $generationOutput = @(& node (Join-Path $root 'build-spec.mjs') --check 2>&1)
 $generationExitCode = $LASTEXITCODE
 $flowHashOkay = $architecture.Contains("flow-source-sha256`" content=`"$flowSourceHash`"") -and

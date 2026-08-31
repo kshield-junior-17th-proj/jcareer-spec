@@ -149,21 +149,21 @@ const canonicalFlowSource = flowSource.replace(/\r\n?/g, '\n');
 const flowSourceHash = crypto.createHash('sha256').update(canonicalFlowSource, 'utf8').digest('hex');
 const architectureFlows = {
   overview: {
-    title: '전체 인프라',
-    status: 'Terraform 설계',
+    title: '전체 시스템 지도',
+    status: '구현·설계 경계',
     tone: 'modelled',
-    summary: '사용자 진입부터 앱, 저장소, 기록·탐지까지 기준 Terraform이 표현한 구성과, 선으로 연결하지 않은 외부 업무 시스템·독립 MLOps 경계를 함께 봅니다.',
+    summary: '업무망, GitHub 검사와 Pages 배포, AWS 기준 런타임, 별도 MLOps와 기본 비활성 로컬 확장을 한 장에서 보되 구현 상태를 섞지 않습니다.',
     detailHref: 'index.html#section-14',
     detailLabel: '서비스·구성요소 명세 보기',
     stages: [
-      { label: '서비스 접속' },
-      { label: '인터넷 주소 안내' },
-      { label: '웹 콘텐츠 전달' },
-      { label: '웹 요청 검사' },
-      { label: '앱 요청 분배' },
-      { label: '앱·저장소·기록 설계' }
+      { label: 'GitHub 저장소 → Actions 검사' },
+      { label: '검사 통과 → GitHub Pages 배포' },
+      { label: '업무망 PC → Route 53·CloudFront·WAF' },
+      { label: 'ALB → ECS Fargate 앱 서비스' },
+      { label: 'RDS·Redis·S3·기록·탐지 설계' },
+      { label: '별도 MLOps → 사람 검토 대기' }
     ],
-    boundary: '서울 리전 2-AZ, 6개 Terraform 모듈, 110개 계획 항목을 기준선으로 사용합니다. AWS 배포 상태와 실행 결과는 별도 검증 기록에서 관리합니다.'
+    boundary: 'GitHub Actions는 검사와 Pages 배포까지 구현되어 있습니다. 서울 리전 2-AZ·6개 모듈·110개 항목은 AWS 미배포 기준 설계이고, MLOps 0/13/14는 분리된 계획입니다. CI에서 AWS로 이어지는 자동 배포선은 없습니다.'
   },
   candidate: {
     title: '구직자 공고 추천',
@@ -211,13 +211,17 @@ const architectureFlows = {
     title: 'MLOps 학습·평가',
     status: '모델 검증 · 검토 대기',
     tone: 'guarded',
-    summary: '기준 110개와 분리된 default-off 서버리스 경로에서 feature-only 입력을 검사하고 결과 6개·상태·로그를 남긴 뒤 사람 검토를 기다립니다.',
+    summary: '기준 110개와 분리된 서버리스 경로에서 합성 특징 파일을 검사하고 후보 모델과 상태를 남긴 뒤 사람 검토를 기다립니다.',
     detailHref: '../../mlops/',
     detailLabel: 'MLOps 7단계 상세 보기',
     stages: [
-      { label: '합성 DB 옆 exporter → 특징 5개', x: 438, y: 1005 },
-      { label: 'feature-only S3 → 일회성 Lambda', x: 988, y: 1005 },
-      { label: '결과 6개·상태·로그 → 사람 검토 대기', x: 2135, y: 1005 }
+      { label: '합성 회원·기업 자료 읽기' },
+      { label: '숫자 비교 특징 5개 만들기' },
+      { label: 'S3에 입력 파일 3개 보관' },
+      { label: '사람이 한 번 실행 시작' },
+      { label: 'Lambda가 후보 모델 만들기' },
+      { label: 'S3 결과 6개·DynamoDB 상태 저장' },
+      { label: 'TRAINED_PENDING_HUMAN_REVIEW에서 정지' }
     ],
     boundary: '별도 terraform/serverless-mlops 계획은 기본 0개, 기반 준비 13개, 일회성 실행 14개이며 기준 110개와 합산하지 않습니다. 자동 일정·자동 승격·추천 런타임 배선과 AWS 배포·호출 결과는 없습니다.'
   },
@@ -297,10 +301,10 @@ const commonHead = `
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%23202b35'/%3E%3Cpath d='M19 14h9v24c0 9-5 13-14 12v-8c4 0 5-1 5-5V14zm14 0h17v8h-9v7h8v8h-8v13h-8V14z' fill='%23e87928'/%3E%3C/svg%3E">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ko_KR">
-  <meta property="og:image" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/JCAREER_ASIS_FLOW.drawio.png">
-  <meta property="og:image:alt" content="J-Career 채용 서비스와 AWS 구성의 전체 흐름도">
+  <meta property="og:image" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/assets/JCAREER_FULL_INFRA_ANIMATED.png">
+  <meta property="og:image:alt" content="업무망, GitHub CI와 Pages, AWS 기준 설계, 별도 MLOps를 함께 보여 주는 J-Career 전체 인프라 지도">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image:alt" content="J-Career 채용 서비스와 AWS 구성의 전체 흐름도">
+  <meta name="twitter:image:alt" content="업무망, GitHub CI와 Pages, AWS 기준 설계, 별도 MLOps를 함께 보여 주는 J-Career 전체 인프라 지도">
   <link rel="preconnect" href="https://api.fontshare.com">
   <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -611,11 +615,11 @@ ${commonHead}
 
       <section class="architecture" aria-labelledby="architecture-title">
         <div class="architecture__head">
-          <div><p class="section-label">상호작용 전체 흐름도</p><h2 id="architecture-title">전체 구성에서 서비스별 경로까지</h2><p>전체 보기와 서비스·보조 경로 8개를 제공합니다. 항목을 누르면 관련 구간, 번호와 확인 수준이 함께 바뀝니다.</p></div>
+          <div><p class="section-label">상호작용 전체 흐름도</p><h2 id="architecture-title">전체 구성에서 서비스별 경로까지</h2><p>전체 보기와 서비스·보조 경로 8개를 제공합니다. 경로를 누르면 관련 구간, 번호와 확인 수준이 함께 바뀝니다.</p></div>
           <a class="button" href="architecture.html">서비스 경로 탐색</a>
         </div>
         <a class="diagram-link" href="architecture.html" aria-label="서비스별로 탐색할 수 있는 AWS 인프라 흐름도 열기">
-          <img src="JCAREER_ASIS_FLOW.drawio.png" width="2400" height="1400" loading="lazy" decoding="async" alt="업무망 Windows 100대와 macOS 80대, 사용자 요청 6단계, AWS 서비스 아이콘, 독립 MLOps, Slack 외부 SaaS와 기본 비활성 TRACE·외부 업무도구 소스 경계를 표시한 J-Career 기존 설계 흐름도">
+          <img src="JCAREER_ASIS_FLOW.drawio.png" width="2400" height="1400" loading="lazy" decoding="async" alt="업무망 Windows 100대와 macOS 80대, 사용자 요청 6단계, 가용 영역 두 곳, 데이터 저장소, 기록·탐지와 승인 전 MLOps 확장 경계를 표시한 J-Career 기존 설계 흐름도">
         </a>
         <div class="diagram-caption"><span>실선: 구성 확인 · 점선: 실제 연결 미구현</span><span>서비스별 강조 경로는 도면 페이지에서 확인 · 비밀정보 미표시</span></div>
       </section>
@@ -670,12 +674,12 @@ const architectureHtml = `<!doctype html>
 <html lang="ko">
 <head>
 ${commonHead}
-  <meta property="og:title" content="J-Career AWS 인프라 흐름도">
-  <meta property="og:description" content="서비스 버튼을 누르면 채용 기능과 MLOps, 보안·운영 경로를 단계별로 볼 수 있습니다.">
+  <meta property="og:title" content="J-Career 전체 인프라 지도">
+  <meta property="og:description" content="업무망, GitHub CI·Pages, AWS 기준 설계와 별도 serverless MLOps를 상태 경계와 함께 탐색합니다.">
   <meta property="og:url" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/architecture.html">
   <link rel="canonical" href="https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/architecture.html">
   <meta name="flow-source-sha256" content="${flowSourceHash}">
-  <title>J-Career AWS 인프라 흐름도</title>
+  <title>J-Career 전체 인프라 지도</title>
   <style>
 ${commonCss}
     .plate { width: min(1520px, calc(100% - 48px)); margin: 38px auto 80px; }
@@ -686,6 +690,12 @@ ${commonCss}
     .motion-toggle-doc:hover { color: var(--ink); background: #fff; border-color: var(--ink); }
     .motion-toggle-doc:active { transform: translateY(1px); }
     .motion-toggle-doc[aria-pressed="true"]::before { background: #9ba8af; box-shadow: none; animation: none; }
+    .axis-rail { margin: 0 0 18px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: #fff; border: 1px solid var(--line); box-shadow: 0 18px 44px rgba(45,49,47,.08); }
+    .axis-rail > div { min-height: 96px; padding: 17px 19px; display: grid; align-content: space-between; gap: 11px; border-left: 1px solid var(--line); }
+    .axis-rail > div:first-child { border-left: 0; }
+    .axis-rail dt { color: var(--muted); font: 700 10px/1.25 var(--mono); letter-spacing: .075em; text-transform: uppercase; }
+    .axis-rail dd { margin: 0; color: var(--ink); font-size: .88rem; font-weight: 800; line-height: 1.35; }
+    .axis-rail code { color: var(--accent); background: transparent; font-size: .66rem; }
     .architecture-workspace { display: grid; grid-template-columns: minmax(370px, .62fr) minmax(0, 1.38fr); gap: 18px; align-items: start; }
     .flow-explorer { margin: 0; padding: 30px; background: var(--ink); color: white; border-top: 5px solid var(--accent); box-shadow: var(--shadow); }
     .flow-explorer__head { display: grid; grid-template-columns: 1fr; gap: 12px; align-items: end; }
@@ -713,10 +723,13 @@ ${commonCss}
     .flow-detail__link::after { content: ' →'; margin-left: 4px; }
     .flow-detail__link:hover { color: var(--accent); border-color: var(--accent); }
     .flow-explorer__exclusion { margin: 13px 0 0; color: #aebbc4; font-size: .72rem; }
-    .plate__frame { position: relative; margin: 0 12px 12px 0; padding: 18px; overflow: auto; background: var(--surface); border: 1px solid var(--line); box-shadow: 12px 12px 0 #d4cdc0, 0 34px 72px rgba(45,49,47,.14); }
+    .plate__frame { position: relative; margin: 0 12px 12px 0; padding: 18px; overflow: auto; background: var(--surface); border: 1px solid var(--line); box-shadow: 12px 12px 0 #d4cdc0, 0 34px 72px rgba(45,49,47,.14); perspective: 1800px; }
+    .diagram-media[hidden] { display: none !important; }
     .diagram-stage { position: relative; width: 100%; min-width: 720px; }
+    .diagram-stage--full { --stage-rx: 0deg; --stage-ry: 0deg; min-width: 880px; transform: rotateX(var(--stage-ry)) rotateY(var(--stage-rx)); transform-origin: 50% 55%; transition: transform .16s ease-out; }
     .diagram-stage > a, .diagram-stage img { display: block; width: 100%; }
     .diagram-stage img { height: auto; border: 1px solid var(--line); filter: saturate(.82) contrast(1.02); transition: filter .35s ease; }
+    .diagram-stage--full img { filter: saturate(.94) contrast(1.02); box-shadow: 0 20px 50px rgba(24,34,41,.12); }
     .plate__frame:hover .diagram-stage img { filter: saturate(1) contrast(1.04); }
     .flow-overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
     .flow-layer { opacity: 0; transition: opacity .25s ease; }
@@ -741,6 +754,7 @@ ${commonCss}
     .flow-callout.unknown { fill: rgba(255,255,255,.18); stroke: #5a6c86; stroke-dasharray: 12 9; }
     .flow-callout-text { fill: var(--ink); font: 800 24px/1.2 var(--sans); text-anchor: middle; }
     .plate__frame.is-zoomed .diagram-stage { width: 2400px; }
+    .plate__frame.is-zoomed .diagram-stage--full { width: 1780px; }
     .diagram-legend { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 10px 22px; color: var(--muted); font-size: .74rem; }
     .diagram-legend span { display: inline-flex; align-items: center; gap: 7px; }
     .legend-line { width: 32px; border-top: 4px solid #e87928; }
@@ -768,111 +782,124 @@ ${commonCss}
     html[data-motion="reduced"] *, html[data-motion="reduced"] *::before, html[data-motion="reduced"] *::after { animation: none !important; transition-duration: .01ms !important; }
     @media (max-width: 1200px) { .architecture-workspace { grid-template-columns: 1fr; } .flow-explorer__head { grid-template-columns: minmax(0, 1fr) minmax(260px, .46fr); gap: 36px; } .flow-selector { grid-template-columns: repeat(3, minmax(0, 1fr)); } .flow-detail { grid-template-columns: minmax(250px, .65fr) minmax(0, 1.35fr); gap: 30px; } .flow-detail__boundary { grid-column: 1 / -1; } }
     @media (max-width: 1060px) { .flow-selector { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-    @media (max-width: 880px) { .plate__nav, .flow-explorer__head { align-items: flex-start; grid-template-columns: 1fr; } .plate__nav { flex-direction: column; } .flow-detail { grid-template-columns: 1fr; } }
-    @media (max-width: 640px) { .plate { width: calc(100% - 24px); margin-top: 20px; } .plate__frame { padding: 6px; } .flow-explorer { padding: 24px 18px; } .flow-selector { grid-template-columns: 1fr 1fr; } .flow-button { min-height: 64px; } .flow-detail { padding: 19px; gap: 20px; } .flow-detail__boundary { grid-column: auto; } .diagram-stage { min-width: 900px; } }
+    @media (max-width: 880px) { .plate__nav, .flow-explorer__head { align-items: flex-start; grid-template-columns: 1fr; } .plate__nav { flex-direction: column; } .axis-rail { grid-template-columns: 1fr 1fr; } .axis-rail > div:nth-child(3) { border-left: 0; border-top: 1px solid var(--line); } .axis-rail > div:nth-child(4) { border-top: 1px solid var(--line); } .flow-detail { grid-template-columns: 1fr; } }
+    @media (max-width: 640px) { .plate { width: calc(100% - 24px); margin-top: 20px; } .plate__frame { padding: 6px; } .flow-explorer { padding: 24px 18px; } .flow-selector { grid-template-columns: 1fr 1fr; } .flow-button { min-height: 64px; } .flow-detail { padding: 19px; gap: 20px; } .flow-detail__boundary { grid-column: auto; } .diagram-stage { min-width: 900px; } .diagram-stage--full { min-width: 980px; } }
     @media (max-width: 410px) { .flow-selector { grid-template-columns: 1fr; } }
-    @media print { .flow-selector, .flow-overlay, .plate__nav button { display: none !important; } .flow-explorer { color: #111; background: #fff; border: 1pt solid #555; box-shadow: none; } .flow-explorer__head > p, .flow-explorer__exclusion { color: #333; } .flow-detail { border: 1pt solid #777; } .diagram-stage { min-width: 0; } }
+    @media print { .flow-selector, .flow-overlay, .plate__nav button { display: none !important; } .flow-explorer { color: #111; background: #fff; border: 1pt solid #555; box-shadow: none; } .flow-explorer__head > p, .flow-explorer__exclusion { color: #333; } .flow-detail { border: 1pt solid #777; } .diagram-stage, .diagram-stage--full { min-width: 0; transform: none; } }
   </style>
 </head>
 <body>
-  <a class="skip" href="#diagram">도면으로 건너뛰기</a>
+  <a class="skip" href="#diagram">전체 인프라 지도로 건너뛰기</a>
   <header class="masthead">
     <div class="masthead__inner">
-      <div class="utility"><a href="index.html">← 기술 명세</a><nav class="utility__links" aria-label="산출물"><a href="../../mlops/">MLOps 7단계</a><a href="JCAREER_ASIS_FLOW.drawio">DRAW.IO</a><a href="JCAREER_ASIS_FLOW.drawio.png">PNG</a><a href="JCAREER_ASIS_SYSTEM_SPEC.pdf">PDF</a><a href="validation-report.json">검증 JSON</a><button class="motion-toggle-doc" type="button" data-motion-toggle aria-pressed="false" hidden><span data-motion-label>움직임 줄이기</span></button></nav></div>
+      <div class="utility"><a href="index.html">← 기술 명세</a><nav class="utility__links" aria-label="산출물"><a href="../../mlops/">MLOps 7단계</a><a href="JCAREER_FULL_INFRA.drawio">전체 편집 원본</a><a href="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg">전체 SVG</a><a href="JCAREER_ASIS_SYSTEM_SPEC.pdf">PDF</a><a href="validation-report.json">검증 JSON</a><button class="motion-toggle-doc" type="button" data-motion-toggle aria-pressed="false" hidden><span data-motion-label>움직임 줄이기</span></button></nav></div>
       <div class="doc-hero">
-        <div><p class="kicker">JC-ASIS-ARCH-001 · 서비스별 경로 탐색</p><h1>J-Career AWS<br>인프라 흐름도</h1><p class="hero-copy">업무망, AWS 기준 설계, 독립 MLOps와 기본 비활성 TRACE·외부 업무도구 소스를 한 장에 구분했습니다. 서비스 버튼을 누르면 관련 경로와 1·2·3 단계 설명이 함께 바뀝니다.</p></div>
-        <dl class="doc-control"><div><dt>도면 성격</dt><dd>서비스·인프라 기준 설계</dd></div><div><dt>업무망</dt><dd>180대 · Windows 100 / macOS 80</dd></div><div><dt>AWS 설계</dt><dd>2-AZ · 6개 모듈 · 계획 110개</dd></div><div><dt>MLOps</dt><dd>독립 default-off · 계획 0 / 13 / 14</dd></div><div><dt>로컬 확장</dt><dd>TRACE·Slack·Notion·SMTP · default-off</dd></div><div><dt>실행 상태</dt><dd>외부 전송·AWS 배포 미확인</dd></div></dl>
+        <div><p class="kicker">JC-ASIS-ARCH-001 · full system atlas</p><h1>J-Career 전체<br>인프라 지도</h1><p class="hero-copy">업무망, GitHub CI와 Pages, AWS 런타임 기준 설계, 서버리스 MLOps와 기본 비활성 TRACE·외부 업무도구 소스를 한 화면에서 탐색합니다. 선택 버튼에 따라 전체 지도·서비스 경로·MLOps 7단계 도면이 실제로 전환됩니다.</p></div>
+        <dl class="doc-control"><div><dt>GitHub delivery</dt><dd>검사 + Pages 배포 구현</dd></div><div><dt>업무망</dt><dd>180대 · Windows 100 / macOS 80</dd></div><div><dt>AWS 설계</dt><dd>2-AZ · 6개 모듈 · 계획 110개 · 미배포</dd></div><div><dt>MLOps</dt><dd>별도 7단계 · 계획 0 / 13 / 14</dd></div><div><dt>로컬 확장</dt><dd>TRACE·Slack·Notion·SMTP · default-off</dd></div><div><dt>CI / AWS</dt><dd>자동 배포선 없음</dd></div></dl>
       </div>
     </div>
   </header>
   <main class="plate" id="diagram">
-    <div class="plate__nav"><p>업무망 수량은 <span class="status confirmed" title="내부 상태 코드: USER_CONFIRMED">사용자 확인</span>, AWS 구성은 <span class="status modelled" title="내부 상태 코드: MODELLED">기준 설계 반영</span>, Slack 운영은 <span class="status unknown" title="내부 상태 코드: SCENARIO_USE_UNVERIFIED">시나리오 사용 미확인</span>입니다.</p><div><button class="button button--accent" id="diagram-zoom" type="button" aria-pressed="false">원본 크기로 보기</button> <a class="button" href="JCAREER_ASIS_FLOW.drawio">편집 원본</a> <a class="button" href="JCAREER_ASIS_FLOW.drawio.png">PNG 원본</a></div></div>
+    <div class="plate__nav"><p>GitHub 검사는 <span class="status local">구현</span>, 업무망 수량은 <span class="status confirmed" title="내부 상태 코드: USER_CONFIRMED">사용자 확인</span>, AWS와 MLOps는 <span class="status modelled" title="내부 상태 코드: MODELLED">미배포 기준 설계</span>로 구분합니다.</p><div><button class="button button--accent" id="diagram-zoom" type="button" aria-pressed="false">원본 크기로 보기</button> <a class="button" href="JCAREER_FULL_INFRA.drawio">전체 편집 원본</a> <a class="button" href="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg">전체 SVG</a></div></div>
+    <dl class="axis-rail" aria-label="전체 지도 네 영역의 상태">
+      <div><dt>01 · workplace</dt><dd>업무망 PC 180대<br><code>USER_CONFIRMED · 실물 미관찰</code></dd></div>
+      <div><dt>02 · GitHub delivery</dt><dd>Actions 검사 → Pages<br><code>IMPLEMENTED · AWS 배포 없음</code></dd></div>
+      <div><dt>03 · AWS runtime</dt><dd>2-AZ · 계획 110개<br><code>MODELLED · NOT DEPLOYED</code></dd></div>
+      <div><dt>04 · serverless MLOps</dt><dd>0 / 13 / 14 · 사람 검토<br><code>GUARDED PLAN · UNWIRED</code></dd></div>
+    </dl>
     <div class="architecture-workspace">
     <section class="flow-explorer" aria-labelledby="flow-explorer-title">
       <div class="flow-explorer__head">
-        <div><p class="kicker">전체 보기 1개 · 서비스·보조 경로 8개</p><h2 id="flow-explorer-title">전체는 ①~⑥, 선택 경로는 1·2·3으로 읽습니다.</h2></div>
-        <p>전체 인프라는 바탕 도면의 ①~⑥을 따라갑니다. 나머지 여덟 선택 화면은 1·2·3 표시와 왼쪽 단계 목록이 같은 순서입니다.</p>
+        <div><p class="kicker">전체 지도 1개 · 서비스·보조 경로 8개</p><h2 id="flow-explorer-title">버튼이 설명뿐 아니라 도면 자체를 바꿉니다.</h2></div>
+        <p>전체 시스템은 업무망·GitHub·AWS·MLOps를 함께 표시합니다. MLOps를 선택하면 빈 표식 대신 전용 7단계 도면으로 전환됩니다. 나머지 선택 경로는 AWS 기준 도면의 1·2·3 강조 화면으로 바뀝니다.</p>
       </div>
       <div class="flow-selector" role="group" aria-label="표시할 서비스·보조 경로">
-        <button class="flow-button" type="button" data-flow-button="overview" aria-pressed="true" aria-controls="flow-detail"><strong>전체 인프라</strong><small>기준 설계</small></button>
+        <button class="flow-button" type="button" data-flow-button="overview" aria-pressed="true" aria-controls="flow-detail"><strong>전체 시스템 지도</strong><small>업무망 · GitHub · AWS · MLOps</small></button>
         <button class="flow-button" type="button" data-flow-button="candidate" aria-pressed="false" aria-controls="flow-detail"><strong>구직자 공고 추천</strong><small>AI · 구현 범위</small></button>
         <button class="flow-button" type="button" data-flow-button="recruiter" aria-pressed="false" aria-controls="flow-detail"><strong>기업용 인재 찾기</strong><small>AI · 공고 지원자 안에서</small></button>
         <button class="flow-button" type="button" data-flow-button="explanation" aria-pressed="false" aria-controls="flow-detail"><strong>AI 설명 만들기</strong><small>점수와 분리</small></button>
         <button class="flow-button" type="button" data-flow-button="mlops" aria-pressed="false" aria-controls="flow-detail"><strong>MLOps 학습·평가</strong><small>모델 검증 · 검토 대기</small></button>
         <button class="flow-button" type="button" data-flow-button="workplace" aria-pressed="false" aria-controls="flow-detail"><strong>업무망·Slack</strong><small>외부 SaaS · 운영 미확인</small></button>
-        <button class="flow-button" type="button" data-flow-button="trace" aria-pressed="false" aria-controls="flow-detail"><strong>TRACE·JC-RECEIPT</strong><small>권리·증적 · 기본 비활성</small></button>
-        <button class="flow-button" type="button" data-flow-button="integrations" aria-pressed="false" aria-controls="flow-detail"><strong>외부 업무도구</strong><small>Slack·Notion·SMTP · 기본 비활성</small></button>
+        <button class="flow-button" type="button" data-flow-button="trace" aria-pressed="false" aria-controls="flow-detail"><strong>TRACE·JC-RECEIPT</strong><small>증적·정정 · 기본 비활성</small></button>
+        <button class="flow-button" type="button" data-flow-button="integrations" aria-pressed="false" aria-controls="flow-detail"><strong>외부 업무도구</strong><small>Slack · Notion · SMTP</small></button>
         <button class="flow-button" type="button" data-flow-button="operations" aria-pressed="false" aria-controls="flow-detail"><strong>기록·탐지</strong><small>운영 보조 경로</small></button>
       </div>
       <article class="flow-detail" id="flow-detail" aria-live="polite" aria-atomic="false">
         <div>
-          <span class="flow-detail__status status modelled" id="flow-status">Terraform 설계</span>
-          <h3 id="flow-title">전체 인프라</h3>
-          <p class="flow-detail__summary" id="flow-summary">사용자 진입부터 앱, 저장소, 기록·탐지까지 기준 Terraform이 표현한 전체 구성을 봅니다.</p>
+          <span class="flow-detail__status status modelled" id="flow-status">구현·설계 경계</span>
+          <h3 id="flow-title">전체 시스템 지도</h3>
+          <p class="flow-detail__summary" id="flow-summary">업무망, GitHub 검사와 Pages 배포, AWS 기준 런타임, 별도 MLOps와 기본 비활성 로컬 확장을 한 장에서 봅니다.</p>
         </div>
         <div class="flow-detail__route"><strong>순서대로 읽는 단계</strong><ol class="flow-steps" id="flow-steps" aria-label="전체 인프라 단계별 경로">${flowStepItems('overview')}</ol></div>
-        <div class="flow-detail__boundary"><strong>설계 범위</strong><p id="flow-boundary">서울 리전 2-AZ, 6개 Terraform 모듈, 110개 계획 항목을 기준선으로 사용합니다. AWS 배포 상태와 실행 결과는 별도 검증 기록에서 관리합니다.</p><a class="flow-detail__link" id="flow-detail-link" href="index.html#section-14">서비스·구성요소 명세 보기</a></div>
+        <div class="flow-detail__boundary"><strong>설계 범위</strong><p id="flow-boundary">GitHub Actions는 검사와 Pages 배포까지 구현되어 있습니다. 서울 리전 2-AZ·6개 모듈·110개 항목은 AWS 미배포 기준 설계이고, MLOps 0/13/14는 분리된 계획입니다. CI에서 AWS로 이어지는 자동 배포선은 없습니다.</p><a class="flow-detail__link" id="flow-detail-link" href="index.html#section-14">서비스·구성요소 명세 보기</a></div>
       </article>
-      <p class="flow-explorer__exclusion">MLOps는 기준 110개와 분리한 별도 계획입니다. TRACE·JC-RECEIPT와 Slack·Notion·SMTP 어댑터는 기본 비활성 로컬 소스이며 실제 외부 전송·AWS 배포·새 Terraform 리소스가 없습니다.</p>
+      <p class="flow-explorer__exclusion">TRACE·JC-RECEIPT와 Slack·Notion·SMTP 어댑터는 기본 비활성 로컬 소스입니다. 실제 외부 전송·AWS 배포·새 Terraform 리소스가 없으며, 전체 지도에서 AWS 서비스처럼 연결하지 않습니다.</p>
     </section>
-    <figure class="plate__frame" id="diagram-frame" aria-describedby="flow-boundary">
-      <div class="diagram-stage" data-scale-reveal>
-        <a href="JCAREER_ASIS_FLOW.drawio.png" aria-label="AWS 인프라 흐름도 PNG 원본 열기"><img src="JCAREER_ASIS_FLOW.drawio.png" width="2400" height="1400" fetchpriority="high" decoding="async" alt="업무망 PC 180대, 사용자 요청 6단계, 공식 AWS 서비스 아이콘, 독립 MLOps, Slack 외부 SaaS와 기본 비활성 TRACE·외부 업무도구 소스 경계를 표시한 J-Career 기존 설계 흐름도"></a>
-        <svg class="flow-overlay" viewBox="0 0 2400 1400" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
-          <g class="flow-layer is-active" data-flow-layer="overview">
-            <path class="flow-line" d="M165 455H382 M490 455H628 M734 455H870 M980 455H1120V510H1216 M1348 510H1535" />
-            <path class="flow-line missing" d="M1664 510H1822" />
-            <path class="flow-line record" d="M1280 582V922 M1600 582V922" />
-            <circle class="flow-node" cx="435" cy="435" r="68" /><circle class="flow-node" cx="680" cy="435" r="68" /><circle class="flow-node" cx="925" cy="455" r="70" /><circle class="flow-node" cx="1280" cy="510" r="68" /><circle class="flow-node" cx="1600" cy="510" r="70" />
-          </g>
-          <g class="flow-layer" data-flow-layer="candidate">
-            <path class="flow-line" d="M165 455H382 M490 455H628 M734 455H870 M980 455H1120V510H1216 M1348 510H1535" />
-            <circle class="flow-node local" cx="1600" cy="510" r="76" />
-            <rect class="flow-callout" x="1370" y="330" width="460" height="62" rx="12" /><text class="flow-callout-text" x="1600" y="370">서비스 구현 범위 · 데이터 연계 검토</text>
-${svgStepMarkers('candidate', 'local')}
-          </g>
-          <g class="flow-layer" data-flow-layer="recruiter">
-            <path class="flow-line" d="M165 455H382 M490 455H628 M734 455H870 M980 455H1120V510H1216 M1348 510H1535" />
-            <circle class="flow-node local" cx="1600" cy="510" r="76" />
-            <rect class="flow-callout" x="1370" y="330" width="460" height="62" rx="12" /><text class="flow-callout-text" x="1600" y="370">서비스 구현 범위 · 데이터 연계 검토</text>
-${svgStepMarkers('recruiter', 'local')}
-          </g>
-          <g class="flow-layer" data-flow-layer="explanation">
-            <path class="flow-line" d="M165 455H382 M490 455H628 M734 455H870 M980 455H1120V510H1216 M1348 510H1535" />
-            <circle class="flow-node local" cx="1600" cy="510" r="76" />
-            <rect class="flow-callout" x="1405" y="330" width="390" height="62" rx="12" /><text class="flow-callout-text" x="1600" y="370">점수 고정 → 설명만 생성</text>
-${svgStepMarkers('explanation', 'local')}
-          </g>
-          <g class="flow-layer" data-flow-layer="mlops">
-            <rect class="flow-callout missing" x="330" y="960" width="2030" height="380" rx="18" />
-            <path class="flow-line missing" d="M438 1138H2135" />
-            <circle class="flow-node missing" cx="438" cy="1138" r="48" /><circle class="flow-node missing" cx="713" cy="1138" r="48" /><circle class="flow-node missing" cx="988" cy="1138" r="48" /><circle class="flow-node missing" cx="1273" cy="1138" r="48" /><circle class="flow-node missing" cx="1493" cy="1088" r="48" /><circle class="flow-node missing" cx="1493" cy="1188" r="48" /><circle class="flow-node missing" cx="2135" cy="1138" r="76" />
-${svgStepMarkers('mlops', 'missing')}
-          </g>
-          <g class="flow-layer" data-flow-layer="workplace">
-            <rect class="flow-callout unknown" x="25" y="640" width="290" height="710" rx="18" />
-${svgStepMarkers('workplace', 'unknown')}
-          </g>
-          <g class="flow-layer" data-flow-layer="trace">
-            <path class="flow-line local" d="M1500 565H1870" />
-            <circle class="flow-node local" cx="1600" cy="510" r="82" />
-            <rect class="flow-callout" x="1360" y="650" width="520" height="62" rx="12" /><text class="flow-callout-text" x="1620" y="690">기본 비활성 · receipt와 사람 검토 소스</text>
-${svgStepMarkers('trace', 'local')}
-          </g>
-          <g class="flow-layer" data-flow-layer="integrations">
-            <path class="flow-line local" d="M1450 610H1850" />
-            <circle class="flow-node local" cx="1600" cy="510" r="82" />
-            <rect class="flow-callout" x="1360" y="650" width="520" height="62" rx="12" /><text class="flow-callout-text" x="1620" y="690">opt-in 소스 · 실제 외부 전송 미확인</text>
-${svgStepMarkers('integrations', 'local')}
-          </g>
-          <g class="flow-layer" data-flow-layer="operations">
-            <path class="flow-line record" d="M1290 505V742 M1630 505V742" />
-            <circle class="flow-node record" cx="572" cy="775" r="54" /><circle class="flow-node record" cx="1292" cy="775" r="54" /><circle class="flow-node record" cx="1632" cy="775" r="54" /><circle class="flow-node record" cx="1992" cy="775" r="54" />
-${svgStepMarkers('operations', 'record')}
-          </g>
-        </svg>
+    <figure class="plate__frame" id="diagram-frame" aria-describedby="flow-boundary diagram-caption" data-active-media="overview">
+      <div class="diagram-media" data-flow-media="overview" aria-hidden="false">
+        <div class="diagram-stage diagram-stage--full" data-spatial-stage data-full-map>
+          <a href="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg" aria-label="업무망, GitHub CI, AWS와 MLOps 전체 인프라 SVG 원본 열기"><img src="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-animated-diagram data-motion-src="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-still-src="../../assets/JCAREER_FULL_INFRA_ANIMATED.png" width="1780" height="1160" fetchpriority="high" decoding="async" alt="업무망 PC 180대, GitHub 저장소와 Actions 검사 및 Pages 배포, CI와 AWS의 단절 경계, Route 53부터 ECS와 RDS까지의 AWS 기준 설계, 사람 검토에서 멈추는 별도 서버리스 MLOps 흐름을 표시한 전체 인프라 지도"></a>
+        </div>
       </div>
-      <figcaption class="diagram-legend"><span><i class="legend-line"></i>Terraform 기준 진입 경로</span><span><i class="legend-line local"></i>서비스 구현 경로</span><span><i class="legend-line missing"></i>독립 계획·연결 미구현</span><span><i class="legend-line record"></i>기록·탐지 구성</span><span>회색 점선 경계는 선언·운영 미확정이며 AWS 흐름선이 아닙니다.</span><span>바탕 ①~⑥은 전체 흐름, 큰 원 1·2·3은 선택 경로입니다.</span></figcaption>
+      <div class="diagram-media" data-flow-media="asis" aria-hidden="true" hidden>
+        <div class="diagram-stage">
+          <a href="JCAREER_ASIS_FLOW.drawio.png" aria-label="AWS 런타임 기준 흐름도 PNG 원본 열기"><img src="JCAREER_ASIS_FLOW.drawio.png" width="2400" height="1400" loading="eager" decoding="async" alt="업무망 PC 180대, 사용자 요청 6단계, 공식 AWS 서비스 아이콘, 가용 영역 두 곳, 데이터 저장소와 기록·탐지, 기본 비활성 로컬 확장 경계를 표시한 J-Career AWS 기준 설계 흐름도"></a>
+          <svg class="flow-overlay" viewBox="0 0 2400 1400" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+            <g class="flow-layer is-active" data-flow-layer="overview">
+              <path class="flow-line" d="M165 455H382 M490 455H628 M734 455H870 M980 455H1120V510H1216 M1348 510H1535" />
+              <path class="flow-line missing" d="M1664 510H1822" />
+              <path class="flow-line record" d="M1280 582V922 M1600 582V922" />
+              <circle class="flow-node" cx="435" cy="435" r="68" /><circle class="flow-node" cx="680" cy="435" r="68" /><circle class="flow-node" cx="925" cy="455" r="70" /><circle class="flow-node" cx="1280" cy="510" r="68" /><circle class="flow-node" cx="1600" cy="510" r="70" />
+            </g>
+            <g class="flow-layer" data-flow-layer="candidate">
+              <path class="flow-line" d="M165 455H382 M490 455H628 M734 455H870 M980 455H1120V510H1216 M1348 510H1535" />
+              <circle class="flow-node local" cx="1600" cy="510" r="76" />
+              <rect class="flow-callout" x="1370" y="330" width="460" height="62" rx="12" /><text class="flow-callout-text" x="1600" y="370">서비스 구현 범위 · 데이터 연계 검토</text>
+${svgStepMarkers('candidate', 'local')}
+            </g>
+            <g class="flow-layer" data-flow-layer="recruiter">
+              <path class="flow-line" d="M165 455H382 M490 455H628 M734 455H870 M980 455H1120V510H1216 M1348 510H1535" />
+              <circle class="flow-node local" cx="1600" cy="510" r="76" />
+              <rect class="flow-callout" x="1370" y="330" width="460" height="62" rx="12" /><text class="flow-callout-text" x="1600" y="370">서비스 구현 범위 · 데이터 연계 검토</text>
+${svgStepMarkers('recruiter', 'local')}
+            </g>
+            <g class="flow-layer" data-flow-layer="explanation">
+              <path class="flow-line" d="M165 455H382 M490 455H628 M734 455H870 M980 455H1120V510H1216 M1348 510H1535" />
+              <circle class="flow-node local" cx="1600" cy="510" r="76" />
+              <rect class="flow-callout" x="1405" y="330" width="390" height="62" rx="12" /><text class="flow-callout-text" x="1600" y="370">점수 고정 → 설명만 생성</text>
+${svgStepMarkers('explanation', 'local')}
+            </g>
+            <g class="flow-layer" data-flow-layer="mlops"></g>
+            <g class="flow-layer" data-flow-layer="workplace">
+              <rect class="flow-callout unknown" x="25" y="640" width="290" height="710" rx="18" />
+${svgStepMarkers('workplace', 'unknown')}
+            </g>
+            <g class="flow-layer" data-flow-layer="trace">
+              <path class="flow-line local" d="M1500 565H1870" />
+              <circle class="flow-node local" cx="1600" cy="510" r="82" />
+              <rect class="flow-callout" x="1360" y="650" width="520" height="62" rx="12" /><text class="flow-callout-text" x="1620" y="690">기본 비활성 · receipt와 사람 검토 소스</text>
+${svgStepMarkers('trace', 'local')}
+            </g>
+            <g class="flow-layer" data-flow-layer="integrations">
+              <path class="flow-line local" d="M1450 610H1850" />
+              <circle class="flow-node local" cx="1600" cy="510" r="82" />
+              <rect class="flow-callout" x="1360" y="650" width="520" height="62" rx="12" /><text class="flow-callout-text" x="1620" y="690">opt-in 소스 · 실제 외부 전송 미확인</text>
+${svgStepMarkers('integrations', 'local')}
+            </g>
+            <g class="flow-layer" data-flow-layer="operations">
+              <path class="flow-line record" d="M1290 505V742 M1630 505V742" />
+              <circle class="flow-node record" cx="572" cy="775" r="54" /><circle class="flow-node record" cx="1292" cy="775" r="54" /><circle class="flow-node record" cx="1632" cy="775" r="54" /><circle class="flow-node record" cx="1992" cy="775" r="54" />
+${svgStepMarkers('operations', 'record')}
+            </g>
+          </svg>
+        </div>
+      </div>
+      <div class="diagram-media" data-flow-media="mlops" aria-hidden="true" hidden>
+        <div class="diagram-stage">
+          <a href="../serverless-mlops/JCAREER_MLOPS_FLOW.svg" aria-label="서버리스 MLOps 7단계 SVG 원본 열기"><img src="../serverless-mlops/JCAREER_MLOPS_FLOW.svg" width="2400" height="1400" loading="eager" decoding="async" alt="합성 자료를 숫자 특징으로 바꾸고 S3에 보관한 뒤 사람이 Lambda 학습을 한 번 시작하고, 결과와 상태를 저장한 다음 사람 검토 대기에서 멈추는 서버리스 MLOps 7단계 흐름도"></a>
+        </div>
+      </div>
+      <figcaption class="diagram-legend" id="diagram-caption"><span><i class="legend-line"></i>현재 선택에 맞춰 전체 지도·AWS 서비스 경로·MLOps 7단계 원본으로 전환</span><span><i class="legend-line local"></i>GitHub 검사와 기본 비활성 로컬 소스</span><span><i class="legend-line missing"></i>AWS·MLOps는 미배포 설계</span><span><i class="legend-line record"></i>CI→AWS 자동 배포선 없음</span></figcaption>
     </figure>
     </div>
     <section class="plate__section plate__source" data-flow-source-sha256="${flowSourceHash}">${flowBody}</section>
@@ -886,11 +913,12 @@ ${svgStepMarkers('operations', 'record')}
     zoomButton?.addEventListener('click', () => {
       const expanded = diagramFrame.classList.toggle('is-zoomed');
       zoomButton.setAttribute('aria-pressed', String(expanded));
-      zoomButton.textContent = '원본 크기로 보기';
+      zoomButton.textContent = expanded ? '화면에 맞추기' : '원본 크기로 보기';
     });
     const flowDefinitions = ${JSON.stringify(architectureFlows)};
     const flowButtons = [...document.querySelectorAll('[data-flow-button]')];
     const flowLayers = [...document.querySelectorAll('[data-flow-layer]')];
+    const flowMedia = [...document.querySelectorAll('[data-flow-media]')];
     const flowStatus = document.querySelector('#flow-status');
     const flowTitle = document.querySelector('#flow-title');
     const flowSummary = document.querySelector('#flow-summary');
@@ -901,8 +929,15 @@ ${svgStepMarkers('operations', 'record')}
       const key = Object.hasOwn(flowDefinitions, requestedKey) ? requestedKey : 'overview';
       const definition = flowDefinitions[key];
       const updateFlow = () => {
+        const mediaKey = key === 'overview' ? 'overview' : key === 'mlops' ? 'mlops' : 'asis';
         flowButtons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.flowButton === key)));
         flowLayers.forEach((layer) => layer.classList.toggle('is-active', layer.dataset.flowLayer === key));
+        flowMedia.forEach((media) => {
+          const active = media.dataset.flowMedia === mediaKey;
+          media.hidden = !active;
+          media.setAttribute('aria-hidden', String(!active));
+        });
+        diagramFrame.dataset.activeMedia = mediaKey;
         flowStatus.textContent = definition.status;
         flowStatus.className = 'flow-detail__status status ' + definition.tone;
         flowTitle.textContent = definition.title;

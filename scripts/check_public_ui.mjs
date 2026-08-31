@@ -16,54 +16,63 @@ const EXPECTED_ROUTES = [
     flow: 'overview',
     detailHref: 'index.html#section-14',
     steps: 6,
+    media: 'overview',
   },
   {
     href: 'terraform/asis/architecture.html?flow=candidate',
     flow: 'candidate',
     detailHref: 'index.html#section-31',
     steps: 3,
+    media: 'asis',
   },
   {
     href: 'terraform/asis/architecture.html?flow=recruiter',
     flow: 'recruiter',
     detailHref: 'index.html#section-31',
     steps: 3,
+    media: 'asis',
   },
   {
     href: 'terraform/asis/architecture.html?flow=explanation',
     flow: 'explanation',
     detailHref: 'index.html#section-33',
     steps: 3,
+    media: 'asis',
   },
   {
     href: 'terraform/asis/architecture.html?flow=mlops',
     flow: 'mlops',
     detailHref: '../../mlops/',
-    steps: 3,
+    steps: 7,
+    media: 'mlops',
   },
   {
     href: 'terraform/asis/architecture.html?flow=workplace',
     flow: 'workplace',
     detailHref: 'index.html#section-15',
     steps: 3,
+    media: 'asis',
   },
   {
     href: 'terraform/asis/architecture.html?flow=trace',
     flow: 'trace',
     detailHref: 'index.html#section-25',
     steps: 3,
+    media: 'asis',
   },
   {
     href: 'terraform/asis/architecture.html?flow=integrations',
     flow: 'integrations',
     detailHref: 'index.html#section-25',
     steps: 3,
+    media: 'asis',
   },
   {
     href: 'terraform/asis/architecture.html?flow=operations',
     flow: 'operations',
     detailHref: 'index.html#section-52',
     steps: 3,
+    media: 'asis',
   },
 ];
 
@@ -391,7 +400,9 @@ async function runChecks(client, origin) {
         'const activeLayers = Array.from(document.querySelectorAll("[data-flow-layer].is-active"))' +
           '.map((layer) => layer.dataset.flowLayer);' +
         'const detailLink = document.querySelector("#flow-detail-link");' +
-        'const diagram = document.querySelector(".diagram-stage img");' +
+        'const visibleMedia = document.querySelector("[data-flow-media]:not([hidden])");' +
+        'const diagram = visibleMedia?.querySelector(".diagram-stage img");' +
+        'const fullMap = document.querySelector("[data-full-map] img");' +
         'return {' +
           'activeButton: activeButton ? activeButton.dataset.flowButton : null,' +
           'activeLayers: activeLayers,' +
@@ -399,9 +410,11 @@ async function runChecks(client, origin) {
           'detailText: detailLink ? detailLink.textContent.trim() : "",' +
           'query: new URL(location.href).searchParams.get("flow"),' +
           'stepCount: document.querySelectorAll("#flow-steps > li").length,' +
+          'visibleMedia: visibleMedia?.dataset.flowMedia || null,' +
           'innerWidth: window.innerWidth,' +
           'scrollWidth: document.documentElement.scrollWidth,' +
-          'diagramReady: Boolean(diagram && diagram.complete && diagram.naturalWidth > 0)' +
+          'diagramReady: Boolean(diagram && diagram.complete && diagram.naturalWidth > 0),' +
+          'fullMapReady: Boolean(fullMap && fullMap.complete && fullMap.naturalWidth > 0)' +
         '};' +
       '})()',
     );
@@ -411,8 +424,10 @@ async function runChecks(client, origin) {
     assert(routeState.detailHref === route.detailHref && routeState.detailText.length > 0, 'Missing or wrong detail link for route: ' + route.href);
     assert(routeState.query === expectedQuery, 'URL flow state diverged for route: ' + route.href);
     assert(routeState.stepCount === route.steps, 'Wrong step count for route: ' + route.href);
+    assert(routeState.visibleMedia === route.media, 'Wrong visible diagram media for route: ' + route.href);
     assert(routeState.innerWidth === 390 && routeState.scrollWidth <= routeState.innerWidth, 'Architecture route overflows at 390px: ' + route.href);
     assert(routeState.diagramReady, 'Architecture diagram did not load for route: ' + route.href);
+    assert(routeState.fullMapReady, 'Full infrastructure map did not load for route: ' + route.href);
     checkedRoutes += 1;
   }
 

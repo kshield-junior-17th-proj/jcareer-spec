@@ -30,6 +30,10 @@ output = output.replace(
   /<circle(?![^>]*\bclass="motion-dot")([^>]*)><animateMotion\b/g,
   '<circle class="motion-dot"$1><animateMotion',
 );
+output = output.replace(/\bbegin="(?!-)([0-9]+(?:\.[0-9]+)?)s"/g, (match, rawSeconds) => {
+  const seconds = Number(rawSeconds);
+  return seconds > 0 ? `begin="-${rawSeconds}s"` : match;
+});
 output = output.replace(/\r\n?/g, '\n').replace(/[ \t]+$/gm, '');
 
 const motionCount = (output.match(/<animateMotion\b/g) || []).length;

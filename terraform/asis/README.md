@@ -34,10 +34,16 @@
 - [웹 명세](index.html)
 - [PDF 명세](JCAREER_ASIS_SYSTEM_SPEC.pdf)
 - [도면 설명](architecture.html)
+- [업무망·GitHub CI·AWS·MLOps 전체 지도 원본](JCAREER_FULL_INFRA.drawio)
+- [전체 지도 해설](JCAREER_FULL_INFRA.md)
+- [웹용 애니메이션 전체 지도](../../assets/JCAREER_FULL_INFRA_ANIMATED.svg)
 - [쉽게 보는 draw.io 원본](JCAREER_ASIS_FLOW.drawio)
 - [쉽게 보는 PNG 도면](JCAREER_ASIS_FLOW.drawio.png)
 - [보조 상세 draw.io 원본](JCAREER_ASIS_2AZ.drawio)
 - [자동검사 결과](validation-report.json)
+
+`JCAREER_FULL_INFRA.drawio`는 업무망, GitHub 검사·Pages 배포, AWS 기준 설계와 별도 MLOps를
+한 장에 합친 편집 원본이다. CI에서 AWS로 이어지는 자동 배포선은 없으며 실제 구현처럼 그리지 않는다.
 
 `JCAREER_ASIS_2AZ.drawio`는 원본 작업 트리에서 관리한 별도 기술 기록이다. 공개 기준 도면의
 수량과 검증 결과에는 합치지 않는다. 공개 화면은 60개 셀·14개 연결의
