@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "verified_at": "2026-08-31T11:43:33+09:00",
+  "verified_at": "2026-08-31T11:48:36+09:00",
   "aws_api_calls": 0,
   "terraform_apply_destroy": false,
   "environment": {
@@ -155,7 +155,7 @@
     "README.md": "d17df4c0ba684e4adfe8c5b3629b0fac85742d23b4afa09175f41c083c69bc83",
     "scripts/browser_support.mjs": "725a0eef03fd97a2074b630c9b34b14e566f519da93f9ba2cc6eb587c5c70a22",
     "scripts/check_public_mlops.py": "fe7424c463fc311aaefd055f48500c9eae3921e0fb976937ffe67a95b9b411da",
-    "scripts/check_public_ui.mjs": "cafc6c4f00da0a4b11a24c7d1a3df54eea5eaeafe9fbedf7c59d43bd86fa1936",
+    "scripts/check_public_ui.mjs": "0a775a3a39e307bd2dc3d49ca82e5cb54cdc03224ce9a077641cf4d251a4e717",
     "scripts/check_serverless_mlops_static.py": "f5935cbdf61dfcda864cd50f117fbfefae881f5c9fb9499ab7b675f244bf4d7c",
     "scripts/finalize_animated_arch.mjs": "a5d701346cde27a68c627433faaba9c96e83c7ee8b3cb8a41ab8d0b4255b64a0",
     "scripts/render_spec_pdf.mjs": "8361ceb438c6ac634509e2d5ec09de8203948ccf063fd1c36c278610d327ddb0",

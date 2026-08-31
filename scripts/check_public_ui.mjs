@@ -474,9 +474,13 @@ async function runChecks(client, origin) {
       '})()',
     );
     assert(clicked, 'Missing MLOps stage button: ' + stage);
-    await delay(30);
-    const state = await inspectStage(client);
-    assert(state.active === stage, 'MLOps stage did not become active: ' + stage);
+    const state = await waitFor(
+      async () => {
+        const current = await inspectStage(client);
+        return current.active === stage ? current : null;
+      },
+      'MLOps stage ' + stage + ' to become active',
+    );
     if (stage === 'all') {
       assert(state.query === null && state.itemCount === 7 && state.current.length === 0, 'All-stage state did not show the seven-stage overview or clear the URL.');
       assert(state.progress === '1' && state.position === '100%' && state.readout === '전체 7단계', 'All-stage progress indicator is wrong.');
