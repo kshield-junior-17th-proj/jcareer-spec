@@ -28,6 +28,12 @@ $required = @(
     'JCAREER_ASIS_SYSTEM_SPEC.pdf',
     'JCAREER_ASIS_FLOW.drawio',
     'JCAREER_ASIS_FLOW.drawio.png',
+    'production-transition.html',
+    'JCAREER_PRODUCTION_TRANSITION.md',
+    'JCAREER_PRODUCTION_TRANSITION.svg',
+    'JCAREER_PRODUCTION_TRANSITION.drawio',
+    'JCAREER_PRODUCTION_TRANSITION_SERVERLESS.png',
+    'JCAREER_PRODUCTION_TRANSITION_ENDPOINT_MDM.png',
     '..\..\assets\JCAREER_PRODUCTION_ASSESSMENT_MAP.svg',
     '..\..\assets\JCAREER_PRODUCTION_ASSESSMENT_MAP.spec.json',
     '..\..\assets\JCAREER_PRODUCTION_ASSESSMENT_MAP.drawio',
@@ -39,6 +45,7 @@ Add-Check 'required_files' ($missing.Count -eq 0) $(if ($missing.Count) { $missi
 $spec = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'JCAREER_ASIS_SYSTEM_SPEC.md')
 $index = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'index.html')
 $architecture = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'architecture.html')
+$transition = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'production-transition.html')
 $publishedText = $spec + "`n" + $index + "`n" + $architecture
 
 $readme = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'README.md')
@@ -196,7 +203,7 @@ Add-Check 'runtime_screen_contract' $screenContractOkay $(if ($runtimeSourceAvai
 $stateFiles = @(Get-ChildItem -LiteralPath $root -File -Recurse | Where-Object { $_.Name -match '^terraform\.tfstate(?:\.|$)' })
 Add-Check 'terraform_state_absent' ($stateFiles.Count -eq 0) "$($stateFiles.Count) state files"
 
-$htmlFiles = @('index.html', 'architecture.html')
+$htmlFiles = @('index.html', 'architecture.html', 'production-transition.html')
 $brokenLinks = [System.Collections.Generic.List[string]]::new()
 $brokenFragments = [System.Collections.Generic.List[string]]::new()
 $duplicateIds = [System.Collections.Generic.List[string]]::new()
@@ -247,18 +254,26 @@ $metadataContractOkay = $index.Contains('<meta property="og:url" content="https:
     $index.Contains('<link rel="canonical" href="https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/">') -and
     $architecture.Contains('<meta property="og:url" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/architecture.html">') -and
     $architecture.Contains('<link rel="canonical" href="https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/architecture.html">') -and
+    $transition.Contains('<meta property="og:url" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/production-transition.html">') -and
+    $transition.Contains('<link rel="canonical" href="https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/production-transition.html">') -and
     $index.Contains('<meta property="og:image" content="https://') -and
     $architecture.Contains('<meta property="og:image" content="https://') -and
+    $transition.Contains('<meta property="og:image" content="https://') -and
     $index.Contains('<meta property="og:image:alt"') -and
-    $architecture.Contains('<meta property="og:image:alt"')
+    $architecture.Contains('<meta property="og:image:alt"') -and
+    $transition.Contains('<meta property="og:image:alt"')
 $uiContractOkay = $metadataContractOkay -and
     $index.Contains('class="skip"') -and
     $architecture.Contains('class="skip"') -and
+    $transition.Contains('class="skip"') -and
     $index.Contains(':focus-visible') -and
+    $transition.Contains(':focus-visible') -and
     $index.Contains('prefers-reduced-motion') -and
+    $transition.Contains('prefers-reduced-motion') -and
     $index.Contains('scroll-margin-top') -and
     $index.Contains('loading="lazy"') -and
     $architecture.Contains('fetchpriority="high"') -and
+    $transition.Contains('fetchpriority="high"') -and
     $architecture.Contains('id="diagram-zoom"') -and
     $architecture.Contains('aria-pressed="false"') -and
     $architecture.Contains("classList.toggle('is-zoomed')") -and
@@ -534,6 +549,10 @@ $textDeliverables = @(
     'JCAREER_ASIS_SYSTEM_SPEC.md',
     'index.html',
     'architecture.html',
+    'production-transition.html',
+    'JCAREER_PRODUCTION_TRANSITION.md',
+    'JCAREER_PRODUCTION_TRANSITION.svg',
+    'JCAREER_PRODUCTION_TRANSITION.drawio',
     'JCAREER_ASIS_FLOW.md',
     'JCAREER_ASIS_FLOW.drawio',
     'validation-report.json',
@@ -553,13 +572,13 @@ $binaryPatterns = [ordered]@{
     access_key  = '\b(?:AKIA|ASIA)[0-9A-Z]{16}\b'
     private_key = '-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----'
 }
-foreach ($file in @('JCAREER_ASIS_SYSTEM_SPEC.pdf', 'JCAREER_ASIS_FLOW.drawio.png')) {
+foreach ($file in @('JCAREER_ASIS_SYSTEM_SPEC.pdf', 'JCAREER_ASIS_FLOW.drawio.png', 'JCAREER_PRODUCTION_TRANSITION_SERVERLESS.png', 'JCAREER_PRODUCTION_TRANSITION_ENDPOINT_MDM.png')) {
     $binaryAscii = [System.Text.Encoding]::ASCII.GetString([System.IO.File]::ReadAllBytes((Join-Path $root $file)))
     foreach ($entry in $binaryPatterns.GetEnumerator()) {
         if ($binaryAscii -match $entry.Value) { $secretHits.Add("${file}:$($entry.Key)") }
     }
 }
-Add-Check 'deliverable_secret_patterns' ($secretHits.Count -eq 0) $(if ($secretHits.Count) { $secretHits -join ', ' } else { "0 patterns across $($textDeliverables.Count) UTF-8 sources + 2 binary sentinels" })
+Add-Check 'deliverable_secret_patterns' ($secretHits.Count -eq 0) $(if ($secretHits.Count) { $secretHits -join ', ' } else { "0 patterns across $($textDeliverables.Count) UTF-8 sources + 4 binary sentinels" })
 
 $summary = [pscustomobject]@{
     generated_at = (Get-Date).ToString('yyyy-MM-ddTHH:mm:ssK')

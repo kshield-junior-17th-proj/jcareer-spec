@@ -562,6 +562,7 @@ ${commonHead}
       <div class="utility">
         <a href="index.html">J-Career / 서비스·인프라 명세</a>
         <nav class="utility__links" aria-label="산출물">
+          <a href="production-transition.html">운영 전환 현황</a>
           <a href="../../mlops/">MLOps</a>
           <a href="architecture.html">인프라 도면</a>
           <a href="#production-assessment-slice">핵심 평가 슬라이스</a>
@@ -575,7 +576,7 @@ ${commonHead}
           <p class="kicker">JC-ASIS-SPEC-001 · 2026.08 기준 설계</p>
           <h1>J-Career 서비스·인프라<br>시스템 명세</h1>
           <p class="hero-copy">채용 서비스의 기능과 데이터, AWS 인프라와 운영 통제, LLM Gateway·Bedrock·OpenDART, MLOps 모델 검증을 한 문서로 정리했습니다. 업무망 PC 180대와 서울 리전 2-AZ, 6개 Terraform 모듈, 110개 기준 계획을 읽되 서로 다른 구현·적용 상태를 섞지 않습니다. TRACE·JC-RECEIPT는 실행 인프라가 아닌 보조 설명으로 구분합니다.</p>
-          <p class="hero-links"><a href="#mlops-overview">MLOps 7단계 바로 보기 ↓</a><a href="../../mlops/">MLOps 전용 페이지 ↗</a></p>
+          <p class="hero-links"><a href="production-transition.html">2026-09-01 운영 전환 기록 ↗</a><a href="#mlops-overview">MLOps 7단계 바로 보기 ↓</a><a href="../../mlops/">MLOps 전용 페이지 ↗</a></p>
         </div>
         <dl class="doc-control">
           <div><dt>문서 번호</dt><dd>JC-ASIS-SPEC-001</dd></div>
@@ -605,7 +606,8 @@ ${commonHead}
       <p class="toc__title">문서 목차</p>
       <ol>${toc}</ol>
       <div class="toc__actions">
-        <a class="button button--accent" href="JCAREER_ASIS_SYSTEM_SPEC.pdf">PDF 내려받기</a>
+        <a class="button button--accent" href="production-transition.html">운영 전환 현황</a>
+        <a class="button" href="JCAREER_ASIS_SYSTEM_SPEC.pdf">PDF 내려받기</a>
         <a class="button" href="../../mlops/">MLOps 7단계</a>
         <a class="button" href="architecture.html">도면 크게 보기</a>
         <a class="button" href="#production-assessment-slice">USD 50 실행 범위</a>
@@ -643,16 +645,16 @@ ${commonHead}
       <section id="production-assessment-slice" class="production-slice" aria-labelledby="production-assessment-title">
         <div class="production-slice__head">
           <div>
-            <p class="section-label">예산 승인형 실제 실행 범위</p>
-            <h2 id="production-assessment-title">기업 목표는 유지하고, 평가에 필요한 핵심 경로만 독립 배포합니다.</h2>
-            <div class="production-slice__status"><span>SERVERLESS APPLIED</span><span>LIVE SMOKE PASS</span><span>PIPELINE RE-LOCKED</span></div>
+            <p class="section-label">운영 전환 증거 · 기준 설계와 분리</p>
+            <h2 id="production-assessment-title">서버리스 핵심 경로의 적용 결과를 별도 시점 기록으로 연결합니다.</h2>
+            <div class="production-slice__status"><span>GITHUB E2E PASS</span><span>QUEUE · DLQ · RETRY_PENDING 0</span><span>ENDPOINT · MDM NOT DEPLOYED</span></div>
           </div>
-          <p class="production-slice__copy">2026-09-01 GitHub Actions에서 다른 사람 승인과 OIDC 단기 역할로 동일 saved plan을 적용했고 live smoke를 통과했습니다. 현재 경로는 CloudFront·private S3, API Gateway, Lambda, SQS, DynamoDB on-demand와 최소 권한 Bedrock broker입니다. Evidence Desk는 제안·미배포이며 ECS·RDS·Redis·NAT 2-AZ와 Windows 100대·macOS 80대는 이번 완료 주장에 포함하지 않습니다.</p>
+          <div><p class="production-slice__copy">2026-09-01 GitHub run에서 CloudFront·HTTP API·Lambda·SQS·DynamoDB·Bedrock 경로와 매칭 완료, OWASP 10/10을 확인했습니다. 기존 2-AZ·ECS·RDS·Redis 목표 구조, Windows·macOS·MDM, 별도 OpenDART·MLOps 수명주기는 완료 주장에 포함하지 않습니다. CloudFront viewer TLS 최소 버전과 과거 오류 필드 정규화도 남아 있습니다.</p><p><a class="button button--accent" href="production-transition.html">운영 전환 기록 보기</a></p></div>
         </div>
         <a class="diagram-link" href="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg" aria-label="기업 목표와 USD 50 핵심 평가 슬라이스 SVG 원본 열기">
           <img src="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg" width="2320" height="1500" loading="lazy" decoding="async" alt="GitHub 승인형 OIDC 배포, 서버리스 AI 매칭 실행면, 별도 Evidence Desk, OpenDART와 MLOps의 분리된 수명주기, 미배포 기업 목표를 구분한 J-Career 핵심 평가 슬라이스">
         </a>
-        <div class="diagram-caption"><span>현재 상태: production-serverless apply·live smoke PASS · pipeline 재잠금</span><span><a href="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.drawio">DRAW.IO 원본</a> · 전체 기업 production 완료를 뜻하지 않음</span></div>
+        <div class="diagram-caption"><span>현재 배포 지도: production-serverless E2E PASS · pipeline 재잠금</span><span><a href="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.drawio">DRAW.IO 원본</a> · <a href="production-transition.html">12:56:38 KST 전환 기록</a></span></div>
       </section>
 
       <section id="mlops-overview" class="mlops-bridge" aria-labelledby="mlops-overview-title">
@@ -823,7 +825,7 @@ ${commonCss}
   <a class="skip" href="#diagram">전체 인프라 지도로 건너뛰기</a>
   <header class="masthead">
     <div class="masthead__inner">
-      <div class="utility"><a href="index.html">← 기술 명세</a><nav class="utility__links" aria-label="산출물"><a href="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg">현재 배포 지도</a><a href="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.drawio">현재 지도 원본</a><a href="../../mlops/">MLOps 7단계</a><a href="../../consulting/">단말 진단 사례</a><a href="JCAREER_FULL_INFRA.drawio">2-AZ 목표 원본</a><a href="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg">2-AZ 목표 SVG</a><a href="JCAREER_ASIS_SYSTEM_SPEC.pdf">PDF</a><a href="validation-report.json">검증 JSON</a><button class="motion-toggle-doc" type="button" data-motion-toggle aria-pressed="false" hidden><span data-motion-label>움직임 줄이기</span></button></nav></div>
+      <div class="utility"><a href="index.html">← 기술 명세</a><nav class="utility__links" aria-label="산출물"><a href="production-transition.html">운영 전환 현황</a><a href="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg">현재 배포 지도</a><a href="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.drawio">현재 지도 원본</a><a href="../../mlops/">MLOps 7단계</a><a href="../../consulting/">단말 진단 사례</a><a href="JCAREER_FULL_INFRA.drawio">2-AZ 목표 원본</a><a href="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg">2-AZ 목표 SVG</a><a href="JCAREER_ASIS_SYSTEM_SPEC.pdf">PDF</a><a href="validation-report.json">검증 JSON</a><button class="motion-toggle-doc" type="button" data-motion-toggle aria-pressed="false" hidden><span data-motion-label>움직임 줄이기</span></button></nav></div>
       <div class="doc-hero">
         <div><p class="kicker">JC-ASIS-ARCH-001 · current + target atlas</p><h1>J-Career 전체<br>인프라 지도</h1><p class="hero-copy">현재 production-serverless와 기업 2-AZ 목표를 분리하고, 업무망·Slack, GitHub OIDC delivery, LLM Gateway·Bedrock, OpenDART와 MLOps의 연결 수준을 함께 탐색합니다. TRACE·JC-RECEIPT는 실행 컴포넌트에 넣지 않습니다.</p></div>
         <dl class="doc-control"><div><dt>현재 AWS</dt><dd>serverless apply · smoke PASS</dd></div><div><dt>GitHub delivery</dt><dd>saved plan · 승인 · OIDC · 재잠금</dd></div><div><dt>업무망</dt><dd>180대 · Windows 100 / macOS 80</dd></div><div><dt>외부 업무도구</dt><dd>Slack·Notion·SMTP · prod 미연결</dd></div><div><dt>2-AZ 목표</dt><dd>6개 모듈 · 계획 110개 · 미배포</dd></div><div><dt>MLOps</dt><dd>bootstrap 13개 · runtime 미실행</dd></div></dl>
@@ -831,7 +833,7 @@ ${commonCss}
     </div>
   </header>
   <main class="plate" id="diagram">
-    <div class="plate__nav"><p>GitHub 검사는 <span class="status local">구현</span>, 업무망 수량은 <span class="status confirmed" title="내부 상태 코드: USER_CONFIRMED">사용자 확인</span>, AWS 2-AZ 기준선은 <span class="status modelled" title="내부 상태 코드: MODELLED">미배포 설계</span>, MLOps는 <span class="status confirmed" title="내부 상태 코드: MLOPS_BOOTSTRAP_APPLIED_RUNTIME_NOT_DEPLOYED">bootstrap만 적용</span>으로 구분합니다.</p><div><button class="button button--accent" id="diagram-zoom" type="button" aria-pressed="false">원본 크기로 보기</button> <a class="button" href="JCAREER_FULL_INFRA.drawio">전체 편집 원본</a> <a class="button" href="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg">전체 SVG</a></div></div>
+    <div class="plate__nav"><p>GitHub 검사는 <span class="status local">구현</span>, 업무망 수량은 <span class="status confirmed" title="내부 상태 코드: USER_CONFIRMED">사용자 확인</span>, AWS 2-AZ 기준선은 <span class="status modelled" title="내부 상태 코드: MODELLED">미배포 설계</span>, MLOps는 <span class="status confirmed" title="내부 상태 코드: MLOPS_BOOTSTRAP_APPLIED_RUNTIME_NOT_DEPLOYED">bootstrap만 적용</span>으로 구분합니다. 2026-09-01 서버리스 적용 결과는 별도 운영 전환 기록에서 확인합니다.</p><div><a class="button button--accent" href="production-transition.html">운영 전환 현황</a> <button class="button" id="diagram-zoom" type="button" aria-pressed="false">원본 크기로 보기</button> <a class="button" href="JCAREER_FULL_INFRA.drawio">전체 편집 원본</a> <a class="button" href="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg">전체 SVG</a></div></div>
     <dl class="axis-rail" aria-label="전체 지도 네 영역의 상태">
       <div><dt>01 · workplace</dt><dd>업무망 PC 180대<br><code>USER_CONFIRMED · 실물 미관찰</code></dd></div>
       <div><dt>02 · GitHub delivery</dt><dd>Actions 검사 + main branch Pages<br><code>SEPARATE PATHS · AWS 배포 없음</code></dd></div>

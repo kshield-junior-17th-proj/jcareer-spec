@@ -41,6 +41,10 @@
 - [기업 목표·USD 50 핵심 평가 슬라이스](../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg)
 - [현재 배포 지도 draw.io 원본](../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.drawio)
 - [핵심 평가 슬라이스 해설](../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.md)
+- [2026-09-01 운영 인프라 전환 페이지](production-transition.html)
+- [운영 전환 SVG](JCAREER_PRODUCTION_TRANSITION.svg)
+- [운영 전환 draw.io 원본](JCAREER_PRODUCTION_TRANSITION.drawio)
+- [운영 전환 검증 해설](JCAREER_PRODUCTION_TRANSITION.md)
 - [쉽게 보는 draw.io 원본](JCAREER_ASIS_FLOW.drawio)
 - [쉽게 보는 PNG 도면](JCAREER_ASIS_FLOW.drawio.png)
 - [보조 상세 draw.io 원본](JCAREER_ASIS_2AZ.drawio)
@@ -54,6 +58,11 @@ ECS·RDS 경로는 미배포다. 현재 서버리스 실행면은 별도 핵심 
 2026-09-01 실제 적용·시연한 서버리스 실행면, 아직 제안·미배포인 Evidence Desk를 구분한다.
 GitHub saved plan·다른 사람 승인·OIDC·동일 plan apply·live smoke·재잠금을 AWS 증거로 기록하며,
 GitHub Pages 배포 자체를 AWS 서비스 배포 증거로 사용하지 않는다.
+
+위 핵심 평가 슬라이스는 배포 전 예산·설계 snapshot으로 보존한다. 그 뒤 실제 적용된 서버리스
+경로는 [운영 인프라 전환 페이지](production-transition.html)에 별도 기록했다. 2026-09-01 GitHub
+run `33466745822`의 E2E PASS와 queue·DLQ·`RETRY_PENDING` 0을 근거로 하며, RDS·Redis,
+Windows·macOS·MDM, 별도 OpenDART·MLOps 수명주기와 TLS caveat는 완료 범위에서 제외한다.
 
 `JCAREER_ASIS_2AZ.drawio`는 원본 작업 트리에서 관리한 별도 기술 기록이다. 공개 기준 도면의
 수량과 검증 결과에는 합치지 않는다. 공개 화면은 60개 셀·14개 연결의

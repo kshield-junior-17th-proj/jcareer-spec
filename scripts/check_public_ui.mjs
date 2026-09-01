@@ -101,6 +101,10 @@ const PUBLIC_PAGES = [
     path: '/terraform/asis/architecture.html',
     canonical: 'https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/architecture.html',
   },
+  {
+    path: '/terraform/asis/production-transition.html',
+    canonical: 'https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/production-transition.html',
+  },
 ];
 
 function delay(milliseconds) {

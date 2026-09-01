@@ -24,6 +24,12 @@ PNG = ROOT / "terraform" / "serverless-mlops" / "JCAREER_MLOPS_FLOW.drawio.png"
 REPORT = ROOT / "mlops" / "VERIFICATION.json"
 ASIS_PAGE = ROOT / "terraform" / "asis" / "index.html"
 ASIS_ARCHITECTURE = ROOT / "terraform" / "asis" / "architecture.html"
+TRANSITION_PAGE = ROOT / "terraform" / "asis" / "production-transition.html"
+TRANSITION_REPORT = ROOT / "terraform" / "asis" / "JCAREER_PRODUCTION_TRANSITION.md"
+TRANSITION_SVG = ROOT / "terraform" / "asis" / "JCAREER_PRODUCTION_TRANSITION.svg"
+TRANSITION_DRAWIO = ROOT / "terraform" / "asis" / "JCAREER_PRODUCTION_TRANSITION.drawio"
+TRANSITION_SERVERLESS_PNG = ROOT / "terraform" / "asis" / "JCAREER_PRODUCTION_TRANSITION_SERVERLESS.png"
+TRANSITION_ENDPOINT_PNG = ROOT / "terraform" / "asis" / "JCAREER_PRODUCTION_TRANSITION_ENDPOINT_MDM.png"
 PLATFORM_SVG = ROOT / "assets" / "JCAREER_PLATFORM_ANIMATED.svg"
 PLATFORM_PNG = ROOT / "assets" / "JCAREER_PLATFORM_ANIMATED.png"
 PLATFORM_SPEC = ROOT / "assets" / "JCAREER_PLATFORM_ANIMATED.spec.json"
@@ -59,7 +65,7 @@ EXPECTED_NOTES = [
     "bootstrap/runtime counts were checked only with Terraform mock_provider tests.",
     "The disabled default plan used the ordinary provider configuration with AWS validation disabled by the configuration and planned zero managed resources.",
     "All nine architecture states were opened and checked for the selected button, active diagram layer, visible diagram media, detail link, full-map asset, and 390px overflow by scripts/check_public_ui.mjs.",
-    "Six public pages were checked at 390px and 1440px for overflow, canonical and Open Graph metadata, touch action, and keyboard focus; MLOps aria-controls was also checked.",
+    "Seven public pages were checked at 390px and 1440px for overflow, canonical and Open Graph metadata, touch action, and keyboard focus; MLOps aria-controls was also checked.",
     "MLOps stage URL state, invalid-stage fallback, and browser history were checked by scripts/check_public_ui.mjs.",
     "Eight motion checks covered the carousel, MLOps stage rail, animated architecture, manual motion toggle, and reduced-motion fallback.",
     "The animated architecture source hash, 15 nodes, 11 edges, 17 motion dots, 1480x820 PNG, and manual visual review were recorded together.",
@@ -193,6 +199,12 @@ def evidence_scope_files() -> list[Path]:
         ROOT / "terraform" / "asis" / "README.md",
         FULL_INFRA_DRAWIO,
         FULL_INFRA_GUIDE,
+        TRANSITION_PAGE,
+        TRANSITION_REPORT,
+        TRANSITION_SVG,
+        TRANSITION_DRAWIO,
+        TRANSITION_SERVERLESS_PNG,
+        TRANSITION_ENDPOINT_PNG,
         ROOT / "terraform" / "asis" / "validate-spec.ps1",
         ROOT / "src" / "runtime" / "ASIS_RUNTIME_SPEC.md",
         ROOT / "src" / "runtime" / "VERIFICATION.md",
@@ -314,7 +326,7 @@ def check_evidence_report(errors: list[str]) -> None:
         "disabled_plan_resources": 0,
         "terraform_boundary_tests": "19/19 PASS",
         "synthetic_pipeline_tests": "22/22 PASS",
-        "public_ui": "9/9 routes, 8/8 stage states, 6 pages at 390/1440px, motion 8/8 PASS",
+        "public_ui": "9/9 routes, 8/8 stage states, 7 pages at 390/1440px, motion 8/8 PASS",
         "pdf_source_binding": "PASS",
         "public_integrity": "PASS",
     }
@@ -331,7 +343,7 @@ def check_evidence_report(errors: list[str]) -> None:
             "landing_routes": 9,
             "stage_states": 8,
             "viewports_css_px": [390, 1440],
-            "page_viewport_checks": 12,
+            "page_viewport_checks": 14,
             "motion_checks": 8,
             "page_checks": [
                 "horizontal_overflow",
@@ -454,6 +466,7 @@ def check() -> list[str]:
         ROOT / "terraform" / "lab" / "index.html": "https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/lab/",
         ASIS_PAGE: "https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/",
         ASIS_ARCHITECTURE: "https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/architecture.html",
+        TRANSITION_PAGE: "https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/production-transition.html",
     }
     public_pages = tuple(public_urls)
     parsers: dict[Path, PageParser] = {}
@@ -528,6 +541,47 @@ def check() -> list[str]:
     )
     if not asis_mlops_contract:
         errors.append("AS-IS pages do not preserve the separate MLOps 0/13/14 and seven-stage boundary")
+
+    transition_text = TRANSITION_PAGE.read_text(encoding="utf-8")
+    transition_contract = (
+        'href="production-transition.html"' in asis_text
+        and 'href="production-transition.html"' in architecture_text
+        and "33466745822" in transition_text
+        and "QUEUE · DLQ · RETRY_PENDING 0" in asis_text
+        and all(
+            term in transition_text
+            for term in (
+                "TLSv1",
+                "RDS",
+                "Redis/ElastiCache",
+                "Windows",
+                "macOS",
+                "MDM",
+                "OpenDART",
+                "serverless MLOps",
+                "GATEWAY_RESPONSE_INVALID",
+            )
+        )
+    )
+    if not transition_contract:
+        errors.append("production transition page or AS-IS routing is incomplete")
+
+    try:
+        ET.parse(TRANSITION_SVG)
+        transition_drawio_tree = ET.parse(TRANSITION_DRAWIO)
+        transition_pages = list(transition_drawio_tree.getroot().findall("diagram"))
+        if len(transition_pages) != 3:
+            errors.append(f"unexpected production transition draw.io page count: {len(transition_pages)}")
+    except ET.ParseError as exc:
+        errors.append(f"production transition XML parse failed: {exc}")
+    for transition_png in (TRANSITION_SERVERLESS_PNG, TRANSITION_ENDPOINT_PNG):
+        try:
+            if png_size(transition_png) != (2400, 1400):
+                errors.append(
+                    f"unexpected production transition PNG size: {relative_name(transition_png)} {png_size(transition_png)}"
+                )
+        except (OSError, ValueError, struct.error) as exc:
+            errors.append(f"production transition PNG validation failed: {exc}")
 
     source_readme = (ROOT / "src" / "mlops" / "README.md").read_text(encoding="utf-8")
     flow_readme = (
