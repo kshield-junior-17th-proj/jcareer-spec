@@ -206,7 +206,7 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 | TRACE·JC-RECEIPT | `IMPLEMENTED_GUARDED_NOT_ACTIVE` | receipt·정정 요청·원본-정정 관찰·사람 검토 기록과 역할별 React 경로가 있음. 기본값 `disabled`; 자동 채용·이의·적합성·잔여위험 판정과 AWS/Terraform 리소스는 없음 |
 | 기준 AWS 설계(Terraform) | `MODELLED` | 여섯 모듈로 구성됨. 기록된 AWS 비접속 계획은 생성 예정 110개, 변경 0개, 삭제 0개임. 별도 로컬 변경분을 넣어 다시 계산하지는 않음 |
 | J-Career 고객사 AWS 리소스 | 생성 안 함 | AWS에 접속하지 않는 모의 방식이므로 실제 AWS 상태를 나타내지 않음 |
-| production-serverless 마지막 관찰 배포 | `HISTORICAL_DEPLOYED_REVISION_LIVE_SMOKE_PASS` | revision `7a5acfb`, run `33466745822`, 2026-09-01 12:56:38 KST에 CloudFront·private S3→API Gateway→API Lambda→SQS→Agent Lambda→LLM Gateway Lambda→Capability Broker Lambda→Bedrock live smoke를 확인. 최신 소스 `b7b44a4`의 배포 증거로 재사용하지 않음 |
+| production-serverless 마지막 관찰 배포 | `HISTORICAL_DEPLOYED_REVISION_LIVE_SMOKE_PASS` | revision `7a5acfb`, run `33466745822`, 2026-09-01 12:56:38 KST에 CloudFront·private S3→API Gateway→API Lambda→SQS→Agent Lambda→LLM Gateway Lambda→Capability Broker Lambda→Bedrock live smoke를 확인. 최신 소스 `a9764f8`의 배포 증거로 재사용하지 않음 |
 | 별도 AWS 검증 Lab | `DEPLOYED_STOPPED_SEPARATE` | production과 분리된 24-resource 검증 환경. private EC2는 정지했으나 NAT·공인 IPv4·볼륨·edge 잔존비용 경로는 별도 확인·정리 대상 |
 | 기준 폴더의 애플리케이션 | `PLANNED_UNIMPLEMENTED` | 실행할 소스와 이미지가 없음 |
 | 서비스 구현 코드 | `LOCAL_SYNTHETIC_IMPLEMENTED` | `web`, `api`, `agent`, `llm-gateway`와 PostgreSQL, Redis 소스가 있음. 합성 데이터 검증 범위이며 AWS 배포 결과는 별도 관리 |
@@ -216,7 +216,7 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 | MLOps 전용 서버리스 경로 | `MLOPS_BOOTSTRAP_APPLIED_RUNTIME_NOT_DEPLOYED` | 합성 DB 옆 exporter, S3 입력·결과, Lambda 학습, DynamoDB 상태와 CloudWatch 로그 소스가 있음. bootstrap 13개는 적용됐고 이미지 게시·14번째 Lambda·호출 결과는 없음 |
 | 로컬 코드 검사 | `STATIC_CHECKED` | 현재 공개 릴리스 검사는 6단계이며 Lab·MLOps·OpenDART 정적 검사와 단위시험 묶음을 실행함 |
 | 로컬 검토 도구(Evidence Desk) | `LOCAL_SYNTHETIC_IMPLEMENTED`, `STATIC_CHECKED` | 민감정보를 지운 내부 검토용 복사본을 읽는 소스가 있음. 네트워크 전송과 브라우저 저장을 막지만, 승인 진위와 고객사별 데이터 분리는 구현하지 않음 |
-| Bedrock 내부 연결 코드 | `HISTORICAL_REVISION_E2E_PASS_LATEST_PENDING` | revision `7a5acfb`에서는 API Lambda→LLM Gateway Lambda→Capability Broker Lambda→Bedrock live smoke를 확인했으나, 최신 소스 `b7b44a4`는 plan run `33522434817`만 성공했고 apply·live smoke는 미실행. 미배포 ECS 2-AZ 목표 경로와도 별도 |
+| Bedrock 내부 연결 코드 | `HISTORICAL_REVISION_E2E_PASS_LATEST_PENDING` | revision `7a5acfb`에서는 API Lambda→LLM Gateway Lambda→Capability Broker Lambda→Bedrock live smoke를 확인했으나, 최신 소스 `a9764f8`는 plan run `33569358467` attempt `1`, plan SHA-256 `c0e596e222fcf440f23e29dd165fe42b3d934656d89b96195c2e0a0e9ca8b2f2`까지만 성공. **APPLY · LIVE SMOKE NOT RUN.** 미배포 ECS 2-AZ 목표 경로와도 별도 |
 | 별도 Bedrock 실험 | `BRANCH_PROTOTYPE_UNDEPLOYED` | API Gateway, Lambda, Guardrail 실험 코드와 단위 검사가 있음. 과거 삭제 완료 이력 2건과 현재 관련 리소스 0개만 다른 세션이 읽기 전용으로 확인함. 성공한 AI 응답은 확인하지 못함 |
 | 기준 ECR 이미지 | `PLANNED_UNIMPLEMENTED` | 이미지를 둘 저장소의 자리와 예시 주소만 있음. 최신 소스를 올리거나 AWS에서 실행한 증거는 없음 |
 | 컨설턴트 대시보드 미리보기 | `PEER_OBSERVED_PREVIEW_AVAILABLE` | 화면과 API 소스, 빌드 결과가 있음. 다른 세션에서 최신 작업 성공, 화면 껍데기 응답, 공유 비밀번호 세션 발급을 확인함. 같은 버전인지, 실제로 접근 가능한지, 운영 요건을 갖췄는지는 확인하지 못함 |
