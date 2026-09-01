@@ -118,8 +118,13 @@ class AiSecurityDiagramContract(unittest.TestCase):
         self.assertIn("APPLY · LIVE SMOKE NOT RUN", section.group())
         self.assertNotIn("GITHUB E2E PASS", section.group())
         self.assertIn("TO-BE NOT DEPLOYED", section.group())
-        self.assertIn("LATEST_SOURCE_SHA=b7b44a4", section.group())
-        self.assertIn("PLAN_RUN=33522434817", section.group())
+        self.assertIn("LATEST_SOURCE_SHA=a9764f8", section.group())
+        self.assertIn("PLAN_RUN=33569358467", section.group())
+        self.assertIn("PLAN_ATTEMPT=1", section.group())
+        self.assertIn(
+            "PLAN_SHA256=c0e596e222fcf440f23e29dd165fe42b3d934656d89b96195c2e0a0e9ca8b2f2",
+            section.group(),
+        )
         self.assertIn("LAST_OBSERVED_DEPLOYMENT_SHA=7a5acfb", section.group())
         self.assertIn("HISTORICAL_RUN=33466745822", section.group())
         self.assertNotIn("DEPLOYED_LIVE_SMOKE_PASS_RELOCKED", page)

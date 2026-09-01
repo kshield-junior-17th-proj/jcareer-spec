@@ -1,13 +1,17 @@
 {
   "title": "J-Career 현재 AI 서비스 실행면",
-  "subtitle": "production-serverless 소스 기준 · 현재 계정 apply/smoke 영수증 확인 전",
+  "subtitle": "latest main saved plan 확인 · APPLY · LIVE SMOKE NOT RUN",
   "canvas": { "w": 1800, "h": 980 },
   "labelBackplates": true,
   "source_of_truth": {
     "repository": "jcareer-aws-lab",
-    "revision": "b7b44a46f075c1130b0aae1d4ce77201216ac6fd",
+    "revision": "a9764f88efb72aaf9c8aa60c98ae789d77442c37",
     "path": "terraform/production-serverless",
-    "observed_on": "2026-09-01"
+    "observed_on": "2026-09-02",
+    "plan_run_id": "33569358467",
+    "plan_run_attempt": 1,
+    "plan_sha256": "c0e596e222fcf440f23e29dd165fe42b3d934656d89b96195c2e0a0e9ca8b2f2",
+    "plan_completed_at": "2026-09-02T08:06:36+09:00"
   },
   "status": "SOURCE_IMPLEMENTED_CURRENT_ACCOUNT_APPLY_SMOKE_UNVERIFIED",
   "groups": [
@@ -59,5 +63,5 @@
   "steps": [["user", "cloudfront", 1], ["cloudfront", "api_gateway", 2], ["api_gateway", "api_lambda", 3], ["api_lambda", "queue", 4], ["queue", "agent", 5], ["agent", "gateway", 6], ["gateway", "broker", 7], ["broker", "bedrock", 8]],
   "legend": ["request", "tool", "ambient", "aux"],
   "legendY": 900,
-  "footer": "RDS · ECS · Redis · NAT · WAF는 이 실행면에 없음. 현재 계정의 apply/smoke 영수증 확인 전에는 DEPLOYED로 표기하지 않음."
+  "footer": "latest main a9764f8 · plan 33569358467/1 확인. APPLY · LIVE SMOKE NOT RUN. 마지막 관찰 배포 7a5acfb와 분리."
 }

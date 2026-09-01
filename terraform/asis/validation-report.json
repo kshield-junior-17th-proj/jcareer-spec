@@ -1,5 +1,5 @@
 {
-    "generated_at":  "2026-09-01T13:09:34+09:00",
+    "generated_at":  "2026-09-02T08:20:26+09:00",
     "scope":  "local static validation only; no AWS API or terraform apply",
     "passed":  25,
     "failed":  0,
@@ -7,7 +7,7 @@
                    {
                        "check":  "required_files",
                        "status":  "PASS",
-                       "detail":  "all 10 deliverables present"
+                       "detail":  "all 16 deliverables present"
                    },
                    {
                        "check":  "readme_current_deliverables",
@@ -97,7 +97,7 @@
                    {
                        "check":  "interactive_service_flow",
                        "status":  "PASS",
-                       "detail":  "controls 9, overlay layers 9, stages overview=12, explanation/workplace=4, MLOps=7, other=3, markers 23; integrated full-map AI/MLOps context, guarded-source separation, URL state, detail links 9 checked"
+                       "detail":  "controls 9, overlay layers 9, stages overview=7, explanation/workplace=4, MLOps=7, other=3, markers 23; separated current/evidence/TO-BE context, guarded-source separation, URL state, detail links 9 checked"
                    },
                    {
                        "check":  "flow_source_sync",
@@ -122,12 +122,12 @@
                    {
                        "check":  "pdf_page_objects",
                        "status":  "PASS",
-                       "detail":  "51 page objects; checkout mtime advisory=True; HTML source bound=True; loopback links=0"
+                       "detail":  "53 page objects; checkout mtime advisory=False; HTML source bound=True; loopback links=0"
                    },
                    {
                        "check":  "deliverable_secret_patterns",
                        "status":  "PASS",
-                       "detail":  "0 patterns across 10 UTF-8 sources + 2 binary sentinels"
+                       "detail":  "0 patterns across 14 UTF-8 sources + 4 binary sentinels"
                    }
                ]
 }
