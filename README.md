@@ -8,6 +8,7 @@ J-Career는 구직자와 기업을 연결하는 채용 플랫폼입니다. 이 �
 
 - [서비스 아키텍처](https://kshield-junior-17th-proj.github.io/jcareer-spec/)
 - [업무망·GitHub CI·AWS·MLOps 전체 인프라 지도](https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/architecture.html)
+- [2026-09-01 운영 인프라 전환 기록](https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/production-transition.html)
 - [MLOps 7단계 모델 검증](https://kshield-junior-17th-proj.github.io/jcareer-spec/mlops/)
 - [AWS 검증 환경](https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/lab/)
 
@@ -16,12 +17,15 @@ J-Career는 구직자와 기업을 연결하는 채용 플랫폼입니다. 이 �
 2026-09-01 production-serverless는 GitHub saved plan·다른 사람 승인·OIDC 동일 plan apply와
 live smoke를 통과한 뒤 pipeline을 다시 잠갔습니다. [현재 배포 SVG](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg),
 [draw.io 원본](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.drawio), [기업 2-AZ 목표 지도](assets/JCAREER_FULL_INFRA_ANIMATED.svg)를 구분해 제공합니다.
+12:56:38 KST에 queue·DLQ·`RETRY_PENDING`이 모두 0으로 정리된 최신 상태와
+TLS·RDS/Redis·엔드포인트 잔여 경계는 [운영 인프라 전환 기록](terraform/asis/production-transition.html)에 분리했습니다.
 
 ## 구성 한눈에 보기
 
 | 구성 | 역할 | 현재 관리 기준 |
 |---|---|---|
 | [`terraform/asis`](terraform/asis/README.md) | J-Career 서비스·AWS 기준 설계 | 서울 리전 2-AZ, 6개 모듈, Terraform 계획 항목 110개 |
+| [운영 서버리스 전환 기록](terraform/asis/production-transition.html) | GitHub로 적용한 운영 애플리케이션 경로 | 2026-09-01 E2E PASS, queue·DLQ·RETRY_PENDING 0, 잔여 경계 별도 표시 |
 | [`terraform/serverless-mlops`](terraform/serverless-mlops/README.md) | 합성 데이터 기반 후보 모델 검증 | bootstrap 13개 적용 확인, runtime 14번째 Lambda 미배포·미실행 |
 | [`terraform/serverless-opendart`](terraform/serverless-opendart/README.md) | 기업 공개정보 온디맨드 갱신 | 기본 잠금 0개, bootstrap 8개, runtime 11개 source·미배포 |
 | [`terraform/lab`](terraform/lab/README.md) | 서비스와 데이터 흐름을 확인하는 AWS 검증 환경 | 모드별 13/14/23/24개, 외부 인바운드 0개, SSM 관리 접속 |
@@ -37,6 +41,11 @@ MLOps bootstrap 기반 13개와 serverless roots용 비공개 state S3 1개 생�
 Slack·Notion·SMTP 외부 업무도구 어댑터는 기본 비활성 로컬 소스이며 실제 외부 계정 연결과
 메시지 전송은 미확인입니다. TRACE·JC-RECEIPT는 실행 인프라 구성요소가 아니므로 전체 지도에서
 제외하고 보조 검토 설명으로만 다룹니다.
+
+이 기준 설계와 별도로, 2026-09-01 운영 서버리스 경로는 GitHub run `33466745822`에서 매칭
+`COMPLETED`, OWASP LLM 10/10 `LIVE_OBSERVED`, evidence 보존과 최종 fail-closed gate 통과를
+확인했습니다. 이 결과는 기준 2-AZ·ECS·RDS·Redis나 Windows·macOS·MDM이 배포됐다는 뜻이
+아닙니다. 세부 근거와 공개 URL은 [운영 인프라 전환 기록](terraform/asis/production-transition.html)에 있습니다.
 
 ## MLOps 명세 바로 보기
 
@@ -70,6 +79,8 @@ DynamoDB 실행 상태와 CloudWatch Logs를 기록하고 `TRAINED_PENDING_HUMAN
 - [현재 배포·컨설팅 경계 SVG](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg): GitHub OIDC delivery, 실제 serverless 실행면, Evidence Desk 제안, OpenDART·MLOps·미배포 목표를 상태별로 구분
 - [현재 배포·컨설팅 경계 draw.io 원본](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.drawio)
 - [핵심 평가 슬라이스 해설](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.md)
+- [운영 인프라 전환 페이지](terraform/asis/production-transition.html): 배포된 서버리스 경로와 TLS·RDS/Redis·엔드포인트 잔여 경계
+- [운영 인프라 전환 SVG](terraform/asis/JCAREER_PRODUCTION_TRANSITION.svg) · [draw.io 원본](terraform/asis/JCAREER_PRODUCTION_TRANSITION.drawio)
 - [전체 인프라 draw.io 원본](terraform/asis/JCAREER_FULL_INFRA.drawio)
 - [PNG 도면](terraform/asis/JCAREER_ASIS_FLOW.drawio.png)
 - [쉽게 보는 draw.io 원본](terraform/asis/JCAREER_ASIS_FLOW.drawio)
@@ -119,8 +130,8 @@ AS-IS 코드의 12자리 숫자는 가상 입력값과 AWS가 공개한 서비�
 | 범위 | 확인된 상태 | 아직 확인되지 않은 것 |
 |---|---|---|
 | 기준 `terraform/asis` | 2-AZ·6모듈·110개 Terraform 모델 | apply, ECS 이미지 게시, 서비스 실행 |
-| production-serverless | GitHub saved plan·다른 사람 승인·OIDC 동일 plan apply, live smoke PASS, pipeline 재잠금 | 장기 운영, 기업 2-AZ 전체, Evidence Desk |
-| Bedrock | production-serverless의 API Lambda → LLM Gateway Lambda → Capability Broker Lambda → Bedrock E2E smoke PASS | 미배포 ECS 2-AZ 목표 경로 |
+| production-serverless | GitHub run `33466745822` E2E PASS, Bedrock 매칭 완료, OWASP 10/10, queue·DLQ·`RETRY_PENDING` 0, pipeline 재잠금 | TLS 최소 버전 상향, 과거 오류 필드 정규화, Windows·macOS·MDM |
+| Bedrock | production-serverless의 API Lambda → LLM Gateway Lambda → Capability Broker Lambda → Bedrock E2E PASS | 미배포 ECS 2-AZ 목표 경로 |
 | MLOps | 비공개 state S3 1개와 bootstrap 13개 기반 자원 적용 | ECR 이미지 게시, Lambda 배포·실행, 결과 6종, 사람 검토·서비스 연결 |
 | OpenDART | 0/8/11 source와 승인 경계 | Terraform 적용, API key 준비, 외부 live 조회 |
 | AWS 검증 Lab | production과 분리된 24-resource 환경, private EC2 정지 | NAT·공인 IPv4·볼륨·edge 잔존비용 제거 완료 여부 |

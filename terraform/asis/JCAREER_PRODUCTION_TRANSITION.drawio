@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-09-01T03:00:00.000Z" agent="Codex" version="24.7.17" type="device" compressed="false">
+  <diagram id="observed-baseline" name="1 - Observed baseline">
+    <mxGraphModel dx="2800" dy="1600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="1400" math="0" shadow="0">
+      <root>
+        <mxCell id="p1-0" />
+        <mxCell id="p1-1" parent="p1-0" />
+        <mxCell id="p1-bg" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F5F7FA;strokeColor=none;" vertex="1" parent="p1-1">
+          <mxGeometry x="0" y="0" width="2400" height="1400" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-title" value="&lt;b&gt;JCareer AWS production transition — historical pre-serverless baseline&lt;/b&gt;&lt;br&gt;Observed 2026-09-01 11:20–12:02 KST · final GitHub E2E PASS is shown on page 2 · public account identifier redacted" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=18;spacing=8;fontColor=#232F3E;" vertex="1" parent="p1-1">
+          <mxGeometry x="40" y="30" width="1200" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-legend" value="&lt;font color=&quot;#15803D&quot;&gt;&lt;b&gt;● OBSERVED / RESPONDING&lt;/b&gt;&lt;/font&gt; &amp;nbsp; &lt;font color=&quot;#D97706&quot;&gt;&lt;b&gt;● PARTIAL / UNVERIFIED&lt;/b&gt;&lt;/font&gt; &amp;nbsp; &lt;font color=&quot;#DC2626&quot;&gt;&lt;b&gt;● STOPPED / NOT LIVE&lt;/b&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CBD5E1;fontSize=13;align=center;verticalAlign=middle;" vertex="1" parent="p1-1">
+          <mxGeometry x="1450" y="38" width="880" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-cloud" value="AWS Cloud · observed resources and retained bootstrap controls" style="sketch=0;outlineConnect=0;fontColor=#232F3E;fillColor=none;strokeColor=#232F3E;dashed=0;verticalAlign=top;align=left;html=1;whiteSpace=wrap;fontSize=16;fontStyle=1;shape=mxgraph.aws4.group_aws_cloud_alt;grIcon=mxgraph.aws4.group_aws_cloud_alt;container=1;dropTarget=1;spacingTop=28;spacingLeft=12;" vertex="1" parent="p1-1">
+          <mxGeometry x="280" y="155" width="2050" height="1110" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-browser" value="&lt;b&gt;Consultant browser&lt;/b&gt;&lt;br&gt;external GET observation" style="sketch=0;outlineConnect=0;fontColor=#232F3E;fillColor=#232F3D;strokeColor=#ffffff;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;shape=mxgraph.aws4.client;" vertex="1" parent="p1-1">
+          <mxGeometry x="75" y="505" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-github" value="&lt;b&gt;GitHub Actions&lt;/b&gt;&lt;br&gt;OIDC delivery plane" style="sketch=0;outlineConnect=0;fontColor=#232F3E;fillColor=#232F3D;strokeColor=#ffffff;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;shape=mxgraph.aws4.traditional_server;" vertex="1" parent="p1-1">
+          <mxGeometry x="75" y="885" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-legacy-cf" value="Amazon CloudFront&lt;br&gt;&lt;b&gt;legacy preview · DEPLOYED&lt;/b&gt;&lt;br&gt;d3ll17… · observed HTTP 403" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#15803D;fillColor=#8C4FFF;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;labelWidth=190;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cloudfront;" vertex="1" parent="p1-cloud">
+          <mxGeometry x="130" y="335" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-vpc" value="Legacy preview VPC origin · private target" style="sketch=0;outlineConnect=0;fontColor=#8C4FFF;fillColor=none;strokeColor=#8C4FFF;dashed=0;verticalAlign=top;align=left;html=1;whiteSpace=wrap;fontSize=14;fontStyle=1;shape=mxgraph.aws4.group_vpc2;grIcon=mxgraph.aws4.group_vpc2;container=1;dropTarget=1;spacingTop=28;spacingLeft=12;" vertex="1" parent="p1-cloud">
+          <mxGeometry x="410" y="205" width="580" height="455" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-vpc-origin" value="&lt;b&gt;CloudFront VPC origin&lt;/b&gt;&lt;br&gt;vo_Kvkw… · private :3000" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDE9FE;strokeColor=#8C4FFF;fontColor=#232F3E;fontSize=13;align=center;verticalAlign=middle;" vertex="1" parent="p1-vpc">
+          <mxGeometry x="75" y="145" width="180" height="72" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-ec2" value="Amazon EC2&lt;br&gt;&lt;b&gt;Linux t3.small · STOPPED&lt;/b&gt;&lt;br&gt;i-0fe655… · 10.91.0.94" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#DC2626;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;labelWidth=210;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.ec2;" vertex="1" parent="p1-vpc">
+          <mxGeometry x="385" y="140" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-oidc" value="GitHub OIDC + IAM&lt;br&gt;&lt;b&gt;plan/apply roles separated&lt;/b&gt;&lt;br&gt;bootstrap UPDATE_COMPLETE" style="sketch=0;outlineConnect=0;fontColor=#15803D;fillColor=#C7131F;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;labelWidth=210;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.identity_and_access_management;" vertex="1" parent="p1-cloud">
+          <mxGeometry x="130" y="720" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-state-s3" value="Amazon S3&lt;br&gt;&lt;b&gt;retained Terraform state&lt;/b&gt;&lt;br&gt;exact state object + native lock" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#15803D;fillColor=#7AA116;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;labelWidth=210;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;" vertex="1" parent="p1-cloud">
+          <mxGeometry x="410" y="720" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-kms" value="AWS KMS&lt;br&gt;&lt;b&gt;state key retained&lt;/b&gt;&lt;br&gt;16aeb7a1..." style="sketch=0;outlineConnect=0;fontColor=#15803D;fillColor=#C7131F;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;labelWidth=180;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.key_management_service;" vertex="1" parent="p1-cloud">
+          <mxGeometry x="660" y="720" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-prod-cf" value="Amazon CloudFront&lt;br&gt;&lt;b&gt;fixed production edge&lt;/b&gt;&lt;br&gt;E1DXS827UE3Y24 · DEPLOYED" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#15803D;fillColor=#8C4FFF;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;labelWidth=210;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cloudfront;" vertex="1" parent="p1-cloud">
+          <mxGeometry x="1010" y="720" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-prod-api" value="Amazon API Gateway&lt;br&gt;&lt;b&gt;fixed HTTP API ID&lt;/b&gt;&lt;br&gt;pyvaij2cpk · stage count 0" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#D97706;fillColor=#E7157B;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;labelWidth=200;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.api_gateway;" vertex="1" parent="p1-cloud">
+          <mxGeometry x="1290" y="720" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-prod-web" value="Amazon S3&lt;br&gt;&lt;b&gt;web bucket · 5 objects&lt;/b&gt;&lt;br&gt;CloudFront root observed HTTP 200" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#15803D;fillColor=#7AA116;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;labelWidth=220;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;" vertex="1" parent="p1-cloud">
+          <mxGeometry x="1570" y="720" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-baseline-note" value="&lt;b&gt;Historical baseline conclusion&lt;/b&gt;&lt;br&gt;At this snapshot, static root was observable but neither edge was an application E2E service: legacy origin was stopped; production API had no stage and both health paths returned 404. This is retained as before-state evidence; page 2 records the later PASS." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF7ED;strokeColor=#D97706;fontColor=#7C2D12;fontSize=14;align=left;verticalAlign=middle;spacing=14;" vertex="1" parent="p1-cloud">
+          <mxGeometry x="1040" y="230" width="820" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-edge-browser-legacy" value="HTTPS GET" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#15803D;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;labelBackgroundColor=#F5F5F5;fontSize=11;" edge="1" parent="p1-1" source="p1-browser" target="p1-legacy-cf">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-edge-legacy-vpc" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#15803D;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="p1-1" source="p1-legacy-cf" target="p1-vpc-origin">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-edge-vpc-ec2" value="origin :3000" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#DC2626;dashed=1;dashPattern=8 6;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;labelBackgroundColor=#F5F5F5;fontSize=11;" edge="1" parent="p1-vpc" source="p1-vpc-origin" target="p1-ec2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-edge-github-oidc" value="OIDC" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#15803D;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;labelBackgroundColor=#F5F5F5;fontSize=11;" edge="1" parent="p1-1" source="p1-github" target="p1-oidc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-edge-oidc-state" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#15803D;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="p1-cloud" source="p1-oidc" target="p1-state-s3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-edge-state-kms" value="SSE-KMS" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#15803D;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;labelBackgroundColor=#F5F5F5;fontSize=11;" edge="1" parent="p1-cloud" source="p1-state-s3" target="p1-kms">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-edge-kms-cf" value="bootstrap identities" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#15803D;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;labelBackgroundColor=#F5F5F5;fontSize=11;" edge="1" parent="p1-cloud" source="p1-kms" target="p1-prod-cf">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-edge-cf-api" value="/api/* · currently 404" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#D97706;dashed=1;dashPattern=8 6;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;labelBackgroundColor=#F5F5F5;fontSize=11;" edge="1" parent="p1-cloud" source="p1-prod-cf" target="p1-prod-api">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-edge-cf-web" value="default path · HTTP 200" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#15803D;endArrow=block;endFill=1;exitX=0.5;exitY=0;entryX=0.5;entryY=0;labelBackgroundColor=#F5F5F5;fontSize=11;" edge="1" parent="p1-cloud" source="p1-prod-cf" target="p1-prod-web">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1329" y="610" />
+              <mxPoint x="1889" y="610" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="serverless-transition" name="2 - Serverless transition">
+    <mxGraphModel dx="2800" dy="1600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="1400" math="0" shadow="0">
+      <root>
+        <mxCell id="p2-0" />
+        <mxCell id="p2-1" parent="p2-0" />
+        <mxCell id="p2-bg" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F5F7FA;strokeColor=none;" vertex="1" parent="p2-1">
+          <mxGeometry x="0" y="0" width="2400" height="1400" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-title" value="&lt;b&gt;JCareer serverless production — GitHub-deployed E2E PASS&lt;/b&gt;&lt;br&gt;Run 33466745822 · matching COMPLETED · OWASP 10/10 LIVE_OBSERVED · delivery relocked · queues settled 12:56:38 KST" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=18;spacing=8;fontColor=#232F3E;" vertex="1" parent="p2-1">
+          <mxGeometry x="40" y="30" width="1320" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-legend" value="&lt;font color=&quot;#15803D&quot;&gt;&lt;b&gt;● LIVE / E2E PASS&lt;/b&gt;&lt;/font&gt; &amp;nbsp; &lt;font color=&quot;#D97706&quot;&gt;&lt;b&gt;● RESIDUAL CAVEAT&lt;/b&gt;&lt;/font&gt; &amp;nbsp; &lt;font color=&quot;#DC2626&quot;&gt;&lt;b&gt;● NOT DEPLOYED&lt;/b&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CBD5E1;fontSize=13;align=center;verticalAlign=middle;" vertex="1" parent="p2-1">
+          <mxGeometry x="1510" y="38" width="820" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-cloud" value="AWS Cloud · serverless assessment slice · current transition state" style="sketch=0;outlineConnect=0;fontColor=#232F3E;fillColor=none;strokeColor=#232F3E;dashed=0;verticalAlign=top;align=left;html=1;whiteSpace=wrap;fontSize=16;fontStyle=1;shape=mxgraph.aws4.group_aws_cloud_alt;grIcon=mxgraph.aws4.group_aws_cloud_alt;container=1;dropTarget=1;spacingTop=28;spacingLeft=12;" vertex="1" parent="p2-1">
+          <mxGeometry x="240" y="140" width="2090" height="1150" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-browser" value="&lt;b&gt;Service user&lt;/b&gt;&lt;br&gt;HTTPS browser" style="sketch=0;outlineConnect=0;fontColor=#232F3E;fillColor=#232F3D;strokeColor=#ffffff;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;shape=mxgraph.aws4.client;" vertex="1" parent="p2-1">
+          <mxGeometry x="70" y="585" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-cf" value="Amazon CloudFront&lt;br&gt;&lt;b&gt;fixed edge · DEPLOYED&lt;/b&gt;&lt;br&gt;static root 200" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#15803D;fillColor=#8C4FFF;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;labelWidth=180;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cloudfront;" vertex="1" parent="p2-cloud">
+          <mxGeometry x="105" y="455" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-api-gw" value="Amazon API Gateway&lt;br&gt;&lt;b&gt;7 routes · $default LIVE&lt;/b&gt;&lt;br&gt;direct + edge health 200" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#15803D;fillColor=#E7157B;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;labelWidth=190;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.api_gateway;" vertex="1" parent="p2-cloud">
+          <mxGeometry x="330" y="455" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-api-lambda" value="AWS Lambda&lt;br&gt;&lt;b&gt;API · INVOKED&lt;/b&gt;&lt;br&gt;JWT roles admitted" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#15803D;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;labelWidth=170;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="p2-cloud">
+          <mxGeometry x="555" y="455" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-sqs" value="Amazon SQS&lt;br&gt;&lt;b&gt;matching · EMPTY&lt;/b&gt;&lt;br&gt;visible / in-flight / delayed 0" style="sketch=0;outlineConnect=0;fontColor=#15803D;gradientColor=none;strokeColor=#ffffff;fillColor=#232F3E;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;fontStyle=0;labelWidth=210;shape=mxgraph.aws4.productIcon;prIcon=mxgraph.aws4.sqs;" vertex="1" parent="p2-cloud">
+          <mxGeometry x="775" y="432" width="70" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-agent" value="AWS Lambda&lt;br&gt;&lt;b&gt;agent · COMPLETED&lt;/b&gt;&lt;br&gt;200 of 1,000 returned" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#15803D;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;labelWidth=175;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="p2-cloud">
+          <mxGeometry x="995" y="455" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-gateway" value="AWS Lambda&lt;br&gt;&lt;b&gt;LLM Gateway · PASS&lt;/b&gt;&lt;br&gt;tool contract accepted" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#15803D;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;labelWidth=190;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="p2-cloud">
+          <mxGeometry x="1215" y="455" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-broker" value="AWS Lambda&lt;br&gt;&lt;b&gt;Broker · PASS&lt;/b&gt;&lt;br&gt;forced toolUse valid" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#15803D;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;labelWidth=190;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="p2-cloud">
+          <mxGeometry x="1435" y="455" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-bedrock" value="Amazon Bedrock&lt;br&gt;&lt;b&gt;Nova Converse · E2E PASS&lt;/b&gt;&lt;br&gt;provider=bedrock" style="sketch=0;outlineConnect=0;fontColor=#15803D;fillColor=#116D5B;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;labelWidth=190;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.bedrock;" vertex="1" parent="p2-cloud">
+          <mxGeometry x="1655" y="455" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-web-s3" value="Amazon S3&lt;br&gt;&lt;b&gt;web · 5 objects&lt;/b&gt;&lt;br&gt;index.html observed 200" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#15803D;fillColor=#7AA116;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;labelWidth=180;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;" vertex="1" parent="p2-cloud">
+          <mxGeometry x="105" y="155" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-cognito" value="Amazon Cognito&lt;br&gt;&lt;b&gt;user pool · PASS&lt;/b&gt;&lt;br&gt;roles + CI cleanup 0" style="sketch=0;outlineConnect=0;fontColor=#15803D;fillColor=#C7131F;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;labelWidth=180;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cognito;" vertex="1" parent="p2-cloud">
+          <mxGeometry x="330" y="155" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-job-ddb" value="Amazon DynamoDB&lt;br&gt;&lt;b&gt;job catalog · LIVE&lt;/b&gt;&lt;br&gt;1,000 synthetic rows" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#15803D;fillColor=#C925D1;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;labelWidth=190;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.dynamodb;" vertex="1" parent="p2-cloud">
+          <mxGeometry x="555" y="155" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-runs-ddb" value="Amazon DynamoDB&lt;br&gt;&lt;b&gt;RETRY_PENDING · 0&lt;/b&gt;&lt;br&gt;stale error field retained" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#D97706;fillColor=#C925D1;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;labelWidth=190;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.dynamodb;" vertex="1" parent="p2-cloud">
+          <mxGeometry x="555" y="805" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-dlq" value="Amazon SQS&lt;br&gt;&lt;b&gt;DLQ · EMPTY&lt;/b&gt;&lt;br&gt;messages 0 · alarm OK" style="sketch=0;outlineConnect=0;fontColor=#15803D;gradientColor=none;strokeColor=#ffffff;fillColor=#232F3E;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;fontStyle=0;labelWidth=180;shape=mxgraph.aws4.productIcon;prIcon=mxgraph.aws4.sqs;" vertex="1" parent="p2-cloud">
+          <mxGeometry x="775" y="782" width="70" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-evidence-s3" value="Amazon S3&lt;br&gt;&lt;b&gt;evidence · RETAINED&lt;/b&gt;&lt;br&gt;runtime + CI receipts" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#15803D;fillColor=#7AA116;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;labelWidth=200;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;" vertex="1" parent="p2-cloud">
+          <mxGeometry x="995" y="805" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-alarm" value="Amazon CloudWatch&lt;br&gt;&lt;b&gt;logs + DLQ alarm LIVE&lt;/b&gt;&lt;br&gt;failure trail observed" style="sketch=0;outlineConnect=0;fontColor=#15803D;fillColor=#BC1356;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;labelWidth=190;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cloudwatch;" vertex="1" parent="p2-cloud">
+          <mxGeometry x="1215" y="805" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-failure" value="&lt;b&gt;GITHUB E2E + FINAL GATE · PASS&lt;/b&gt;&lt;br&gt;33466745822: catalog 1,000; provider=bedrock; evaluated 1,000; results 200; match COMPLETED. OWASP 10/10 SUCCEEDED + LIVE_OBSERVED; overall COMPLETE; evidence retained.&lt;br&gt;&lt;br&gt;&lt;b&gt;Relocked:&lt;/b&gt; pipeline=false; breakglass absent; approvers bin-h7 + kimme-more; bootstrap actors 177460935 + 229136888; boundary v5 removed wildcard log activation.&lt;br&gt;&lt;br&gt;&lt;b&gt;12:56:38 refresh:&lt;/b&gt; main queue visible/in-flight/delayed 0; DLQ 0; DynamoDB RETRY_PENDING 0; last retry broker AVAILABLE → agent COMPLETED. Data hygiene: the COMPLETED item retains historical error_category=GATEWAY_RESPONSE_INVALID. Viewer TLS minimum TLSv1; RDS/Redis and endpoint/MDM absent." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECFDF5;strokeColor=#15803D;fontColor=#14532D;fontSize=13;align=left;verticalAlign=middle;spacing=14;" vertex="1" parent="p2-cloud">
+          <mxGeometry x="1450" y="745" width="510" height="285" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-separate" value="&lt;b&gt;Separate lifecycles — NOT CONNECTED&lt;/b&gt;&lt;br&gt;OpenDART and serverless MLOps do not feed automatic recommendation. Automatic hiring is prohibited." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#64748B;fontColor=#334155;fontSize=13;align=left;verticalAlign=middle;spacing=12;dashed=1;" vertex="1" parent="p2-cloud">
+          <mxGeometry x="1450" y="120" width="510" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-edge-browser-cf" value="HTTPS 200" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#15803D;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;labelBackgroundColor=#F5F5F5;fontSize=11;" edge="1" parent="p2-1" source="p2-browser" target="p2-cf">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-edge-cf-api" value="/api/* observed" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#15803D;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;labelBackgroundColor=#F5F5F5;fontSize=11;" edge="1" parent="p2-cloud" source="p2-cf" target="p2-api-gw">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-edge-api-lambda" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#15803D;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="p2-cloud" source="p2-api-gw" target="p2-api-lambda">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-edge-lambda-sqs" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#15803D;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="p2-cloud" source="p2-api-lambda" target="p2-sqs">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-edge-sqs-agent" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#15803D;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="p2-cloud" source="p2-sqs" target="p2-agent">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-edge-agent-gateway" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#15803D;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="p2-cloud" source="p2-agent" target="p2-gateway">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-edge-gateway-broker" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#15803D;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="p2-cloud" source="p2-gateway" target="p2-broker">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-edge-broker-bedrock" value="Converse observed" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#15803D;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;labelBackgroundColor=#F5F5F5;fontSize=11;" edge="1" parent="p2-cloud" source="p2-broker" target="p2-bedrock">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-edge-cf-web" value="default path" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#15803D;endArrow=block;endFill=1;exitX=0.5;exitY=0;entryX=0.5;entryY=1;labelBackgroundColor=#F5F5F5;fontSize=11;" edge="1" parent="p2-cloud" source="p2-cf" target="p2-web-s3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-edge-cognito-api" value="JWT roles observed" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#15803D;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;labelBackgroundColor=#F5F5F5;fontSize=11;" edge="1" parent="p2-cloud" source="p2-cognito" target="p2-api-gw">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-edge-api-job" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#15803D;endArrow=block;endFill=1;exitX=0.5;exitY=0;entryX=0.5;entryY=1;" edge="1" parent="p2-cloud" source="p2-api-lambda" target="p2-job-ddb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-edge-api-runs" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#15803D;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="p2-cloud" source="p2-api-lambda" target="p2-runs-ddb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-edge-sqs-dlq" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#2563EB;dashed=1;dashPattern=5 5;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="p2-cloud" source="p2-sqs" target="p2-dlq">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-edge-agent-evidence" value="version + SHA-256" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#15803D;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;labelBackgroundColor=#F5F5F5;fontSize=11;" edge="1" parent="p2-cloud" source="p2-agent" target="p2-evidence-s3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-edge-dlq-alarm" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#2563EB;dashed=1;dashPattern=5 5;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="p2-cloud" source="p2-dlq" target="p2-alarm">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="endpoint-mdm" name="3 - Endpoint and MDM">
+    <mxGraphModel dx="2800" dy="1600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="1400" math="0" shadow="0">
+      <root>
+        <mxCell id="p3-0" />
+        <mxCell id="p3-1" parent="p3-0" />
+        <mxCell id="p3-bg" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F5F7FA;strokeColor=none;" vertex="1" parent="p3-1">
+          <mxGeometry x="0" y="0" width="2400" height="1400" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-title" value="&lt;b&gt;Consultant endpoints / MDM — NOT DEPLOYED after application E2E PASS&lt;/b&gt;&lt;br&gt;Run 33466745822 validates the serverless service only · no live device, image-build, SSM, MDM, or teardown receipt" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=18;spacing=8;fontColor=#232F3E;" vertex="1" parent="p3-1">
+          <mxGeometry x="40" y="30" width="1350" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-legend" value="&lt;font color=&quot;#DC2626&quot;&gt;&lt;b&gt;● NOT BUILT / NOT DEPLOYED / NOT OBSERVED&lt;/b&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DC2626;fontSize=13;align=center;verticalAlign=middle;" vertex="1" parent="p3-1">
+          <mxGeometry x="1660" y="38" width="670" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-cloud" value="AWS Cloud / endpoint review boundary · all states below are source contracts or declarations" style="sketch=0;outlineConnect=0;fontColor=#232F3E;fillColor=none;strokeColor=#232F3E;dashed=0;verticalAlign=top;align=left;html=1;whiteSpace=wrap;fontSize=16;fontStyle=1;shape=mxgraph.aws4.group_aws_cloud_alt;grIcon=mxgraph.aws4.group_aws_cloud_alt;container=1;dropTarget=1;spacingTop=28;spacingLeft=12;" vertex="1" parent="p3-1">
+          <mxGeometry x="280" y="170" width="2050" height="1080" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-consultant" value="&lt;b&gt;Consultant&lt;/b&gt;&lt;br&gt;separate approval required" style="sketch=0;outlineConnect=0;fontColor=#232F3E;fillColor=#232F3D;strokeColor=#ffffff;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;shape=mxgraph.aws4.client;" vertex="1" parent="p3-1">
+          <mxGeometry x="75" y="595" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-inventory" value="&lt;b&gt;Scenario inventory only&lt;/b&gt;&lt;br&gt;Windows 100 + macOS 80&lt;br&gt;&lt;font color=&quot;#DC2626&quot;&gt;&lt;b&gt;NOT OBSERVED&lt;/b&gt;&lt;/font&gt;&lt;br&gt;no device identities or telemetry" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF2F2;strokeColor=#DC2626;fontColor=#232F3E;fontSize=14;align=center;verticalAlign=middle;spacing=12;" vertex="1" parent="p3-cloud">
+          <mxGeometry x="110" y="390" width="260" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-windows" value="Windows endpoint sample&lt;br&gt;&lt;b&gt;WIN-01..03 · NOT BUILT&lt;/b&gt;&lt;br&gt;Windows Server 2022 desktop simulation&lt;br&gt;Windows 11 claim prohibited" style="sketch=0;outlineConnect=0;fontColor=#DC2626;fillColor=#232F3D;strokeColor=#ffffff;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;labelWidth=230;shape=mxgraph.aws4.client;" vertex="1" parent="p3-cloud">
+          <mxGeometry x="470" y="430" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-builder" value="EC2 Image Builder&lt;br&gt;&lt;b&gt;pipelines 0 · images 0&lt;/b&gt;&lt;br&gt;serverless role has no endpoint lifecycle" style="sketch=0;outlineConnect=0;fontColor=#DC2626;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;labelWidth=220;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.ec2_image_builder;" vertex="1" parent="p3-cloud">
+          <mxGeometry x="780" y="430" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-ssm" value="AWS Systems Manager&lt;br&gt;&lt;b&gt;managed instances 0&lt;/b&gt;&lt;br&gt;no endpoint role or deployed target" style="sketch=0;outlineConnect=0;fontColor=#DC2626;fillColor=#BC1356;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;labelWidth=220;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.systems_manager;" vertex="1" parent="p3-cloud">
+          <mxGeometry x="1090" y="430" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-macos" value="macOS endpoint sample&lt;br&gt;&lt;b&gt;MAC-01..03 · NOT DEPLOYED&lt;/b&gt;&lt;br&gt;physical Mac + MDM or EC2 Mac&lt;br&gt;policy/license/budget undecided" style="sketch=0;outlineConnect=0;fontColor=#DC2626;fillColor=#232F3D;strokeColor=#ffffff;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;labelWidth=235;shape=mxgraph.aws4.client;" vertex="1" parent="p3-cloud">
+          <mxGeometry x="1400" y="430" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-mdm" value="&lt;b&gt;Approved MDM / remote access&lt;/b&gt;&lt;br&gt;HUMAN DECISION REQUIRED&lt;br&gt;no device enrollment or cleanup receipt" style="sketch=0;outlineConnect=0;fontColor=#DC2626;fillColor=#232F3D;strokeColor=#ffffff;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;whiteSpace=wrap;fontSize=12;labelWidth=230;shape=mxgraph.aws4.traditional_server;" vertex="1" parent="p3-cloud">
+          <mxGeometry x="1710" y="430" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-boundary" value="&lt;b&gt;Exact endpoint boundary&lt;/b&gt;&lt;br&gt;The scoped serverless delivery role has no Image Builder, EC2 endpoint, or SSM managed-node lifecycle. No Windows image/instance identity exists. No physical Mac + MDM asset or approved EC2 Mac policy/budget exists. Application E2E PASS and Slack source scripts do not prove OS/browser/EDR/VPN posture, consultant access, enrollment, cleanup, or teardown." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF2F2;strokeColor=#DC2626;fontColor=#7F1D1D;fontSize=14;align=left;verticalAlign=middle;spacing=16;" vertex="1" parent="p3-cloud">
+          <mxGeometry x="290" y="745" width="1470" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-edge-consult-inventory" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#DC2626;dashed=1;dashPattern=8 6;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="p3-1" source="p3-consultant" target="p3-inventory">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-edge-inventory-windows" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#DC2626;dashed=1;dashPattern=8 6;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="p3-cloud" source="p3-inventory" target="p3-windows">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-edge-windows-builder" value="source contract only" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#DC2626;dashed=1;dashPattern=8 6;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;labelBackgroundColor=#F5F5F5;fontSize=11;" edge="1" parent="p3-cloud" source="p3-windows" target="p3-builder">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-edge-builder-ssm" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#DC2626;dashed=1;dashPattern=8 6;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="p3-cloud" source="p3-builder" target="p3-ssm">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-edge-ssm-macos" value="not a deployed bridge" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#DC2626;dashed=1;dashPattern=8 6;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;labelBackgroundColor=#F5F5F5;fontSize=11;" edge="1" parent="p3-cloud" source="p3-ssm" target="p3-macos">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-edge-macos-mdm" value="human approval" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#DC2626;dashed=1;dashPattern=8 6;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;labelBackgroundColor=#F5F5F5;fontSize=11;" edge="1" parent="p3-cloud" source="p3-macos" target="p3-mdm">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
