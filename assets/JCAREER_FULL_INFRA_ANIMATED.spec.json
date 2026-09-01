@@ -1,20 +1,21 @@
 {
   "title": "J-Career 전체 인프라 · 업무망 × GitHub CI × AWS × AI/외부조회 × MLOps",
-  "subtitle": "GitHub delivery 구현 · AWS 2-AZ 110개 미배포 · Bedrock 직접 합성 호출 PASS / 전체 경로 미확인 · MLOps bootstrap 13개 적용",
-  "footer": "움직이는 점=구현 또는 기준 내부 흐름(배포 증거 아님) · 옅은 점선=소스·설계·의존 관계 · TRACE·JC-RECEIPT 제외",
+  "subtitle": "현재 production-serverless 배포·live smoke PASS · 2-AZ 110개는 별도 목표 · MLOps bootstrap 13개/runtime 미실행",
+  "footer": "현재 실행면은 핵심 평가 지도를 참조 · 이 도면의 2-AZ 영역은 목표 설계 · TRACE·JC-RECEIPT는 인프라 제외",
   "canvas": {"w": 2320, "h": 1500},
   "labelBackplates": true,
 
   "nodes": [
     {"id": "repo", "x": 82, "y": 170, "icon": "tile:generic", "label": "GitHub 저장소", "sub": "as-is · jcareer-spec"},
-    {"id": "actions", "x": 320, "y": 170, "icon": "tile:generic", "label": "GitHub Actions CI", "sub": "PR/main 검사 · deploy job 없음"},
+    {"id": "actions", "x": 320, "y": 170, "icon": "tile:generic", "label": "GitHub Actions", "sub": "공개 검사 + production delivery"},
     {"id": "pages", "x": 558, "y": 170, "icon": "tile:external", "label": "GitHub Pages", "sub": "legacy · main/(root) 공개 배포"},
-    {"id": "deploygate", "x": 810, "y": 170, "icon": "tile:generic", "label": "CI / AWS 경계", "sub": "IaC 대상 관계 · 자동 배포 없음"},
+    {"id": "deploygate", "x": 810, "y": 170, "icon": "iam", "label": "승인 + GitHub OIDC", "sub": "saved plan · distinct human"},
+    {"id": "proddeploy", "x": 1060, "y": 170, "icon": "tile:generic", "label": "production-serverless", "sub": "apply · smoke PASS · 재잠금"},
 
     {"id": "user", "x": 82, "y": 430, "icon": "tile:generic", "label": "서비스 사용자", "sub": "지원자 · 채용 담당자"},
     {"id": "office", "x": 110, "y": 590, "icon": "tile:generic", "label": "업무망 PC 180대", "sub": "Windows 100 · macOS 80 · 실물 미관찰"},
     {"id": "network", "x": 110, "y": 710, "icon": "tile:generic", "label": "VPN · MFA · UTM", "sub": "SCENARIO_DECLARED · 운영 미확인"},
-    {"id": "slack", "x": 110, "y": 830, "icon": "tile:external", "label": "Slack · 외부 업무도구", "sub": "Notion · SMTP · default-off / 미확인"},
+    {"id": "slack", "x": 110, "y": 830, "icon": "tile:external", "label": "Slack · 외부 업무도구", "sub": "adapter source default-off · prod 미연결"},
     {"id": "endpoint_pack", "x": 110, "y": 950, "icon": "tile:generic", "label": "Endpoint / Image source", "sub": "Windows 3 + macOS 3 검토 · 실물 없음"},
 
     {"id": "route", "x": 310, "y": 430, "icon": "route53", "label": "Amazon Route 53", "sub": "서비스 주소 안내"},
@@ -30,7 +31,7 @@
     {"id": "llm_gateway", "x": 1130, "y": 600, "icon": "tile:gateway", "label": "LLM Gateway", "sub": "ECS 기술 배포 단위 · 로컬 source 구현"},
     {"id": "bedrock_broker", "x": 1380, "y": 600, "icon": "tile:gateway", "label": "Bedrock Capability Broker", "sub": "Lab source only · 미배포"},
     {"id": "redis", "x": 1600, "y": 600, "icon": "tile:generic", "label": "Amazon ElastiCache", "sub": "data subnet ×2 · Redis"},
-    {"id": "bedrock", "x": 1880, "y": 600, "icon": "bedrock", "label": "Amazon Bedrock", "sub": "직접 합성 호출 PASS · 전체 경로 미확인"},
+    {"id": "bedrock", "x": 1880, "y": 600, "icon": "bedrock", "label": "Amazon Bedrock", "sub": "serverless E2E PASS · 2-AZ ECS 경로 미배포"},
 
     {"id": "network_ctrl", "x": 690, "y": 770, "icon": "vpc", "label": "IGW · EIP · SG · Routes", "sub": "public / app / data 네트워크 모델"},
     {"id": "nat", "x": 920, "y": 770, "icon": "nat", "label": "NAT Gateway ×2", "sub": "app subnet 외부 연결"},
@@ -60,8 +61,8 @@
   ],
 
   "groups": [
-    {"kind": "event", "x": 34, "y": 94, "w": 1100, "h": 174, "label": "GitHub CI + branch Pages · 현재 동작 · AWS 배포와 분리", "lx": 52, "ly": 112},
-    {"kind": "region", "x": 222, "y": 286, "w": 1780, "h": 1140, "label": "AWS · 기준 2-AZ 110개는 미배포 / 별도 MLOps bootstrap 13개만 적용 확인", "lx": 242, "ly": 306},
+    {"kind": "event", "x": 34, "y": 94, "w": 1270, "h": 174, "label": "GitHub CI + branch Pages + 승인형 AWS delivery · current serverless PASS", "lx": 52, "ly": 112},
+    {"kind": "region", "x": 222, "y": 286, "w": 1780, "h": 1140, "label": "AWS 기업 목표 2-AZ · 110개 기준선 미배포 / 현재 serverless는 별도 핵심 평가 지도", "lx": 242, "ly": 306},
     {"kind": "subnet", "x": 852, "y": 330, "w": 870, "h": 500, "label": "VPC · public ×2 / app ×2 / data ×2 · 2-AZ", "lx": 872, "ly": 350},
     {"kind": "event", "x": 20, "y": 520, "w": 180, "h": 510, "label": "업무망·외부 SaaS · AWS 밖", "lx": 34, "ly": 540},
     {"kind": "event", "x": 2040, "y": 540, "w": 250, "h": 300, "label": "외부 공개정보 API · AWS 밖", "lx": 2055, "ly": 560},
@@ -71,8 +72,9 @@
   "edges": [
     {"from": "repo", "fs": "r", "to": "actions", "ts": "l", "flow": "schedule", "label": "push / PR", "lxy": [198, 157]},
     {"from": "repo", "fs": "t", "to": "pages", "ts": "t", "flow": "schedule", "label": "main/(root) publish", "lxy": [320, 127], "mids": [[82, 130], [558, 130]]},
-    {"from": "actions", "fs": "b", "to": "deploygate", "ts": "b", "flow": "aux", "static": true, "label": "검사 관계 · AWS deploy 없음", "lxy": [678, 235], "mids": [[320, 232], [810, 232]]},
-    {"from": "deploygate", "fs": "b", "to": "ecs", "ts": "t", "flow": "aux", "static": true, "label": "IaC 대상 · 자동 배포 없음", "lxy": [1010, 266], "mids": [[810, 270], [1210, 270]]},
+    {"from": "actions", "fs": "b", "to": "deploygate", "ts": "b", "flow": "schedule", "label": "saved plan + approval", "lxy": [678, 235], "mids": [[320, 232], [810, 232]]},
+    {"from": "deploygate", "fs": "r", "to": "proddeploy", "ts": "l", "flow": "schedule", "label": "same plan apply", "lxy": [935, 157]},
+    {"from": "proddeploy", "fs": "b", "to": "user", "ts": "t", "flow": "aux", "static": true, "label": "현재 serverless 실행면 · 2-AZ 목표와 별도", "lxy": [570, 280], "mids": [[1060, 278], [82, 278]]},
 
     {"from": "user", "fs": "r", "to": "route", "ts": "l", "flow": "request"},
     {"from": "route", "fs": "r", "to": "front", "ts": "l", "flow": "request"},
@@ -88,7 +90,7 @@
 
     {"from": "ecs", "fs": "b", "to": "llm_gateway", "ts": "t", "flow": "tool", "label": "API → 설명", "lxy": [1170, 510]},
     {"from": "llm_gateway", "fs": "r", "to": "bedrock_broker", "ts": "l", "flow": "aux", "static": true, "label": "Lab source only", "lxy": [1255, 587]},
-    {"from": "bedrock_broker", "fs": "r", "to": "bedrock", "ts": "l", "flow": "aux", "static": true, "label": "전체 경로 미확인", "lxy": [1630, 587]},
+    {"from": "bedrock_broker", "fs": "r", "to": "bedrock", "ts": "l", "flow": "aux", "static": true, "label": "2-AZ 목표 경로 · 미배포", "lxy": [1630, 587]},
     {"from": "ecs", "fs": "b", "to": "redis", "ts": "l", "flow": "tool", "label": "cache", "lxy": [1450, 587], "mids": [[1210, 650], [1500, 650], [1500, 600]]},
     {"from": "ecs", "fs": "b", "to": "endpoints", "ts": "t", "flow": "aux", "static": true, "mids": [[1210, 705], [1130, 705]]},
     {"from": "ecs", "fs": "b", "to": "nat", "ts": "t", "flow": "tool", "static": true, "label": "egress route", "lxy": [1045, 692], "mids": [[1210, 690], [920, 690]]},
@@ -128,7 +130,7 @@
   "journeys": [
     {"flow": "request", "dur": 3.2, "hops": [["user", "route"], ["route", "front"], ["front", "waf"], ["waf", "alb"], ["alb", "ecs"], ["ecs", "rds"]]},
     {"flow": "reply", "dur": 3.5, "reverse": true, "hops": [["ecs", "rds"], ["alb", "ecs"], ["waf", "alb"], ["front", "waf"], ["route", "front"], ["user", "route"]]},
-    {"flow": "schedule", "dur": 2.4, "hops": [["repo", "actions"], ["repo", "pages"]]},
+    {"flow": "schedule", "dur": 2.8, "hops": [["repo", "actions"], ["repo", "pages"], ["actions", "deploygate"], ["deploygate", "proddeploy"]]},
     {"flow": "tool", "dur": 2.2, "hops": [["ecs", "llm_gateway"]]},
     {"flow": "ambient", "dur": 3.0, "hops": [["snapshot", "mls3"], ["mls3", "trainer"], ["trainer", "results"], ["results", "runs"], ["runs", "review"]]},
     {"flow": "garden", "dur": 2.4, "hops": [["flowlogs", "cloudwatch"], ["trail", "s3data"]]}

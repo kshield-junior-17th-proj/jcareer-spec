@@ -67,6 +67,16 @@ if (spec.labelBackplates === true) {
 }
 output = output.replace(/\r\n?/g, '\n').replace(/[ \t]+$/gm, '');
 
+// AWS artwork can carry the same internal IDs every time one official icon is
+// inlined. Keep the first ID as the shared reference target and suffix later
+// occurrences so the final self-contained document remains valid XML/SVG.
+const embeddedIdCounts = new Map();
+output = output.replace(/\bid="([^"]+)"/g, (match, id) => {
+  const count = (embeddedIdCounts.get(id) || 0) + 1;
+  embeddedIdCounts.set(id, count);
+  return count === 1 ? match : `id="${id}__${count}"`;
+});
+
 const motionCount = (output.match(/<animateMotion\b/g) || []).length;
 const guardedMotionCount = (output.match(/<circle class="motion-dot"[^>]*><animateMotion\b/g) || []).length;
 const expectedMotionCount = spec.journeys.reduce((total, journey) => total + journey.hops.length, 0);

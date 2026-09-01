@@ -9,6 +9,7 @@
 - Terraform은 여섯 부분으로 나뉘며, 기록된 모의 계획에는 생성 예정 항목이 110개다.
 - 이 기준선은 AWS에 적용하지 않았으며 현재 생성 리소스는 0개다.
 - 기준선에 애플리케이션 이미지와 실행 환경은 포함되어 있지 않다.
+- 별도 `production-serverless` 핵심 스택은 2026-09-01 GitHub 승인형 OIDC apply와 live smoke를 통과했고 pipeline을 다시 잠갔다. 이 성공을 아래 2-AZ 기준선과 합산하지 않는다.
 - MLOps는 별도 default-off Terraform 루트이며 2026-08-31 bootstrap 13개 적용만 확인됐다. runtime의 14번째 Lambda는 미배포·미실행이며 기준 110개와 합산하지 않는다.
 - Slack은 AWS 밖의 외부 업무 SaaS·자산대장 경계다. 기본 비활성 webhook 어댑터 소스는 있으나 실제 workspace 운영·전송은 확인되지 않았다.
 - TRACE·JC-RECEIPT는 실행 인프라나 구축 대상이 아니다. 관련 기본 비활성 로컬 source는 보조 설명으로만 다루며 Terraform 리소스와 AWS 실행은 없다.
@@ -38,20 +39,21 @@
 - [전체 지도 해설](JCAREER_FULL_INFRA.md)
 - [웹용 애니메이션 전체 지도](../../assets/JCAREER_FULL_INFRA_ANIMATED.svg)
 - [기업 목표·USD 50 핵심 평가 슬라이스](../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg)
+- [현재 배포 지도 draw.io 원본](../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.drawio)
 - [핵심 평가 슬라이스 해설](../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.md)
 - [쉽게 보는 draw.io 원본](JCAREER_ASIS_FLOW.drawio)
 - [쉽게 보는 PNG 도면](JCAREER_ASIS_FLOW.drawio.png)
 - [보조 상세 draw.io 원본](JCAREER_ASIS_2AZ.drawio)
 - [자동검사 결과](validation-report.json)
 
-`JCAREER_FULL_INFRA.drawio`는 업무망·Slack, GitHub 검사·Pages 배포, AWS 기준 설계,
-LLM Gateway·Bedrock·OpenDART와 별도 MLOps를 한 장에 합친 편집 원본이다. CI에서 AWS로
-이어지는 자동 배포선은 없으며 실제 구현처럼 그리지 않는다.
+`JCAREER_FULL_INFRA.drawio`는 업무망·Slack, GitHub 검사·Pages 배포, AWS 2-AZ 목표 설계,
+LLM Gateway·Bedrock·OpenDART와 별도 MLOps를 한 장에 합친 편집 원본이다. 이 목표 도면의
+ECS·RDS 경로는 미배포다. 현재 서버리스 실행면은 별도 핵심 평가 지도에서만 구현 경로로 표시한다.
 
 별도 핵심 평가 슬라이스 지도는 전체 기업 목표를 대체하지 않는다. 고정비가 큰 목표 구조와
-USD 50 한도에서 실제 평가·시연에 사용할 서버리스 실행면, 사람이 승인한 snapshot만 읽는
-Evidence Desk를 구분한다. AWS 적용 전에는 `DEPLOYMENT EVIDENCE PENDING`으로 표시하며,
-GitHub Pages 배포를 AWS 서비스 배포 증거로 사용하지 않는다.
+2026-09-01 실제 적용·시연한 서버리스 실행면, 아직 제안·미배포인 Evidence Desk를 구분한다.
+GitHub saved plan·다른 사람 승인·OIDC·동일 plan apply·live smoke·재잠금을 AWS 증거로 기록하며,
+GitHub Pages 배포 자체를 AWS 서비스 배포 증거로 사용하지 않는다.
 
 `JCAREER_ASIS_2AZ.drawio`는 원본 작업 트리에서 관리한 별도 기술 기록이다. 공개 기준 도면의
 수량과 검증 결과에는 합치지 않는다. 공개 화면은 60개 셀·14개 연결의

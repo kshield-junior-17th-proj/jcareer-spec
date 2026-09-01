@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="가상 기업 J사의 Windows 골든 이미지와 macOS MDM 기준선을 실제 배포 단말 검증과 분리해 설명하는 J-Career 기술 사례입니다.">
+  <meta name="theme-color" content="#172129">
+  <meta property="og:type" content="article">
+  <meta property="og:locale" content="ko_KR">
+  <meta property="og:title" content="가상 기업 J사의 이기종 업무 단말 보안 진단">
+  <meta property="og:description" content="Windows 이미지 기준선부터 macOS MDM 결정, 배포 후 드리프트 검증까지 사실 상태를 구분해 설명합니다.">
+  <meta property="og:url" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/consulting/">
+  <meta property="og:image" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/assets/JCAREER_FULL_INFRA_ANIMATED.png">
+  <meta property="og:image:alt" content="업무망, GitHub delivery, AWS 인프라와 별도 MLOps를 연결한 J-Career 전체 시스템 지도">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://kshield-junior-17th-proj.github.io/jcareer-spec/consulting/">
+  <link rel="preconnect" href="https://api.fontshare.com">
+  <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&amp;display=swap">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%23172129'/%3E%3Cpath d='M18 13h11v25c0 10-5 14-16 13v-9c4 0 5-1 5-5V13zm17 0h17v9h-7v29H35V13z' fill='%23d55d24'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="article.css">
+  <title>가상 기업 J사의 이기종 업무 단말 보안 진단 | J-Career</title>
+</head>
+<body>
+  <div class="reading-progress" aria-hidden="true"><span data-reading-progress></span></div>
+  <a class="skip-link" href="#article">본문으로 건너뛰기</a>
+
+  <header class="site-header">
+    <nav class="nav" aria-label="주요 메뉴">
+      <a class="brand" href="../">J-Career Engineering</a>
+      <div class="nav-links">
+        <a href="../terraform/asis/architecture.html">전체 인프라</a>
+        <a href="../mlops/">MLOps</a>
+        <a href="./" aria-current="page">단말 진단 사례</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="article">
+    <article>
+      <header class="article-hero">
+        <div class="article-hero__grid">
+          <div class="hero-copy">
+            <p class="breadcrumb"><a href="../">J-Career</a><span>/</span>Field Note 01</p>
+            <h1>가상 기업 J사의<br>이기종 업무 단말<br><em>보안 진단</em></h1>
+            <p class="standfirst">Windows 골든 이미지와 macOS MDM 기준선이 안전하다는 사실만으로, 현장의 단말까지 안전하다고 말할 수는 없습니다. 이미지 원본, 배포 경로, 실행 중 상태를 하나의 증거 사슬로 잇는 방법을 정리했습니다.</p>
+            <div class="byline">
+              <div><span>작성</span><strong>J-Career Security Architecture</strong></div>
+              <div><span>기준일</span><strong>2026.09.01</strong></div>
+              <div><span>대상</span><strong>가상 기업 J사</strong></div>
+            </div>
+          </div>
+
+          <div class="hero-plate" aria-label="업무 단말 진단의 두 갈래 흐름">
+            <div class="hero-plate__head"><span>ENDPOINT CONTROL MAP</span><strong>BASELINE ≠ RUNTIME</strong></div>
+            <div class="hero-lane hero-lane--windows">
+              <span class="os-mark" aria-hidden="true">W</span>
+              <div><small>WINDOWS</small><strong>Image Builder source</strong><span>구현</span></div>
+              <i aria-hidden="true"></i>
+              <div><small>AMI / EC2</small><strong>빌드와 배포</strong><span>미실행</span></div>
+            </div>
+            <div class="hero-lane hero-lane--mac">
+              <span class="os-mark" aria-hidden="true">M</span>
+              <div><small>macOS</small><strong>MDM scripts</strong><span>구현</span></div>
+              <i aria-hidden="true"></i>
+              <div><small>DEVICE</small><strong>경로 선택</strong><span>사람 결정 대기</span></div>
+            </div>
+            <div class="hero-plate__footer">
+              <span>승인된 원본</span><span>배포 동일성</span><span>현장 상태</span><span>컨설턴트 판단</span>
+            </div>
+          </div>
+        </div>
+
+        <dl class="truth-strip" aria-label="현재 사실 상태">
+          <div><dt>시나리오 자산</dt><dd>Windows 100<br>macOS 80</dd><span>사용자 확인</span></div>
+          <div><dt>Windows 소스</dt><dd>Image Builder<br>정의 준비</dd><span>구현</span></div>
+          <div><dt>Windows 실행</dt><dd>AMI 0<br>단말 0</dd><span>미실행</span></div>
+          <div><dt>macOS 실행</dt><dd>이미지 0<br>단말 0</dd><span>결정 대기</span></div>
+        </dl>
+      </header>
+
+      <div class="article-layout">
+        <aside class="toc" aria-label="글 목차">
+          <p>이 글의 순서</p>
+          <ol>
+            <li><a href="#problem">질문을 다시 세우기</a></li>
+            <li><a href="#architecture">진단 아키텍처</a></li>
+            <li><a href="#baseline">두 개의 검증 축</a></li>
+            <li><a href="#windows">Windows 이미지</a></li>
+            <li><a href="#macos">macOS 기준선</a></li>
+            <li><a href="#deployed">배포 단말 예시</a></li>
+            <li><a href="#slack">Slack과 업무망</a></li>
+            <li><a href="#publish">공개 AS-IS 기준</a></li>
+          </ol>
+          <a class="source-link" href="JCAREER_ENDPOINT_ASSESSMENT.drawio">편집 가능한 도면 받기</a>
+        </aside>
+
+        <div class="article-body">
+          <section id="problem">
+            <p class="chapter-label">문제 정의</p>
+            <h2>이미지가 안전하면 단말도 안전할까</h2>
+            <p class="lead">J사는 Windows 100대와 macOS 80대를 쓰는 가상 기업입니다. 이 숫자는 시나리오상의 자산 규모이지, 저장소에서 180대의 실물을 관찰했다는 뜻이 아닙니다.</p>
+            <p>보안 진단에서 자주 생기는 오해는 이미지와 실행 중인 단말을 같은 대상으로 보는 것입니다. 골든 이미지의 방화벽과 백신 설정이 올바르더라도 사용자가 로컬 관리자 권한을 얻었거나, 브라우저 세션이 남았거나, 배포 이후 정책이 바뀌었다면 실제 위험은 달라집니다. 반대로 현장 단말 한 대에서 이상이 없었다고 해서 이미지 공급망 전체가 검증된 것도 아닙니다.</p>
+            <blockquote>
+              <strong>이번 진단의 기준 질문</strong>
+              <p>승인한 원본이 어떤 경로로 단말에 도착했고, 현재도 같은 통제를 유지하며, 검토가 끝난 뒤 민감한 흔적을 지웠다는 사실을 무엇으로 설명할 수 있는가.</p>
+            </blockquote>
+            <div class="state-note state-note--warning">
+              <strong>먼저 밝히는 현재 상태</strong>
+              <p>저장소에는 Windows 이미지와 3대 샘플 단말을 만들 수 있는 기본 비활성 정의가 있습니다. 실제 AMI 빌드, EC2 단말 배포, 원격 세션 관찰은 수행하지 않았습니다. macOS는 스크립트와 계약만 있고 MDM 또는 EC2 Mac 예외 경로가 결정되지 않았습니다.</p>
+            </div>
+          </section>
+
+          <section id="architecture" class="wide-section">
+            <p class="chapter-label">Architecture</p>
+            <h2>기준선과 현장 상태를 한 증거 사슬로 잇습니다</h2>
+            <p>Windows와 macOS는 같은 점검표를 공유할 수 있지만 배포 수단은 같지 않습니다. Windows는 EC2 Image Builder로 검증용 AMI를 만들고 Systems Manager 터널을 통해 3대 샘플을 확인하는 경로를 준비했습니다. macOS는 물리 Mac과 MDM을 우선하며, EC2 Mac은 비용, 라이선스, 리전 용량을 승인한 경우에만 예외로 검토합니다.</p>
+
+            <figure class="architecture-board" aria-labelledby="architecture-caption">
+              <div class="diagram-head">
+                <div><span>J-CAREER / ENDPOINT ASSESSMENT</span><strong>현재 상태를 포함한 목표 검증 흐름</strong></div>
+                <div class="legend"><span><i class="implemented"></i>구현</span><span><i class="pending"></i>미실행</span><span><i class="decision"></i>사람 결정</span></div>
+              </div>
+
+              <div class="diagram-axis" aria-hidden="true">
+                <span>01 원본</span><span>02 이미지·정책</span><span>03 샘플 단말</span><span>04 관찰</span><span>05 판단</span>
+              </div>
+
+              <div class="diagram-lane diagram-lane--windows">
+                <div class="lane-title"><b>Windows</b><small>Server 2022 desktop simulation</small></div>
+                <div class="diagram-node is-implemented"><span>SOURCE</span><strong>버전 고정 구성</strong><small>SHA와 승인 입력</small></div>
+                <div class="diagram-arrow" aria-hidden="true"></div>
+                <div class="diagram-node is-pending"><span>AWS</span><strong>EC2 Image Builder</strong><small>빌드 시작 전</small></div>
+                <div class="diagram-arrow" aria-hidden="true"></div>
+                <div class="diagram-node is-pending"><span>AWS</span><strong>EC2 3대</strong><small>WIN-01 · 02 · 03</small></div>
+                <div class="diagram-arrow" aria-hidden="true"></div>
+                <div class="diagram-node is-pending"><span>AWS</span><strong>Systems Manager</strong><small>RDP는 loopback</small></div>
+                <div class="diagram-arrow" aria-hidden="true"></div>
+                <div class="diagram-node is-pending"><span>REVIEW</span><strong>단말 관찰</strong><small>아직 기록 없음</small></div>
+              </div>
+
+              <div class="diagram-lane diagram-lane--mac">
+                <div class="lane-title"><b>macOS</b><small>licensed device path</small></div>
+                <div class="diagram-node is-implemented"><span>SOURCE</span><strong>MDM용 스크립트</strong><small>서명 패키지 아님</small></div>
+                <div class="diagram-arrow" aria-hidden="true"></div>
+                <div class="diagram-node is-decision"><span>HUMAN</span><strong>경로 승인</strong><small>물리 Mac 우선</small></div>
+                <div class="diagram-arrow" aria-hidden="true"></div>
+                <div class="diagram-node is-pending"><span>DEVICE</span><strong>Mac 3대</strong><small>MAC-01 · 02 · 03</small></div>
+                <div class="diagram-arrow" aria-hidden="true"></div>
+                <div class="diagram-node is-pending"><span>MDM</span><strong>정책과 세션</strong><small>실행 전</small></div>
+                <div class="diagram-arrow" aria-hidden="true"></div>
+                <div class="diagram-node is-pending"><span>REVIEW</span><strong>단말 관찰</strong><small>아직 기록 없음</small></div>
+              </div>
+
+              <div class="diagram-controls">
+                <div><img src="../assets/aws/aws-iam.svg" alt=""><span><strong>IAM</strong> 최소 권한과 승인 경계</span></div>
+                <div><img src="../assets/aws/amazon-cloudwatch.svg" alt=""><span><strong>CloudWatch</strong> 실행 시 로그 목적지</span></div>
+                <div><span class="control-mark" aria-hidden="true">S</span><span><strong>Slack</strong> AWS 밖의 업무 SaaS 경계</span></div>
+              </div>
+              <figcaption id="architecture-caption">실선은 승인 후 실행할 순서입니다. 색이 채워진 원본 단계만 현재 구현됐습니다. 나머지 노드는 배포 사실이 아니라 검증 설계입니다.</figcaption>
+            </figure>
+
+            <div class="artifact-row">
+              <div><span>EDITABLE SOURCE</span><strong>JCAREER_ENDPOINT_ASSESSMENT.drawio</strong></div>
+              <a href="JCAREER_ENDPOINT_ASSESSMENT.drawio" download>원본 도면 내려받기</a>
+              <a href="JCAREER_ENDPOINT_ASSESSMENT.md">도면 해설 읽기</a>
+            </div>
+          </section>
+
+          <section id="baseline">
+            <p class="chapter-label">Assessment model</p>
+            <h2>검증 축을 두 개로 나눕니다</h2>
+            <p>첫 번째 축은 이미지와 정책의 공급망입니다. 두 번째 축은 그 결과가 설치된 단말의 현재 상태입니다. 둘 중 하나만 확인하면 결론도 절반에 그칩니다.</p>
+
+            <div class="comparison-table" role="table" aria-label="이미지 기준선과 배포 단말 검증 비교">
+              <div class="comparison-row comparison-row--head" role="row"><span role="columnheader">검증 항목</span><span role="columnheader">이미지·정책 기준선</span><span role="columnheader">배포된 단말</span></div>
+              <div class="comparison-row" role="row"><strong role="rowheader">출처</strong><span role="cell">승인된 상위 이미지, 구성요소 버전, 소스 SHA</span><span role="cell">실제 AMI ID 또는 MDM 배포 프로필과 단말 연결</span></div>
+              <div class="comparison-row" role="row"><strong role="rowheader">통제</strong><span role="cell">방화벽, Defender 또는 EDR, IMDSv2, 서명 검증</span><span role="cell">정책 적용 결과, 예외, 로컬 권한, 실행 중 프로세스</span></div>
+              <div class="comparison-row" role="row"><strong role="rowheader">세션</strong><span role="cell">자격증명과 토큰을 이미지에 넣지 않음</span><span role="cell">MFA, 만료 시간, 브라우저·Slack 흔적, 종료 정리</span></div>
+              <div class="comparison-row" role="row"><strong role="rowheader">결론</strong><span role="cell">재현 가능한 출발점인지 판단</span><span role="cell">배포 후 드리프트와 실제 노출을 판단</span></div>
+            </div>
+          </section>
+
+          <section id="windows">
+            <p class="chapter-label">Walkthrough A</p>
+            <h2>Windows 골든 이미지부터 검토합니다</h2>
+            <p class="lead">현재 소스는 Windows 11 단말이 아닙니다. Windows Server 2022 Desktop Experience를 업무 화면 검토용으로 구성하는 시뮬레이션입니다.</p>
+            <p>Image Builder 구성은 상위 이미지 버전을 고정하고, 암호화된 gp3 볼륨과 IMDSv2, Windows Firewall, Defender, Systems Manager Agent, 서명된 Edge를 검사하도록 작성돼 있습니다. RDP는 외부에 열지 않고 Systems Manager 터널의 loopback 연결로만 접근하는 설계입니다.</p>
+
+            <div class="code-frame">
+              <div class="code-frame__title"><span>endpoint_image_contract.yaml</span><small>정확한 상태 계약</small></div>
+              <pre><code><span class="key">platform</span>: WINDOWS_SERVER_2022_DESKTOP_SIMULATION
+<span class="key">image_strategy</span>: AWS_EC2_IMAGE_BUILDER_AMI
+<span class="key">current_execution_state</span>: NOT_BUILT_OR_DEPLOYED
+<span class="key">sample_profiles</span>: [WIN-01, WIN-02, WIN-03]
+<span class="key">access</span>: SSM_TUNNELED_RDP_OR_FLEET_MANAGER
+<span class="key">baked_secrets</span>: PROHIBITED</code></pre>
+            </div>
+
+            <ol class="procedure">
+              <li><span>01</span><div><strong>원본을 고정합니다.</strong><p>상위 이미지, 구성 번들, 파이프라인 설정을 버전과 SHA로 묶습니다.</p></div></li>
+              <li><span>02</span><div><strong>빌드와 시험을 분리합니다.</strong><p>이미지를 만든 사실과 Defender, Firewall, Edge 서명을 통과한 사실을 각각 기록합니다.</p></div></li>
+              <li><span>03</span><div><strong>승인 뒤에만 3대를 엽니다.</strong><p>WIN-01부터 WIN-03까지 정확히 세 대를 만들고 인바운드 규칙은 0개로 유지합니다.</p></div></li>
+              <li><span>04</span><div><strong>세션 종료를 검증합니다.</strong><p>최대 8시간 안에 종료하고 임시 Edge 프로필과 클립보드 토큰이 남지 않았는지 확인합니다.</p></div></li>
+            </ol>
+
+            <div class="result-grid">
+              <div><span>확인한 것</span><strong>재현 가능한 소스와 차단 규칙</strong><p>정의, 검증 스크립트, 승인 입력 계약이 저장소에 있습니다.</p></div>
+              <div><span>확인하지 않은 것</span><strong>AMI와 GUI의 실제 상태</strong><p>빌드 ID, AMI ID, 세션 화면, 실행 로그는 아직 없습니다.</p></div>
+            </div>
+          </section>
+
+          <section id="macos">
+            <p class="chapter-label">Walkthrough A, continued</p>
+            <h2>macOS는 이미지를 만들기 전에 경로부터 결정합니다</h2>
+            <p>macOS에는 준비, 설정, 검증, 제거 스크립트가 있습니다. 하지만 이 파일들은 서명된 설치 패키지나 MDM 프로필도 아니고, 이미지 배포 증거도 아닙니다. 물리 Mac 3대에 고객사 MDM 정책을 적용하는 경로가 우선안입니다.</p>
+
+            <div class="decision-split">
+              <article>
+                <span class="choice-label">권장 경로</span>
+                <h3>물리 Mac + MDM</h3>
+                <p>Apple 라이선스와 기존 업무 환경을 지키면서 FileVault, Gatekeeper, 방화벽, EDR, 브라우저 세션 정책을 검토합니다.</p>
+                <ul><li>MAC-01 · 후보자 역할</li><li>MAC-02 · 채용 담당자 역할</li><li>MAC-03 · 관리자 역할</li></ul>
+              </article>
+              <article>
+                <span class="choice-label">승인 필요 예외</span>
+                <h3>EC2 Mac</h3>
+                <p>전용 호스트 비용, 최소 할당 시간, 리전 용량, 원격 접속 방식까지 승인한 경우에만 검토합니다.</p>
+                <ul><li>베어 메탈 Dedicated Host</li><li>호스트당 Mac 인스턴스 1대</li><li>호스트 해제 전 최소 24시간</li></ul>
+              </article>
+            </div>
+
+            <div class="state-note">
+              <strong>현재 결론</strong>
+              <p>macOS AWS 리소스는 0개입니다. 물리 Mac과 MDM 사용 여부, Apple 정책, 담당자, 단말 접근 방식이 결정되기 전에는 배포 완료로 표시하지 않습니다.</p>
+            </div>
+          </section>
+
+          <section id="deployed">
+            <p class="chapter-label">Walkthrough B</p>
+            <h2>이미 배포된 단말은 이렇게 다시 봅니다</h2>
+            <p class="lead">아래는 실제 실행 결과가 아니라, 승인 뒤 WIN-02와 MAC-02를 대상으로 수행할 검증 예시입니다. 공개본에서 실행한 것처럼 보이지 않도록 모든 결과 칸을 미관찰로 유지합니다.</p>
+
+            <div class="session-example">
+              <div class="session-example__head">
+                <div><span>SAMPLE SESSION</span><strong>채용 담당자 역할</strong></div>
+                <span class="pending-badge">NOT OBSERVED</span>
+              </div>
+              <div class="session-columns">
+                <section>
+                  <h3>WIN-02</h3>
+                  <dl><div><dt>이미지 동일성</dt><dd>AMI · source SHA 대조</dd></div><div><dt>접속</dt><dd>SSM tunnel · loopback RDP</dd></div><div><dt>통제</dt><dd>Firewall · Defender · Edge signature</dd></div><div><dt>종료</dt><dd>임시 프로필 제거 · shutdown</dd></div></dl>
+                </section>
+                <section>
+                  <h3>MAC-02</h3>
+                  <dl><div><dt>정책 동일성</dt><dd>MDM profile · script SHA 대조</dd></div><div><dt>접속</dt><dd>승인한 사내 원격 경로</dd></div><div><dt>통제</dt><dd>FileVault · Gatekeeper · EDR</dd></div><div><dt>종료</dt><dd>브라우저 쿠키 · Slack 세션 확인</dd></div></dl>
+                </section>
+              </div>
+            </div>
+
+            <div class="evidence-chain" aria-label="배포 단말 검증의 증거 사슬">
+              <div><span>A</span><strong>승인 입력</strong><small>담당자 · 범위 · 만료</small></div><i aria-hidden="true"></i>
+              <div><span>B</span><strong>원본 동일성</strong><small>AMI · MDM · SHA</small></div><i aria-hidden="true"></i>
+              <div><span>C</span><strong>현장 관찰</strong><small>화면 · 통제 · 드리프트</small></div><i aria-hidden="true"></i>
+              <div><span>D</span><strong>종료 증거</strong><small>세션 정리 · 단말 종료</small></div>
+            </div>
+
+            <p>컨설턴트는 기준선 준수 여부만 체크하지 않습니다. 업무 역할별로 로그인, 채용 서비스 이용, 파일 반출, 브라우저와 Slack 세션, 복구 경로를 직접 보고 예외와 잔여위험을 기록해야 합니다. 세 대씩의 샘플은 통제 경로를 검증하기 위한 최소 단위이며 180대 전체를 통계적으로 대표하지 않습니다.</p>
+          </section>
+
+          <section id="slack">
+            <p class="chapter-label">Business boundary</p>
+            <h2>Slack은 사라진 컴포넌트가 아니라 AWS 밖의 경계입니다</h2>
+            <p>Windows와 macOS 소스에는 <code>app.slack.com</code>으로 가는 업무 바로가기와 세션 종료 보조 처리가 있습니다. 이것은 실제 Slack workspace, 계정 정책, 보존 규칙, AWS 알림 연동을 증명하지 않습니다.</p>
+
+            <div class="boundary-map">
+              <div><span>업무 단말</span><strong>Windows 100 · macOS 80</strong><small>시나리오 자산</small></div>
+              <i aria-hidden="true"></i>
+              <div><span>업무망 통제</span><strong>VPN + MFA · UTM</strong><small>시나리오 선언</small></div>
+              <i aria-hidden="true"></i>
+              <div><span>외부 SaaS</span><strong>Slack</strong><small>운영 미확인</small></div>
+            </div>
+
+            <p>실제 진단에서는 SSO와 MFA 강제, 게스트와 외부 연결, 앱 설치 승인, 메시지와 파일 보존, 모바일 세션, 퇴사자 비활성화, 감사 로그 내보내기를 별도 확인합니다. 현재 저장소의 기본 비활성 webhook 소스는 이 운영 점검을 대신하지 못합니다. Amazon Q Developer, SNS, EventBridge 연동도 구현돼 있지 않습니다.</p>
+          </section>
+
+          <section id="publish">
+            <p class="chapter-label">Publication rule</p>
+            <h2>공개 AS-IS에는 사실만 남깁니다</h2>
+            <p>외부에 공개할 문서라면 구현 사실과 다음 단계 제안을 한 문장 안에서 섞지 않아야 합니다. 특히 자산 수량과 실행 증거를 구분해야 합니다.</p>
+
+            <div class="publish-rules">
+              <article>
+                <h3>반드시 추가할 항목</h3>
+                <ul>
+                  <li>Windows 100대, macOS 80대는 시나리오 자산 규모라는 설명</li>
+                  <li>Windows Server 2022 Desktop Experience 시뮬레이션이라는 정확한 OS 표기</li>
+                  <li>이미지 정의, AMI 빌드, 단말 배포, GUI 관찰의 개별 상태</li>
+                  <li>macOS의 물리 Mac + MDM 우선안과 EC2 Mac 예외 승인 조건</li>
+                  <li>Slack은 AWS 밖의 운영 미확인 SaaS 경계라는 설명</li>
+                  <li>3+3 샘플은 검증 경로용이며 180대를 대표하지 않는다는 한계</li>
+                </ul>
+              </article>
+              <article>
+                <h3>추가하면 안 되는 항목</h3>
+                <ul>
+                  <li>실제 180대를 배포하거나 관찰했다는 표현</li>
+                  <li>Windows 11 이미지, macOS 이미지, MDM 정책을 만들었다는 주장</li>
+                  <li>Slack workspace와 AWS가 연동됐다는 주장</li>
+                  <li>AWS 계정 ID, 자격증명, 내부 주소, 원본 state와 민감 로그</li>
+                  <li>실제 지원자 정보나 화면 캡처, 복구할 수 있는 개인정보</li>
+                  <li>TRACE와 JC-RECEIPT를 단말 실행 인프라로 표현하는 도면</li>
+                </ul>
+              </article>
+            </div>
+          </section>
+
+          <section id="operations">
+            <p class="chapter-label">Operations note</p>
+            <h2>실행 전 마지막 결정</h2>
+            <p>다음 단계는 Terraform 적용이 아니라 사람의 범위 승인입니다. Windows 3대의 빌드와 세션 비용, macOS 물리 단말과 MDM 담당자, 자료 반입 금지, 세션 만료, 종료 후 삭제 기준을 먼저 정해야 합니다. GitHub CI는 정적 검사 경계이며 현재 이 단말 환경을 자동으로 AWS에 적용하지 않습니다.</p>
+            <div class="closing-statement">
+              <span>CONSULTING PRINCIPLE</span>
+              <strong>기준선은 출발점이고,<br>현장 관찰이 결론입니다.</strong>
+              <p>두 결과를 같은 식별자와 해시로 연결해야 단말 보안 상태를 설명할 수 있습니다.</p>
+            </div>
+          </section>
+
+          <section class="references" aria-labelledby="references-title">
+            <h2 id="references-title">근거와 더 읽을 자료</h2>
+            <ol>
+              <li><a href="../fleet/README.md">J-Career endpoint review 범위와 실행 경계</a></li>
+              <li><a href="../fleet/images/endpoint_image_contract.yaml">endpoint image contract</a></li>
+              <li><a href="../terraform/workplace-images/README.md">Windows 이미지 정의와 macOS source-only 경계</a></li>
+              <li><a href="../terraform/workplace-endpoints/README.md">Windows 3대 샘플 단말 세션 계약</a></li>
+              <li><a href="https://docs.aws.amazon.com/imagebuilder/latest/userguide/what-is-image-builder.html">AWS EC2 Image Builder User Guide</a></li>
+              <li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-mac-instances.html">Amazon EC2 Mac instances</a></li>
+              <li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-IMDS-new-instances.html">Configure IMDSv2 for new EC2 instances</a></li>
+            </ol>
+          </section>
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div><strong>J-Career Engineering</strong><p>가상 기업 시나리오를 바탕으로 설계와 실행 상태를 분리해 기록합니다.</p></div>
+    <div><a href="../">서비스 맵</a><a href="../terraform/asis/architecture.html?flow=workplace">업무망 흐름</a><a href="#article">맨 위로</a></div>
+  </footer>
+
+  <script src="article.js"></script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 {
-    "generated_at":  "2026-08-31T20:43:54+09:00",
+    "generated_at":  "2026-09-01T13:09:34+09:00",
     "scope":  "local static validation only; no AWS API or terraform apply",
     "passed":  25,
     "failed":  0,
@@ -7,7 +7,7 @@
                    {
                        "check":  "required_files",
                        "status":  "PASS",
-                       "detail":  "all 9 deliverables present"
+                       "detail":  "all 10 deliverables present"
                    },
                    {
                        "check":  "readme_current_deliverables",
@@ -17,7 +17,7 @@
                    {
                        "check":  "plain_language_reader_guide",
                        "status":  "PASS",
-                       "detail":  "spec guide Hangul 3302; flow guide Hangul 148; drawio Hangul 431; reader-first status labels checked"
+                       "detail":  "spec guide Hangul 3296; flow guide Hangul 148; drawio Hangul 431; reader-first status labels checked"
                    },
                    {
                        "check":  "render_temp_artifacts_absent",
@@ -32,7 +32,7 @@
                    {
                        "check":  "prohibited_live_claims",
                        "status":  "PASS",
-                       "detail":  "0 live / in-production claims"
+                       "detail":  "0 unqualified full-production claims"
                    },
                    {
                        "check":  "excluded_ai_services",
@@ -97,12 +97,12 @@
                    {
                        "check":  "interactive_service_flow",
                        "status":  "PASS",
-                       "detail":  "controls 9, overlay layers 9, stages overview=10, explanation/workplace=4, MLOps=7, other=3, markers 23; integrated full-map AI/MLOps context, guarded-source separation, URL state, detail links 9 checked"
+                       "detail":  "controls 9, overlay layers 9, stages overview=12, explanation/workplace=4, MLOps=7, other=3, markers 23; integrated full-map AI/MLOps context, guarded-source separation, URL state, detail links 9 checked"
                    },
                    {
                        "check":  "flow_source_sync",
                        "status":  "PASS",
-                       "detail":  "index+architecture match generator inputs; flow 6ec7f79a8e49..."
+                       "detail":  "index+architecture match generator inputs; flow 35dff2466e1c..."
                    },
                    {
                        "check":  "drawio_xml",
@@ -122,12 +122,12 @@
                    {
                        "check":  "pdf_page_objects",
                        "status":  "PASS",
-                       "detail":  "50 page objects; checkout mtime advisory=True; HTML source bound=True; loopback links=0"
+                       "detail":  "51 page objects; checkout mtime advisory=True; HTML source bound=True; loopback links=0"
                    },
                    {
                        "check":  "deliverable_secret_patterns",
                        "status":  "PASS",
-                       "detail":  "0 patterns across 9 UTF-8 sources + 2 binary sentinels"
+                       "detail":  "0 patterns across 10 UTF-8 sources + 2 binary sentinels"
                    }
                ]
 }

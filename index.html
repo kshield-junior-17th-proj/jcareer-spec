@@ -3,17 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="J-Career의 업무망·GitHub CI, AWS 기준 설계, LLM Gateway·Bedrock·OpenDART, 데이터 아키텍처와 MLOps 상태를 한눈에 보여 줍니다.">
+  <meta name="description" content="GitHub OIDC delivery, 현재 production-serverless, 업무망·Slack, LLM Gateway·Bedrock와 MLOps·OpenDART·2-AZ 목표 경계를 한눈에 보여 줍니다.">
   <meta name="theme-color" content="#172129">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ko_KR">
   <meta property="og:title" content="J-Career 서비스 아키텍처">
-  <meta property="og:description" content="업무망·Slack, GitHub delivery, AWS 기준 설계, LLM Gateway·Bedrock·OpenDART와 MLOps 검증 흐름을 한곳에서 확인합니다.">
+  <meta property="og:description" content="GitHub OIDC delivery, 현재 production-serverless, 업무망·Slack, LLM Gateway·Bedrock와 MLOps·OpenDART·2-AZ 목표 경계를 한곳에서 확인합니다.">
   <meta property="og:url" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/">
-  <meta property="og:image" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/assets/JCAREER_FULL_INFRA_ANIMATED.png">
-  <meta property="og:image:alt" content="서비스 사용자, 업무망과 Slack, GitHub delivery, AWS 기준 설계, LLM Gateway·Bedrock·OpenDART와 별도 MLOps의 관계를 연결한 J-Career 전체 인프라 지도">
+  <meta property="og:image" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.png">
+  <meta property="og:image:alt" content="GitHub 승인형 OIDC 배포, 현재 production-serverless, 업무망과 Slack, Bedrock, Evidence Desk 제안, MLOps·OpenDART·2-AZ 목표를 구분한 J-Career 인프라 지도">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image:alt" content="서비스 사용자, 업무망과 Slack, GitHub delivery, AWS 기준 설계, LLM Gateway·Bedrock·OpenDART와 별도 MLOps의 관계를 연결한 J-Career 전체 인프라 지도">
+  <meta name="twitter:image:alt" content="GitHub 승인형 OIDC 배포, 현재 production-serverless, 업무망과 Slack, Bedrock, Evidence Desk 제안, MLOps·OpenDART·2-AZ 목표를 구분한 J-Career 인프라 지도">
   <link rel="canonical" href="https://kshield-junior-17th-proj.github.io/jcareer-spec/">
   <link rel="preconnect" href="https://api.fontshare.com">
   <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
@@ -32,6 +32,7 @@
         <div class="nav-links">
           <a href="terraform/asis/">AWS 아키텍처</a>
           <a href="mlops/">MLOps</a>
+          <a href="consulting/">단말 진단 사례</a>
           <a href="terraform/lab/">AWS 검증 환경</a>
         </div>
         <button class="motion-toggle" type="button" data-motion-toggle aria-pressed="false" hidden><span data-motion-label>움직임 줄이기</span></button>
@@ -133,7 +134,7 @@
             <p class="section-label">구성 범위</p>
             <h2>서비스부터 검증 환경까지<br>한곳에서 봅니다</h2>
           </div>
-          <p class="section-intro">서비스 기능, AWS 인프라, AI 모델 검증은 서로 연결되지만 확인 기준은 다릅니다. 각 영역의 역할과 현재 검증 범위를 따로 정리했습니다.</p>
+          <p class="section-intro">서비스 기능, AWS 인프라, AI 모델 검증과 업무 단말은 서로 연결되지만 확인 기준은 다릅니다. 각 영역의 역할과 현재 검증 범위를 따로 정리했습니다.</p>
         </div>
 
         <div class="workstream-stack" data-card-stack>
@@ -153,7 +154,12 @@
           <a class="workstream-link" href="mlops/">7단계 흐름 →</a>
         </article>
         <article class="workstream">
-          <p class="workstream-kicker">04 · 검증 환경</p>
+          <p class="workstream-kicker">04 · 단말 보안</p>
+          <div><h3>Windows·macOS 진단 사례</h3><p>골든 이미지와 MDM 기준선을 배포된 단말의 실제 상태와 분리합니다. Windows 검증용 AWS 경로, 물리 Mac 우선 경로와 Slack 운영 미확인 경계를 함께 설명합니다.</p></div>
+          <a class="workstream-link" href="consulting/">기술 사례 →</a>
+        </article>
+        <article class="workstream">
+          <p class="workstream-kicker">05 · 검증 환경</p>
           <div><h3>AWS 검증 Lab</h3><p>공개 접속 포트를 두지 않고 AWS Systems Manager로 관리하는 단기 검증 환경입니다. 비용과 배포 결과는 별도 기록으로 관리합니다.</p></div>
           <a class="workstream-link" href="terraform/lab/">환경 구성 →</a>
         </article>
@@ -193,9 +199,9 @@
         <div class="section-head">
           <div>
             <p class="section-label">전체 인프라</p>
-            <h2>서비스별 경로를<br>한 장에서 확인합니다</h2>
+            <h2>현재 배포와 목표를<br>한 장에서 구분합니다</h2>
           </div>
-          <p class="section-intro">서비스 사용자와 업무망·Slack, GitHub delivery, AWS 런타임, LLM Gateway·Bedrock·OpenDART, MLOps를 한 연결 지도에 놓았습니다. 실선은 영역 안의 순서, 촘촘한 점선은 자동화되지 않은 배포·데이터·승인 관계입니다.</p>
+          <p class="section-intro">2026-09-01 GitHub OIDC로 적용하고 live smoke를 통과한 production-serverless와 업무망·Slack, Evidence Desk 제안, MLOps·OpenDART·2-AZ 목표를 상태별로 분리했습니다.</p>
         </div>
         <nav class="flow-shortcuts" aria-label="서비스별 인프라 경로 바로가기">
           <a href="terraform/asis/architecture.html"><span aria-hidden="true">전체</span><strong>전체 인프라</strong><small>①~⑥ 기준 흐름</small></a>
@@ -209,9 +215,9 @@
           <a href="terraform/asis/architecture.html?flow=operations"><span aria-hidden="true">운영</span><strong>기록·탐지</strong><small>로그·위협 탐지</small></a>
         </nav>
         <a class="architecture-frame" href="terraform/asis/architecture.html" aria-label="대화형 전체 인프라 도면 열기" data-scale-reveal>
-          <img src="assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-animated-diagram data-motion-src="assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-still-src="assets/JCAREER_FULL_INFRA_ANIMATED.png" width="2320" height="1500" loading="lazy" decoding="async" alt="서비스 사용자, 업무망 PC 180대와 Slack·Notion·SMTP 외부 경계, PR·main GitHub Actions 검사와 별도 main branch Pages 배포, AWS 2-AZ 기준 설계, LLM Gateway와 Bedrock 직접 호출·전체 경로 경계, OpenDART source-only 경로, bootstrap 13개가 적용된 MLOps와 미배포 runtime의 관계를 연결한 전체 인프라 지도">
+          <img src="assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg" data-animated-diagram data-motion-src="assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg" data-still-src="assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.png" width="2320" height="1500" loading="lazy" decoding="async" alt="GitHub saved plan, 다른 사람 승인과 OIDC apply, live smoke, 현재 production-serverless 요청 경로, 업무망과 Slack, Bedrock, Evidence Desk 제안, MLOps·OpenDART·2-AZ 목표를 상태별로 구분한 J-Career 전체 인프라 지도">
         </a>
-        <p class="caption">움직이는 점은 영역 안의 처리 순서, 촘촘한 점선은 코드·관리·데이터·승인 관계입니다. 점선은 자동 배포나 운영 데이터 연결을 뜻하지 않습니다.</p>
+        <p class="caption">실선은 검증된 delivery·요청 경로, 점선은 제안·source·미연결 경계입니다. 적용 성공은 전체 기업 production 완료를 뜻하지 않습니다.</p>
       </div>
     </section>
 

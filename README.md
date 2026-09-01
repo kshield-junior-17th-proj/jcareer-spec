@@ -11,11 +11,11 @@ J-Career는 구직자와 기업을 연결하는 채용 플랫폼입니다. 이 �
 - [MLOps 7단계 모델 검증](https://kshield-junior-17th-proj.github.io/jcareer-spec/mlops/)
 - [AWS 검증 환경](https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/lab/)
 
-![업무망 PC, GitHub Actions 검사와 별도 main branch Pages 배포, J-Career AWS 기준 설계, 별도 MLOps 사람 검토 경계를 함께 표시한 전체 인프라 지도](assets/JCAREER_FULL_INFRA_ANIMATED.png)
+![GitHub 승인형 OIDC 배포, 현재 production-serverless, 업무망과 Slack, Bedrock, 제안된 Evidence Desk, MLOps·OpenDART·2-AZ 목표를 상태별로 분리한 J-Career 인프라 지도](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg)
 
-움직이는 점은 설계상 데이터 이동 순서를 설명합니다. AWS에서 관측한 요청이나 배포 상태를
-뜻하지 않습니다. [움직이는 SVG 원본](assets/JCAREER_FULL_INFRA_ANIMATED.svg)과
-[편집 가능한 전체 지도](terraform/asis/JCAREER_FULL_INFRA.drawio)를 별도 링크에서 열 수 있습니다.
+2026-09-01 production-serverless는 GitHub saved plan·다른 사람 승인·OIDC 동일 plan apply와
+live smoke를 통과한 뒤 pipeline을 다시 잠갔습니다. [현재 배포 SVG](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg),
+[draw.io 원본](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.drawio), [기업 2-AZ 목표 지도](assets/JCAREER_FULL_INFRA_ANIMATED.svg)를 구분해 제공합니다.
 
 ## 구성 한눈에 보기
 
@@ -29,7 +29,9 @@ J-Career는 구직자와 기업을 연결하는 채용 플랫폼입니다. 이 �
 ## 기술 상태와 검증 범위
 
 기준 설계의 110개는 AWS에 접속하지 않는 Terraform 계획에서 계산한 생성 예정 항목이며 미배포입니다.
-MLOps, OpenDART와 AWS 검증 Lab은 기준 설계와 분리된 Terraform 루트입니다. 2026-08-31에는
+현재 실행 증거는 별도 production-serverless의 CloudFront·private S3 → API Gateway → API Lambda →
+SQS → Agent Lambda → LLM Gateway → Capability Broker → Bedrock 경로에 한정됩니다. MLOps, OpenDART와
+AWS 검증 Lab은 이 실행면과 분리된 Terraform 루트입니다. 2026-08-31에는
 MLOps bootstrap 기반 13개와 serverless roots용 비공개 state S3 1개 생성이 확인됐지만,
 애플리케이션 이미지 게시·Lambda 실행·추천 서비스 연결은 확인되지 않았습니다.
 Slack·Notion·SMTP 외부 업무도구 어댑터는 기본 비활성 로컬 소스이며 실제 외부 계정 연결과
@@ -65,7 +67,8 @@ DynamoDB 실행 상태와 CloudWatch Logs를 기록하고 `TRAINED_PENDING_HUMAN
 - [대화형 아키텍처](terraform/asis/architecture.html): 전체 시스템 지도, 경로별 강조와 MLOps 7단계 도면 전환
 - [PDF 명세](terraform/asis/JCAREER_ASIS_SYSTEM_SPEC.pdf)
 - [전체 인프라 애니메이션 SVG](assets/JCAREER_FULL_INFRA_ANIMATED.svg)
-- [기업 목표·USD 50 핵심 평가 슬라이스 SVG](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg): 서비스 실행면, 별도 Evidence Desk, OpenDART·MLOps, 미배포 목표 구조를 상태별로 구분
+- [현재 배포·컨설팅 경계 SVG](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg): GitHub OIDC delivery, 실제 serverless 실행면, Evidence Desk 제안, OpenDART·MLOps·미배포 목표를 상태별로 구분
+- [현재 배포·컨설팅 경계 draw.io 원본](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.drawio)
 - [핵심 평가 슬라이스 해설](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.md)
 - [전체 인프라 draw.io 원본](terraform/asis/JCAREER_FULL_INFRA.drawio)
 - [PNG 도면](terraform/asis/JCAREER_ASIS_FLOW.drawio.png)
@@ -111,25 +114,27 @@ AS-IS 코드의 12자리 숫자는 가상 입력값과 AWS가 공개한 서비�
 
 ## 현재 확인된 AWS 상태
 
-2026-08-31 비식별 관찰 기록을 기준으로 서로 다른 세 범위를 분리합니다.
+2026-09-01 비식별 관찰 기록을 기준으로 서로 다른 범위를 분리합니다.
 
 | 범위 | 확인된 상태 | 아직 확인되지 않은 것 |
 |---|---|---|
 | 기준 `terraform/asis` | 2-AZ·6모듈·110개 Terraform 모델 | apply, ECS 이미지 게시, 서비스 실행 |
-| Bedrock | 서울 리전 APAC Nova Lite 직접 합성 호출 1건 PASS(입력 39·출력 53토큰) | API → LLM Gateway → capability broker → Bedrock 전체 경로 |
+| production-serverless | GitHub saved plan·다른 사람 승인·OIDC 동일 plan apply, live smoke PASS, pipeline 재잠금 | 장기 운영, 기업 2-AZ 전체, Evidence Desk |
+| Bedrock | production-serverless의 API Lambda → LLM Gateway Lambda → Capability Broker Lambda → Bedrock E2E smoke PASS | 미배포 ECS 2-AZ 목표 경로 |
 | MLOps | 비공개 state S3 1개와 bootstrap 13개 기반 자원 적용 | ECR 이미지 게시, Lambda 배포·실행, 결과 6종, 사람 검토·서비스 연결 |
 | OpenDART | 0/8/11 source와 승인 경계 | Terraform 적용, API key 준비, 외부 live 조회 |
-| AWS 검증 Lab | LabOnly 7개 신호 0 | 새 plan/apply, 원격 6서비스와 Bedrock end-to-end |
+| AWS 검증 Lab | production과 분리된 24-resource 환경, private EC2 정지 | NAT·공인 IPv4·볼륨·edge 잔존비용 제거 완료 여부 |
 
 MLOps 기반 13개는 GitHub Actions가 자동 배포한 것이 아닙니다. 실제 식별자·자격증명·state 내용은
 이 저장소와 공개 페이지에 기록하지 않습니다.
 
 ## AWS 검증 환경 배포
 
-다음은 2026-08-30의 역사적 Lab 시도 기록입니다. 새 검증 계정에서 HTTPS와 Bedrock을 포함한 24개 생성 계획은 통과했습니다.
+다음은 2026-08-30~31의 역사적 Lab 시도 기록입니다. 새 검증 계정에서 HTTPS와 Bedrock을 포함한 24개 생성 계획은 통과했습니다.
 적용은 IAM 역할 생성 권한 부족으로 중단됐고, 부분 생성된 16개 항목은 검토된 삭제 계획으로
 정리했습니다. 이후 2026-08-31 LabOnly 재확인에서도 Lab 전용 신호는 0개였습니다. Bedrock 직접 합성 호출은 통과했지만 원격
-애플리케이션 전체 경로는 아직 다시 확인하지 못했습니다. 자세한 범위는
+애플리케이션 전체 경로는 당시 다시 확인하지 못했습니다. 이후 별도 production-serverless E2E는
+성공했으며, 현재 Lab은 production과 분리된 채 private EC2가 정지된 환경으로 관리합니다. 자세한 과거 범위는
 [최근 배포 관찰 기록](terraform/lab/DEPLOYMENT_OBSERVATION_2026-08-30.md)에 있습니다.
 재시도에 필요한 최소 작업과 제한 조건은
 [`IAM 재시도 체크리스트`](terraform/lab/IAM_RETRY_PREREQUISITES_2026-08-30.md)에

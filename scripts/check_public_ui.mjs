@@ -14,8 +14,8 @@ const EXPECTED_ROUTES = [
   {
     href: 'terraform/asis/architecture.html',
     flow: 'overview',
-    detailHref: 'index.html#section-14',
-    steps: 10,
+    detailHref: '../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg',
+    steps: 12,
     media: 'overview',
   },
   {
@@ -49,7 +49,7 @@ const EXPECTED_ROUTES = [
   {
     href: 'terraform/asis/architecture.html?flow=workplace',
     flow: 'workplace',
-    detailHref: 'index.html#section-15',
+    detailHref: '../../consulting/',
     steps: 4,
     media: 'asis',
   },
@@ -80,6 +80,10 @@ const PUBLIC_PAGES = [
   {
     path: '/',
     canonical: 'https://kshield-junior-17th-proj.github.io/jcareer-spec/',
+  },
+  {
+    path: '/consulting/',
+    canonical: 'https://kshield-junior-17th-proj.github.io/jcareer-spec/consulting/',
   },
   {
     path: '/mlops/',
@@ -281,6 +285,12 @@ async function checkPublicPages(client, origin) {
           'const interactive = Array.from(document.querySelectorAll("a, button"));' +
           'const focused = document.activeElement;' +
           'const focusedStyle = focused ? getComputedStyle(focused) : null;' +
+          'const measure = (selector) => {' +
+            'const element = document.querySelector(selector);' +
+            'if (!element) return null;' +
+            'const rect = element.getBoundingClientRect();' +
+            'return {left: rect.left, right: rect.right, width: rect.width, clientWidth: element.clientWidth, scrollWidth: element.scrollWidth};' +
+          '};' +
           'return {' +
             'canonical: canonical ? canonical.href : null,' +
             'ogUrl: ogUrl ? ogUrl.content : null,' +
@@ -296,7 +306,14 @@ async function checkPublicPages(client, origin) {
             'interactiveCount: interactive.length,' +
             'touchReady: interactive.every((item) => getComputedStyle(item).touchAction === "manipulation"),' +
             'focusVisible: Boolean(focused && focused.matches(":focus-visible")),' +
-            'focusOutlined: Boolean(focusedStyle && parseFloat(focusedStyle.outlineWidth) > 0)' +
+            'focusOutlined: Boolean(focusedStyle && parseFloat(focusedStyle.outlineWidth) > 0),' +
+            'consultingGeometry: measure(".article-hero__grid") ? {' +
+              'grid: measure(".article-hero__grid"),' +
+              'copy: measure(".hero-copy"),' +
+              'heading: measure(".hero-copy h1"),' +
+              'standfirst: measure(".standfirst"),' +
+              'nav: measure(".nav")' +
+            '} : null' +
           '};' +
         '})()',
       );
@@ -307,6 +324,13 @@ async function checkPublicPages(client, origin) {
       assert(typeof state.ogImage === 'string' && state.ogImage.startsWith('https://') && state.ogAlt.length > 0, 'Open Graph image metadata is incomplete: ' + label);
       assert(state.interactiveCount > 0 && state.touchReady, 'Touch action is incomplete: ' + label);
       assert(state.focusVisible && state.focusOutlined, 'Keyboard focus is not visibly outlined: ' + label);
+      if (page.path === '/consulting/') {
+        const geometry = state.consultingGeometry;
+        const fits = Object.values(geometry).every((item) =>
+          item.left >= -1 && item.right <= state.innerWidth + 1 && item.scrollWidth <= item.clientWidth + 1
+        );
+        assert(fits, 'Consulting hero content is clipped: ' + label + ' ' + JSON.stringify(geometry));
+      }
       if (page.path === '/mlops/') {
         assert(state.stageTabs === 8 && state.stageControlsValid, 'MLOps stage aria-controls contract failed: ' + label);
       }
@@ -579,7 +603,7 @@ async function main() {
       'landing routes: ' + result.landingRoutes + '/9; MLOps stage states: ' +
       result.stageStates + '/8; invalid stage: fail-closed; viewport: ' +
       result.viewport + 'px; page/viewport checks: ' +
-      result.pageViewportChecks + '/10; motion checks: ' + result.motionChecks + '/8',
+      result.pageViewportChecks + '/' + (PUBLIC_PAGES.length * 2) + '; motion checks: ' + result.motionChecks + '/8',
     );
   } finally {
     if (client) {

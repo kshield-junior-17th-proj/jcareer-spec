@@ -152,11 +152,13 @@ const architectureFlows = {
     title: '전체 시스템 지도',
     status: '구현·설계 경계',
     tone: 'modelled',
-    summary: '서비스 사용자, 업무망·외부 SaaS, GitHub delivery, AWS 기준 런타임, LLM Gateway·Bedrock·OpenDART와 별도 MLOps를 관계선까지 한 장에서 보되 구현 상태를 섞지 않습니다.',
-    detailHref: 'index.html#section-14',
-    detailLabel: '서비스·구성요소 명세 보기',
+    summary: '현재 production-serverless, 업무망·외부 SaaS, GitHub delivery와 기업 2-AZ 목표, OpenDART·MLOps를 관계선까지 한 장에서 보되 구현 상태를 섞지 않습니다.',
+    detailHref: '../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg',
+    detailLabel: '현재 배포 기준 지도 보기',
     stages: [
-      { label: 'GitHub 저장소 → Actions 검사' },
+      { label: 'GitHub 저장소 → Actions 검사·saved plan' },
+      { label: '다른 사람 승인 → OIDC → 동일 plan apply' },
+      { label: 'live smoke PASS → 임시 사용자 정리 → pipeline 재잠금' },
       { label: 'main / (root) → legacy GitHub Pages 배포' },
       { label: '서비스 사용자 → Route 53·CloudFront·WAF' },
       { label: 'ALB → ECS 4서비스 → RDS·Redis 기준 흐름' },
@@ -167,7 +169,7 @@ const architectureFlows = {
       { label: 'MLOps bootstrap 13개 적용 → runtime 미실행' },
       { label: '검토 → 향후 서비스 반영 · 현재 미구현' }
     ],
-    boundary: 'GitHub Actions는 PR/main 검사만 수행하고 Pages는 legacy main/(root) branch source로 배포됩니다. AWS 2-AZ·110개 기준선은 미배포입니다. Bedrock 직접 합성 호출 1건과 MLOps bootstrap 13개 적용만 별도 확인됐습니다. API→Gateway→Broker→Bedrock, OpenDART, MLOps Lambda·서비스 연결은 미확인 또는 미구현입니다.'
+    boundary: '2026-09-01 GitHub Actions saved plan·다른 사람 승인·OIDC 동일 plan apply와 production-serverless live smoke를 확인했고 pipeline은 다시 잠겼습니다. Pages publish는 이 AWS apply와 별도입니다. 2-AZ·110개는 AWS 비접속 plan으로 만든 목표이며 Evidence Desk, OpenDART와 MLOps runtime은 미배포 또는 미실행입니다.'
   },
   candidate: {
     title: '구직자 공고 추천',
@@ -205,12 +207,12 @@ const architectureFlows = {
     detailHref: 'index.html#section-33',
     detailLabel: 'AI 점수·설명 규칙 보기',
     stages: [
-      { label: 'ECS API가 확정 점수·근거 전달', x: 1300, y: 290 },
-      { label: 'LLM Gateway가 설명 전용 요청 구성', x: 1450, y: 290 },
-      { label: '조건부 Lab broker source 경계', x: 1600, y: 290 },
-      { label: 'Bedrock 직접 호출은 PASS · 전체 경로 미확인', x: 1750, y: 290 }
+      { label: 'API Lambda가 확정 점수·근거 전달', x: 1300, y: 290 },
+      { label: 'LLM Gateway Lambda가 설명 전용 요청 구성', x: 1450, y: 290 },
+      { label: 'Capability Broker가 exact model만 허용', x: 1600, y: 290 },
+      { label: 'production-serverless Bedrock E2E smoke PASS', x: 1750, y: 290 }
     ],
-    boundary: 'LLM Gateway source와 Bedrock adapter는 구현됐고 기본 provider는 합성 stub입니다. APAC Nova Lite 직접 합성 호출 한 건은 통과했지만 API→Gateway→Broker→Bedrock end-to-end, 기준 task IAM, 이미지 게시와 AWS 런타임 실행은 확인되지 않았습니다.'
+    boundary: 'production-serverless의 API Lambda→LLM Gateway Lambda→Capability Broker Lambda→Bedrock 경로는 2026-09-01 live smoke에서 확인됐습니다. 이 결과는 미배포 ECS 2-AZ 목표 경로나 자동 채용 판단의 증거가 아닙니다.'
   },
   mlops: {
     title: 'MLOps 학습·평가',
@@ -235,8 +237,8 @@ const architectureFlows = {
     status: '시나리오 사용 미확인',
     tone: 'unknown',
     summary: '업무망 수량, 선언된 VPN+MFA·UTM과 AWS 밖의 Slack 자산대장 경계를 서로 다른 확인 수준으로 봅니다.',
-    detailHref: 'index.html#section-15',
-    detailLabel: '업무망·Slack 경계 보기',
+    detailHref: '../../consulting/',
+    detailLabel: '단말 진단 기술 사례 보기',
     stages: [
       { label: 'PC 180대 · Windows 100 / macOS 80', x: 80, y: 625 },
       { label: 'VPN+MFA·UTM · 시나리오 선언', x: 170, y: 625 },
@@ -307,10 +309,10 @@ const commonHead = `
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%23202b35'/%3E%3Cpath d='M19 14h9v24c0 9-5 13-14 12v-8c4 0 5-1 5-5V14zm14 0h17v8h-9v7h8v8h-8v13h-8V14z' fill='%23e87928'/%3E%3C/svg%3E">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ko_KR">
-  <meta property="og:image" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/assets/JCAREER_FULL_INFRA_ANIMATED.png">
-  <meta property="og:image:alt" content="서비스 사용자, 업무망과 Slack, GitHub delivery, AWS 기준 설계, LLM Gateway·Bedrock·OpenDART와 별도 MLOps의 관계를 연결한 J-Career 전체 인프라 지도">
+  <meta property="og:image" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.png">
+  <meta property="og:image:alt" content="GitHub 승인형 OIDC 배포, 현재 production-serverless, 업무망과 Slack, Bedrock, Evidence Desk 제안, MLOps·OpenDART·2-AZ 목표를 구분한 J-Career 인프라 지도">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image:alt" content="서비스 사용자, 업무망과 Slack, GitHub delivery, AWS 기준 설계, LLM Gateway·Bedrock·OpenDART와 별도 MLOps의 관계를 연결한 J-Career 전체 인프라 지도">
+  <meta name="twitter:image:alt" content="GitHub 승인형 OIDC 배포, 현재 production-serverless, 업무망과 Slack, Bedrock, Evidence Desk 제안, MLOps·OpenDART·2-AZ 목표를 구분한 J-Career 인프라 지도">
   <link rel="preconnect" href="https://api.fontshare.com">
   <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -577,9 +579,9 @@ ${commonHead}
         </div>
         <dl class="doc-control">
           <div><dt>문서 번호</dt><dd>JC-ASIS-SPEC-001</dd></div>
-          <div><dt>기준일</dt><dd>2026-08-31</dd></div>
+          <div><dt>기준일</dt><dd>2026-09-01</dd></div>
           <div><dt>문서 상태</dt><dd>기준 설계 · 기술 검토 진행</dd></div>
-          <div><dt>배포 단계</dt><dd>AS-IS 미적용 · 검증 Lab 별도</dd></div>
+          <div><dt>배포 단계</dt><dd>serverless 적용·smoke PASS · 2-AZ 목표 미적용</dd></div>
           <div><dt>MLOps</dt><dd>bootstrap 13개 적용 · runtime 미배포</dd></div>
           <div><dt>외부·보조 경계</dt><dd>Slack·Notion·SMTP default-off · TRACE 인프라 제외</dd></div>
         </dl>
@@ -629,13 +631,13 @@ ${commonHead}
 
       <section class="architecture" aria-labelledby="architecture-title">
         <div class="architecture__head">
-          <div><p class="section-label">상호작용 전체 흐름도</p><h2 id="architecture-title">전체 구성에서 서비스별 경로까지</h2><p>전체 보기와 서비스·보조 경로 8개를 제공합니다. 경로를 누르면 관련 구간, 번호와 확인 수준이 함께 바뀝니다.</p></div>
+          <div><p class="section-label">상호작용 전체 흐름도</p><h2 id="architecture-title">현재 배포와 기업 목표를 분리해 봅니다.</h2><p>현재 production-serverless 핵심 지도와 서비스·보조 경로 8개를 제공합니다. 2-AZ 110개는 별도 목표 설계입니다.</p></div>
           <a class="button" href="architecture.html">서비스 경로 탐색</a>
         </div>
         <a class="diagram-link" href="architecture.html" aria-label="서비스별로 탐색할 수 있는 AWS 인프라 흐름도 열기">
           <img src="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg" width="2320" height="1500" loading="lazy" decoding="async" alt="업무망 PC 180대와 Slack·Notion·SMTP 경계, GitHub Actions 검사와 Pages 배포, AWS 2-AZ 런타임 기준 설계, LLM Gateway·Bedrock·OpenDART, 별도 서버리스 MLOps를 연결한 J-Career 전체 인프라 지도">
         </a>
-        <div class="diagram-caption"><span>실선: 구성 확인 · 점선: 실제 연결 미구현</span><span>서비스별 강조 경로는 도면 페이지에서 확인 · 비밀정보 미표시</span></div>
+        <div class="diagram-caption"><span>이 도면의 2-AZ 영역: 기업 목표 · 미배포</span><span>현재 serverless apply·smoke는 아래 핵심 평가 지도에서 확인</span></div>
       </section>
 
       <section id="production-assessment-slice" class="production-slice" aria-labelledby="production-assessment-title">
@@ -643,14 +645,14 @@ ${commonHead}
           <div>
             <p class="section-label">예산 승인형 실제 실행 범위</p>
             <h2 id="production-assessment-title">기업 목표는 유지하고, 평가에 필요한 핵심 경로만 독립 배포합니다.</h2>
-            <div class="production-slice__status"><span>USD 50 CEILING</span><span>DEPLOYMENT EVIDENCE PENDING</span><span>NO DIRECT CUSTOMER-AWS BROWSER ACCESS</span></div>
+            <div class="production-slice__status"><span>SERVERLESS APPLIED</span><span>LIVE SMOKE PASS</span><span>PIPELINE RE-LOCKED</span></div>
           </div>
-          <p class="production-slice__copy">CloudFront·S3, API Gateway, Lambda, SQS, DynamoDB on-demand로 요청·대기·처리·조회 경로를 구성하고 Bedrock 호출은 최소 권한 broker로 제한합니다. 컨설턴트용 Evidence Desk는 별도 인증·tenant 경계와 사람이 승인한 서명 snapshot만 사용합니다. ECS·RDS·Redis·NAT 2-AZ 구성과 Windows 100대·macOS 80대는 목표 설계이며 이 배포의 완료 주장에 포함하지 않습니다.</p>
+          <p class="production-slice__copy">2026-09-01 GitHub Actions에서 다른 사람 승인과 OIDC 단기 역할로 동일 saved plan을 적용했고 live smoke를 통과했습니다. 현재 경로는 CloudFront·private S3, API Gateway, Lambda, SQS, DynamoDB on-demand와 최소 권한 Bedrock broker입니다. Evidence Desk는 제안·미배포이며 ECS·RDS·Redis·NAT 2-AZ와 Windows 100대·macOS 80대는 이번 완료 주장에 포함하지 않습니다.</p>
         </div>
         <a class="diagram-link" href="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg" aria-label="기업 목표와 USD 50 핵심 평가 슬라이스 SVG 원본 열기">
           <img src="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg" width="2320" height="1500" loading="lazy" decoding="async" alt="GitHub 승인형 OIDC 배포, 서버리스 AI 매칭 실행면, 별도 Evidence Desk, OpenDART와 MLOps의 분리된 수명주기, 미배포 기업 목표를 구분한 J-Career 핵심 평가 슬라이스">
         </a>
-        <div class="diagram-caption"><span>현재 상태: 코드·배포 경로 구현 중 · AWS 배포 증적 전</span><span>적용 후에만 URL·commit SHA·plan digest·smoke receipt를 배포 증적으로 기록</span></div>
+        <div class="diagram-caption"><span>현재 상태: production-serverless apply·live smoke PASS · pipeline 재잠금</span><span><a href="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.drawio">DRAW.IO 원본</a> · 전체 기업 production 완료를 뜻하지 않음</span></div>
       </section>
 
       <section id="mlops-overview" class="mlops-bridge" aria-labelledby="mlops-overview-title">
@@ -681,7 +683,7 @@ ${commonHead}
       </section>
 
       <article class="content">${body}</article>
-      <footer class="footer"><p><strong>JC-ASIS-SPEC-001</strong> · 기준일 2026-08-31</p><p>J-Career 서비스·인프라 기준 설계 · 배포 검증 별도 관리</p></footer>
+      <footer class="footer"><p><strong>JC-ASIS-SPEC-001</strong> · 기준일 2026-09-01</p><p>J-Career 현재 serverless·기업 목표·컨설팅 경계 · 증거 수준 별도 관리</p></footer>
     </main>
   </div>
   <script>
@@ -704,7 +706,7 @@ const architectureHtml = `<!doctype html>
 <head>
 ${commonHead}
   <meta property="og:title" content="J-Career 전체 인프라 지도">
-  <meta property="og:description" content="업무망, Slack, GitHub CI·Pages, AWS 기준 설계, LLM Gateway·Bedrock·OpenDART와 별도 serverless MLOps를 상태 경계와 함께 탐색합니다.">
+  <meta property="og:description" content="업무망·Slack, GitHub OIDC delivery, 현재 production-serverless, LLM Gateway·Bedrock와 MLOps·OpenDART·2-AZ 목표 경계를 탐색합니다.">
   <meta property="og:url" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/architecture.html">
   <link rel="canonical" href="https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/architecture.html">
   <meta name="flow-source-sha256" content="${flowSourceHash}">
@@ -821,10 +823,10 @@ ${commonCss}
   <a class="skip" href="#diagram">전체 인프라 지도로 건너뛰기</a>
   <header class="masthead">
     <div class="masthead__inner">
-      <div class="utility"><a href="index.html">← 기술 명세</a><nav class="utility__links" aria-label="산출물"><a href="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg">USD 50 실행 범위</a><a href="../../mlops/">MLOps 7단계</a><a href="JCAREER_FULL_INFRA.drawio">전체 편집 원본</a><a href="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg">전체 SVG</a><a href="JCAREER_ASIS_SYSTEM_SPEC.pdf">PDF</a><a href="validation-report.json">검증 JSON</a><button class="motion-toggle-doc" type="button" data-motion-toggle aria-pressed="false" hidden><span data-motion-label>움직임 줄이기</span></button></nav></div>
+      <div class="utility"><a href="index.html">← 기술 명세</a><nav class="utility__links" aria-label="산출물"><a href="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg">현재 배포 지도</a><a href="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.drawio">현재 지도 원본</a><a href="../../mlops/">MLOps 7단계</a><a href="../../consulting/">단말 진단 사례</a><a href="JCAREER_FULL_INFRA.drawio">2-AZ 목표 원본</a><a href="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg">2-AZ 목표 SVG</a><a href="JCAREER_ASIS_SYSTEM_SPEC.pdf">PDF</a><a href="validation-report.json">검증 JSON</a><button class="motion-toggle-doc" type="button" data-motion-toggle aria-pressed="false" hidden><span data-motion-label>움직임 줄이기</span></button></nav></div>
       <div class="doc-hero">
-        <div><p class="kicker">JC-ASIS-ARCH-001 · full system atlas</p><h1>J-Career 전체<br>인프라 지도</h1><p class="hero-copy">서비스 사용자, 업무망과 Slack·외부 업무도구, GitHub CI·Pages, AWS 비접속 런타임 기준 설계, LLM Gateway·Bedrock·OpenDART와 별도 서버리스 MLOps를 한 연결 지도에서 탐색합니다. TRACE·JC-RECEIPT는 실행 컴포넌트에 섞지 않고 별도 보조 설명으로만 둡니다.</p></div>
-        <dl class="doc-control"><div><dt>GitHub delivery</dt><dd>Actions 검사 · branch Pages 배포</dd></div><div><dt>업무망</dt><dd>180대 · Windows 100 / macOS 80</dd></div><div><dt>외부 업무도구</dt><dd>Slack·Notion·SMTP · default-off</dd></div><div><dt>AWS 설계</dt><dd>2-AZ · 6개 모듈 · 계획 110개 · 미배포</dd></div><div><dt>MLOps</dt><dd>bootstrap 13개 적용 · runtime 미배포</dd></div><div><dt>관계 점선</dt><dd>의존 표시 · 자동 연결 아님</dd></div></dl>
+        <div><p class="kicker">JC-ASIS-ARCH-001 · current + target atlas</p><h1>J-Career 전체<br>인프라 지도</h1><p class="hero-copy">현재 production-serverless와 기업 2-AZ 목표를 분리하고, 업무망·Slack, GitHub OIDC delivery, LLM Gateway·Bedrock, OpenDART와 MLOps의 연결 수준을 함께 탐색합니다. TRACE·JC-RECEIPT는 실행 컴포넌트에 넣지 않습니다.</p></div>
+        <dl class="doc-control"><div><dt>현재 AWS</dt><dd>serverless apply · smoke PASS</dd></div><div><dt>GitHub delivery</dt><dd>saved plan · 승인 · OIDC · 재잠금</dd></div><div><dt>업무망</dt><dd>180대 · Windows 100 / macOS 80</dd></div><div><dt>외부 업무도구</dt><dd>Slack·Notion·SMTP · prod 미연결</dd></div><div><dt>2-AZ 목표</dt><dd>6개 모듈 · 계획 110개 · 미배포</dd></div><div><dt>MLOps</dt><dd>bootstrap 13개 · runtime 미실행</dd></div></dl>
       </div>
     </div>
   </header>
@@ -860,7 +862,7 @@ ${commonCss}
           <p class="flow-detail__summary" id="flow-summary">사용자, 업무망·외부 SaaS, GitHub delivery, AWS 기준 런타임, LLM Gateway·Bedrock·OpenDART와 별도 MLOps를 연결 관계까지 한 장에서 봅니다.</p>
         </div>
         <div class="flow-detail__route"><strong>순서대로 읽는 단계</strong><ol class="flow-steps" id="flow-steps" aria-label="전체 인프라 단계별 경로">${flowStepItems('overview')}</ol></div>
-        <div class="flow-detail__boundary"><strong>설계 범위</strong><p id="flow-boundary">GitHub Actions는 PR/main 검사를 수행하고 Pages는 별도 legacy main/(root) branch source로 배포됩니다. AWS 2-AZ·110개 기준선은 미배포 설계입니다. Bedrock은 직접 합성 호출만 확인됐으며, MLOps는 bootstrap 13개만 적용되고 Lambda runtime·실행·추천 연결은 없습니다. 점선은 자동 배포나 운영 DB 연결을 뜻하지 않습니다.</p><a class="flow-detail__link" id="flow-detail-link" href="index.html#section-14">서비스·구성요소 명세 보기</a></div>
+        <div class="flow-detail__boundary"><strong>상태 범위</strong><p id="flow-boundary">GitHub Actions의 saved plan·다른 사람 승인·OIDC 동일 plan apply와 live smoke는 확인됐고 pipeline은 다시 잠겼습니다. 현재 실행면은 production-serverless이며 이 화면의 ECS·RDS·Redis·NAT 2-AZ·110개 기준선은 미배포 목표입니다. MLOps는 bootstrap 13개만 적용되고 runtime·추천 연결은 없습니다.</p><a class="flow-detail__link" id="flow-detail-link" href="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg">현재 배포 지도 보기</a></div>
       </article>
       <p class="flow-explorer__exclusion">Slack·Notion·SMTP는 AWS 밖의 업무도구 경계로 표시하며 기본 비활성·실전송 미확인입니다. Bedrock은 직접 호출과 end-to-end를 분리하고, OpenDART는 source-only·미배포로 표시합니다. TRACE·JC-RECEIPT는 실행 컴포넌트에서 제외하고 보조 설명에만 남깁니다.</p>
     </section>

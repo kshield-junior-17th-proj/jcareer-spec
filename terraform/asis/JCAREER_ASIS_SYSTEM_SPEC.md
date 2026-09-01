@@ -37,7 +37,7 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 | 7 | 합성 자료 준비부터 사람 검토 대기까지의 MLOps 단계 수 | 모델이 승인되거나 추천에 반영됐다는 뜻이 아님 |
 | 0 / 13 / 14 | 별도 MLOps Terraform의 기본 잠금 / bootstrap / runtime 단계 수. bootstrap 13개 적용 확인 | 기준 110개와 합산하지 않으며 Lambda 실행 완료를 뜻하지 않음 |
 | 24 | 별도 AWS 검증 Lab의 HTTPS·Bedrock 포함 생성 계획 수 | 기준 110개와 합산하지 않으며 배포 완료 수가 아님 |
-| 0 | 2026-08-31 LabOnly 7개 신호로 다시 확인한 AWS 검증 Lab 전용 리소스 수 | 별도 MLOps 13개와 비공개 state S3는 이 범위에 포함하지 않음 |
+| 0 | 2026-08-31 당시 정리 직후의 LabOnly 7개 신호 | 현재 Lab 상태가 아님. 이후 별도 검증 Lab이 배포됐으므로 역사적 snapshot으로만 사용 |
 
 ### 0.3 지금 확인된 것과 확인되지 않은 것
 
@@ -46,7 +46,8 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 | 업무망 PC | 전체 180대, Windows 100대, macOS 80대 | 버전, 보안 프로그램, 인증, 실제 접속 경로 |
 | 업무 시스템·외부 연동 | Windows/macOS의 Slack 바로가기·세션 정리와 API의 기본 비활성 Slack·Notion·SMTP 어댑터 소스 | 실제 workspace·메일 시스템 사용, 계정·보존 정책, 실전송, AWS 연동 |
 | AWS 설계 | 2-AZ, 6개 모듈, 기록된 계획 항목 110개 | 고객사 AWS 배포 결과와 실행 상태 |
-| AWS 검증 Lab | 별도 24개 생성 계획과 Bedrock 직접 합성 호출 통과, 권한 차단 뒤 부분 자원 정리 완료 | 원격 여섯 서비스, HTTPS 인증 경계, Bedrock 전체 애플리케이션 경로 |
+| production-serverless | GitHub saved plan·다른 사람 승인·OIDC 동일 plan apply, live smoke PASS, pipeline 재잠금 | 기업 2-AZ 전체·Evidence Desk·MLOps runtime·OpenDART 배포 |
+| AWS 검증 Lab | production과 분리된 24-resource 검증 환경, private EC2 정지 | NAT·공인 IPv4·볼륨·edge 잔존비용 제거 완료 여부 |
 | 기준 애플리케이션 | 배치할 자리와 서비스 이름 | 실행 이미지, 실제 기동, 사용자 통합 시험 |
 | 서비스 구현 범위 | 합성 데이터용 소스, 공개 릴리스 검사 6단계(정적 검사 3개·단위시험 묶음 3개) | 실제 사용자 데이터 처리와 장기 운영 관찰 |
 | MLOps 전용 구성 | 7단계 흐름, 단계별 0/13/14, bootstrap 기반 13개 적용, 소스 경계 검사 19건과 합성 파이프라인 시험 22건 | 이미지 등록, Lambda 배포·실행, 결과 6종, 서비스 연결, 모델 품질·공정성 판단 |
@@ -205,7 +206,8 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 | TRACE·JC-RECEIPT | `IMPLEMENTED_GUARDED_NOT_ACTIVE` | receipt·정정 요청·원본-정정 관찰·사람 검토 기록과 역할별 React 경로가 있음. 기본값 `disabled`; 자동 채용·이의·적합성·잔여위험 판정과 AWS/Terraform 리소스는 없음 |
 | 기준 AWS 설계(Terraform) | `MODELLED` | 여섯 모듈로 구성됨. 기록된 AWS 비접속 계획은 생성 예정 110개, 변경 0개, 삭제 0개임. 별도 로컬 변경분을 넣어 다시 계산하지는 않음 |
 | J-Career 고객사 AWS 리소스 | 생성 안 함 | AWS에 접속하지 않는 모의 방식이므로 실제 AWS 상태를 나타내지 않음 |
-| 별도 AWS 검증 Lab | 권한 보완 대기 | HTTPS·Bedrock 포함 24개 생성 계획은 통과. 적용은 IAM 역할 생성 권한 부족으로 중단됐고 부분 생성 16개를 정리해 현재 0개. Bedrock 직접 합성 호출은 통과했으나 전체 경로는 미확인 |
+| production-serverless | `DEPLOYED_LIVE_SMOKE_PASS_RELOCKED` | CloudFront·private S3→API Gateway→API Lambda→SQS→Agent Lambda→LLM Gateway Lambda→Capability Broker Lambda→Bedrock을 GitHub 승인형 OIDC apply와 live smoke로 확인. pipeline은 다시 잠금 |
+| 별도 AWS 검증 Lab | `DEPLOYED_STOPPED_SEPARATE` | production과 분리된 24-resource 검증 환경. private EC2는 정지했으나 NAT·공인 IPv4·볼륨·edge 잔존비용 경로는 별도 확인·정리 대상 |
 | 기준 폴더의 애플리케이션 | `PLANNED_UNIMPLEMENTED` | 실행할 소스와 이미지가 없음 |
 | 서비스 구현 코드 | `LOCAL_SYNTHETIC_IMPLEMENTED` | `web`, `api`, `agent`, `llm-gateway`와 PostgreSQL, Redis 소스가 있음. 합성 데이터 검증 범위이며 AWS 배포 결과는 별도 관리 |
 | 로컬 API | `LOCAL_SYNTHETIC_IMPLEMENTED` | 로그인, 동의, 추천, 작업 기록 등을 다루는 FastAPI 소스와 자동 API 문서 소스가 있음 |
@@ -214,7 +216,7 @@ J-Career는 구직자와 기업을 연결하고 서로 맞는 선택지를 빠�
 | MLOps 전용 서버리스 경로 | `MLOPS_BOOTSTRAP_APPLIED_RUNTIME_NOT_DEPLOYED` | 합성 DB 옆 exporter, S3 입력·결과, Lambda 학습, DynamoDB 상태와 CloudWatch 로그 소스가 있음. bootstrap 13개는 적용됐고 이미지 게시·14번째 Lambda·호출 결과는 없음 |
 | 로컬 코드 검사 | `STATIC_CHECKED` | 현재 공개 릴리스 검사는 6단계이며 Lab·MLOps·OpenDART 정적 검사와 단위시험 묶음을 실행함 |
 | 로컬 검토 도구(Evidence Desk) | `LOCAL_SYNTHETIC_IMPLEMENTED`, `STATIC_CHECKED` | 민감정보를 지운 내부 검토용 복사본을 읽는 소스가 있음. 네트워크 전송과 브라우저 저장을 막지만, 승인 진위와 고객사별 데이터 분리는 구현하지 않음 |
-| Bedrock 내부 연결 코드 | `IMPLEMENTED_GUARDED_NOT_ACTIVE` | `llm-gateway` 안에 adapter가 있고 기본값은 합성 응답이다. 별도 직접 합성 호출 1건은 통과했지만 기준 IAM과 API→gateway→broker 전체 경로는 미확인 |
+| Bedrock 내부 연결 코드 | `PRODUCTION_SERVERLESS_E2E_PASS` | production-serverless의 API Lambda→LLM Gateway Lambda→Capability Broker Lambda→Bedrock은 live smoke로 확인. 미배포 ECS 2-AZ 목표 경로와는 별도 |
 | 별도 Bedrock 실험 | `BRANCH_PROTOTYPE_UNDEPLOYED` | API Gateway, Lambda, Guardrail 실험 코드와 단위 검사가 있음. 과거 삭제 완료 이력 2건과 현재 관련 리소스 0개만 다른 세션이 읽기 전용으로 확인함. 성공한 AI 응답은 확인하지 못함 |
 | 기준 ECR 이미지 | `PLANNED_UNIMPLEMENTED` | 이미지를 둘 저장소의 자리와 예시 주소만 있음. 최신 소스를 올리거나 AWS에서 실행한 증거는 없음 |
 | 컨설턴트 대시보드 미리보기 | `PEER_OBSERVED_PREVIEW_AVAILABLE` | 화면과 API 소스, 빌드 결과가 있음. 다른 세션에서 최신 작업 성공, 화면 껍데기 응답, 공유 비밀번호 세션 발급을 확인함. 같은 버전인지, 실제로 접근 가능한지, 운영 요건을 갖췄는지는 확인하지 못함 |
@@ -1405,16 +1407,16 @@ fallback 또는 운영 SLA로 표현하지 않는다.
 
 ## 11. 검증 기록
 
-> 아래 PASS는 해당 행에 적힌 검사만 통과했다는 뜻이다. AWS 배포나 실제 서비스 운영을
-> 통과했다는 뜻은 아니다.
+> 아래 PASS는 해당 행에 적힌 검사만 통과했다는 뜻이다. production-serverless 배포·smoke 행을
+> 제외한 로컬·정적 PASS를 AWS 배포나 장기 운영 증거로 확대하지 않는다.
 
 2026-08-27~31에 원본 대조, 로컬 정적 검사, 문서 렌더링 검사를 수행했다.
 기준 설계인 `terraform/asis`에는 AWS 변경이나 `terraform apply`를 수행하지 않았다.
-별도 검증용 `terraform/lab`에서는 24개 생성 계획과 Bedrock 직접 호출을 확인했지만,
-IAM 역할 생성 권한이 없어 적용이 중단됐다. 그 과정에서 만들어진 16개 항목은 같은 저장
-계획으로 지웠고 2026-08-31 LabOnly 7개 신호도 0이었다. 별도 MLOps bootstrap 13개와
-비공개 state S3 1개는 이 LabOnly 범위에 포함하지 않는다. 따라서 애플리케이션 전체 경로가 배포됐거나
-서비스가 운영 중이라는 뜻이 아니다. 아래 PASS는 각 행에 적힌 범위만 뜻한다.
+2026-09-01 별도 `production-serverless`는 GitHub saved plan·다른 사람 승인·OIDC 동일 plan
+apply와 live smoke를 통과했고 임시 사용자를 정리한 뒤 pipeline을 다시 잠갔다. 별도 검증용
+`terraform/lab`은 이후 배포된 24-resource 환경이며 private EC2는 정지했지만 NAT·공인 IPv4·
+볼륨·edge 잔존비용 경로는 별도 정리 대상이다. MLOps bootstrap 13개, Lab, current serverless와
+2-AZ 기준 110개는 서로 합산하지 않는다. 아래 PASS는 각 행에 적힌 범위만 뜻한다.
 
 | 검사 | 결과 |
 |---|---|
@@ -1426,8 +1428,9 @@ IAM 역할 생성 권한이 없어 적용이 중단됐다. 그 과정에서 만�
 | 스캐너 결과 분류 | `PROVISIONAL` — 중복 정규화 후 117건을 보존했으나 사람 판정 전이며 통과로 읽지 않음 |
 | 인용 anchor | PASS — strict mode 55개, broken 0개 |
 | 공개 합성 런타임 소스 | PASS(정적·단위시험 범위) — 현재 공개 릴리스 검사 6단계가 통과했다. 기존 API/agent/gateway 라우트 30/6/4개와 별도 guarded API 라우트 9개, React 라우트 23개, 70·20·10 점수식과 `score_effect=NONE`을 정적 대조했다. 단말·성능·장기 운영 결과는 포함하지 않는다. |
-| AWS 검증 계정 Bedrock 직접 호출 | PASS(직접 호출 범위) — APAC Nova Lite에 합성 문장 한 건을 보내 입력 39·출력 53토큰 응답을 확인했다. 응답 본문과 계정 식별자는 기록하지 않았다. API→gateway→broker 전체 경로의 성공을 뜻하지 않는다. |
-| AWS 검증 Lab 재배포 | BLOCKED 후 정리 완료 — 24개 생성 계획은 통과했으나 IAM 역할 생성 권한 부족으로 적용이 중단됐다. 부분 생성된 16개 항목만 지우는 저장 계획을 적용해 현재 Lab 상태를 0개로 되돌렸다. |
+| production-serverless GitHub delivery | PASS — saved plan digest, plan actor와 다른 사람의 승인, GitHub OIDC 단기 역할, 동일 plan apply, live smoke, 임시 Cognito 사용자 정리와 pipeline 재잠금을 확인했다. 전체 기업 production 완료를 뜻하지 않는다. |
+| production-serverless Bedrock E2E | PASS — API Lambda→LLM Gateway Lambda→Capability Broker Lambda→Bedrock 경로를 합성 매칭·OWASP LLM smoke에서 확인했다. 자동 채용 판단이나 미배포 2-AZ ECS 경로의 성공을 뜻하지 않는다. |
+| AWS 검증 Lab | SEPARATE / STOPPED — production과 분리된 24-resource 검증 환경이며 private EC2는 정지 상태다. NAT·공인 IPv4·볼륨·edge 잔존비용 경로는 별도 확인·정리 대상으로 남긴다. |
 | MLOps 합성 파이프라인 | PASS(단위시험 범위) — `python -m unittest src/mlops/tests/test_synthetic_pipeline.py`를 실행해 22/22, FAIL 0을 확인했다. 합성 SQLite와 테스트 대역 S3·DynamoDB로 원문 잔류, 중복 실행과 실패 경계를 확인한 결과이며 AWS 자원·모델 품질 판정은 포함하지 않음 |
 | MLOps 전용 Terraform | BOOTSTRAP APPLIED — 전용 루트 경계 시험 19/19, mock 단계 0/13/14를 확인했고 2026-08-31 검토한 saved plan으로 bootstrap 13개 적용을 관찰했다. 이미지 등록, runtime 14번째 Lambda 배포·실행, 추천 연결은 하지 않음 |
 | API 소스·효과 계약 | PASS(정적 범위) — `api_surface.json` 라우트 40개와 처리 함수 35개, 효과 회귀 17/17, 도우미 20개·선택 순서 9개 확인. `AST_PARTIAL`이며 제어 흐름 지배·실행 횟수·원자성·실제 후속 서비스 수신을 증명하지 않음 |
@@ -1449,20 +1452,21 @@ IAM 역할 생성 권한이 없어 적용이 중단됐다. 그 과정에서 만�
 
 ## 12. 예산 승인형 핵심 평가 슬라이스
 
-`JCAREER_FULL_INFRA`는 기업 규모의 목표 구조를 설명한다. USD 50 한도에서는 이 전체 구조를
-상시 운영했다고 주장하지 않고, 실제 평가와 시연에 필요한 경로를 별도 서버리스 스택으로 배포한다.
+`JCAREER_FULL_INFRA`는 기업 규모의 목표 구조를 설명한다. 현재 실행 증거는 이 전체 구조가 아니라
+2026-09-01 GitHub 승인형 OIDC 경로로 적용한 별도 production-serverless 핵심 스택에 한정한다.
 
 | 구분 | 이번 배포 범위 | 완료 판단 |
 |---|---|---|
 | AI 매칭 실행면 | CloudFront·S3 → API Gateway → API Lambda → SQS → Agent Lambda → LLM Gateway → capability broker → Bedrock | GitHub OIDC로 동일 saved plan 적용 후 공개 HTTPS 요청, `202` 상태 전이, 결과·correlation receipt 확인 |
 | 데이터·관측 | DynamoDB on-demand, 증적 S3, CloudWatch Logs | tenant 격리, 암호화, 보존 정책과 redacted smoke artifact 확인 |
-| 컨설팅 증적면 | 별도 Cognito·API·저장소, 승인된 비식별 snapshot, 서명·만료·회수, 불변 감사기록 | 서비스 DB·고객 AWS/API 직접 조회가 없고 유효 snapshot만 역할별 조회 가능 |
+| 컨설팅 증적면 | Evidence Desk source contract·제안: 별도 Cognito·API·저장소, 승인된 비식별 snapshot, 서명·만료·회수, 불변 감사기록 | 아직 미배포. 서비스 DB·고객 AWS/API 직접 조회가 없는 별도 경계로 구현·검증해야 함 |
 | OWASP LLM | 합성 입력 전용 실행 API와 결과 화면 | LLM01·02·08은 부분 통제, LLM07은 미통제 expected-fail을 실제 receipt와 함께 정직하게 표시 |
 | 별도 수명주기 | OpenDART, MLOps | 추천 자동 연결과 사람 검토 전 자동 승격 없음 |
 | 기업 목표·단말 | ECS·RDS·Redis·NAT 2-AZ, Windows 100·macOS 80 | 이번 적용 범위 아님. 설계·자산 모델을 실제 배포 증거로 사용하지 않음 |
 
 AWS 적용은 GitHub main 검사, plan 정책검사, plan digest, 다른 사람의 승인, OIDC 역할 획득,
-동일 saved plan 적용, smoke/evidence 순서로만 수행한다. GitHub Pages 배포는 AWS 배포 증거가
-아니다. 실제 적용 전 상태는 `DEPLOYMENT EVIDENCE PENDING`이며, 적용 후에도 URL·commit SHA·
-plan digest·CloudTrail OIDC 세션·smoke receipt가 모두 일치할 때만 핵심 평가 슬라이스 배포 완료로
-표기한다. 전체 기업 production 완료라는 표현은 사용하지 않는다.
+동일 saved plan 적용, smoke/evidence 순서로 수행했다. 2026-09-01 production-serverless apply와
+live smoke가 성공했고 임시 사용자를 정리한 뒤 production pipeline을 다시 잠갔다. 이 증거는
+CloudFront·S3, API Gateway, 5개 Lambda, SQS·DLQ, DynamoDB, Cognito, Bedrock broker 경로에
+한정한다. GitHub Pages 배포는 AWS 배포 증거가 아니며 Evidence Desk, MLOps runtime, OpenDART,
+ECS·RDS·Redis·NAT 2-AZ 목표를 전체 기업 production 완료로 확대하지 않는다.
