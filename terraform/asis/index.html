@@ -10,9 +10,9 @@
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ko_KR">
   <meta property="og:image" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.png">
-  <meta property="og:image:alt" content="GitHub 승인형 OIDC 배포, 현재 production-serverless, 업무망과 Slack, Bedrock, Evidence Desk 제안, MLOps·OpenDART·2-AZ 목표를 구분한 J-Career 인프라 지도">
+  <meta property="og:image:alt" content="GitHub 승인형 OIDC saved-plan apply, Browser와 Cognito의 별도 sign-in·JWT 인증 가지, Browser에서 CloudFront /api/*를 거쳐 HTTP API로 가는 요청 경로, CloudFront의 S3 web origin, Lambda·SQS·Bedrock과 별도 serverless MLOps를 보여 주는 J-Career AI 서비스 실행면">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image:alt" content="GitHub 승인형 OIDC 배포, 현재 production-serverless, 업무망과 Slack, Bedrock, Evidence Desk 제안, MLOps·OpenDART·2-AZ 목표를 구분한 J-Career 인프라 지도">
+  <meta name="twitter:image:alt" content="GitHub 승인형 OIDC saved-plan apply, Browser와 Cognito의 별도 sign-in·JWT 인증 가지, Browser에서 CloudFront /api/*를 거쳐 HTTP API로 가는 요청 경로, CloudFront의 S3 web origin, Lambda·SQS·Bedrock과 별도 serverless MLOps를 보여 주는 J-Career AI 서비스 실행면">
   <link rel="preconnect" href="https://api.fontshare.com">
   <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -342,12 +342,12 @@
             <h2 id="production-assessment-title">서버리스 핵심 경로의 적용 결과를 별도 시점 기록으로 연결합니다.</h2>
             <div class="production-slice__status"><span>GITHUB E2E PASS</span><span>QUEUE · DLQ · RETRY_PENDING 0</span><span>ENDPOINT · MDM NOT DEPLOYED</span></div>
           </div>
-          <div><p class="production-slice__copy">2026-09-01 GitHub run에서 CloudFront·HTTP API·Lambda·SQS·DynamoDB·Bedrock 경로와 매칭 완료, OWASP 10/10을 확인했습니다. 기존 2-AZ·ECS·RDS·Redis 목표 구조, Windows·macOS·MDM, 별도 OpenDART·MLOps 수명주기는 완료 주장에 포함하지 않습니다. CloudFront viewer TLS 최소 버전과 과거 오류 필드 정규화도 남아 있습니다.</p><p><a class="button button--accent" href="production-transition.html">운영 전환 기록 보기</a></p></div>
+          <div><p class="production-slice__copy">사용자가 main <code>96d70d7</code>의 승인형 saved-plan apply 실행을 보고했지만, 이 문서 갱신 시점에는 현재 실행의 완료·live smoke receipt를 확인하지 않았습니다. 도식은 Browser↔Cognito 인증 가지와 Browser→CloudFront(<code>/api/*</code>)→HTTP API 요청 경로, CloudFront→S3 web origin, Lambda·SQS·Bedrock apply 대상과 별도 serverless MLOps 수명주기만 보여 줍니다.</p><p><a class="button button--accent" href="production-transition.html">운영 전환 기록 보기</a></p></div>
         </div>
-        <a class="diagram-link" href="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg" aria-label="기업 목표와 USD 50 핵심 평가 슬라이스 SVG 원본 열기">
-          <img src="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg" width="2320" height="1500" loading="lazy" decoding="async" alt="GitHub 승인형 OIDC 배포, 서버리스 AI 매칭 실행면, 별도 Evidence Desk, OpenDART와 MLOps의 분리된 수명주기, 미배포 기업 목표를 구분한 J-Career 핵심 평가 슬라이스">
+        <a class="diagram-link" href="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg" aria-label="J-Career AI 서비스 실행면 SVG 원본 열기">
+          <img src="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg" width="2400" height="1400" loading="lazy" decoding="async" alt="GitHub 승인형 OIDC saved-plan apply, Browser와 Cognito의 별도 sign-in·JWT 인증 가지, Browser에서 CloudFront /api/*를 거쳐 HTTP API로 가는 요청 경로, CloudFront의 S3 web origin, Lambda·SQS·Bedrock과 별도 serverless MLOps를 보여 주는 J-Career AI 서비스 실행면">
         </a>
-        <div class="diagram-caption"><span>현재 배포 지도: production-serverless E2E PASS · pipeline 재잠금</span><span><a href="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.drawio">DRAW.IO 원본</a> · <a href="production-transition.html">12:56:38 KST 전환 기록</a></span></div>
+        <div class="diagram-caption"><span>AI 서비스 실행면: apply 요청 보고됨 · 현재 완료/live smoke 미확인</span><span><a href="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.drawio">DRAW.IO 원본</a> · <a href="production-transition.html">운영 전환 기록</a></span></div>
       </section>
 
       <section id="mlops-overview" class="mlops-bridge" aria-labelledby="mlops-overview-title">

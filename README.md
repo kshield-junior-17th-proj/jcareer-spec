@@ -12,13 +12,12 @@ J-Career는 구직자와 기업을 연결하는 채용 플랫폼입니다. 이 �
 - [MLOps 7단계 모델 검증](https://kshield-junior-17th-proj.github.io/jcareer-spec/mlops/)
 - [AWS 검증 환경](https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/lab/)
 
-![GitHub 승인형 OIDC 배포, 현재 production-serverless, 업무망과 Slack, Bedrock, 제안된 Evidence Desk, MLOps·OpenDART·2-AZ 목표를 상태별로 분리한 J-Career 인프라 지도](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg)
+![GitHub 승인형 OIDC saved-plan apply, production-serverless AI 요청 경로와 분리형 serverless MLOps를 상태별로 구분한 J-Career AI 서비스 실행면](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg)
 
-2026-09-01 production-serverless는 GitHub saved plan·다른 사람 승인·OIDC 동일 plan apply와
-live smoke를 통과한 뒤 pipeline을 다시 잠갔습니다. [현재 배포 SVG](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg),
+현재 AI 서비스 도식은 main `96d70d7346774e9502fc4b509e1ed5b9e99eaa5d`의 GitHub saved plan·다른 사람 승인·OIDC apply 대상과
+별도 serverless MLOps 수명주기만 보여 줍니다. 사용자가 새 apply 실행을 보고했지만 현재 실행의
+완료·live smoke receipt는 이 갱신에서 확인하지 않았습니다. [AI 서비스 SVG](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg),
 [draw.io 원본](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.drawio), [기업 2-AZ 목표 지도](assets/JCAREER_FULL_INFRA_ANIMATED.svg)를 구분해 제공합니다.
-12:56:38 KST에 queue·DLQ·`RETRY_PENDING`이 모두 0으로 정리된 최신 상태와
-TLS·RDS/Redis·엔드포인트 잔여 경계는 [운영 인프라 전환 기록](terraform/asis/production-transition.html)에 분리했습니다.
 
 ## 구성 한눈에 보기
 
@@ -76,8 +75,8 @@ DynamoDB 실행 상태와 CloudWatch Logs를 기록하고 `TRAINED_PENDING_HUMAN
 - [대화형 아키텍처](terraform/asis/architecture.html): 전체 시스템 지도, 경로별 강조와 MLOps 7단계 도면 전환
 - [PDF 명세](terraform/asis/JCAREER_ASIS_SYSTEM_SPEC.pdf)
 - [전체 인프라 애니메이션 SVG](assets/JCAREER_FULL_INFRA_ANIMATED.svg)
-- [현재 배포·컨설팅 경계 SVG](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg): GitHub OIDC delivery, 실제 serverless 실행면, Evidence Desk 제안, OpenDART·MLOps·미배포 목표를 상태별로 구분
-- [현재 배포·컨설팅 경계 draw.io 원본](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.drawio)
+- [AI 서비스 실행면 SVG](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg): GitHub OIDC delivery, production-serverless 요청 topology와 분리형 serverless MLOps를 상태별로 구분
+- [AI 서비스 실행면 draw.io 원본](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.drawio)
 - [핵심 평가 슬라이스 해설](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.md)
 - [운영 인프라 전환 페이지](terraform/asis/production-transition.html): 배포된 서버리스 경로와 TLS·RDS/Redis·엔드포인트 잔여 경계
 - [운영 인프라 전환 SVG](terraform/asis/JCAREER_PRODUCTION_TRANSITION.svg) · [draw.io 원본](terraform/asis/JCAREER_PRODUCTION_TRANSITION.drawio)
