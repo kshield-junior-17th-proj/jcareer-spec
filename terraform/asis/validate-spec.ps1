@@ -30,6 +30,7 @@ $required = @(
     'JCAREER_ASIS_FLOW.drawio.png',
     '..\..\assets\JCAREER_PRODUCTION_ASSESSMENT_MAP.svg',
     '..\..\assets\JCAREER_PRODUCTION_ASSESSMENT_MAP.spec.json',
+    '..\..\assets\JCAREER_PRODUCTION_ASSESSMENT_MAP.drawio',
     '..\..\assets\JCAREER_PRODUCTION_ASSESSMENT_MAP.md'
 )
 $missing = @($required | Where-Object { -not (Test-Path -LiteralPath (Join-Path $root $_) -PathType Leaf) })
@@ -49,7 +50,8 @@ $readmeOkay = $readme.Contains('index.html') -and
     $readme.Contains('JCAREER_ASIS_2AZ.md') -and
     $readme.Contains('JCAREER_ASIS_2AZ.drawio') -and
     $readme.Contains('JCAREER_PRODUCTION_ASSESSMENT_MAP.svg') -and
-    $readme.Contains('DEPLOYMENT EVIDENCE PENDING') -and
+    $readme.Contains('JCAREER_PRODUCTION_ASSESSMENT_MAP.drawio') -and
+    $readme.Contains('live smoke') -and
     $readme.Contains('보조 상세 draw.io 원본') -and
     $readme.Contains('60개 셀·14개 연결') -and
     $readme.Contains('구판(legacy)')
@@ -118,14 +120,13 @@ $scopeTermDetail = if ($scopeTermsOkay) {
 Add-Check 'required_scope_terms' $scopeTermsOkay $scopeTermDetail
 
 $prohibitedClaims = [ordered]@{
-    live_word             = '(?i)(?<!aria-)\blive\b'
-    production_in_service = '(?i)(?:AWS|service|system)\s*(?:is\s*)?(?:live|in production)'
+    unqualified_full_production = '(?i)(?:entire|full)\s+(?:AWS|service|system)\s+(?:is\s+)?(?:live|in production)|전체 기업 production 완료(?:입니다|됨)'
 }
 $claimHits = [System.Collections.Generic.List[string]]::new()
 foreach ($entry in $prohibitedClaims.GetEnumerator()) {
     if ($publishedText -match $entry.Value) { $claimHits.Add($entry.Key) }
 }
-Add-Check 'prohibited_live_claims' ($claimHits.Count -eq 0) $(if ($claimHits.Count) { $claimHits -join ', ' } else { '0 live / in-production claims' })
+Add-Check 'prohibited_live_claims' ($claimHits.Count -eq 0) $(if ($claimHits.Count) { $claimHits -join ', ' } else { '0 unqualified full-production claims' })
 
 $tfFiles = @(Get-ChildItem -LiteralPath $root -Filter '*.tf' -File -Recurse)
 $tfText = ($tfFiles | ForEach-Object { Get-Content -Raw -Encoding UTF8 $_.FullName }) -join "`n"
@@ -287,7 +288,7 @@ $flowDefinitionMatch = [regex]::Match($architecture, '(?s)const flowDefinitions 
 $serviceFlowKeys = @('candidate', 'recruiter', 'explanation', 'mlops', 'workplace', 'trace', 'integrations', 'operations')
 $overlayFlowKeys = @('candidate', 'recruiter', 'explanation', 'workplace', 'trace', 'integrations', 'operations')
 $expectedStageCounts = @{
-    overview = 10
+    overview = 12
     candidate = 3
     recruiter = 3
     explanation = 4
@@ -320,12 +321,12 @@ if ($flowDefinitionMatch.Success) {
         }
         $stageCoordinatesOkay = $badCoordinateKeys.Count -eq 0
         $expectedDetailLinks = @{
-            overview = @{ href = 'index.html#section-14'; label = '서비스·구성요소 명세 보기' }
+            overview = @{ href = '../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg'; label = '현재 배포 기준 지도 보기' }
             candidate = @{ href = 'index.html#section-31'; label = '공고 추천 기능 명세 보기' }
             recruiter = @{ href = 'index.html#section-31'; label = '기업용 인재 찾기 명세 보기' }
             explanation = @{ href = 'index.html#section-33'; label = 'AI 점수·설명 규칙 보기' }
             mlops = @{ href = '../../mlops/'; label = 'MLOps 7단계 상세 보기' }
-            workplace = @{ href = 'index.html#section-15'; label = '업무망·Slack 경계 보기' }
+            workplace = @{ href = '../../consulting/'; label = '단말 진단 기술 사례 보기' }
             trace = @{ href = 'index.html#section-25'; label = 'TRACE·JC-RECEIPT 보조 경계 보기' }
             integrations = @{ href = 'index.html#section-25'; label = '외부 업무도구 구현 경계 보기' }
             operations = @{ href = 'index.html#section-52'; label = '보안·운영 명세 보기' }
@@ -438,7 +439,7 @@ $interactiveFlowOkay = $flowButtonCount -eq 9 -and
     $architecture.Contains('TRACE·JC-RECEIPT는 실행 컴포넌트에서 제외하고 보조 설명에만 남깁니다') -and
     $architecture.Contains('AI 설명과 MLOps를 선택해도 전체 지도를 유지해') -and
     $architecture.Contains("['overview', 'mlops', 'explanation'].includes(key) ? 'overview' : 'asis'")
-Add-Check 'interactive_service_flow' $interactiveFlowOkay "controls $flowButtonCount, overlay layers $flowLayerCount, stages overview=10, explanation/workplace=4, MLOps=7, other=3, markers $stepMarkerCount; integrated full-map AI/MLOps context, guarded-source separation, URL state, detail links 9 checked"
+Add-Check 'interactive_service_flow' $interactiveFlowOkay "controls $flowButtonCount, overlay layers $flowLayerCount, stages overview=12, explanation/workplace=4, MLOps=7, other=3, markers $stepMarkerCount; integrated full-map AI/MLOps context, guarded-source separation, URL state, detail links 9 checked"
 
 $normalizedFlowSource = (Get-Content -Raw -Encoding UTF8 (Join-Path $root 'JCAREER_ASIS_FLOW.md')).Replace("`r`n", "`n").Replace("`r", "`n")
 $flowSourceHasher = [System.Security.Cryptography.SHA256]::Create()
@@ -538,6 +539,7 @@ $textDeliverables = @(
     'validation-report.json',
     '..\..\assets\JCAREER_PRODUCTION_ASSESSMENT_MAP.svg',
     '..\..\assets\JCAREER_PRODUCTION_ASSESSMENT_MAP.spec.json',
+    '..\..\assets\JCAREER_PRODUCTION_ASSESSMENT_MAP.drawio',
     '..\..\assets\JCAREER_PRODUCTION_ASSESSMENT_MAP.md'
 )
 foreach ($file in $textDeliverables) {

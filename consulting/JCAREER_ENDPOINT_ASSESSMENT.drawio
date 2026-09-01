@@ -1,0 +1,197 @@
+<mxfile host="app.diagrams.net" agent="J-Career" version="24.7.17">
+  <diagram id="jcareer-endpoint-assessment" name="J-Career Endpoint Assessment">
+    <mxGraphModel dx="2400" dy="1400" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="1400" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="page-bg" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F5F4EF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="2400" height="1400" as="geometry"/>
+        </mxCell>
+        <mxCell id="title" value="J-Career 이기종 업무 단말 보안 진단" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=38;fontStyle=1;fontColor=#172129;" vertex="1" parent="1">
+          <mxGeometry x="80" y="55" width="1250" height="54" as="geometry"/>
+        </mxCell>
+        <mxCell id="subtitle" value="가상 기업 J사 | Windows 100 · macOS 80 시나리오 | 기준일 2026.09.01" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=16;fontColor=#52616C;" vertex="1" parent="1">
+          <mxGeometry x="80" y="112" width="1180" height="32" as="geometry"/>
+        </mxCell>
+        <mxCell id="legend-implemented" value="구현" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E6EFEA;strokeColor=#2F6D58;strokeWidth=2;fontFamily=Arial;fontSize=13;fontStyle=1;fontColor=#172129;" vertex="1" parent="1">
+          <mxGeometry x="1800" y="74" width="120" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="legend-pending" value="미실행" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9DA3A4;dashed=1;fontFamily=Arial;fontSize=13;fontStyle=1;fontColor=#172129;" vertex="1" parent="1">
+          <mxGeometry x="1934" y="74" width="120" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="legend-decision" value="사람 결정" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F4DFD3;strokeColor=#D55D24;strokeWidth=2;fontFamily=Arial;fontSize=13;fontStyle=1;fontColor=#172129;" vertex="1" parent="1">
+          <mxGeometry x="2068" y="74" width="140" height="44" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="source-boundary" value="VERSIONED SOURCE | IMPLEMENTED" style="swimlane;html=1;startSize=52;horizontal=1;rounded=0;container=1;dropTarget=1;fillColor=#EEECE4;swimlaneFillColor=#EEECE4;strokeColor=#172129;strokeWidth=2;fontFamily=Arial;fontSize=15;fontStyle=1;fontColor=#172129;align=left;spacingLeft=18;" vertex="1" parent="1">
+          <mxGeometry x="80" y="200" width="330" height="930" as="geometry"/>
+        </mxCell>
+        <mxCell id="source-contract" value="&lt;b&gt;공통 이미지 계약&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#52616C&quot;&gt;자격증명 반입 금지&lt;br&gt;승인 · 만료 · 정리 경계&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2F6D58;strokeWidth=2;fontFamily=Arial;fontSize=14;fontColor=#172129;align=left;spacing=14;" vertex="1" parent="source-boundary">
+          <mxGeometry x="30" y="90" width="270" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="source-win" value="&lt;b&gt;Windows source bundle&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#52616C&quot;&gt;WIN-01 · 02 · 03&lt;br&gt;Server 2022 desktop simulation&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#2F6D58&quot;&gt;IMPLEMENTED&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E6EFEA;strokeColor=#2F6D58;strokeWidth=2;fontFamily=Arial;fontSize=14;fontColor=#172129;align=left;spacing=14;" vertex="1" parent="source-boundary">
+          <mxGeometry x="30" y="260" width="270" height="145" as="geometry"/>
+        </mxCell>
+        <mxCell id="source-mac" value="&lt;b&gt;macOS source scripts&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#52616C&quot;&gt;prepare · configure&lt;br&gt;validate · remove&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#2F6D58&quot;&gt;SOURCE ONLY&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E6EFEA;strokeColor=#2F6D58;strokeWidth=2;fontFamily=Arial;fontSize=14;fontColor=#172129;align=left;spacing=14;" vertex="1" parent="source-boundary">
+          <mxGeometry x="30" y="640" width="270" height="145" as="geometry"/>
+        </mxCell>
+        <mxCell id="source-limit" value="현재 공통 실행 상태&lt;br&gt;&lt;b&gt;NOT_BUILT_OR_DEPLOYED&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#172129;strokeColor=#172129;fontFamily=Arial;fontSize=14;fontStyle=1;fontColor=#FFFFFF;align=left;spacing=14;" vertex="1" parent="source-boundary">
+          <mxGeometry x="30" y="835" width="270" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="aws-cloud" value="AWS Cloud | Windows 검증용 샘플 경로" style="shape=mxgraph.aws4.group_aws_cloud_alt;grIcon=mxgraph.aws4.group_aws_cloud;html=1;rounded=0;container=1;dropTarget=1;fillColor=none;strokeColor=#879196;strokeWidth=2;fontFamily=Arial;fontSize=17;fontStyle=1;fontColor=#172129;align=left;verticalAlign=top;spacingTop=15;spacingLeft=70;" vertex="1" parent="1">
+          <mxGeometry x="460" y="200" width="1260" height="430" as="geometry"/>
+        </mxCell>
+        <mxCell id="image-builder-icon" value="" style="shape=mxgraph.aws4.ec2_image_builder;html=1;fillColor=#8C4FFF;strokeColor=#FFFFFF;" vertex="1" parent="aws-cloud">
+          <mxGeometry x="70" y="100" width="82" height="82" as="geometry"/>
+        </mxCell>
+        <mxCell id="image-builder-label" value="&lt;b&gt;EC2 Image Builder&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#52616C&quot;&gt;definition only&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#95401B&quot;&gt;NOT BUILT&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9DA3A4;dashed=1;fontFamily=Arial;fontSize=13;fontColor=#172129;" vertex="1" parent="aws-cloud">
+          <mxGeometry x="35" y="195" width="150" height="92" as="geometry"/>
+        </mxCell>
+        <mxCell id="ami-candidate" value="&lt;b&gt;Approved AMI candidate&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#52616C&quot;&gt;version · source SHA&lt;br&gt;build receipt&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#95401B&quot;&gt;ABSENT&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9DA3A4;dashed=1;fontFamily=Arial;fontSize=13;fontColor=#172129;spacing=10;" vertex="1" parent="aws-cloud">
+          <mxGeometry x="260" y="115" width="190" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="ec2-icon" value="" style="shape=mxgraph.aws4.ec2;html=1;fillColor=#ED7100;strokeColor=#FFFFFF;" vertex="1" parent="aws-cloud">
+          <mxGeometry x="545" y="100" width="82" height="82" as="geometry"/>
+        </mxCell>
+        <mxCell id="ec2-label" value="&lt;b&gt;EC2 endpoint × 3&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#52616C&quot;&gt;WIN-01 · WIN-02 · WIN-03&lt;br&gt;zero inbound&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#95401B&quot;&gt;NOT DEPLOYED&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9DA3A4;dashed=1;fontFamily=Arial;fontSize=13;fontColor=#172129;" vertex="1" parent="aws-cloud">
+          <mxGeometry x="505" y="195" width="165" height="104" as="geometry"/>
+        </mxCell>
+        <mxCell id="ssm-icon" value="" style="shape=mxgraph.aws4.systems_manager;html=1;fillColor=#DD344C;strokeColor=#FFFFFF;" vertex="1" parent="aws-cloud">
+          <mxGeometry x="810" y="100" width="82" height="82" as="geometry"/>
+        </mxCell>
+        <mxCell id="ssm-label" value="&lt;b&gt;Systems Manager&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#52616C&quot;&gt;tunneled RDP&lt;br&gt;loopback only&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#95401B&quot;&gt;NOT OBSERVED&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9DA3A4;dashed=1;fontFamily=Arial;fontSize=13;fontColor=#172129;" vertex="1" parent="aws-cloud">
+          <mxGeometry x="770" y="195" width="165" height="104" as="geometry"/>
+        </mxCell>
+        <mxCell id="iam-icon" value="" style="shape=mxgraph.aws4.iam;html=1;fillColor=#DD344C;strokeColor=#FFFFFF;" vertex="1" parent="aws-cloud">
+          <mxGeometry x="1020" y="108" width="62" height="62" as="geometry"/>
+        </mxCell>
+        <mxCell id="iam-label" value="IAM&lt;br&gt;&lt;font color=&quot;#52616C&quot;&gt;least privilege&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;fontFamily=Arial;fontSize=12;fontStyle=1;fontColor=#172129;" vertex="1" parent="aws-cloud">
+          <mxGeometry x="980" y="178" width="140" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="cloudwatch-icon" value="" style="shape=mxgraph.aws4.cloudwatch;html=1;fillColor=#E7157B;strokeColor=#FFFFFF;" vertex="1" parent="aws-cloud">
+          <mxGeometry x="1140" y="108" width="62" height="62" as="geometry"/>
+        </mxCell>
+        <mxCell id="cloudwatch-label" value="CloudWatch&lt;br&gt;&lt;font color=&quot;#52616C&quot;&gt;runtime logs&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;fontFamily=Arial;fontSize=12;fontStyle=1;fontColor=#172129;" vertex="1" parent="aws-cloud">
+          <mxGeometry x="1100" y="178" width="140" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="aws-lane-note" value="Definition 12 resources when enabled · build start and endpoint deployment are separate approvals" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=12;fontColor=#52616C;" vertex="1" parent="aws-cloud">
+          <mxGeometry x="35" y="355" width="850" height="35" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="mac-zone" value="CUSTOMER-MANAGED | macOS 우선 경로" style="swimlane;html=1;startSize=52;horizontal=1;rounded=0;container=1;dropTarget=1;fillColor=#EEECE4;swimlaneFillColor=#EEECE4;strokeColor=#172129;strokeWidth=2;fontFamily=Arial;fontSize=16;fontStyle=1;fontColor=#172129;align=left;spacingLeft=18;" vertex="1" parent="1">
+          <mxGeometry x="460" y="700" width="1260" height="430" as="geometry"/>
+        </mxCell>
+        <mxCell id="mac-decision" value="&lt;b&gt;Human decision gate&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#52616C&quot;&gt;physical Mac + MDM first&lt;br&gt;license · owner · access&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#95401B&quot;&gt;DECISION REQUIRED&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F4DFD3;strokeColor=#D55D24;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#172129;" vertex="1" parent="mac-zone">
+          <mxGeometry x="40" y="105" width="210" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="mdm-policy" value="&lt;b&gt;Approved MDM policy&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#52616C&quot;&gt;FileVault · Gatekeeper&lt;br&gt;firewall · EDR&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#95401B&quot;&gt;NOT PROVIDED&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9DA3A4;dashed=1;fontFamily=Arial;fontSize=13;fontColor=#172129;" vertex="1" parent="mac-zone">
+          <mxGeometry x="310" y="105" width="200" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="mac-client-icon" value="" style="shape=mxgraph.aws4.client;html=1;fillColor=#232F3E;strokeColor=#FFFFFF;" vertex="1" parent="mac-zone">
+          <mxGeometry x="600" y="90" width="88" height="88" as="geometry"/>
+        </mxCell>
+        <mxCell id="mac-client-label" value="&lt;b&gt;Physical Mac × 3&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#52616C&quot;&gt;MAC-01 · MAC-02 · MAC-03&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#95401B&quot;&gt;NOT OBSERVED&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9DA3A4;dashed=1;fontFamily=Arial;fontSize=13;fontColor=#172129;" vertex="1" parent="mac-zone">
+          <mxGeometry x="555" y="190" width="180" height="92" as="geometry"/>
+        </mxCell>
+        <mxCell id="mac-session" value="&lt;b&gt;Approved review session&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#52616C&quot;&gt;15 min to 8 h&lt;br&gt;browser · Slack cleanup&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#95401B&quot;&gt;NOT EXECUTED&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9DA3A4;dashed=1;fontFamily=Arial;fontSize=13;fontColor=#172129;" vertex="1" parent="mac-zone">
+          <mxGeometry x="805" y="105" width="200" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="ec2-mac-exception" value="&lt;b&gt;EC2 Mac exception&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#52616C&quot;&gt;Dedicated Host · min 24 h&lt;br&gt;budget · capacity · license approval&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F8F8F4;strokeColor=#D55D24;dashed=1;fontFamily=Arial;fontSize=12;fontColor=#172129;align=left;spacing=10;" vertex="1" parent="mac-zone">
+          <mxGeometry x="805" y="300" width="380" height="82" as="geometry"/>
+        </mxCell>
+        <mxCell id="slack-boundary" value="&lt;b&gt;Slack external SaaS&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#52616C&quot;&gt;shortcut + best-effort cleanup source&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#95401B&quot;&gt;WORKSPACE UNVERIFIED&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F4DFD3;strokeColor=#D55D24;strokeWidth=2;fontFamily=Arial;fontSize=12;fontColor=#172129;" vertex="1" parent="mac-zone">
+          <mxGeometry x="1050" y="105" width="170" height="140" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="review-boundary" value="CONSULTANT REVIEW | REDACTED EVIDENCE ONLY" style="swimlane;html=1;startSize=52;horizontal=1;rounded=0;container=1;dropTarget=1;fillColor=#FFFFFF;swimlaneFillColor=#FFFFFF;strokeColor=#172129;strokeWidth=2;fontFamily=Arial;fontSize=15;fontStyle=1;fontColor=#172129;align=left;spacingLeft=18;" vertex="1" parent="1">
+          <mxGeometry x="1780" y="200" width="540" height="930" as="geometry"/>
+        </mxCell>
+        <mxCell id="win-evidence" value="&lt;b&gt;Windows observation set&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#52616C&quot;&gt;AMI lineage · controls · session cleanup&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#95401B&quot;&gt;NOT OBSERVED&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9DA3A4;dashed=1;fontFamily=Arial;fontSize=13;fontColor=#172129;" vertex="1" parent="review-boundary">
+          <mxGeometry x="35" y="135" width="220" height="130" as="geometry"/>
+        </mxCell>
+        <mxCell id="mac-evidence" value="&lt;b&gt;macOS observation set&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#52616C&quot;&gt;MDM lineage · controls · session cleanup&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#95401B&quot;&gt;NOT OBSERVED&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9DA3A4;dashed=1;fontFamily=Arial;fontSize=13;fontColor=#172129;" vertex="1" parent="review-boundary">
+          <mxGeometry x="35" y="560" width="220" height="130" as="geometry"/>
+        </mxCell>
+        <mxCell id="consultant-desk" value="&lt;b&gt;Consultant AIMS Desk&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#52616C&quot;&gt;baseline + runtime&lt;br&gt;finding · owner · residual risk&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#95401B&quot;&gt;DECISION BY HUMAN&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#172129;strokeColor=#172129;strokeWidth=2;fontFamily=Arial;fontSize=14;fontColor=#FFFFFF;" vertex="1" parent="review-boundary">
+          <mxGeometry x="300" y="350" width="205" height="170" as="geometry"/>
+        </mxCell>
+        <mxCell id="review-output" value="공개 출력: 비식별 상태 · 한계 · 다음 결정&lt;br&gt;&lt;b&gt;계정 ID · 자격증명 · state · 개인정보 제외&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#EEECE4;strokeColor=#172129;fontFamily=Arial;fontSize=13;fontColor=#172129;" vertex="1" parent="review-boundary">
+          <mxGeometry x="70" y="780" width="400" height="95" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="edge-contract-win" value="same contract" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#2F6D58;strokeWidth=2;fontFamily=Arial;fontSize=11;fontColor=#52616C;" edge="1" parent="1" source="source-contract" target="source-win">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-contract-mac" value="same contract" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#2F6D58;strokeWidth=2;fontFamily=Arial;fontSize=11;fontColor=#52616C;" edge="1" parent="1" source="source-contract" target="source-mac">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-source-builder" value="source SHA + approval" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#172129;strokeWidth=2;fontFamily=Arial;fontSize=11;fontColor=#52616C;" edge="1" parent="1" source="source-win" target="image-builder-icon">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-builder-ami" value="build + test" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#172129;strokeWidth=2;fontFamily=Arial;fontSize=11;fontColor=#52616C;" edge="1" parent="1" source="image-builder-icon" target="ami-candidate">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-ami-ec2" value="approved AMI" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#172129;strokeWidth=2;fontFamily=Arial;fontSize=11;fontColor=#52616C;" edge="1" parent="1" source="ami-candidate" target="ec2-icon">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-ec2-ssm" value="session" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#172129;strokeWidth=2;fontFamily=Arial;fontSize=11;fontColor=#52616C;" edge="1" parent="1" source="ec2-icon" target="ssm-icon">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-ssm-win-evidence" value="redacted observation" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#172129;strokeWidth=2;fontFamily=Arial;fontSize=11;fontColor=#52616C;" edge="1" parent="1" source="ssm-icon" target="win-evidence">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-source-mac-decision" value="source contract" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#172129;strokeWidth=2;fontFamily=Arial;fontSize=11;fontColor=#52616C;" edge="1" parent="1" source="source-mac" target="mac-decision">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-decision-mdm" value="approved path" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#D55D24;strokeWidth=2;fontFamily=Arial;fontSize=11;fontColor=#95401B;" edge="1" parent="1" source="mac-decision" target="mdm-policy">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-mdm-mac" value="policy deploy" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#172129;strokeWidth=2;fontFamily=Arial;fontSize=11;fontColor=#52616C;" edge="1" parent="1" source="mdm-policy" target="mac-client-icon">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-mac-session" value="approved access" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#172129;strokeWidth=2;fontFamily=Arial;fontSize=11;fontColor=#52616C;" edge="1" parent="1" source="mac-client-icon" target="mac-session">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-session-mac-evidence" value="redacted observation" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#172129;strokeWidth=2;fontFamily=Arial;fontSize=11;fontColor=#52616C;" edge="1" parent="1" source="mac-session" target="mac-evidence">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-decision-ec2mac" value="exception only" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#D55D24;strokeWidth=2;dashed=1;fontFamily=Arial;fontSize=11;fontColor=#95401B;" edge="1" parent="1" source="mac-decision" target="ec2-mac-exception">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-mac-slack" value="usage boundary" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#D55D24;strokeWidth=2;dashed=1;fontFamily=Arial;fontSize=11;fontColor=#95401B;" edge="1" parent="1" source="mac-client-icon" target="slack-boundary">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-ec2-slack" value="shortcut source only" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#D55D24;strokeWidth=2;dashed=1;fontFamily=Arial;fontSize=11;fontColor=#95401B;" edge="1" parent="1" source="ec2-icon" target="slack-boundary">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-iam-builder" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#879196;strokeWidth=1;dashed=1;" edge="1" parent="1" source="iam-icon" target="image-builder-icon">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-cloudwatch-ssm" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#879196;strokeWidth=1;dashed=1;" edge="1" parent="1" source="cloudwatch-icon" target="ssm-icon">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-win-desk" value="baseline + runtime" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#172129;strokeWidth=2;fontFamily=Arial;fontSize=11;fontColor=#52616C;" edge="1" parent="1" source="win-evidence" target="consultant-desk">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-mac-desk" value="baseline + runtime" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#172129;strokeWidth=2;fontFamily=Arial;fontSize=11;fontColor=#52616C;" edge="1" parent="1" source="mac-evidence" target="consultant-desk">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-desk-output" value="human decision" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#172129;strokeWidth=2;fontFamily=Arial;fontSize=11;fontColor=#52616C;" edge="1" parent="1" source="consultant-desk" target="review-output">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="footer-rule" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#172129;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="80" y="1210" width="2240" height="2" as="geometry"/>
+        </mxCell>
+        <mxCell id="footer-note" value="State truth: source implemented · image not built · endpoint not deployed · GUI not observed · macOS path decision pending" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=16;fontStyle=1;fontColor=#172129;" vertex="1" parent="1">
+          <mxGeometry x="80" y="1235" width="1750" height="38" as="geometry"/>
+        </mxCell>
+        <mxCell id="footer-exclusion" value="TRACE · JC-RECEIPT는 이 단말 실행 아키텍처의 컴포넌트가 아님" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;fontFamily=Arial;fontSize=14;fontColor=#95401B;" vertex="1" parent="1">
+          <mxGeometry x="1590" y="1280" width="730" height="38" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

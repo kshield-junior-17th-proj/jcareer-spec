@@ -53,7 +53,7 @@ AWS 또는 MLOps를 자동 배포하는 워크플로는 없다. 전체 지도의
 |---|---|---|
 | 구직자 공고 추천 | 이력서와 열린 공고의 조건을 비교하는 흐름 | 합격 예측이 아닌 조건 일치도 제공 |
 | 기업용 인재 찾기 | 자사 공고에 지원한 활성 후보자를 비교하는 흐름 | 최대 3명의 비교 선택은 현재 화면에서만 유지 |
-| AI 설명 만들기 | API → LLM Gateway → 조건부 broker → Bedrock 관계 | LLM Gateway 로컬 구현, Bedrock 직접 호출 PASS, 전체 경로 미확인 |
+| AI 설명 만들기 | API Lambda → LLM Gateway Lambda → Capability Broker Lambda → Bedrock | production-serverless E2E smoke PASS, 2-AZ ECS 목표 경로는 미배포 |
 | MLOps 학습·평가 | 합성 자료 준비부터 사람 검토 대기까지의 모델 검증 흐름 | bootstrap 13개 적용, runtime/Lambda·서비스 연계 전 |
 | 업무망·Slack | PC 수량, VPN+MFA·UTM 선언과 외부 업무 SaaS 자산대장 경계 | Slack 실제 workspace 운영과 AWS 연동은 확인되지 않음 |
 | TRACE·JC-RECEIPT | 보조 설명에서만 다루는 receipt·정정·사람 검토 source | 실행 인프라·구현 대상으로 전체 지도에 넣지 않음 |
@@ -106,6 +106,9 @@ bootstrap 기반과 아직 실행하지 않은 runtime 단계를 함께 설명�
 보존·삭제 정책과 전송은 `SCENARIO_USE_UNVERIFIED`다. Amazon Q Developer(AWS Chatbot), SNS,
 EventBridge나 새 Terraform 리소스는 없다.
 
+Windows 이미지 기준선, macOS MDM 우선 경로와 배포 후 단말 관찰 방법은
+[이기종 업무 단말 보안 진단 사례](../../consulting/)에서 별도로 설명한다.
+
 ### 3.4 TRACE·JC-RECEIPT 경계
 
 1. 기존 70·20·10 추천 결과가 성공하면 최소 개인정보 receipt를 만들 수 있다.
@@ -145,8 +148,8 @@ AWS 리소스는 확인하지 않았다. SMTP 소스 존재를 조직 그룹웨�
 - MLOps 전용 경계 시험 19건과 합성 파이프라인 시험 22건을 통과했다. 기반 적용은 모델 품질 평가나 운영 완료를 뜻하지 않는다.
 - Slack·Notion·SMTP 어댑터는 기본 비활성 소스와 무통신 시험만 있으며 workspace·메일 시스템 운영이나 실제 전송을 증명하지 않는다.
 - TRACE·JC-RECEIPT는 기본 비활성 로컬 소스다. 운영 승인·실데이터·자동 채용/이의/적합성/잔여위험 판정 증거가 아니다.
-- Bedrock 직접 합성 호출은 별도 AWS 검증 계정에서 확인했다. API→gateway→broker→Bedrock 전체 경로는 별도 항목이며 아직 확인하지 못했다.
-- AWS 검증 Lab은 생성 예정 24개 계획을 두 차례 확인했지만 같은 IAM 권한에서 중단됐다. 각 실패의 부분 생성 16개를 지웠고 2026-08-31 LabOnly 7개 신호도 0이었다. 별도 MLOps 13개·state S3·계획 24개·AS-IS 기준선 110개를 서로 합산하지 않는다.
+- 2026-09-01 production-serverless의 API→LLM Gateway→Capability Broker→Bedrock 전체 경로와 live smoke를 확인했다. 이 결과를 미배포 2-AZ ECS 목표 경로의 증거로 확대하지 않는다.
+- AWS 검증 Lab은 production과 별도이며 private EC2는 정지 상태다. NAT·공인 IPv4·볼륨·edge 등 잔존 비용 가능 경로는 별도 정리 대상이다. MLOps 13개·Lab·production-serverless·AS-IS 기준선 110개를 서로 합산하지 않는다.
 - 컨설턴트 대시보드는 고객사 AWS에 직접 연결하지 않는다. 승인된 비식별본만 받아야 한다.
 - 외부 미리보기에는 민감정보 제거본만 쓴다.
 - 개선안(TO-BE)은 승인 전 리소스 0개를 유지한다. 승인 정보에 문제가 있으면 중단한다.
@@ -154,7 +157,7 @@ AWS 리소스는 확인하지 않았다. SMTP 소스 존재를 조직 그룹웨�
 ## 6. 이 그림만 보고 단정하면 안 되는 것
 
 - 고객사 AWS에 같은 구성이 실제로 있다는 뜻이 아니다.
-- 기준 애플리케이션이 실행 중이라는 뜻이 아니다. 실행 이미지가 없다.
+- 2-AZ 기준 애플리케이션이 실행 중이라는 뜻이 아니다. 현재 검증된 것은 별도 production-serverless다.
 - 업무망 PC가 AWS에 연결됐다는 뜻이 아니다. 실제 접속 경로는 확인하지 못했다.
 - Slack workspace가 운영 중이거나 AWS 알림·이벤트와 연결됐다는 뜻이 아니다.
 - TRACE·JC-RECEIPT와 외부 업무도구 소스가 실제 운영 또는 AWS에 배포됐다는 뜻이 아니다.
@@ -170,10 +173,11 @@ AWS 리소스는 확인하지 않았다. SMTP 소스 존재를 조직 그룹웨�
 3. SQS가 요청을 보존하고 Agent Lambda가 결정식 점수와 근거를 만든다.
 4. LLM Gateway는 설명에 필요한 최소 필드만 만들며 capability broker만 허용된 Bedrock model ARN을 호출한다.
 5. 결과와 correlation ID는 DynamoDB·S3·CloudWatch에 남고 화면은 상태를 polling한다.
-6. 컨설턴트는 고객 DB나 AWS API를 브라우저에서 직접 조회하지 않는다. 사람이 승인한 비식별·서명·만료 snapshot만 별도 Evidence Desk로 반입한다.
+6. 제안된 Evidence Desk에서는 컨설턴트가 고객 DB나 AWS API를 브라우저에서 직접 조회하지 않는다. 사람이 승인한 비식별·서명·만료 snapshot만 별도 경계로 반입한다. 이 경계는 아직 미배포다.
 
 OpenDART와 MLOps는 별도 수명주기다. 두 경로는 추천 결과에 자동 연결하지 않으며 사람 검토 전
 승격하지 않는다. Redis는 필수 저장소가 아닌 선택형 성능 계층으로 두고, 없을 때도 cache miss로
 정상 처리해야 한다. Windows 100대와 macOS 80대는 자산 모델이며 현재 실제 배포 수량이 아니다.
-새 지도 원본은 [`../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg`](../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg)이며,
-AWS 적용 전에는 URL·실행 성공·production 완료를 주장하지 않는다.
+새 지도는 [웹용 SVG](../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg)와
+[편집 가능한 draw.io 원본](../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.drawio)으로 제공한다.
+2026-09-01 GitHub 승인형 OIDC apply와 live smoke는 성공했지만 이를 전체 기업 production 완료로 주장하지 않는다.

@@ -59,11 +59,11 @@ EXPECTED_NOTES = [
     "bootstrap/runtime counts were checked only with Terraform mock_provider tests.",
     "The disabled default plan used the ordinary provider configuration with AWS validation disabled by the configuration and planned zero managed resources.",
     "All nine architecture states were opened and checked for the selected button, active diagram layer, visible diagram media, detail link, full-map asset, and 390px overflow by scripts/check_public_ui.mjs.",
-    "Five public pages were checked at 390px and 1440px for overflow, canonical and Open Graph metadata, touch action, and keyboard focus; MLOps aria-controls was also checked.",
+    "Six public pages were checked at 390px and 1440px for overflow, canonical and Open Graph metadata, touch action, and keyboard focus; MLOps aria-controls was also checked.",
     "MLOps stage URL state, invalid-stage fallback, and browser history were checked by scripts/check_public_ui.mjs.",
     "Eight motion checks covered the carousel, MLOps stage rail, animated architecture, manual motion toggle, and reduced-motion fallback.",
     "The animated architecture source hash, 15 nodes, 11 edges, 17 motion dots, 1480x820 PNG, and manual visual review were recorded together.",
-    "The full infrastructure source hash, 45 nodes, 47 edges, 22 motion dots, 45 label backplates, 2320x1500 PNG, editable draw.io source, and manual visual review were recorded together.",
+    "The full infrastructure source hash, 46 nodes, 48 edges, 24 motion dots, 46 label backplates, 2320x1500 PNG, editable draw.io source, and manual visual review were recorded together.",
     "The MLOps PDF was rendered from mlops/index.html and carries that source file's SHA-256 marker.",
     "The three logical databases, LLM Gateway, Bedrock, OpenDART, Slack/workplace, and MLOps IAM are included; TRACE and JC-RECEIPT remain outside the execution infrastructure.",
 ]
@@ -314,7 +314,7 @@ def check_evidence_report(errors: list[str]) -> None:
         "disabled_plan_resources": 0,
         "terraform_boundary_tests": "19/19 PASS",
         "synthetic_pipeline_tests": "22/22 PASS",
-        "public_ui": "9/9 routes, 8/8 stage states, 5 pages at 390/1440px, motion 8/8 PASS",
+        "public_ui": "9/9 routes, 8/8 stage states, 6 pages at 390/1440px, motion 8/8 PASS",
         "pdf_source_binding": "PASS",
         "public_integrity": "PASS",
     }
@@ -331,7 +331,7 @@ def check_evidence_report(errors: list[str]) -> None:
             "landing_routes": 9,
             "stage_states": 8,
             "viewports_css_px": [390, 1440],
-            "page_viewport_checks": 10,
+            "page_viewport_checks": 12,
             "motion_checks": 8,
             "page_checks": [
                 "horizontal_overflow",
@@ -387,9 +387,9 @@ def check_evidence_report(errors: list[str]) -> None:
             "drawio": relative_name(FULL_INFRA_DRAWIO),
             "drawio_sha256": file_sha256(FULL_INFRA_DRAWIO),
             "canvas_css_px": [2320, 1500],
-            "nodes": 45,
-            "edges": 47,
-            "motion_dots": 22,
+            "nodes": 46,
+            "edges": 48,
+            "motion_dots": 24,
             "visual_review": "PASS",
         },
     }
@@ -742,9 +742,9 @@ def check() -> list[str]:
         pending.extend(full_adjacency[node_id] - full_connected)
     if (
         full_spec.get("canvas") != {"w": 2320, "h": 1500}
-        or len(full_nodes) != 45
-        or len(full_edges) != 47
-        or full_motion_count != 22
+        or len(full_nodes) != 46
+        or len(full_edges) != 48
+        or full_motion_count != 24
         or len(full_ids) != len(set(full_ids))
         or full_svg_text.count('<path class="flow"')
         != sum(not edge.get("static", False) for edge in full_edges)
@@ -756,10 +756,13 @@ def check() -> list[str]:
         or full_connected != full_spec_ids
         or f'data-spec-sha256="{file_sha256(FULL_INFRA_SPEC)}"'
         not in full_svg_text
-        or "GitHub Actions CI" not in full_boundary_text
-        or "PR/main 검사 · deploy job 없음" not in full_boundary_text
+        or "GitHub Actions" not in full_boundary_text
+        or "공개 검사 + production delivery" not in full_boundary_text
         or "legacy · main/(root) 공개 배포" not in full_boundary_text
-        or "CI / AWS 경계" not in full_boundary_text
+        or "승인 + GitHub OIDC" not in full_boundary_text
+        or "saved plan · distinct human" not in full_boundary_text
+        or "production-serverless" not in full_boundary_text
+        or "apply · smoke PASS · 재잠금" not in full_boundary_text
         or "업무망 PC 180대" not in full_boundary_text
         or "Slack · 외부 업무도구" not in full_boundary_text
         or "런타임 Amazon ECR" not in full_boundary_text
@@ -773,7 +776,6 @@ def check() -> list[str]:
         or "MLOps IAM" not in full_boundary_text
         or "role + policy 2개 적용" not in full_boundary_text
         or "TRAINED_PENDING_HUMAN_REVIEW" not in full_boundary_text
-        or "자동 배포 없음" not in full_boundary_text
         or "검토 후 서비스 반영 · 미구현" not in full_boundary_text
         or full_spec.get("labelBackplates") is not True
         or full_svg_text.count('class="node-label-backdrop"') != len(full_nodes)
