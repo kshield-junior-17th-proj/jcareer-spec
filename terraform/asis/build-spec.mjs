@@ -765,7 +765,7 @@ ${commonCss}
     .flow-steps li { min-height: 38px; display: grid; grid-template-columns: 25px minmax(0, 1fr); align-items: center; gap: 9px; padding: 7px 2px; color: #364650; background: transparent; border-bottom: 1px solid var(--line); font-size: .76rem; font-weight: 700; }
     .flow-step__number { width: 22px; height: 22px; display: inline-grid; place-items: center; color: var(--accent); background: transparent; border: 1px solid rgba(189,77,30,.52); border-radius: 0; font: 800 10px/1 var(--mono); font-variant-numeric: tabular-nums; }
     .flow-detail__boundary { padding-top: 14px; border-top: 1px solid var(--line); }
-    .flow-detail__boundary p { margin: 0; color: #59666e; font-size: .78rem; line-height: 1.6; }
+    .flow-detail__boundary p { margin: 0; color: #59666e; font-size: .78rem; line-height: 1.6; overflow-wrap: anywhere; word-break: break-word; }
     .flow-detail__link { display: inline-flex; align-items: center; margin-top: 13px; padding-bottom: 2px; color: var(--ink); border-bottom: 2px solid var(--accent); font-size: .78rem; font-weight: 800; text-decoration: none; transition: color .18s, border-color .18s; }
     .flow-detail__link::after { content: ' →'; margin-left: 4px; }
     .flow-detail__link:hover { color: var(--accent); border-color: var(--accent); }
