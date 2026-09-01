@@ -23,7 +23,7 @@ DIAGRAMS = {
         "status": "TARGET_EVIDENCE_PIPELINE_PARTIALLY_IMPLEMENTED_EXECUTION_PENDING",
         "nodes": 14,
         "edges": 14,
-        "motion": 8,
+        "motion": 0,
     },
     "JCAREER_ENTERPRISE_TOBE_TARGET": {
         "status": "PLANNED_NOT_DEPLOYED_APPROVAL_GATED",
@@ -57,7 +57,7 @@ class AiSecurityDiagramContract(unittest.TestCase):
                 self.assertEqual(len(spec["nodes"]), expected["nodes"])
                 self.assertEqual(len(spec["edges"]), expected["edges"])
                 self.assertEqual(
-                    sum(len(journey["hops"]) for journey in spec["journeys"]),
+                    sum(len(journey["hops"]) for journey in spec.get("journeys", [])),
                     expected["motion"],
                 )
                 self.assertEqual(svg.count("<animateMotion "), expected["motion"])
@@ -68,6 +68,15 @@ class AiSecurityDiagramContract(unittest.TestCase):
                 self.assertIn(f'data-spec-sha256="{digest}"', svg)
                 ET.fromstring(svg)
                 self.assertEqual(png_dimensions(png_path), (1800, 980))
+
+                if stem == "JCAREER_ASSESSMENT_EVIDENCE":
+                    labels = {node["label"]: node["sub"] for node in spec["nodes"]}
+                    self.assertEqual(labels["Prowler AWS·LLM"], "UNRUN · 진단의 20~25%")
+                    self.assertIn("UNRUN", labels["MLOps 실행 기록"])
+                    self.assertIn("UNWIRED", labels["Source Adapters"])
+                    self.assertIn("UNWIRED", labels["Evidence Desk"])
+                    self.assertTrue(all(edge.get("static") is True for edge in spec["edges"]))
+                    self.assertIn("통합 미실행", spec["subtitle"] + spec["footer"])
 
     def test_editable_drawio_has_three_bound_2400_by_1400_pages(self) -> None:
         tree = ET.parse(ASSETS / "JCAREER_AI_SECURITY_FLOWS.drawio")
@@ -87,6 +96,12 @@ class AiSecurityDiagramContract(unittest.TestCase):
             self.assertTrue(
                 all(edge.get("source") in ids and edge.get("target") in ids for edge in edges)
             )
+            if page.get("name") == "2-assessment-evidence":
+                visible = " ".join(cell.get("value", "") for cell in cells)
+                self.assertIn("통합 미실행", visible)
+                self.assertIn("UNRUN", visible)
+                self.assertIn("UNWIRED", visible)
+                self.assertTrue(all("dashed=1" in edge.get("style", "") for edge in edges))
         drawio = (ASSETS / "JCAREER_AI_SECURITY_FLOWS.drawio").read_text(encoding="utf-8")
         for icon in ("cloudfront", "api_gateway", "lambda", "bedrock", "fargate", "rds", "elasticache"):
             self.assertIn(f"mxgraph.aws4.{icon}", drawio)
@@ -103,6 +118,12 @@ class AiSecurityDiagramContract(unittest.TestCase):
         self.assertIn("APPLY · LIVE SMOKE NOT RUN", section.group())
         self.assertNotIn("GITHUB E2E PASS", section.group())
         self.assertIn("TO-BE NOT DEPLOYED", section.group())
+        self.assertIn("LATEST_SOURCE_SHA=b7b44a4", section.group())
+        self.assertIn("PLAN_RUN=33522434817", section.group())
+        self.assertIn("LAST_OBSERVED_DEPLOYMENT_SHA=7a5acfb", section.group())
+        self.assertIn("HISTORICAL_RUN=33466745822", section.group())
+        self.assertNotIn("DEPLOYED_LIVE_SMOKE_PASS_RELOCKED", page)
+        self.assertNotIn("PRODUCTION_SERVERLESS_E2E_PASS", page)
 
 
 if __name__ == "__main__":

@@ -164,7 +164,7 @@ const architectureFlows = {
       { label: '공통 포맷 → 비식별화 → 사람 승인 → Evidence Desk' },
       { label: 'ECS·RDS·Redis·2-AZ는 미배포 TO-BE 도면으로 분리' }
     ],
-    boundary: '최신 main 1592505는 GitHub Actions validate·plan까지만 확인됐으며 apply와 live smoke는 실행되지 않았습니다. Pages publish는 AWS apply와 별도입니다. ECS·RDS·Redis·NAT·WAF·2-AZ 목표는 AWS 비접속 plan 기반이며 현재 서버리스 실행면의 배포 자원으로 표시하지 않습니다.'
+    boundary: 'LATEST_SOURCE_SHA=b7b44a4 · PLAN_RUN=33522434817 · PLAN_AT=2026-09-01T23:56:13+09:00. apply와 live smoke는 실행되지 않았습니다. LAST_OBSERVED_DEPLOYMENT_SHA=7a5acfb · HISTORICAL_RUN=33466745822 · OBSERVED_AT=2026-09-01T12:56:38+09:00과 구분합니다. Pages publish는 AWS apply와 별도이며 기업 TO-BE는 AWS 비접속 plan입니다.'
   },
   candidate: {
     title: '구직자 공고 추천',
@@ -207,7 +207,7 @@ const architectureFlows = {
       { label: 'Capability Broker가 exact model만 허용', x: 1600, y: 290 },
       { label: '현재 SHA apply·Bedrock E2E smoke 대기', x: 1750, y: 290 }
     ],
-    boundary: 'API Lambda→LLM Gateway Lambda→Capability Broker Lambda→Bedrock 경로는 소스와 Terraform에 구현됐지만 최신 main 1592505의 apply·live smoke는 실행되지 않았습니다. 과거 SHA의 성공 기록을 현재 배포 증거로 확대하지 않습니다.'
+    boundary: 'API Lambda→LLM Gateway Lambda→Capability Broker Lambda→Bedrock 경로는 소스와 Terraform에 구현됐습니다. LATEST_SOURCE_SHA=b7b44a4의 plan run 33522434817은 성공했지만 apply·live smoke는 미실행이며, LAST_OBSERVED_DEPLOYMENT_SHA=7a5acfb의 성공 기록과 분리합니다.'
   },
   mlops: {
     title: 'MLOps 학습·평가',
@@ -652,7 +652,7 @@ ${commonHead}
             <h2 id="production-assessment-title">실제로 확인할 것과 앞으로 만들 것을 세 장으로 분리합니다.</h2>
             <div class="production-slice__status"><span>LATEST MAIN PLAN PASS</span><span>APPLY · LIVE SMOKE NOT RUN</span><span>TO-BE NOT DEPLOYED</span></div>
           </div>
-          <div><p class="production-slice__copy">최신 <code>1592505</code>는 validate·saved plan까지만 확인됐습니다. 따라서 현재 도면은 Terraform과 런타임 소스에 구현된 실행면을 보여 주되, 같은 SHA의 apply와 live smoke 영수증 전에는 배포 완료라고 쓰지 않습니다. 과거 성공 전환 기록의 <code>QUEUE · DLQ · RETRY_PENDING 0</code>은 현재 SHA의 증거로 재사용하지 않습니다. Prowler·동적 LLM·MLOps·수기 점검은 별도 증적 흐름으로, ECS·RDS·Redis·2-AZ는 승인 전 목표로 분리합니다.</p><p><a class="button button--accent" href="production-transition.html">운영 전환 기록 보기</a></p></div>
+          <div><p class="production-slice__copy"><code>LATEST_SOURCE_SHA=b7b44a4</code>는 <code>PLAN_RUN=33522434817</code>·<code>PLAN_AT=2026-09-01T23:56:13+09:00</code>까지만 확인됐습니다. <code>LAST_OBSERVED_DEPLOYMENT_SHA=7a5acfb</code>·<code>HISTORICAL_RUN=33466745822</code>·<code>OBSERVED_AT=2026-09-01T12:56:38+09:00</code>의 과거 live smoke와 분리합니다. 과거 관찰의 <code>QUEUE · DLQ · RETRY_PENDING 0</code>도 최신 SHA의 증거로 재사용하지 않으며, 같은 SHA의 apply·smoke 영수증 전에는 최신 배포 완료라고 쓰지 않습니다. 진단·증적 통합도 아직 미실행입니다.</p><p><a class="button button--accent" href="production-transition.html">운영 전환 기록 보기</a></p></div>
         </div>
         <div class="diagram-trio">
           <article class="diagram-card">
@@ -878,7 +878,7 @@ ${commonCss}
           <p class="flow-detail__summary" id="flow-summary">사용자, 업무망·외부 SaaS, GitHub delivery, AWS 기준 런타임, LLM Gateway·Bedrock·OpenDART와 별도 MLOps를 연결 관계까지 한 장에서 봅니다.</p>
         </div>
         <div class="flow-detail__route"><strong>순서대로 읽는 단계</strong><ol class="flow-steps" id="flow-steps" aria-label="전체 인프라 단계별 경로">${flowStepItems('overview')}</ol></div>
-        <div class="flow-detail__boundary"><strong>상태 범위</strong><p id="flow-boundary">최신 main 1592505는 validate·saved plan까지만 확인됐으며 apply와 live smoke는 실행되지 않았습니다. 현재 서버리스 실행면과 ECS·RDS·Redis·NAT 2-AZ 목표는 서로 다른 도면입니다. MLOps runtime과 추천 연결도 실행 영수증 전에는 완료로 표시하지 않습니다.</p><a class="flow-detail__link" id="flow-detail-link" href="../../assets/JCAREER_AI_RUNTIME_ACTUAL.svg">현재 AI 실행면 보기</a></div>
+        <div class="flow-detail__boundary"><strong>상태 범위</strong><p id="flow-boundary">LATEST_SOURCE_SHA=b7b44a4의 plan run 33522434817은 성공했지만 apply와 live smoke는 실행되지 않았습니다. 마지막 관찰 배포 revision 7a5acfb·run 33466745822와 분리합니다. 현재 서버리스 실행면과 ECS·RDS·Redis·NAT 2-AZ 목표도 서로 다른 도면입니다.</p><a class="flow-detail__link" id="flow-detail-link" href="../../assets/JCAREER_AI_RUNTIME_ACTUAL.svg">현재 AI 실행면 보기</a></div>
       </article>
       <p class="flow-explorer__exclusion">Slack·Notion·SMTP는 AWS 밖의 업무도구 경계로 표시하며 기본 비활성·실전송 미확인입니다. Bedrock은 직접 호출과 end-to-end를 분리하고, OpenDART는 source-only·미배포로 표시합니다. TRACE·JC-RECEIPT는 실행 컴포넌트에서 제외하고 보조 설명에만 남깁니다.</p>
     </section>

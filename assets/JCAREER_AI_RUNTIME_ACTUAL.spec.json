@@ -5,7 +5,7 @@
   "labelBackplates": true,
   "source_of_truth": {
     "repository": "jcareer-aws-lab",
-    "revision": "1592505a647e285a460d18d08dca03e55aefe5aa",
+    "revision": "b7b44a46f075c1130b0aae1d4ce77201216ac6fd",
     "path": "terraform/production-serverless",
     "observed_on": "2026-09-01"
   },

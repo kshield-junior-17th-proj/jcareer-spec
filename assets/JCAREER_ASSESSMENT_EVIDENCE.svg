@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1800 980" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" role="img" aria-label="J-Career 진단·증적 흐름">
 <title>J-Career 진단·증적 흐름</title>
-<metadata id="jcareer-animated-source" data-spec-sha256="948aa604e650649f8733b1987739369ea298ea64fb5bbd8bea980b13c85080ef"/>
+<metadata id="jcareer-animated-source" data-spec-sha256="49f70e04a8ca7e002fb319095bcbe6556e5c7194a2844746c127afdad3541262"/>
 <defs>
 <pattern id="grid" width="34" height="34" patternUnits="userSpaceOnUse"><path d="M34 0 H0 V34" fill="none" stroke="#EAEFF6" stroke-width="1"/></pattern>
 <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9" fill="none" stroke="context-stroke" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></marker>
@@ -8,27 +8,27 @@
 </defs>
 <rect width="1800" height="980" fill="#FBFCFE"/><rect width="1800" height="980" fill="url(#grid)"/>
 <text x="40" y="46" font-size="21" font-weight="800" fill="#16202E">J-Career 진단·증적 흐름</text>
-<text x="40" y="68" font-size="12" fill="#5A6B7B">도구 관찰과 컨설턴트 판정을 분리하고 승인된 비식별 사본만 대시보드에 반입</text>
+<text x="40" y="68" font-size="12" fill="#5A6B7B">통합 미실행 · 도구 관찰과 컨설턴트 판정을 분리하는 승인 전 목표 흐름</text>
 <rect x="55" y="115" width="400" height="700" rx="12" fill="rgba(231,21,123,0.04)" stroke="#E7157B" stroke-width="1.5" stroke-dasharray="3 4"/>
 <text x="73" y="135" font-size="11" font-weight="700" fill="#B21667">원본 관찰 자료 · 원형 보존</text>
 <rect x="500" y="115" width="1040" height="700" rx="12" fill="rgba(0,164,166,0.045)" stroke="#00A4A6" stroke-width="1.5" stroke-dasharray="9 5"/>
 <text x="518" y="135" font-size="11" font-weight="700" fill="#0B7E7F">정규화·비식별·승인 경계</text>
 <rect x="1575" y="225" width="190" height="455" rx="12" fill="rgba(140,79,255,0.06)" stroke="#8C4FFF" stroke-width="1.5" stroke-dasharray="6 4"/>
 <text x="1593" y="245" font-size="11" font-weight="700" fill="#7C3AED">승인된 컨설턴트 열람면</text>
-<path class="flow" d="M 233.0 205.0 L 420.0 205.0 L 420.0 455.0 L 562.0 455.0" fill="none" stroke="#1D4ED8" stroke-width="2" marker-end="url(#ah)"/>
-<path class="flow" d="M 233.0 330.0 L 440.0 330.0 L 440.0 455.0 L 562.0 455.0" fill="none" stroke="#1D4ED8" stroke-width="2" marker-end="url(#ah)"/>
-<path class="flow" d="M 233.0 455.0 L 562.0 455.0" fill="none" stroke="#1D4ED8" stroke-width="2" marker-end="url(#ah)"/>
-<path class="flow" d="M 233.0 580.0 L 440.0 580.0 L 440.0 455.0 L 562.0 455.0" fill="none" stroke="#1D4ED8" stroke-width="2" marker-end="url(#ah)"/>
-<path class="flow" d="M 233.0 705.0 L 420.0 705.0 L 420.0 455.0 L 562.0 455.0" fill="none" stroke="#1D4ED8" stroke-width="2" marker-end="url(#ah)"/>
-<path class="flow" d="M 608.0 455.0 L 777.0 455.0" fill="none" stroke="#1D4ED8" stroke-width="2" marker-end="url(#ah)"/>
-<path class="flow" d="M 823.0 455.0 L 992.0 455.0" fill="none" stroke="#1D4ED8" stroke-width="2" marker-end="url(#ah)"/>
-<path class="flow" d="M 1038.0 455.0 L 1207.0 455.0" fill="none" stroke="#1D4ED8" stroke-width="2" marker-end="url(#ah)"/>
-<path class="flow" d="M 1253.0 455.0 L 1412.0 455.0" fill="none" stroke="#1D4ED8" stroke-width="2" marker-end="url(#ah)"/>
-<path class="flow" d="M 1458.0 455.0 L 1647.0 455.0" fill="none" stroke="#1D4ED8" stroke-width="2" marker-end="url(#ah)"/>
-<path class="flow" d="M 608.0 455.0 L 585.0 625.0 L 700.0 625.0 L 677.0 710.0" fill="none" stroke="#0369A1" stroke-width="2" marker-end="url(#ah)"/>
-<path class="flow" d="M 1038.0 455.0 L 992.0 710.0" fill="none" stroke="#0369A1" stroke-width="2" marker-end="url(#ah)"/>
-<path class="flow" d="M 1253.0 455.0 L 1230.0 620.0 L 1435.0 620.0 L 1412.0 710.0" fill="none" stroke="#7E22CE" stroke-width="2" marker-end="url(#ah)"/>
-<path class="flow" d="M 1458.0 455.0 L 1412.0 710.0" fill="none" stroke="#7E22CE" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M 233.0 205.0 L 420.0 205.0 L 420.0 455.0 L 562.0 455.0" fill="none" stroke="#1D4ED8" stroke-width="1.4" stroke-dasharray="2 5" opacity="0.7"/>
+<path d="M 233.0 330.0 L 440.0 330.0 L 440.0 455.0 L 562.0 455.0" fill="none" stroke="#1D4ED8" stroke-width="1.4" stroke-dasharray="2 5" opacity="0.7"/>
+<path d="M 233.0 455.0 L 562.0 455.0" fill="none" stroke="#1D4ED8" stroke-width="1.4" stroke-dasharray="2 5" opacity="0.7"/>
+<path d="M 233.0 580.0 L 440.0 580.0 L 440.0 455.0 L 562.0 455.0" fill="none" stroke="#1D4ED8" stroke-width="1.4" stroke-dasharray="2 5" opacity="0.7"/>
+<path d="M 233.0 705.0 L 420.0 705.0 L 420.0 455.0 L 562.0 455.0" fill="none" stroke="#1D4ED8" stroke-width="1.4" stroke-dasharray="2 5" opacity="0.7"/>
+<path d="M 608.0 455.0 L 777.0 455.0" fill="none" stroke="#1D4ED8" stroke-width="1.4" stroke-dasharray="2 5" opacity="0.7"/>
+<path d="M 823.0 455.0 L 992.0 455.0" fill="none" stroke="#1D4ED8" stroke-width="1.4" stroke-dasharray="2 5" opacity="0.7"/>
+<path d="M 1038.0 455.0 L 1207.0 455.0" fill="none" stroke="#1D4ED8" stroke-width="1.4" stroke-dasharray="2 5" opacity="0.7"/>
+<path d="M 1253.0 455.0 L 1412.0 455.0" fill="none" stroke="#1D4ED8" stroke-width="1.4" stroke-dasharray="2 5" opacity="0.7"/>
+<path d="M 1458.0 455.0 L 1647.0 455.0" fill="none" stroke="#1D4ED8" stroke-width="1.4" stroke-dasharray="2 5" opacity="0.7"/>
+<path d="M 608.0 455.0 L 585.0 625.0 L 700.0 625.0 L 677.0 710.0" fill="none" stroke="#0369A1" stroke-width="1.4" stroke-dasharray="2 5" opacity="0.7"/>
+<path d="M 1038.0 455.0 L 992.0 710.0" fill="none" stroke="#0369A1" stroke-width="1.4" stroke-dasharray="2 5" opacity="0.7"/>
+<path d="M 1253.0 455.0 L 1230.0 620.0 L 1435.0 620.0 L 1412.0 710.0" fill="none" stroke="#7E22CE" stroke-width="1.4" stroke-dasharray="2 5" opacity="0.7"/>
+<path d="M 1458.0 455.0 L 1412.0 710.0" fill="none" stroke="#7E22CE" stroke-width="1.4" stroke-dasharray="2 5" opacity="0.7"/>
 <rect x="676" y="432" width="28" height="14" rx="3" fill="#FBFCFE" opacity="0.92"/>
 <text x="690" y="442" text-anchor="middle" font-size="9.5" fill="#48586a">map</text>
 <rect x="874" y="432" width="67" height="14" rx="3" fill="#FBFCFE" opacity="0.92"/>
@@ -43,17 +43,9 @@
 <text x="645" y="615" text-anchor="middle" font-size="9.5" fill="#48586a">preserve</text>
 <rect x="1066" y="620" width="48" height="14" rx="3" fill="#FBFCFE" opacity="0.92"/>
 <text x="1090" y="630" text-anchor="middle" font-size="9.5" fill="#48586a">digest</text>
-<circle class="motion-dot" r="4" fill="#1D4ED8"><animateMotion dur="6.2s" begin="0.00s" repeatCount="indefinite" path="M 233.0 455.0 L 562.0 455.0"/></circle>
-<circle class="motion-dot" r="4" fill="#1D4ED8"><animateMotion dur="6.2s" begin="-1.03s" repeatCount="indefinite" path="M 608.0 455.0 L 777.0 455.0"/></circle>
-<circle class="motion-dot" r="4" fill="#1D4ED8"><animateMotion dur="6.2s" begin="-2.07s" repeatCount="indefinite" path="M 823.0 455.0 L 992.0 455.0"/></circle>
-<circle class="motion-dot" r="4" fill="#1D4ED8"><animateMotion dur="6.2s" begin="-3.10s" repeatCount="indefinite" path="M 1038.0 455.0 L 1207.0 455.0"/></circle>
-<circle class="motion-dot" r="4" fill="#1D4ED8"><animateMotion dur="6.2s" begin="-4.13s" repeatCount="indefinite" path="M 1253.0 455.0 L 1412.0 455.0"/></circle>
-<circle class="motion-dot" r="4" fill="#1D4ED8"><animateMotion dur="6.2s" begin="-5.17s" repeatCount="indefinite" path="M 1458.0 455.0 L 1647.0 455.0"/></circle>
-<circle class="motion-dot" r="4" fill="#0369A1"><animateMotion dur="3.0s" begin="0.00s" repeatCount="indefinite" path="M 608.0 455.0 L 585.0 625.0 L 700.0 625.0 L 677.0 710.0"/></circle>
-<circle class="motion-dot" r="4" fill="#7E22CE"><animateMotion dur="3.2s" begin="0.00s" repeatCount="indefinite" path="M 1253.0 455.0 L 1230.0 620.0 L 1435.0 620.0 L 1412.0 710.0"/></circle>
-<rect x="187.0" y="182.0" width="46" height="46" rx="8" fill="#475569"/><circle cx="207" cy="202" r="8" fill="none" stroke="#fff" stroke-width="2.6"/><line x1="213" y1="208" x2="220" y2="215" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/><rect class="node-label-backdrop" data-node-label="prowler_aws" x="160.5" y="233.0" width="99" height="31" rx="5" fill="#FBFCFE" fill-opacity="0.94"/><text x="210" y="243" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">Prowler AWS</text><text x="210" y="256" text-anchor="middle" font-size="9.5" fill="#5A6B7B">OCSF · 후순위 실행</text>
-<rect x="187.0" y="307.0" width="46" height="46" rx="8" fill="#475569"/><circle cx="207" cy="327" r="8" fill="none" stroke="#fff" stroke-width="2.6"/><line x1="213" y1="333" x2="220" y2="340" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/><rect class="node-label-backdrop" data-node-label="prowler_llm" x="164.0" y="358.0" width="92" height="31" rx="5" fill="#FBFCFE" fill-opacity="0.94"/><text x="210" y="368" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">Prowler LLM</text><text x="210" y="381" text-anchor="middle" font-size="9.5" fill="#5A6B7B">도구 원본</text>
-<rect x="187.0" y="432.0" width="46" height="46" rx="8" fill="#475569"/><circle cx="207" cy="452" r="8" fill="none" stroke="#fff" stroke-width="2.6"/><line x1="213" y1="458" x2="220" y2="465" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/><rect class="node-label-backdrop" data-node-label="dynamic_llm" x="151.0" y="483.0" width="118" height="31" rx="5" fill="#FBFCFE" fill-opacity="0.94"/><text x="210" y="493" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">동적 LLM 시험</text><text x="210" y="506" text-anchor="middle" font-size="9.5" fill="#5A6B7B">실제 API·Gateway 경로</text>
+<rect x="187.0" y="182.0" width="46" height="46" rx="8" fill="#475569"/><circle cx="207" cy="202" r="8" fill="none" stroke="#fff" stroke-width="2.6"/><line x1="213" y1="208" x2="220" y2="215" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/><rect class="node-label-backdrop" data-node-label="prowler_aws" x="149.0" y="233.0" width="122" height="31" rx="5" fill="#FBFCFE" fill-opacity="0.94"/><text x="210" y="243" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">Prowler AWS·LLM</text><text x="210" y="256" text-anchor="middle" font-size="9.5" fill="#5A6B7B">UNRUN · 진단의 20~25%</text>
+<rect x="187.0" y="307.0" width="46" height="46" rx="8" fill="#475569"/><circle cx="207" cy="327" r="8" fill="none" stroke="#fff" stroke-width="2.6"/><line x1="213" y1="333" x2="220" y2="340" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/><rect class="node-label-backdrop" data-node-label="prowler_llm" x="132.0" y="358.0" width="156" height="31" rx="5" fill="#FBFCFE" fill-opacity="0.94"/><text x="210" y="368" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">Gateway·아키텍처 리뷰</text><text x="210" y="381" text-anchor="middle" font-size="9.5" fill="#5A6B7B">PENDING · 소스·권한·경계</text>
+<rect x="187.0" y="432.0" width="46" height="46" rx="8" fill="#475569"/><circle cx="207" cy="452" r="8" fill="none" stroke="#fff" stroke-width="2.6"/><line x1="213" y1="458" x2="220" y2="465" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/><rect class="node-label-backdrop" data-node-label="dynamic_llm" x="137.5" y="483.0" width="145" height="31" rx="5" fill="#FBFCFE" fill-opacity="0.94"/><text x="210" y="493" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">동적 LLM 시험</text><text x="210" y="506" text-anchor="middle" font-size="9.5" fill="#5A6B7B">PENDING · 실제 API·Gateway</text>
 <g transform="translate(187.00,557.00) scale(0.7188)">
 
 
@@ -63,8 +55,8 @@
         </g>
         <path d="M22.6794094,52 L13.5740701,52 L23.8376189,30.41 L28.3997494,39.861 L22.6794094,52 Z M24.7269406,27.667 C24.5606285,27.321 24.2120702,27.103 23.8306478,27.103 L23.8276601,27.103 C23.4452418,27.104 23.0966835,27.325 22.9323632,27.672 L11.0973143,52.569 C10.9499239,52.879 10.9708374,53.243 11.1540795,53.534 C11.3353298,53.824 11.6540117,54 11.9955989,54 L23.309802,54 C23.695208,54 24.0447622,53.777 24.2100784,53.428 L30.4044577,40.284 C30.5329264,40.01 30.5319305,39.692 30.3994783,39.42 L24.7269406,27.667 Z M51.0082382,52 L41.985557,52 L26.9547262,19.578 C26.7914017,19.226 26.4388599,19 26.0524581,19 L20.1279625,19 L20.1349337,12 L31.8146251,12 L46.7747483,44.42 C46.9380728,44.774 47.2906147,45 47.6790082,45 L51.0082382,45 L51.0082382,52 Z M52.0041191,43 L48.3143803,43 L33.354257,10.58 C33.1909326,10.226 32.8383907,10 32.450993,10 L19.1400486,10 C18.5913182,10 18.1451636,10.447 18.1441677,10.999 L18.1362006,19.999 C18.1362006,20.265 18.2407681,20.519 18.4269979,20.707 C18.6142235,20.895 18.8671772,21 19.1310857,21 L25.4170861,21 L40.4479168,53.422 C40.6112413,53.774 40.9627873,54 41.350185,54 L52.0041191,54 C52.5548412,54 53,53.552 53,53 L53,44 C53,43.448 52.5548412,43 52.0041191,43 L52.0041191,43 Z" id="lambda__AWS-Lambda_Icon_48_Squid" fill="#FFFFFF"></path>
     </g>
-</g><rect class="node-label-backdrop" data-node-label="mlops_receipt" x="154.0" y="608.0" width="112" height="31" rx="5" fill="#FBFCFE" fill-opacity="0.94"/><text x="210" y="618" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">MLOps 실행 기록</text><text x="210" y="631" text-anchor="middle" font-size="9.5" fill="#5A6B7B">receipt · 모델 해시</text>
-<rect x="187.0" y="682.0" width="46" height="46" rx="8" fill="#475569"/><circle cx="207" cy="702" r="8" fill="none" stroke="#fff" stroke-width="2.6"/><line x1="213" y1="708" x2="220" y2="715" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/><rect class="node-label-backdrop" data-node-label="manual_review" x="144.5" y="733.0" width="131" height="31" rx="5" fill="#FBFCFE" fill-opacity="0.94"/><text x="210" y="743" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">아키텍처·수기 점검</text><text x="210" y="756" text-anchor="middle" font-size="9.5" fill="#5A6B7B">질문·설정·인터뷰</text>
+</g><rect class="node-label-backdrop" data-node-label="mlops_receipt" x="153.5" y="608.0" width="113" height="31" rx="5" fill="#FBFCFE" fill-opacity="0.94"/><text x="210" y="618" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">MLOps 실행 기록</text><text x="210" y="631" text-anchor="middle" font-size="9.5" fill="#5A6B7B">UNRUN · receipt 없음</text>
+<rect x="187.0" y="682.0" width="46" height="46" rx="8" fill="#475569"/><circle cx="207" cy="702" r="8" fill="none" stroke="#fff" stroke-width="2.6"/><line x1="213" y1="708" x2="220" y2="715" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/><rect class="node-label-backdrop" data-node-label="manual_review" x="138.0" y="733.0" width="144" height="31" rx="5" fill="#FBFCFE" fill-opacity="0.94"/><text x="210" y="743" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">데이터·거버넌스 점검</text><text x="210" y="756" text-anchor="middle" font-size="9.5" fill="#5A6B7B">PENDING · 질문·승인·책임</text>
 <g transform="translate(562.00,432.00) scale(0.7188)">
 
 
@@ -74,7 +66,7 @@
         </g>
         <path d="M22.6794094,52 L13.5740701,52 L23.8376189,30.41 L28.3997494,39.861 L22.6794094,52 Z M24.7269406,27.667 C24.5606285,27.321 24.2120702,27.103 23.8306478,27.103 L23.8276601,27.103 C23.4452418,27.104 23.0966835,27.325 22.9323632,27.672 L11.0973143,52.569 C10.9499239,52.879 10.9708374,53.243 11.1540795,53.534 C11.3353298,53.824 11.6540117,54 11.9955989,54 L23.309802,54 C23.695208,54 24.0447622,53.777 24.2100784,53.428 L30.4044577,40.284 C30.5329264,40.01 30.5319305,39.692 30.3994783,39.42 L24.7269406,27.667 Z M51.0082382,52 L41.985557,52 L26.9547262,19.578 C26.7914017,19.226 26.4388599,19 26.0524581,19 L20.1279625,19 L20.1349337,12 L31.8146251,12 L46.7747483,44.42 C46.9380728,44.774 47.2906147,45 47.6790082,45 L51.0082382,45 L51.0082382,52 Z M52.0041191,43 L48.3143803,43 L33.354257,10.58 C33.1909326,10.226 32.8383907,10 32.450993,10 L19.1400486,10 C18.5913182,10 18.1451636,10.447 18.1441677,10.999 L18.1362006,19.999 C18.1362006,20.265 18.2407681,20.519 18.4269979,20.707 C18.6142235,20.895 18.8671772,21 19.1310857,21 L25.4170861,21 L40.4479168,53.422 C40.6112413,53.774 40.9627873,54 41.350185,54 L52.0041191,54 C52.5548412,54 53,53.552 53,53 L53,44 C53,43.448 52.5548412,43 52.0041191,43 L52.0041191,43 Z" id="lambda__AWS-Lambda_Icon_48_Squid__2" fill="#FFFFFF"></path>
     </g>
-</g><rect class="node-label-backdrop" data-node-label="adapter" x="524.5" y="483.0" width="121" height="31" rx="5" fill="#FBFCFE" fill-opacity="0.94"/><text x="585" y="493" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">Source Adapters</text><text x="585" y="506" text-anchor="middle" font-size="9.5" fill="#5A6B7B">원본별 필드 매핑</text>
+</g><rect class="node-label-backdrop" data-node-label="adapter" x="523.0" y="483.0" width="124" height="31" rx="5" fill="#FBFCFE" fill-opacity="0.94"/><text x="585" y="493" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">Source Adapters</text><text x="585" y="506" text-anchor="middle" font-size="9.5" fill="#5A6B7B">UNWIRED · 변환기 미연결</text>
 <g transform="translate(677.00,687.00) scale(0.7188)">
 
 
@@ -87,7 +79,7 @@
         </g>
     </g>
 </g><rect class="node-label-backdrop" data-node-label="originals" x="632.5" y="738.0" width="135" height="31" rx="5" fill="#FBFCFE" fill-opacity="0.94"/><text x="700" y="748" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">Private Originals</text><text x="700" y="761" text-anchor="middle" font-size="9.5" fill="#5A6B7B">변경 금지 · 접근 제한</text>
-<rect x="777.0" y="432.0" width="46" height="46" rx="8" fill="#64748B"/><circle cx="800" cy="455" r="7" fill="none" stroke="#fff" stroke-width="2.4"/><circle cx="800" cy="455" r="1.8" fill="#fff"/><rect class="node-label-backdrop" data-node-label="common" x="733.0" y="483.0" width="134" height="31" rx="5" fill="#FBFCFE" fill-opacity="0.94"/><text x="800" y="493" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">J-Career 공통 포맷</text><text x="800" y="506" text-anchor="middle" font-size="9.5" fill="#5A6B7B">finding-v1</text>
+<rect x="777.0" y="432.0" width="46" height="46" rx="8" fill="#64748B"/><circle cx="800" cy="455" r="7" fill="none" stroke="#fff" stroke-width="2.4"/><circle cx="800" cy="455" r="1.8" fill="#fff"/><rect class="node-label-backdrop" data-node-label="common" x="733.0" y="483.0" width="134" height="31" rx="5" fill="#FBFCFE" fill-opacity="0.94"/><text x="800" y="493" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">J-Career 공통 포맷</text><text x="800" y="506" text-anchor="middle" font-size="9.5" fill="#5A6B7B">TARGET · NOT EXECUTED</text>
 <g transform="translate(992.00,432.00) scale(0.7188)">
 
 
@@ -97,8 +89,8 @@
         </g>
         <path d="M22.6794094,52 L13.5740701,52 L23.8376189,30.41 L28.3997494,39.861 L22.6794094,52 Z M24.7269406,27.667 C24.5606285,27.321 24.2120702,27.103 23.8306478,27.103 L23.8276601,27.103 C23.4452418,27.104 23.0966835,27.325 22.9323632,27.672 L11.0973143,52.569 C10.9499239,52.879 10.9708374,53.243 11.1540795,53.534 C11.3353298,53.824 11.6540117,54 11.9955989,54 L23.309802,54 C23.695208,54 24.0447622,53.777 24.2100784,53.428 L30.4044577,40.284 C30.5329264,40.01 30.5319305,39.692 30.3994783,39.42 L24.7269406,27.667 Z M51.0082382,52 L41.985557,52 L26.9547262,19.578 C26.7914017,19.226 26.4388599,19 26.0524581,19 L20.1279625,19 L20.1349337,12 L31.8146251,12 L46.7747483,44.42 C46.9380728,44.774 47.2906147,45 47.6790082,45 L51.0082382,45 L51.0082382,52 Z M52.0041191,43 L48.3143803,43 L33.354257,10.58 C33.1909326,10.226 32.8383907,10 32.450993,10 L19.1400486,10 C18.5913182,10 18.1451636,10.447 18.1441677,10.999 L18.1362006,19.999 C18.1362006,20.265 18.2407681,20.519 18.4269979,20.707 C18.6142235,20.895 18.8671772,21 19.1310857,21 L25.4170861,21 L40.4479168,53.422 C40.6112413,53.774 40.9627873,54 41.350185,54 L52.0041191,54 C52.5548412,54 53,53.552 53,53 L53,44 C53,43.448 52.5548412,43 52.0041191,43 L52.0041191,43 Z" id="lambda__AWS-Lambda_Icon_48_Squid__3" fill="#FFFFFF"></path>
     </g>
-</g><rect class="node-label-backdrop" data-node-label="deid" x="949.5" y="483.0" width="131" height="31" rx="5" fill="#FBFCFE" fill-opacity="0.94"/><text x="1015" y="493" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">비식별화·해시 결속</text><text x="1015" y="506" text-anchor="middle" font-size="9.5" fill="#5A6B7B">ID·ARN·본문 제거</text>
-<rect x="1207.0" y="432.0" width="46" height="46" rx="8" fill="#475569"/><circle cx="1227" cy="452" r="8" fill="none" stroke="#fff" stroke-width="2.6"/><line x1="1233" y1="458" x2="1240" y2="465" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/><rect class="node-label-backdrop" data-node-label="reviewer" x="1173.0" y="483.0" width="114" height="31" rx="5" fill="#FBFCFE" fill-opacity="0.94"/><text x="1230" y="493" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">담당자 사람 승인</text><text x="1230" y="506" text-anchor="middle" font-size="9.5" fill="#5A6B7B">사실·한계·판정 검토</text>
+</g><rect class="node-label-backdrop" data-node-label="deid" x="949.5" y="483.0" width="131" height="31" rx="5" fill="#FBFCFE" fill-opacity="0.94"/><text x="1015" y="493" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">비식별화·해시 결속</text><text x="1015" y="506" text-anchor="middle" font-size="9.5" fill="#5A6B7B">TARGET · NOT EXECUTED</text>
+<rect x="1207.0" y="432.0" width="46" height="46" rx="8" fill="#475569"/><circle cx="1227" cy="452" r="8" fill="none" stroke="#fff" stroke-width="2.6"/><line x1="1233" y1="458" x2="1240" y2="465" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/><rect class="node-label-backdrop" data-node-label="reviewer" x="1169.5" y="483.0" width="121" height="31" rx="5" fill="#FBFCFE" fill-opacity="0.94"/><text x="1230" y="493" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">담당자 사람 승인</text><text x="1230" y="506" text-anchor="middle" font-size="9.5" fill="#5A6B7B">TARGET · NOT EXECUTED</text>
 <g transform="translate(1412.00,432.00) scale(0.7188)">
 
 
@@ -110,8 +102,8 @@
             <path d="M36.759,23.948 L36.993,22.131 C39.166,23.385 39.842,24.121 40.037,24.424 C39.713,24.485 38.832,24.509 36.759,23.948 L36.759,23.948 Z M19.5,11 C9.125,11 2.382,8.488 2,6.696 L2,6.511 C2.349,5.392 8.14,2 19.5,2 C30.84,2 36.632,5.381 37,6.505 L37,6.616 C36.724,8.446 29.961,11 19.5,11 L19.5,11 Z M34.818,23.362 C30.053,21.797 23.912,18.979 21.594,17.888 C21.535,16.786 20.628,15.906 19.512,15.906 C18.358,15.906 17.418,16.845 17.418,18 C17.418,19.154 18.358,20.094 19.512,20.094 C19.969,20.094 20.389,19.942 20.733,19.693 C23.132,20.822 29.619,23.798 34.558,25.38 L32.837,38.724 C32.583,40.352 27.919,42 19.497,42 C11.072,42 6.405,40.352 6.155,38.751 L2.435,9.814 C5.945,11.915 12.749,13 19.5,13 C26.25,13 33.054,11.915 36.565,9.815 L34.818,23.362 Z M39,6.5 C39,3.431 30.661,0 19.5,0 C8.339,0 -3.55271368e-15,3.431 -3.55271368e-15,6.5 L-3.55271368e-15,7.043 L4.174,39.033 C4.875,43.516 15.123,44 19.497,44 C23.869,44 34.113,43.516 34.818,39.007 L36.501,25.947 C37.778,26.279 38.812,26.456 39.616,26.455 C40.606,26.455 41.273,26.203 41.697,25.697 C42.047,25.281 42.185,24.756 42.085,24.221 C41.857,23 40.403,21.712 37.37,20.044 L37.27,19.989 L39,7.044 L39,6.5 Z" id="s3__Amazon-Simple-Storage-Service-Icon_48_Squid__2"></path>
         </g>
     </g>
-</g><rect class="node-label-backdrop" data-node-label="approved" x="1367.5" y="483.0" width="135" height="31" rx="5" fill="#FBFCFE" fill-opacity="0.94"/><text x="1435" y="493" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">Approved Snapshot</text><text x="1435" y="506" text-anchor="middle" font-size="9.5" fill="#5A6B7B">서명·만료·회수</text>
-<rect x="1647.0" y="432.0" width="46" height="46" rx="8" fill="#475569"/><circle cx="1667" cy="452" r="8" fill="none" stroke="#fff" stroke-width="2.6"/><line x1="1673" y1="458" x2="1680" y2="465" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/><rect class="node-label-backdrop" data-node-label="desk" x="1617.0" y="483.0" width="106" height="31" rx="5" fill="#FBFCFE" fill-opacity="0.94"/><text x="1670" y="493" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">Evidence Desk</text><text x="1670" y="506" text-anchor="middle" font-size="9.5" fill="#5A6B7B">읽기 전용 대시보드</text>
+</g><rect class="node-label-backdrop" data-node-label="approved" x="1367.5" y="483.0" width="135" height="31" rx="5" fill="#FBFCFE" fill-opacity="0.94"/><text x="1435" y="493" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">Approved Snapshot</text><text x="1435" y="506" text-anchor="middle" font-size="9.5" fill="#5A6B7B">NOT CREATED</text>
+<rect x="1647.0" y="432.0" width="46" height="46" rx="8" fill="#475569"/><circle cx="1667" cy="452" r="8" fill="none" stroke="#fff" stroke-width="2.6"/><line x1="1673" y1="458" x2="1680" y2="465" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/><rect class="node-label-backdrop" data-node-label="desk" x="1601.5" y="483.0" width="137" height="31" rx="5" fill="#FBFCFE" fill-opacity="0.94"/><text x="1670" y="493" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">Evidence Desk</text><text x="1670" y="506" text-anchor="middle" font-size="9.5" fill="#5A6B7B">UNWIRED · 운영 호스팅 없음</text>
 <g transform="translate(992.00,687.00) scale(0.7188)">
 
 
@@ -141,5 +133,5 @@
 <circle cx="92" cy="900" r="5" fill="#1D4ED8"/><text x="102" y="904" font-size="10.5" fill="#5A6B7B">request →</text>
 <circle cx="185" cy="900" r="5" fill="#0369A1"/><text x="195" y="904" font-size="10.5" fill="#5A6B7B">tools/memory</text>
 <circle cx="299" cy="900" r="5" fill="#7E22CE"/><text x="309" y="904" font-size="10.5" fill="#5A6B7B">ambient</text>
-<text x="40" y="926" font-size="10" fill="#5A6B7B">observation.status와 assessment.status를 분리하며, Prowler FAIL을 자동으로 취약 판정하지 않음. 원본 AWS에 브라우저가 직접 연결하지 않음.</text>
+<text x="40" y="926" font-size="10" fill="#5A6B7B">통합 미실행 · Prowler/MLOps UNRUN · Adapters/Evidence Desk UNWIRED. 점선은 승인 전 목표 연결이며 실행 증거가 아님.</text>
 </svg>

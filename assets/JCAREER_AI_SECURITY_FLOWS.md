@@ -4,7 +4,7 @@
 
 | 도면 | 포함 범위 | 상태 경계 |
 |---|---|---|
-| [현재 AI 서비스 실행면](JCAREER_AI_RUNTIME_ACTUAL.svg) | CloudFront, S3 Web, Cognito, API Gateway, API·Agent·Gateway·Broker Lambda, SQS·DLQ, DynamoDB, Evidence S3, CloudWatch, Bedrock | 소스 구현. 최신 main `1592505`는 plan까지만 확인했으며 apply·live smoke 미실행 |
+| [현재 AI 서비스 실행면](JCAREER_AI_RUNTIME_ACTUAL.svg) | CloudFront, S3 Web, Cognito, API Gateway, API·Agent·Gateway·Broker Lambda, SQS·DLQ, DynamoDB, Evidence S3, CloudWatch, Bedrock | 최신 소스 `b7b44a4`, plan run `33522434817` 성공. apply·live smoke는 미실행. 마지막 관찰 배포는 별도 revision `7a5acfb`, run `33466745822` |
 | [진단·증적 흐름](JCAREER_ASSESSMENT_EVIDENCE.svg) | Prowler AWS/LLM, 동적 LLM 시험, MLOps receipt, 수기 점검, 공통 포맷, 비식별화, 사람 승인, Evidence Desk | 부분 소스. 실제 통합 실행·승인 snapshot 미확인 |
 | [기업 TO-BE 목표](JCAREER_ENTERPRISE_TOBE_TARGET.svg) | WAF, ALB, ECS Fargate, RDS PostgreSQL, ElastiCache Redis, NAT, 2-AZ, S3, CloudWatch, Bedrock | 승인 전 미배포 목표. 현재 서버리스 실행면의 리소스로 주장하지 않음 |
 
