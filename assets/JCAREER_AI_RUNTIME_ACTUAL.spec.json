@@ -1,0 +1,63 @@
+{
+  "title": "J-Career 현재 AI 서비스 실행면",
+  "subtitle": "production-serverless 소스 기준 · 현재 계정 apply/smoke 영수증 확인 전",
+  "canvas": { "w": 1800, "h": 980 },
+  "labelBackplates": true,
+  "source_of_truth": {
+    "repository": "jcareer-aws-lab",
+    "revision": "1592505a647e285a460d18d08dca03e55aefe5aa",
+    "path": "terraform/production-serverless",
+    "observed_on": "2026-09-01"
+  },
+  "status": "SOURCE_IMPLEMENTED_CURRENT_ACCOUNT_APPLY_SMOKE_UNVERIFIED",
+  "groups": [
+    { "kind": "region", "label": "AWS Seoul · 저비용 서버리스 실행면", "x": 245, "y": 110, "w": 1510, "h": 735 },
+    { "kind": "event", "label": "비동기 AI 처리", "x": 810, "y": 320, "w": 880, "h": 265, "labelPos": "bottom" },
+    { "kind": "subnet", "label": "비식별 실행·관찰 저장", "x": 575, "y": 640, "w": 1115, "h": 175 }
+  ],
+  "nodes": [
+    { "id": "user", "x": 105, "y": 445, "icon": "tile:external", "label": "구직자·채용담당자", "sub": "브라우저" },
+    { "id": "cognito", "x": 345, "y": 225, "icon": "cognito", "label": "Amazon Cognito", "sub": "로그인·JWT 발급" },
+    { "id": "cloudfront", "x": 345, "y": 445, "icon": "cloudfront", "label": "Amazon CloudFront", "sub": "단일 HTTPS 진입점" },
+    { "id": "web_s3", "x": 345, "y": 690, "icon": "s3", "label": "Amazon S3", "sub": "비공개 웹 원본" },
+    { "id": "api_gateway", "x": 555, "y": 445, "icon": "apigateway", "label": "Amazon API Gateway", "sub": "HTTP API · JWT 검증" },
+    { "id": "api_lambda", "x": 745, "y": 445, "icon": "lambda", "label": "API Lambda", "sub": "요청·권한·실행 등록" },
+    { "id": "queue", "x": 920, "y": 445, "icon": "sqs", "label": "Matching Queue", "sub": "동시 처리 최대 2" },
+    { "id": "agent", "x": 1095, "y": 445, "icon": "lambda", "label": "Agent Lambda", "sub": "점수·순위 결정" },
+    { "id": "gateway", "x": 1270, "y": 445, "icon": "lambda", "label": "LLM Gateway", "sub": "요청 계약·중계" },
+    { "id": "broker", "x": 1445, "y": 445, "icon": "lambda", "label": "Capability Broker", "sub": "허용 모델 호출" },
+    { "id": "bedrock", "x": 1630, "y": 445, "icon": "bedrock", "label": "Amazon Bedrock", "sub": "정성 설명 생성" },
+    { "id": "dlq", "x": 920, "y": 690, "icon": "sqs", "label": "Dead-letter Queue", "sub": "실패 메시지 격리" },
+    { "id": "dynamodb", "x": 700, "y": 745, "icon": "dynamodb", "label": "Amazon DynamoDB", "sub": "카탈로그·실행·결과" },
+    { "id": "evidence_s3", "x": 1190, "y": 745, "icon": "s3", "label": "Evidence S3", "sub": "비식별 결과 객체" },
+    { "id": "cloudwatch", "x": 1540, "y": 745, "icon": "cloudwatch", "label": "Amazon CloudWatch", "sub": "상관 ID·지연·오류" }
+  ],
+  "edges": [
+    { "from": "user", "to": "cloudfront", "flow": "request", "label": "HTTPS", "lxy": [220, 432] },
+    { "from": "cloudfront", "to": "api_gateway", "flow": "request", "label": "/api/*", "lxy": [450, 432] },
+    { "from": "api_gateway", "to": "api_lambda", "flow": "request" },
+    { "from": "api_lambda", "to": "queue", "flow": "request", "label": "run", "lxy": [830, 432] },
+    { "from": "queue", "to": "agent", "flow": "request" },
+    { "from": "agent", "to": "gateway", "flow": "request" },
+    { "from": "gateway", "to": "broker", "flow": "request" },
+    { "from": "broker", "to": "bedrock", "flow": "request", "label": "Converse", "lxy": [1538, 432] },
+    { "from": "user", "to": "cognito", "flow": "aux", "label": "sign-in", "mids": [[165, 225]], "lxy": [245, 212] },
+    { "from": "cognito", "to": "api_gateway", "flow": "aux", "static": true, "label": "JWT issuer trust", "mids": [[555, 225]], "lxy": [450, 212] },
+    { "from": "cloudfront", "to": "web_s3", "flow": "aux", "label": "private origin", "mids": [[430, 445], [430, 690]], "lxy": [475, 678] },
+    { "from": "api_lambda", "to": "dynamodb", "flow": "tool", "mids": [[745, 590], [700, 590]] },
+    { "from": "agent", "to": "dynamodb", "flow": "tool", "mids": [[1095, 610], [700, 610]] },
+    { "from": "agent", "to": "evidence_s3", "flow": "tool", "mids": [[1095, 625], [1190, 625]] },
+    { "from": "queue", "to": "dlq", "flow": "aux", "static": true, "label": "retry exhausted", "lxy": [1000, 635] },
+    { "from": "gateway", "to": "cloudwatch", "flow": "ambient", "mids": [[1270, 620], [1540, 620]] },
+    { "from": "broker", "to": "cloudwatch", "flow": "ambient", "mids": [[1445, 600], [1540, 600]] }
+  ],
+  "journeys": [
+    { "flow": "request", "dur": 5.4, "hops": [["user", "cloudfront"], ["cloudfront", "api_gateway"], ["api_gateway", "api_lambda"], ["api_lambda", "queue"], ["queue", "agent"], ["agent", "gateway"], ["gateway", "broker"], ["broker", "bedrock"]] },
+    { "flow": "tool", "dur": 3.2, "hops": [["agent", "evidence_s3"]] },
+    { "flow": "ambient", "dur": 3.0, "hops": [["gateway", "cloudwatch"]] }
+  ],
+  "steps": [["user", "cloudfront", 1], ["cloudfront", "api_gateway", 2], ["api_gateway", "api_lambda", 3], ["api_lambda", "queue", 4], ["queue", "agent", 5], ["agent", "gateway", 6], ["gateway", "broker", 7], ["broker", "bedrock", 8]],
+  "legend": ["request", "tool", "ambient", "aux"],
+  "legendY": 900,
+  "footer": "RDS · ECS · Redis · NAT · WAF는 이 실행면에 없음. 현재 계정의 apply/smoke 영수증 확인 전에는 DEPLOYED로 표기하지 않음."
+}

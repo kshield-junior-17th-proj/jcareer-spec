@@ -77,7 +77,7 @@ require("terraform/asis/JCAREER_ASIS_FLOW.md", "TRACE_MODE` 기본값은 `disabl
 require("terraform/asis/JCAREER_ASIS_SYSTEM_SPEC.md", "별도 guarded API 라우트 9개", "guarded API route count")
 forbid("terraform/asis/JCAREER_ASIS_SYSTEM_SPEC.md", "TRACE·JC-RECEIPT 미구현", "stale TRACE implementation claim")
 require("terraform/asis/JCAREER_ASIS_FLOW.md", "feature-only S3 입력 파일 3개", "MLOps feature-only input")
-require("terraform/asis/build-spec.mjs", "serverless 적용·smoke PASS · 2-AZ 목표 미적용", "spec deployment boundary")
+require("terraform/asis/build-spec.mjs", "최신 main plan PASS · apply/smoke 미실행", "spec deployment boundary")
 require("terraform/asis/JCAREER_ASIS_SYSTEM_SPEC.md", "결속 시험 28건", "dashboard check count")
 require("terraform/asis/JCAREER_ASIS_SYSTEM_SPEC.md", "승인된 복사본 반입이나 운영 배포를 확인한 결과는 아님", "dashboard evidence boundary")
 forbid("terraform/asis/JCAREER_ASIS_SYSTEM_SPEC.md", "APPROVE, PASS를 받았다", "agent approval overclaim")

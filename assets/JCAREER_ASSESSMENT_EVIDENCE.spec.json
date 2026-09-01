@@ -1,0 +1,53 @@
+{
+  "title": "J-Career 진단·증적 흐름",
+  "subtitle": "도구 관찰과 컨설턴트 판정을 분리하고 승인된 비식별 사본만 대시보드에 반입",
+  "canvas": { "w": 1800, "h": 980 },
+  "labelBackplates": true,
+  "status": "TARGET_EVIDENCE_PIPELINE_PARTIALLY_IMPLEMENTED_EXECUTION_PENDING",
+  "groups": [
+    { "kind": "event", "label": "원본 관찰 자료 · 원형 보존", "x": 55, "y": 115, "w": 400, "h": 700 },
+    { "kind": "region", "label": "정규화·비식별·승인 경계", "x": 500, "y": 115, "w": 1040, "h": 700 },
+    { "kind": "subnet", "label": "승인된 컨설턴트 열람면", "x": 1575, "y": 225, "w": 190, "h": 455 }
+  ],
+  "nodes": [
+    { "id": "prowler_aws", "x": 210, "y": 205, "icon": "tile:external", "label": "Prowler AWS", "sub": "OCSF · 후순위 실행" },
+    { "id": "prowler_llm", "x": 210, "y": 330, "icon": "tile:external", "label": "Prowler LLM", "sub": "도구 원본" },
+    { "id": "dynamic_llm", "x": 210, "y": 455, "icon": "tile:external", "label": "동적 LLM 시험", "sub": "실제 API·Gateway 경로" },
+    { "id": "mlops_receipt", "x": 210, "y": 580, "icon": "lambda", "label": "MLOps 실행 기록", "sub": "receipt · 모델 해시" },
+    { "id": "manual_review", "x": 210, "y": 705, "icon": "tile:external", "label": "아키텍처·수기 점검", "sub": "질문·설정·인터뷰" },
+    { "id": "adapter", "x": 585, "y": 455, "icon": "lambda", "label": "Source Adapters", "sub": "원본별 필드 매핑" },
+    { "id": "originals", "x": 700, "y": 710, "icon": "s3", "label": "Private Originals", "sub": "변경 금지 · 접근 제한" },
+    { "id": "common", "x": 800, "y": 455, "icon": "tile:generic", "label": "J-Career 공통 포맷", "sub": "finding-v1" },
+    { "id": "deid", "x": 1015, "y": 455, "icon": "lambda", "label": "비식별화·해시 결속", "sub": "ID·ARN·본문 제거" },
+    { "id": "reviewer", "x": 1230, "y": 455, "icon": "tile:external", "label": "담당자 사람 승인", "sub": "사실·한계·판정 검토" },
+    { "id": "approved", "x": 1435, "y": 455, "icon": "s3", "label": "Approved Snapshot", "sub": "서명·만료·회수" },
+    { "id": "desk", "x": 1670, "y": 455, "icon": "tile:external", "label": "Evidence Desk", "sub": "읽기 전용 대시보드" },
+    { "id": "registry", "x": 1015, "y": 710, "icon": "dynamodb", "label": "Evidence Register", "sub": "digest·상태·관찰시각" },
+    { "id": "audit", "x": 1435, "y": 710, "icon": "cloudwatch", "label": "승인 감사기록", "sub": "반입·회수 관찰" }
+  ],
+  "edges": [
+    { "from": "prowler_aws", "to": "adapter", "flow": "request", "mids": [[420, 205], [420, 455]] },
+    { "from": "prowler_llm", "to": "adapter", "flow": "request", "mids": [[440, 330], [440, 455]] },
+    { "from": "dynamic_llm", "to": "adapter", "flow": "request" },
+    { "from": "mlops_receipt", "to": "adapter", "flow": "request", "mids": [[440, 580], [440, 455]] },
+    { "from": "manual_review", "to": "adapter", "flow": "request", "mids": [[420, 705], [420, 455]] },
+    { "from": "adapter", "to": "common", "flow": "request", "label": "map", "lxy": [690, 442] },
+    { "from": "common", "to": "deid", "flow": "request", "label": "normalize", "lxy": [908, 442] },
+    { "from": "deid", "to": "reviewer", "flow": "request", "label": "review queue", "lxy": [1123, 442] },
+    { "from": "reviewer", "to": "approved", "flow": "request", "label": "approve", "lxy": [1333, 442] },
+    { "from": "approved", "to": "desk", "flow": "request", "label": "one-way import", "lxy": [1553, 442] },
+    { "from": "adapter", "to": "originals", "flow": "tool", "mids": [[585, 625], [700, 625]], "label": "preserve", "lxy": [645, 615] },
+    { "from": "deid", "to": "registry", "flow": "tool", "label": "digest", "lxy": [1090, 630] },
+    { "from": "reviewer", "to": "audit", "flow": "ambient", "mids": [[1230, 620], [1435, 620]] },
+    { "from": "approved", "to": "audit", "flow": "ambient" }
+  ],
+  "journeys": [
+    { "flow": "request", "dur": 6.2, "hops": [["dynamic_llm", "adapter"], ["adapter", "common"], ["common", "deid"], ["deid", "reviewer"], ["reviewer", "approved"], ["approved", "desk"]] },
+    { "flow": "tool", "dur": 3.0, "hops": [["adapter", "originals"]] },
+    { "flow": "ambient", "dur": 3.2, "hops": [["reviewer", "audit"]] }
+  ],
+  "steps": [["adapter", "common", 1], ["common", "deid", 2], ["deid", "reviewer", 3], ["reviewer", "approved", 4], ["approved", "desk", 5]],
+  "legend": ["request", "tool", "ambient"],
+  "legendY": 900,
+  "footer": "observation.status와 assessment.status를 분리하며, Prowler FAIL을 자동으로 취약 판정하지 않음. 원본 AWS에 브라우저가 직접 연결하지 않음."
+}

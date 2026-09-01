@@ -149,27 +149,22 @@ const canonicalFlowSource = flowSource.replace(/\r\n?/g, '\n');
 const flowSourceHash = crypto.createHash('sha256').update(canonicalFlowSource, 'utf8').digest('hex');
 const architectureFlows = {
   overview: {
-    title: '전체 시스템 지도',
-    status: '구현·설계 경계',
+    title: 'AI 실행·증적·TO-BE 분리 지도',
+    status: '현재와 목표 분리',
     tone: 'modelled',
-    summary: '현재 production-serverless, 업무망·외부 SaaS, GitHub delivery와 기업 2-AZ 목표, OpenDART·MLOps를 관계선까지 한 장에서 보되 구현 상태를 섞지 않습니다.',
-    detailHref: '../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg',
-    detailLabel: '현재 배포 기준 지도 보기',
+    summary: '현재 서버리스 AI 실행면, 컨설팅 증적 반입, 승인 전 기업 2-AZ 목표를 서로 다른 도면으로 읽습니다.',
+    detailHref: '../../assets/JCAREER_AI_RUNTIME_ACTUAL.svg',
+    detailLabel: '현재 AI 실행면 보기',
     stages: [
-      { label: 'GitHub 저장소 → Actions 검사·saved plan' },
-      { label: '다른 사람 승인 → OIDC → 동일 plan apply' },
-      { label: 'live smoke PASS → 임시 사용자 정리 → pipeline 재잠금' },
-      { label: 'main / (root) → legacy GitHub Pages 배포' },
-      { label: '서비스 사용자 → Route 53·CloudFront·WAF' },
-      { label: 'ALB → ECS 4서비스 → RDS·Redis 기준 흐름' },
-      { label: 'API → LLM Gateway → 조건부 broker → Bedrock' },
-      { label: 'OpenDART broker → SQS×2·Lambda·DDB + ECR·IAM·Logs(0/8/11) → 외부 API' },
-      { label: '업무망 180대 → Slack·외부 업무도구 경계' },
-      { label: 'ACM·Auto Scaling·ECR·NAT·SSM·로그·탐지 의존 관계' },
-      { label: 'MLOps bootstrap 13개 적용 → runtime 미실행' },
-      { label: '검토 → 향후 서비스 반영 · 현재 미구현' }
+      { label: '브라우저 → CloudFront → API Gateway' },
+      { label: 'API Lambda → SQS → Agent Lambda' },
+      { label: 'LLM Gateway → Capability Broker → Bedrock' },
+      { label: 'DynamoDB·S3·CloudWatch에 상태와 비식별 증적 기록' },
+      { label: 'Prowler·동적 LLM·MLOps·수기 점검 원본 보존' },
+      { label: '공통 포맷 → 비식별화 → 사람 승인 → Evidence Desk' },
+      { label: 'ECS·RDS·Redis·2-AZ는 미배포 TO-BE 도면으로 분리' }
     ],
-    boundary: '2026-09-01 GitHub Actions saved plan·다른 사람 승인·OIDC 동일 plan apply와 production-serverless live smoke를 확인했고 pipeline은 다시 잠겼습니다. Pages publish는 이 AWS apply와 별도입니다. 2-AZ·110개는 AWS 비접속 plan으로 만든 목표이며 Evidence Desk, OpenDART와 MLOps runtime은 미배포 또는 미실행입니다.'
+    boundary: '최신 main 1592505는 GitHub Actions validate·plan까지만 확인됐으며 apply와 live smoke는 실행되지 않았습니다. Pages publish는 AWS apply와 별도입니다. ECS·RDS·Redis·NAT·WAF·2-AZ 목표는 AWS 비접속 plan 기반이며 현재 서버리스 실행면의 배포 자원으로 표시하지 않습니다.'
   },
   candidate: {
     title: '구직자 공고 추천',
@@ -210,9 +205,9 @@ const architectureFlows = {
       { label: 'API Lambda가 확정 점수·근거 전달', x: 1300, y: 290 },
       { label: 'LLM Gateway Lambda가 설명 전용 요청 구성', x: 1450, y: 290 },
       { label: 'Capability Broker가 exact model만 허용', x: 1600, y: 290 },
-      { label: 'production-serverless Bedrock E2E smoke PASS', x: 1750, y: 290 }
+      { label: '현재 SHA apply·Bedrock E2E smoke 대기', x: 1750, y: 290 }
     ],
-    boundary: 'production-serverless의 API Lambda→LLM Gateway Lambda→Capability Broker Lambda→Bedrock 경로는 2026-09-01 live smoke에서 확인됐습니다. 이 결과는 미배포 ECS 2-AZ 목표 경로나 자동 채용 판단의 증거가 아닙니다.'
+    boundary: 'API Lambda→LLM Gateway Lambda→Capability Broker Lambda→Bedrock 경로는 소스와 Terraform에 구현됐지만 최신 main 1592505의 apply·live smoke는 실행되지 않았습니다. 과거 SHA의 성공 기록을 현재 배포 증거로 확대하지 않습니다.'
   },
   mlops: {
     title: 'MLOps 학습·평가',
@@ -309,10 +304,10 @@ const commonHead = `
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%23202b35'/%3E%3Cpath d='M19 14h9v24c0 9-5 13-14 12v-8c4 0 5-1 5-5V14zm14 0h17v8h-9v7h8v8h-8v13h-8V14z' fill='%23e87928'/%3E%3C/svg%3E">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ko_KR">
-  <meta property="og:image" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.png">
-  <meta property="og:image:alt" content="GitHub 승인형 OIDC saved-plan apply, Browser와 Cognito의 별도 sign-in·JWT 인증 가지, Browser에서 CloudFront /api/*를 거쳐 HTTP API로 가는 요청 경로, CloudFront의 S3 web origin, Lambda·SQS·Bedrock과 별도 serverless MLOps를 보여 주는 J-Career AI 서비스 실행면">
+  <meta property="og:image" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/assets/JCAREER_AI_RUNTIME_ACTUAL.png">
+  <meta property="og:image:alt" content="CloudFront, API Gateway, Lambda, SQS, LLM Gateway, Capability Broker와 Amazon Bedrock으로 이어지는 J-Career 현재 AI 서비스 실행면">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image:alt" content="GitHub 승인형 OIDC saved-plan apply, Browser와 Cognito의 별도 sign-in·JWT 인증 가지, Browser에서 CloudFront /api/*를 거쳐 HTTP API로 가는 요청 경로, CloudFront의 S3 web origin, Lambda·SQS·Bedrock과 별도 serverless MLOps를 보여 주는 J-Career AI 서비스 실행면">
+  <meta name="twitter:image:alt" content="CloudFront, API Gateway, Lambda, SQS, LLM Gateway, Capability Broker와 Amazon Bedrock으로 이어지는 J-Career 현재 AI 서비스 실행면">
   <link rel="preconnect" href="https://api.fontshare.com">
   <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -409,12 +404,20 @@ const commonCss = `
   .diagram-link img { display: block; width: 100%; height: auto; transition: transform .35s ease; }
   .diagram-link:hover img { transform: scale(1.012); }
   .diagram-caption { display: flex; justify-content: space-between; gap: 20px; margin-top: 10px; color: var(--muted); font-size: .76rem; }
+  .diagram-trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+  .diagram-card { min-width: 0; background: rgba(255,255,255,.72); border: 1px solid #9bb9af; }
+  .diagram-card .diagram-link { border: 0; border-bottom: 1px solid #9bb9af; }
+  .diagram-card__body { padding: 16px; }
+  .diagram-card__body h3 { margin: 0; font-size: 1rem; letter-spacing: -.015em; }
+  .diagram-card__body p { margin: 8px 0 0; color: var(--ink-2); font-size: .78rem; line-height: 1.55; }
+  .diagram-card__state { display: inline-block; margin-bottom: 9px; padding: 4px 7px; border: 1px solid currentColor; color: #1f5548; font: 700 9px/1.2 var(--mono); letter-spacing: .04em; }
   .production-slice { padding: 42px clamp(24px, 5vw, 60px); border-bottom: 1px solid var(--line); background: #e9f1ef; }
   .production-slice__head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, .54fr); gap: 30px; align-items: end; margin-bottom: 20px; }
   .production-slice h2 { max-width: 24ch; margin: 0; font-size: clamp(1.55rem, 2.3vw, 2.25rem); letter-spacing: -.035em; }
   .production-slice__copy { margin: 0; color: var(--ink-2); font-size: .9rem; line-height: 1.65; }
   .production-slice__status { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 0; }
   .production-slice__status span { padding: 6px 9px; border: 1px solid #9bb9af; border-radius: 2px; background: rgba(255,255,255,.56); color: #1f5548; font: 700 10px/1.2 var(--mono); letter-spacing: .035em; }
+  @media (max-width: 980px) { .diagram-trio { grid-template-columns: 1fr; } }
   .mlops-bridge { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(330px, .92fr); gap: clamp(30px, 5vw, 72px); padding: clamp(38px, 6vw, 72px); color: #eef3f4; background: #25343d; border-bottom: 5px solid var(--accent); }
   .mlops-bridge .section-label { color: #f2a469; }
   .mlops-bridge h2 { max-width: 16ch; margin: 0; font-size: clamp(1.9rem, 3.4vw, 3.25rem); line-height: 1.08; letter-spacing: -.045em; text-wrap: balance; }
@@ -582,7 +585,7 @@ ${commonHead}
           <div><dt>문서 번호</dt><dd>JC-ASIS-SPEC-001</dd></div>
           <div><dt>기준일</dt><dd>2026-09-01</dd></div>
           <div><dt>문서 상태</dt><dd>기준 설계 · 기술 검토 진행</dd></div>
-          <div><dt>배포 단계</dt><dd>serverless 적용·smoke PASS · 2-AZ 목표 미적용</dd></div>
+          <div><dt>배포 단계</dt><dd>최신 main plan PASS · apply/smoke 미실행</dd></div>
           <div><dt>MLOps</dt><dd>bootstrap 13개 적용 · runtime 미배포</dd></div>
           <div><dt>외부·보조 경계</dt><dd>Slack·Notion·SMTP default-off · TRACE 인프라 제외</dd></div>
         </dl>
@@ -645,16 +648,27 @@ ${commonHead}
       <section id="production-assessment-slice" class="production-slice" aria-labelledby="production-assessment-title">
         <div class="production-slice__head">
           <div>
-            <p class="section-label">운영 전환 증거 · 기준 설계와 분리</p>
-            <h2 id="production-assessment-title">서버리스 핵심 경로의 적용 결과를 별도 시점 기록으로 연결합니다.</h2>
-            <div class="production-slice__status"><span>GITHUB E2E PASS</span><span>QUEUE · DLQ · RETRY_PENDING 0</span><span>ENDPOINT · MDM NOT DEPLOYED</span></div>
+            <p class="section-label">현재 실행 · 진단 증적 · 미배포 목표</p>
+            <h2 id="production-assessment-title">실제로 확인할 것과 앞으로 만들 것을 세 장으로 분리합니다.</h2>
+            <div class="production-slice__status"><span>LATEST MAIN PLAN PASS</span><span>APPLY · LIVE SMOKE NOT RUN</span><span>TO-BE NOT DEPLOYED</span></div>
           </div>
-          <div><p class="production-slice__copy">사용자가 main <code>96d70d7</code>의 승인형 saved-plan apply 실행을 보고했지만, 이 문서 갱신 시점에는 현재 실행의 완료·live smoke receipt를 확인하지 않았습니다. 도식은 Browser↔Cognito 인증 가지와 Browser→CloudFront(<code>/api/*</code>)→HTTP API 요청 경로, CloudFront→S3 web origin, Lambda·SQS·Bedrock apply 대상과 별도 serverless MLOps 수명주기만 보여 줍니다.</p><p><a class="button button--accent" href="production-transition.html">운영 전환 기록 보기</a></p></div>
+          <div><p class="production-slice__copy">최신 <code>1592505</code>는 validate·saved plan까지만 확인됐습니다. 따라서 현재 도면은 Terraform과 런타임 소스에 구현된 실행면을 보여 주되, 같은 SHA의 apply와 live smoke 영수증 전에는 배포 완료라고 쓰지 않습니다. 과거 성공 전환 기록의 <code>QUEUE · DLQ · RETRY_PENDING 0</code>은 현재 SHA의 증거로 재사용하지 않습니다. Prowler·동적 LLM·MLOps·수기 점검은 별도 증적 흐름으로, ECS·RDS·Redis·2-AZ는 승인 전 목표로 분리합니다.</p><p><a class="button button--accent" href="production-transition.html">운영 전환 기록 보기</a></p></div>
         </div>
-        <a class="diagram-link" href="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg" aria-label="J-Career AI 서비스 실행면 SVG 원본 열기">
-          <img src="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg" width="2400" height="1400" loading="lazy" decoding="async" alt="GitHub 승인형 OIDC saved-plan apply, Browser와 Cognito의 별도 sign-in·JWT 인증 가지, Browser에서 CloudFront /api/*를 거쳐 HTTP API로 가는 요청 경로, CloudFront의 S3 web origin, Lambda·SQS·Bedrock과 별도 serverless MLOps를 보여 주는 J-Career AI 서비스 실행면">
-        </a>
-        <div class="diagram-caption"><span>AI 서비스 실행면: apply 요청 보고됨 · 현재 완료/live smoke 미확인</span><span><a href="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.drawio">DRAW.IO 원본</a> · <a href="production-transition.html">운영 전환 기록</a></span></div>
+        <div class="diagram-trio">
+          <article class="diagram-card">
+            <a class="diagram-link" href="../../assets/JCAREER_AI_RUNTIME_ACTUAL.svg" aria-label="현재 AI 서비스 실행면 SVG 원본 열기"><img src="../../assets/JCAREER_AI_RUNTIME_ACTUAL.svg" width="1800" height="980" loading="lazy" decoding="async" alt="CloudFront에서 API Gateway, Lambda, SQS, Agent, LLM Gateway, Capability Broker와 Bedrock으로 이어지는 현재 서버리스 AI 실행면"></a>
+            <div class="diagram-card__body"><span class="diagram-card__state">SOURCE IMPLEMENTED · APPLY UNVERIFIED</span><h3>1. 현재 AI 서비스 실행면</h3><p>CloudFront·S3·Cognito·API Gateway·Lambda·SQS·DynamoDB·Bedrock·CloudWatch만 표시합니다.</p></div>
+          </article>
+          <article class="diagram-card">
+            <a class="diagram-link" href="../../assets/JCAREER_ASSESSMENT_EVIDENCE.svg" aria-label="진단과 증적 흐름 SVG 원본 열기"><img src="../../assets/JCAREER_ASSESSMENT_EVIDENCE.svg" width="1800" height="980" loading="lazy" decoding="async" alt="Prowler, 동적 LLM 시험, MLOps 기록과 수기 점검을 비식별화하고 사람이 승인해 Evidence Desk에 반입하는 흐름"></a>
+            <div class="diagram-card__body"><span class="diagram-card__state">PARTIAL SOURCE · EXECUTION PENDING</span><h3>2. 진단·증적 흐름</h3><p>원본을 보존하고 공통 포맷·비식별화·담당자 승인을 거친 사본만 대시보드로 보냅니다.</p></div>
+          </article>
+          <article class="diagram-card">
+            <a class="diagram-link" href="../../assets/JCAREER_ENTERPRISE_TOBE_TARGET.svg" aria-label="기업 TO-BE 목표 구조 SVG 원본 열기"><img src="../../assets/JCAREER_ENTERPRISE_TOBE_TARGET.svg" width="1800" height="980" loading="lazy" decoding="async" alt="ECS, RDS, ElastiCache, WAF, NAT와 2개 가용 영역으로 구성된 승인 전 기업 TO-BE 목표 구조"></a>
+            <div class="diagram-card__body"><span class="diagram-card__state">PLANNED · NOT DEPLOYED</span><h3>3. 기업 TO-BE 목표 구조</h3><p>ECS·RDS·Redis·NAT·WAF·2-AZ는 현재 배포와 섞지 않고 비용·변경 승인 전 목표로만 표시합니다.</p></div>
+          </article>
+        </div>
+        <div class="diagram-caption"><span>현재·증적·목표를 별도 SVG와 정지 PNG로 제공</span><span><a href="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg">이전 통합도</a> · <a href="production-transition.html">운영 전환 기록</a></span></div>
       </section>
 
       <section id="mlops-overview" class="mlops-bridge" aria-labelledby="mlops-overview-title">
@@ -825,20 +839,20 @@ ${commonCss}
   <a class="skip" href="#diagram">전체 인프라 지도로 건너뛰기</a>
   <header class="masthead">
     <div class="masthead__inner">
-      <div class="utility"><a href="index.html">← 기술 명세</a><nav class="utility__links" aria-label="산출물"><a href="production-transition.html">운영 전환 현황</a><a href="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg">현재 배포 지도</a><a href="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.drawio">현재 지도 원본</a><a href="../../mlops/">MLOps 7단계</a><a href="../../consulting/">단말 진단 사례</a><a href="JCAREER_FULL_INFRA.drawio">2-AZ 목표 원본</a><a href="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg">2-AZ 목표 SVG</a><a href="JCAREER_ASIS_SYSTEM_SPEC.pdf">PDF</a><a href="validation-report.json">검증 JSON</a><button class="motion-toggle-doc" type="button" data-motion-toggle aria-pressed="false" hidden><span data-motion-label>움직임 줄이기</span></button></nav></div>
+      <div class="utility"><a href="index.html">← 기술 명세</a><nav class="utility__links" aria-label="산출물"><a href="production-transition.html">운영 전환 현황</a><a href="../../assets/JCAREER_AI_RUNTIME_ACTUAL.svg">현재 AI 실행면</a><a href="../../assets/JCAREER_ASSESSMENT_EVIDENCE.svg">진단·증적 흐름</a><a href="../../assets/JCAREER_ENTERPRISE_TOBE_TARGET.svg">TO-BE 목표</a><a href="../../mlops/">MLOps 7단계</a><a href="../../consulting/">단말 진단 사례</a><a href="JCAREER_ASIS_SYSTEM_SPEC.pdf">PDF</a><a href="validation-report.json">검증 JSON</a><button class="motion-toggle-doc" type="button" data-motion-toggle aria-pressed="false" hidden><span data-motion-label>움직임 줄이기</span></button></nav></div>
       <div class="doc-hero">
         <div><p class="kicker">JC-ASIS-ARCH-001 · current + target atlas</p><h1>J-Career 전체<br>인프라 지도</h1><p class="hero-copy">현재 production-serverless와 기업 2-AZ 목표를 분리하고, 업무망·Slack, GitHub OIDC delivery, LLM Gateway·Bedrock, OpenDART와 MLOps의 연결 수준을 함께 탐색합니다. TRACE·JC-RECEIPT는 실행 컴포넌트에 넣지 않습니다.</p></div>
-        <dl class="doc-control"><div><dt>현재 AWS</dt><dd>serverless apply · smoke PASS</dd></div><div><dt>GitHub delivery</dt><dd>saved plan · 승인 · OIDC · 재잠금</dd></div><div><dt>업무망</dt><dd>180대 · Windows 100 / macOS 80</dd></div><div><dt>외부 업무도구</dt><dd>Slack·Notion·SMTP · prod 미연결</dd></div><div><dt>2-AZ 목표</dt><dd>6개 모듈 · 계획 110개 · 미배포</dd></div><div><dt>MLOps</dt><dd>bootstrap 13개 · runtime 미실행</dd></div></dl>
+        <dl class="doc-control"><div><dt>현재 AWS</dt><dd>latest main · plan only</dd></div><div><dt>GitHub delivery</dt><dd>apply · live smoke 미실행</dd></div><div><dt>업무망</dt><dd>180대 · 실물 미관찰</dd></div><div><dt>외부 업무도구</dt><dd>Slack·Notion·SMTP · prod 미연결</dd></div><div><dt>2-AZ 목표</dt><dd>6개 모듈 · 계획 110개 · 미배포</dd></div><div><dt>MLOps</dt><dd>runtime 실행 영수증 미확인</dd></div></dl>
       </div>
     </div>
   </header>
   <main class="plate" id="diagram">
-    <div class="plate__nav"><p>GitHub 검사는 <span class="status local">구현</span>, 업무망 수량은 <span class="status confirmed" title="내부 상태 코드: USER_CONFIRMED">사용자 확인</span>, AWS 2-AZ 기준선은 <span class="status modelled" title="내부 상태 코드: MODELLED">미배포 설계</span>, MLOps는 <span class="status confirmed" title="내부 상태 코드: MLOPS_BOOTSTRAP_APPLIED_RUNTIME_NOT_DEPLOYED">bootstrap만 적용</span>으로 구분합니다. 2026-09-01 서버리스 적용 결과는 별도 운영 전환 기록에서 확인합니다.</p><div><a class="button button--accent" href="production-transition.html">운영 전환 현황</a> <button class="button" id="diagram-zoom" type="button" aria-pressed="false">원본 크기로 보기</button> <a class="button" href="JCAREER_FULL_INFRA.drawio">전체 편집 원본</a> <a class="button" href="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg">전체 SVG</a></div></div>
+    <div class="plate__nav"><p>GitHub 검사는 <span class="status local">구현</span>, 최신 serverless main은 <span class="status modelled">plan 확인</span>, AWS 2-AZ 기준선은 <span class="status modelled" title="내부 상태 코드: MODELLED">미배포 설계</span>, MLOps runtime은 <span class="status modelled">실행 영수증 미확인</span>으로 구분합니다. 현재와 목표는 위의 세 분리 도면을 기준으로 읽습니다.</p><div><a class="button button--accent" href="../../assets/JCAREER_AI_RUNTIME_ACTUAL.svg">현재 AI 실행면</a> <a class="button" href="../../assets/JCAREER_ASSESSMENT_EVIDENCE.svg">진단·증적</a> <a class="button" href="../../assets/JCAREER_ENTERPRISE_TOBE_TARGET.svg">TO-BE 목표</a> <button class="button" id="diagram-zoom" type="button" aria-pressed="false">원본 크기로 보기</button></div></div>
     <dl class="axis-rail" aria-label="전체 지도 네 영역의 상태">
       <div><dt>01 · workplace</dt><dd>업무망 PC 180대<br><code>USER_CONFIRMED · 실물 미관찰</code></dd></div>
       <div><dt>02 · GitHub delivery</dt><dd>Actions 검사 + main branch Pages<br><code>SEPARATE PATHS · AWS 배포 없음</code></dd></div>
-      <div><dt>03 · AWS runtime</dt><dd>4 ECS units · LLM Gateway · Bedrock 경계<br><code>2-AZ 110 MODELLED · NOT DEPLOYED</code></dd></div>
-      <div><dt>04 · serverless MLOps</dt><dd>S3·ECR·DynamoDB·IAM·Logs 기반<br><code>BOOTSTRAP 13 APPLIED · RUNTIME NOT DEPLOYED</code></dd></div>
+      <div><dt>03 · AWS runtime</dt><dd>CloudFront · API · Lambda · SQS · Bedrock<br><code>SOURCE IMPLEMENTED · APPLY UNVERIFIED</code></dd></div>
+      <div><dt>04 · enterprise TO-BE</dt><dd>ECS · RDS · Redis · WAF · NAT · 2-AZ<br><code>PLANNED · NOT DEPLOYED</code></dd></div>
     </dl>
     <div class="architecture-workspace">
     <section class="flow-explorer" aria-labelledby="flow-explorer-title">
@@ -864,7 +878,7 @@ ${commonCss}
           <p class="flow-detail__summary" id="flow-summary">사용자, 업무망·외부 SaaS, GitHub delivery, AWS 기준 런타임, LLM Gateway·Bedrock·OpenDART와 별도 MLOps를 연결 관계까지 한 장에서 봅니다.</p>
         </div>
         <div class="flow-detail__route"><strong>순서대로 읽는 단계</strong><ol class="flow-steps" id="flow-steps" aria-label="전체 인프라 단계별 경로">${flowStepItems('overview')}</ol></div>
-        <div class="flow-detail__boundary"><strong>상태 범위</strong><p id="flow-boundary">GitHub Actions의 saved plan·다른 사람 승인·OIDC 동일 plan apply와 live smoke는 확인됐고 pipeline은 다시 잠겼습니다. 현재 실행면은 production-serverless이며 이 화면의 ECS·RDS·Redis·NAT 2-AZ·110개 기준선은 미배포 목표입니다. MLOps는 bootstrap 13개만 적용되고 runtime·추천 연결은 없습니다.</p><a class="flow-detail__link" id="flow-detail-link" href="../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg">현재 배포 지도 보기</a></div>
+        <div class="flow-detail__boundary"><strong>상태 범위</strong><p id="flow-boundary">최신 main 1592505는 validate·saved plan까지만 확인됐으며 apply와 live smoke는 실행되지 않았습니다. 현재 서버리스 실행면과 ECS·RDS·Redis·NAT 2-AZ 목표는 서로 다른 도면입니다. MLOps runtime과 추천 연결도 실행 영수증 전에는 완료로 표시하지 않습니다.</p><a class="flow-detail__link" id="flow-detail-link" href="../../assets/JCAREER_AI_RUNTIME_ACTUAL.svg">현재 AI 실행면 보기</a></div>
       </article>
       <p class="flow-explorer__exclusion">Slack·Notion·SMTP는 AWS 밖의 업무도구 경계로 표시하며 기본 비활성·실전송 미확인입니다. Bedrock은 직접 호출과 end-to-end를 분리하고, OpenDART는 source-only·미배포로 표시합니다. TRACE·JC-RECEIPT는 실행 컴포넌트에서 제외하고 보조 설명에만 남깁니다.</p>
     </section>

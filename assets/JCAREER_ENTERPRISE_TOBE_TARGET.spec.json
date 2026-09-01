@@ -1,0 +1,63 @@
+{
+  "title": "J-Career 기업 TO-BE 목표 구조",
+  "subtitle": "미배포 · 비용 및 변경 승인 전 목표 아키텍처 · 현재 서버리스 실행면과 분리",
+  "canvas": { "w": 1800, "h": 980 },
+  "labelBackplates": true,
+  "status": "PLANNED_NOT_DEPLOYED_APPROVAL_GATED",
+  "groups": [
+    { "kind": "region", "label": "AWS Seoul · 목표 VPC (미배포)", "x": 360, "y": 110, "w": 1390, "h": 735 },
+    { "kind": "subnet", "label": "Availability Zone A · Public / App / Data", "x": 665, "y": 205, "w": 750, "h": 250 },
+    { "kind": "subnet", "label": "Availability Zone C · Public / App / Data", "x": 665, "y": 515, "w": 750, "h": 250 },
+    { "kind": "event", "label": "공유 관리·증적 서비스", "x": 1445, "y": 205, "w": 270, "h": 560 }
+  ],
+  "nodes": [
+    { "id": "user", "x": 90, "y": 430, "icon": "tile:external", "label": "이용자·컨설턴트", "sub": "승인된 접근" },
+    { "id": "route53", "x": 230, "y": 430, "icon": "route53", "label": "Amazon Route 53", "sub": "DNS" },
+    { "id": "cloudfront", "x": 400, "y": 430, "icon": "cloudfront", "label": "Amazon CloudFront", "sub": "정적·동적 진입" },
+    { "id": "waf", "x": 545, "y": 430, "icon": "waf", "label": "AWS WAF", "sub": "웹 요청 통제" },
+    { "id": "alb", "x": 700, "y": 430, "icon": "elb", "label": "Application LB", "sub": "경로 기반 라우팅" },
+    { "id": "nat_a", "x": 770, "y": 275, "icon": "nat", "label": "NAT Gateway A", "sub": "AZ별 egress" },
+    { "id": "ecs_a", "x": 940, "y": 330, "icon": "ecs", "label": "ECS Fargate A", "sub": "web·api·agent·gateway" },
+    { "id": "redis_a", "x": 1130, "y": 330, "icon": "tile:generic", "label": "ElastiCache Redis", "sub": "추천 캐시 · 암호화 목표" },
+    { "id": "rds_primary", "x": 1320, "y": 330, "icon": "rds", "label": "RDS PostgreSQL", "sub": "Multi-AZ primary" },
+    { "id": "nat_c", "x": 770, "y": 585, "icon": "nat", "label": "NAT Gateway C", "sub": "AZ별 egress" },
+    { "id": "ecs_c", "x": 940, "y": 640, "icon": "ecs", "label": "ECS Fargate C", "sub": "web·api·agent·gateway" },
+    { "id": "redis_c", "x": 1130, "y": 640, "icon": "tile:generic", "label": "ElastiCache Replica", "sub": "자동 장애조치 목표" },
+    { "id": "rds_standby", "x": 1320, "y": 640, "icon": "rds", "label": "RDS Standby", "sub": "동기 복제 목표" },
+    { "id": "bedrock", "x": 1575, "y": 285, "icon": "bedrock", "label": "Amazon Bedrock", "sub": "Gateway 허용 모델" },
+    { "id": "s3", "x": 1575, "y": 430, "icon": "s3", "label": "Amazon S3", "sub": "이력서·증적·로그" },
+    { "id": "cloudwatch", "x": 1575, "y": 575, "icon": "cloudwatch", "label": "Amazon CloudWatch", "sub": "통합 관찰" },
+    { "id": "guardduty", "x": 1575, "y": 700, "icon": "guardduty", "label": "Amazon GuardDuty", "sub": "계정 위협 탐지" }
+  ],
+  "edges": [
+    { "from": "user", "to": "route53", "flow": "request" },
+    { "from": "route53", "to": "cloudfront", "flow": "request" },
+    { "from": "cloudfront", "to": "waf", "flow": "request" },
+    { "from": "waf", "to": "alb", "flow": "request" },
+    { "from": "alb", "to": "ecs_a", "flow": "request", "mids": [[800, 430], [800, 330]] },
+    { "from": "alb", "to": "ecs_c", "flow": "request", "mids": [[820, 430], [820, 640]] },
+    { "from": "ecs_a", "to": "redis_a", "flow": "tool" },
+    { "from": "redis_a", "to": "rds_primary", "flow": "tool", "static": true, "label": "data tier", "lxy": [1225, 318] },
+    { "from": "ecs_c", "to": "redis_c", "flow": "tool" },
+    { "from": "redis_c", "to": "rds_standby", "flow": "tool", "static": true, "label": "data tier", "lxy": [1225, 628] },
+    { "from": "rds_primary", "to": "rds_standby", "flow": "aux", "static": true, "mids": [[1395, 330], [1395, 640]], "label": "Multi-AZ", "lxy": [1435, 485] },
+    { "from": "ecs_a", "to": "bedrock", "flow": "request", "mids": [[1415, 330], [1415, 285]] },
+    { "from": "ecs_c", "to": "bedrock", "flow": "request", "mids": [[1430, 640], [1430, 285]] },
+    { "from": "ecs_a", "to": "s3", "flow": "tool", "mids": [[1380, 330], [1380, 430]] },
+    { "from": "ecs_c", "to": "s3", "flow": "tool", "mids": [[1395, 640], [1395, 430]] },
+    { "from": "ecs_a", "to": "cloudwatch", "flow": "ambient", "mids": [[1365, 330], [1365, 575]] },
+    { "from": "ecs_c", "to": "cloudwatch", "flow": "ambient", "mids": [[1380, 640], [1380, 575]] },
+    { "from": "nat_a", "to": "ecs_a", "flow": "aux", "static": true },
+    { "from": "nat_c", "to": "ecs_c", "flow": "aux", "static": true },
+    { "from": "cloudwatch", "to": "guardduty", "flow": "ambient", "static": true }
+  ],
+  "journeys": [
+    { "flow": "request", "dur": 5.8, "hops": [["user", "route53"], ["route53", "cloudfront"], ["cloudfront", "waf"], ["waf", "alb"], ["alb", "ecs_a"], ["ecs_a", "bedrock"]] },
+    { "flow": "tool", "dur": 3.4, "hops": [["ecs_a", "redis_a"], ["redis_a", "rds_primary"]] },
+    { "flow": "ambient", "dur": 3.2, "hops": [["ecs_a", "cloudwatch"]] }
+  ],
+  "steps": [["user", "route53", 1], ["route53", "cloudfront", 2], ["cloudfront", "waf", 3], ["waf", "alb", 4]],
+  "legend": ["request", "tool", "ambient", "aux"],
+  "legendY": 900,
+  "footer": "이 구조는 Terraform 설계·개선 로드맵용이며 현재 AWS 배포 증거가 아님. 비용·보안·변경 승인 전 apply 금지."
+}
