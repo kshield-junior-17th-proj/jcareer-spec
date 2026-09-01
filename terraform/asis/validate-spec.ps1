@@ -303,7 +303,7 @@ $flowDefinitionMatch = [regex]::Match($architecture, '(?s)const flowDefinitions 
 $serviceFlowKeys = @('candidate', 'recruiter', 'explanation', 'mlops', 'workplace', 'trace', 'integrations', 'operations')
 $overlayFlowKeys = @('candidate', 'recruiter', 'explanation', 'workplace', 'trace', 'integrations', 'operations')
 $expectedStageCounts = @{
-    overview = 12
+    overview = 7
     candidate = 3
     recruiter = 3
     explanation = 4
@@ -336,7 +336,7 @@ if ($flowDefinitionMatch.Success) {
         }
         $stageCoordinatesOkay = $badCoordinateKeys.Count -eq 0
         $expectedDetailLinks = @{
-            overview = @{ href = '../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg'; label = '현재 배포 기준 지도 보기' }
+            overview = @{ href = '../../assets/JCAREER_AI_RUNTIME_ACTUAL.svg'; label = '현재 AI 실행면 보기' }
             candidate = @{ href = 'index.html#section-31'; label = '공고 추천 기능 명세 보기' }
             recruiter = @{ href = 'index.html#section-31'; label = '기업용 인재 찾기 명세 보기' }
             explanation = @{ href = 'index.html#section-33'; label = 'AI 점수·설명 규칙 보기' }
@@ -454,7 +454,7 @@ $interactiveFlowOkay = $flowButtonCount -eq 9 -and
     $architecture.Contains('TRACE·JC-RECEIPT는 실행 컴포넌트에서 제외하고 보조 설명에만 남깁니다') -and
     $architecture.Contains('AI 설명과 MLOps를 선택해도 전체 지도를 유지해') -and
     $architecture.Contains("['overview', 'mlops', 'explanation'].includes(key) ? 'overview' : 'asis'")
-Add-Check 'interactive_service_flow' $interactiveFlowOkay "controls $flowButtonCount, overlay layers $flowLayerCount, stages overview=12, explanation/workplace=4, MLOps=7, other=3, markers $stepMarkerCount; integrated full-map AI/MLOps context, guarded-source separation, URL state, detail links 9 checked"
+Add-Check 'interactive_service_flow' $interactiveFlowOkay "controls $flowButtonCount, overlay layers $flowLayerCount, stages overview=7, explanation/workplace=4, MLOps=7, other=3, markers $stepMarkerCount; separated current/evidence/TO-BE context, guarded-source separation, URL state, detail links 9 checked"
 
 $normalizedFlowSource = (Get-Content -Raw -Encoding UTF8 (Join-Path $root 'JCAREER_ASIS_FLOW.md')).Replace("`r`n", "`n").Replace("`r", "`n")
 $flowSourceHasher = [System.Security.Cryptography.SHA256]::Create()

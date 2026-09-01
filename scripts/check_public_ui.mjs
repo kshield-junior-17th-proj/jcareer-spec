@@ -14,8 +14,8 @@ const EXPECTED_ROUTES = [
   {
     href: 'terraform/asis/architecture.html',
     flow: 'overview',
-    detailHref: '../../assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg',
-    steps: 12,
+    detailHref: '../../assets/JCAREER_AI_RUNTIME_ACTUAL.svg',
+    steps: 7,
     media: 'overview',
   },
   {
@@ -417,6 +417,33 @@ async function runChecks(client, origin) {
   assert(reducedMotion.source.endsWith('.png') && reducedMotion.marquee === 'none', 'Reduced mode did not stop decorative motion and use the still diagram.');
   await evaluate(client, 'document.querySelector("[data-motion-toggle]").click(); true');
   await delay(50);
+
+  await navigate(client, origin + '/terraform/asis/index.html');
+  const assessmentAtlas = await evaluate(
+    client,
+    '(function () {' +
+      'return {' +
+        'diagrams: Array.from(document.querySelectorAll(".diagram-trio .diagram-link")).map((link) => link.getAttribute("href").split("/").at(-1)),' +
+        'states: Array.from(document.querySelectorAll(".diagram-trio .diagram-card__state")).map((state) => state.textContent.trim())' +
+      '};' +
+    '})()',
+  );
+  assert(
+    JSON.stringify(assessmentAtlas.diagrams) === JSON.stringify([
+      'JCAREER_AI_RUNTIME_ACTUAL.svg',
+      'JCAREER_ASSESSMENT_EVIDENCE.svg',
+      'JCAREER_ENTERPRISE_TOBE_TARGET.svg',
+    ]),
+    'Current runtime, assessment evidence, and TO-BE diagrams are not separated on the specification page.',
+  );
+  assert(
+    JSON.stringify(assessmentAtlas.states) === JSON.stringify([
+      'SOURCE IMPLEMENTED · APPLY UNVERIFIED',
+      'PARTIAL SOURCE · EXECUTION PENDING',
+      'PLANNED · NOT DEPLOYED',
+    ]),
+    'Assessment diagram states are missing or overstate deployment evidence.',
+  );
 
   let checkedRoutes = 0;
   for (const route of EXPECTED_ROUTES) {
