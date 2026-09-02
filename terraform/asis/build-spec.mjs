@@ -932,7 +932,7 @@ ${commonCss}
     </div>
   </header>
   <main class="plate" id="diagram">
-    <div class="plate__nav"><p>GitHub 검사는 <span class="status local">구현</span>, 최신 serverless main은 <span class="status modelled">plan 확인</span>, AWS 2-AZ 기준선은 <span class="status modelled" title="내부 상태 코드: MODELLED">미배포 설계</span>, MLOps runtime은 <span class="status modelled">실행 영수증 미확인</span>으로 구분합니다. 현재와 목표는 위의 세 분리 도면을 기준으로 읽습니다.</p><div><a class="button button--accent" href="../../assets/JCAREER_AI_RUNTIME_ACTUAL.svg">현재 AI 실행면</a> <a class="button" href="../../assets/JCAREER_ASSESSMENT_EVIDENCE.svg">진단·증적</a> <a class="button" href="../../assets/JCAREER_ENTERPRISE_TOBE_TARGET.svg">TO-BE 목표</a> <button class="button" id="diagram-zoom" type="button" aria-pressed="false">원본 크기로 보기</button></div></div>
+    <div class="plate__nav"><p>GitHub 검사는 <span class="status local">구현</span>, 최신 serverless main은 <span class="status modelled">plan 확인</span>, AWS 2-AZ 기준선은 <span class="status modelled" title="내부 상태 코드: MODELLED">미배포 설계</span>, MLOps runtime은 <span class="status modelled">실행 영수증 미확인</span>으로 구분합니다. 현재와 목표는 위의 세 분리 도면을 기준으로 읽습니다.</p><div><a class="button button--accent" href="#ai-service-flows">AI 서비스 7개 보기</a> <a class="button" href="../../assets/JCAREER_AI_RUNTIME_ACTUAL.svg">현재 AI 실행면</a> <a class="button" href="../../assets/JCAREER_ASSESSMENT_EVIDENCE.svg">진단·증적</a> <a class="button" href="../../assets/JCAREER_ENTERPRISE_TOBE_TARGET.svg">TO-BE 목표</a> <button class="button" id="diagram-zoom" type="button" aria-pressed="false">원본 크기로 보기</button></div></div>
     <dl class="axis-rail" aria-label="전체 지도 네 영역의 상태">
       <div><dt>01 · workplace</dt><dd>업무망 PC 180대<br><code>USER_CONFIRMED · 실물 미관찰</code></dd></div>
       <div><dt>02 · GitHub delivery</dt><dd>Actions 검사 + main branch Pages<br><code>SEPARATE PATHS · AWS 배포 없음</code></dd></div>
@@ -940,7 +940,7 @@ ${commonCss}
       <div><dt>04 · enterprise TO-BE</dt><dd>ECS · RDS · Redis · WAF · NAT · 2-AZ<br><code>PLANNED · NOT DEPLOYED</code></dd></div>
     </dl>
     <div class="architecture-workspace">
-    <section class="flow-explorer" aria-labelledby="flow-explorer-title">
+    <section class="flow-explorer" id="ai-service-flows" aria-labelledby="flow-explorer-title">
       <div class="flow-explorer__head">
         <div><p class="kicker">전체 지도 1개 · AI 서비스·기능 7개</p><h2 id="flow-explorer-title">서비스를 누르면 실제 처리 구간만 움직입니다.</h2></div>
         <p>전체 인프라는 그대로 두고 선택한 경로만 진하게 표시합니다. 움직이는 점과 1·2·3 단계 번호를 따라가면, 처음 보는 사람도 입력부터 결과·기록까지 순서대로 읽을 수 있습니다.</p>
@@ -1115,6 +1115,12 @@ ${svgStepMarkers('operations', 'record')}
     flowButtons.forEach((button) => button.addEventListener('click', () => showFlow(button.dataset.flowButton)));
     window.addEventListener('popstate', () => showFlow(new URLSearchParams(window.location.search).get('flow') || 'overview', false));
     showFlow(new URLSearchParams(window.location.search).get('flow') || 'overview', false);
+    const revealDirectFlow = () => {
+      if (window.location.hash !== '#ai-service-flows') return;
+      document.querySelector('#ai-service-flows')?.scrollIntoView({ block: 'start', behavior: 'instant' });
+    };
+    requestAnimationFrame(revealDirectFlow);
+    window.addEventListener('load', revealDirectFlow, { once: true });
   </script>
 </body>
 </html>`;

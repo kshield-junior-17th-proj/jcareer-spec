@@ -639,14 +639,14 @@ def check() -> list[str]:
             errors.append(f"missing landing context phrase: {phrase}")
 
     flow_links = (
-        "terraform/asis/architecture.html",
-        "terraform/asis/architecture.html?flow=candidate",
-        "terraform/asis/architecture.html?flow=recruiter",
-        "terraform/asis/architecture.html?flow=explanation",
-        "terraform/asis/architecture.html?flow=values",
-        "terraform/asis/architecture.html?flow=history",
-        "terraform/asis/architecture.html?flow=mlops",
-        "terraform/asis/architecture.html?flow=audit",
+        "terraform/asis/architecture.html#ai-service-flows",
+        "terraform/asis/architecture.html?flow=candidate#ai-service-flows",
+        "terraform/asis/architecture.html?flow=recruiter#ai-service-flows",
+        "terraform/asis/architecture.html?flow=explanation#ai-service-flows",
+        "terraform/asis/architecture.html?flow=values#ai-service-flows",
+        "terraform/asis/architecture.html?flow=history#ai-service-flows",
+        "terraform/asis/architecture.html?flow=mlops#ai-service-flows",
+        "terraform/asis/architecture.html?flow=audit#ai-service-flows",
     )
     if landing_text.count('class="flow-shortcuts"') != 1 or any(
         f'href="{href}"' not in landing_text for href in flow_links
