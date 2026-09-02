@@ -204,14 +204,14 @@
           <p class="section-intro">승인형 saved-plan apply 대상인 production-serverless AI 요청 경로와, 자동 연결되지 않은 serverless MLOps 수명주기를 분리했습니다. 최신 소스 <code>a9764f8</code>는 plan run <code>33569358467</code> attempt <code>1</code>·plan SHA-256 <code>c0e596e2…</code>까지 성공했고 <strong>APPLY · LIVE SMOKE NOT RUN</strong> 상태입니다. 마지막으로 관찰된 배포는 별도 revision <code>7a5acfb</code>·run <code>33466745822</code>입니다.</p>
         </div>
         <nav class="flow-shortcuts" aria-label="서비스별 인프라 경로 바로가기">
-          <a href="terraform/asis/architecture.html"><span aria-hidden="true">전체</span><strong>AI 서비스 전체 흐름</strong><small>7개 경로 한눈에 보기</small></a>
-          <a href="terraform/asis/architecture.html?flow=candidate"><span aria-hidden="true">01</span><strong>구직자 공고 추천</strong><small>이력서 → 상위 공고</small></a>
-          <a href="terraform/asis/architecture.html?flow=recruiter"><span aria-hidden="true">02</span><strong>채용담당자 지원자 추천</strong><small>공고 → 담당자 검토</small></a>
-          <a href="terraform/asis/architecture.html?flow=explanation"><span aria-hidden="true">03</span><strong>Bedrock 추천 설명 생성</strong><small>확정 근거 → 한국어 설명</small></a>
-          <a href="terraform/asis/architecture.html?flow=values"><span aria-hidden="true">04</span><strong>기업 방향·가치 일치 근거</strong><small>같은 문구의 위치만 설명</small></a>
-          <a href="terraform/asis/architecture.html?flow=history"><span aria-hidden="true">05</span><strong>합성 과거 결과 관찰</strong><small>참고자료 전용</small></a>
-          <a href="terraform/asis/architecture.html?flow=mlops"><span aria-hidden="true">06</span><strong>합성 MLOps Challenger</strong><small>학습·비교 → 사람 검토 대기</small></a>
-          <a href="terraform/asis/architecture.html?flow=audit"><span aria-hidden="true">07</span><strong>AI 운영 관찰·감사</strong><small>상태·버전·오류·지연 기록</small></a>
+          <a href="terraform/asis/architecture.html#ai-service-flows"><span aria-hidden="true">전체</span><strong>AI 서비스 전체 흐름</strong><small>7개 경로 한눈에 보기</small></a>
+          <a href="terraform/asis/architecture.html?flow=candidate#ai-service-flows"><span aria-hidden="true">01</span><strong>구직자 공고 추천</strong><small>이력서 → 상위 공고</small></a>
+          <a href="terraform/asis/architecture.html?flow=recruiter#ai-service-flows"><span aria-hidden="true">02</span><strong>채용담당자 지원자 추천</strong><small>공고 → 담당자 검토</small></a>
+          <a href="terraform/asis/architecture.html?flow=explanation#ai-service-flows"><span aria-hidden="true">03</span><strong>Bedrock 추천 설명 생성</strong><small>확정 근거 → 한국어 설명</small></a>
+          <a href="terraform/asis/architecture.html?flow=values#ai-service-flows"><span aria-hidden="true">04</span><strong>기업 방향·가치 일치 근거</strong><small>같은 문구의 위치만 설명</small></a>
+          <a href="terraform/asis/architecture.html?flow=history#ai-service-flows"><span aria-hidden="true">05</span><strong>합성 과거 결과 관찰</strong><small>참고자료 전용</small></a>
+          <a href="terraform/asis/architecture.html?flow=mlops#ai-service-flows"><span aria-hidden="true">06</span><strong>합성 MLOps Challenger</strong><small>학습·비교 → 사람 검토 대기</small></a>
+          <a href="terraform/asis/architecture.html?flow=audit#ai-service-flows"><span aria-hidden="true">07</span><strong>AI 운영 관찰·감사</strong><small>상태·버전·오류·지연 기록</small></a>
         </nav>
         <a class="architecture-frame" href="terraform/asis/architecture.html" aria-label="대화형 전체 인프라 도면 열기" data-scale-reveal>
           <img src="assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg" data-animated-diagram data-motion-src="assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg" data-still-src="assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.png" width="2400" height="1400" loading="lazy" decoding="async" alt="GitHub 승인형 OIDC saved-plan apply, Browser와 Cognito의 별도 sign-in·JWT 인증 가지, Browser에서 CloudFront /api/*를 거쳐 HTTP API로 가는 요청 경로, CloudFront의 S3 web origin, Lambda·SQS·Bedrock과 별도 serverless MLOps를 보여 주는 J-Career AI 서비스 실행면">

@@ -12,56 +12,56 @@ import {
 
 const EXPECTED_ROUTES = [
   {
-    href: 'terraform/asis/architecture.html',
+    href: 'terraform/asis/architecture.html#ai-service-flows',
     flow: 'overview',
     detailHref: '../../assets/JCAREER_AI_RUNTIME_ACTUAL.svg',
     steps: 7,
     media: 'overview',
   },
   {
-    href: 'terraform/asis/architecture.html?flow=candidate',
+    href: 'terraform/asis/architecture.html?flow=candidate#ai-service-flows',
     flow: 'candidate',
     detailHref: 'index.html#section-31',
     steps: 5,
     media: 'overview',
   },
   {
-    href: 'terraform/asis/architecture.html?flow=recruiter',
+    href: 'terraform/asis/architecture.html?flow=recruiter#ai-service-flows',
     flow: 'recruiter',
     detailHref: 'index.html#section-31',
     steps: 5,
     media: 'overview',
   },
   {
-    href: 'terraform/asis/architecture.html?flow=explanation',
+    href: 'terraform/asis/architecture.html?flow=explanation#ai-service-flows',
     flow: 'explanation',
     detailHref: 'index.html#section-33',
     steps: 4,
     media: 'overview',
   },
   {
-    href: 'terraform/asis/architecture.html?flow=values',
+    href: 'terraform/asis/architecture.html?flow=values#ai-service-flows',
     flow: 'values',
     detailHref: 'index.html#section-31',
     steps: 5,
     media: 'overview',
   },
   {
-    href: 'terraform/asis/architecture.html?flow=history',
+    href: 'terraform/asis/architecture.html?flow=history#ai-service-flows',
     flow: 'history',
     detailHref: 'index.html#section-31',
     steps: 4,
     media: 'overview',
   },
   {
-    href: 'terraform/asis/architecture.html?flow=mlops',
+    href: 'terraform/asis/architecture.html?flow=mlops#ai-service-flows',
     flow: 'mlops',
     detailHref: '../../mlops/',
     steps: 6,
     media: 'overview',
   },
   {
-    href: 'terraform/asis/architecture.html?flow=audit',
+    href: 'terraform/asis/architecture.html?flow=audit#ai-service-flows',
     flow: 'audit',
     detailHref: 'index.html#section-52',
     steps: 5,
@@ -457,6 +457,8 @@ async function runChecks(client, origin) {
           'detailHref: detailLink ? detailLink.getAttribute("href") : null,' +
           'detailText: detailLink ? detailLink.textContent.trim() : "",' +
           'query: new URL(location.href).searchParams.get("flow"),' +
+          'hash: location.hash,' +
+          'flowTop: document.querySelector("#ai-service-flows")?.getBoundingClientRect().top ?? 9999,' +
           'stepCount: document.querySelectorAll("#flow-steps > li").length,' +
           'markerCount: document.querySelectorAll("[data-flow-layer].is-active [data-flow-step]").length,' +
           'lineCount: document.querySelectorAll("[data-flow-layer].is-active .flow-line").length,' +
@@ -474,6 +476,7 @@ async function runChecks(client, origin) {
     assert(JSON.stringify(routeState.activeLayers) === '["' + route.flow + '"]', 'Wrong active diagram layer for route: ' + route.href);
     assert(routeState.detailHref === route.detailHref && routeState.detailText.length > 0, 'Missing or wrong detail link for route: ' + route.href);
     assert(routeState.query === expectedQuery, 'URL flow state diverged for route: ' + route.href);
+    assert(routeState.hash === '#ai-service-flows' && Math.abs(routeState.flowTop) < 120, 'Direct route did not reveal the AI service controls: ' + route.href);
     assert(routeState.stepCount === route.steps, 'Wrong step count for route: ' + route.href);
     assert(routeState.markerCount === route.steps, 'Diagram markers diverge from written steps for route: ' + route.href);
     assert(routeState.lineCount > 0 && routeState.packetCount === routeState.lineCount, 'Selected route is missing an animated path or travelling dot: ' + route.href);
