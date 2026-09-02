@@ -277,11 +277,17 @@
     .flow-explorer__head h2 { max-width: 760px; margin: 0; font-size: clamp(1.55rem, 2.7vw, 2.2rem); line-height: 1.12; letter-spacing: -.04em; text-wrap: balance; }
     .flow-explorer__head > p { margin: 0; color: #59666e; font-size: .82rem; line-height: 1.65; }
     .flow-selector { margin-top: 20px; display: grid; grid-template-columns: 1fr; gap: 0; border-top: 1px solid var(--line); }
-    .flow-button { min-height: 51px; padding: 9px 10px 9px 12px; display: grid; grid-template-columns: minmax(0, 1fr) auto; justify-content: stretch; align-items: baseline; gap: 10px; border: 0; border-bottom: 1px solid var(--line); color: var(--ink); background: transparent; font-family: inherit; text-align: left; cursor: pointer; transition: color .16s, background .16s, box-shadow .16s; }
+    .flow-group-label { margin: 15px 0 0; padding: 0 12px 7px; color: #6c777d; border-bottom: 1px solid var(--line); font: 750 .62rem/1.25 var(--mono); letter-spacing: .08em; }
+    .flow-button { min-height: 58px; padding: 9px 10px; display: grid; grid-template-columns: 28px minmax(0, 1fr); justify-content: stretch; align-items: center; gap: 10px; border: 0; border-bottom: 1px solid var(--line); color: var(--ink); background: transparent; font-family: inherit; text-align: left; cursor: pointer; transition: color .2s, background .2s, box-shadow .2s, transform .2s; }
     .flow-button:hover { color: var(--accent); background: rgba(255,255,255,.46); transform: none; }
+    .flow-button:active { transform: translateY(1px); }
+    .flow-button:focus-visible { outline: 3px solid rgba(197,83,22,.32); outline-offset: -3px; }
     .flow-button[aria-pressed="true"] { color: var(--ink); background: #fffdf8; box-shadow: inset 3px 0 0 var(--accent); }
-    .flow-button strong { font-size: .88rem; line-height: 1.25; }
-    .flow-button small { color: #748087; font: 700 .62rem/1.25 var(--mono); text-align: right; }
+    .flow-button__index { display: grid; width: 25px; height: 25px; place-items: center; color: #68747b; border: 1px solid #bfc4c1; font: 800 .63rem/1 var(--mono); font-variant-numeric: tabular-nums; }
+    .flow-button[aria-pressed="true"] .flow-button__index { color: #fff; background: var(--accent); border-color: var(--accent); }
+    .flow-button__copy { min-width: 0; }
+    .flow-button strong { display: block; font-size: .86rem; line-height: 1.3; }
+    .flow-button small { display: block; margin-top: 3px; color: #748087; font: 700 .61rem/1.25 var(--mono); }
     .flow-button[aria-pressed="true"] small { color: #65717a; }
     .flow-detail { margin-top: 18px; padding: 19px 0 0; display: grid; grid-template-columns: 1fr; gap: 18px; color: var(--ink); background: transparent; border-top: 2px solid var(--ink); view-transition-name: flow-detail; }
     .flow-detail__status { margin-bottom: 10px; }
@@ -303,14 +309,18 @@
     .diagram-stage { position: relative; width: 100%; min-width: 720px; }
     .diagram-stage--full { min-width: 880px; }
     .diagram-stage > a, .diagram-stage img { display: block; width: 100%; }
-    .diagram-stage img { height: auto; border: 1px solid var(--line); filter: saturate(.88) contrast(1.02); transition: filter .25s ease; }
+    .diagram-stage img { height: auto; border: 1px solid var(--line); filter: saturate(.88) contrast(1.02); opacity: 1; transition: filter .3s ease, opacity .3s ease; }
     .diagram-stage--full img { filter: saturate(.94) contrast(1.02); box-shadow: none; }
     .plate__frame:hover .diagram-stage img { filter: saturate(.94) contrast(1.03); }
-    .flow-overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+    .plate__frame[data-active-flow]:not([data-active-flow="overview"]) .diagram-stage img { filter: grayscale(.78) saturate(.42) contrast(.92); opacity: .42; }
+    .flow-overlay { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; pointer-events: none; }
     .flow-layer { opacity: 0; transition: opacity .25s ease; }
     .flow-layer.is-active { opacity: 1; }
-    .flow-line { fill: none; stroke: #c9541f; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; opacity: .7; stroke-dasharray: 28 22; animation: flowMarch 2.4s linear infinite; }
+    .flow-line { fill: none; stroke: #c9541f; stroke-width: 10; stroke-linecap: round; stroke-linejoin: round; opacity: .92; stroke-dasharray: 28 22; animation: flowMarch 2.4s linear infinite; filter: drop-shadow(0 2px 3px rgba(58,54,44,.2)); }
+    .flow-line.core { stroke: #c9541f; }
     .flow-line.local { stroke: #0d748c; stroke-dasharray: 16 18; }
+    .flow-line.reply { stroke: #087f72; stroke-dasharray: 12 16; }
+    .flow-line.experimental { stroke: #7b4c91; stroke-dasharray: 9 15; }
     .flow-line.missing { stroke: #9b4b8f; stroke-dasharray: 6 20; }
     .flow-line.record { stroke: #7a5b1e; stroke-dasharray: 28 22; }
     .flow-node { fill: rgba(255,255,255,.08); stroke: #c9541f; stroke-width: 5; }
@@ -321,9 +331,15 @@
     .flow-marker.local { fill: #0d7f9b; }
     .flow-marker.missing { fill: #8c2e8f; }
     .flow-marker.record { fill: #765313; }
+    .flow-marker.experimental { fill: #6f4788; }
     .flow-marker.unknown { fill: #5a6c86; }
     .flow-marker-text { fill: #fff; font: 800 16px/1 var(--sans); text-anchor: middle; dominant-baseline: central; }
     .flow-step-marker { transform-box: fill-box; transform-origin: center; }
+    .flow-packet { fill: #c9541f; stroke: #fff; stroke-width: 3; filter: drop-shadow(0 3px 5px rgba(32,43,53,.38)); }
+    .flow-packet.local { fill: #0d748c; }
+    .flow-packet.reply { fill: #087f72; }
+    .flow-packet.experimental { fill: #7b4c91; }
+    .flow-packet.record { fill: #765313; }
     .flow-callout { fill: rgba(255,255,255,.9); stroke: #0d748c; stroke-width: 2; }
     .flow-callout.missing { stroke: #9b4b8f; stroke-dasharray: 9 10; }
     .flow-callout.unknown { fill: none; stroke: #5a6c86; stroke-width: 2; stroke-dasharray: 9 10; }
@@ -353,9 +369,10 @@
     @keyframes flowOld { to { opacity: 0; transform: translateY(-8px); } }
     @keyframes flowNew { from { opacity: 0; transform: translateY(10px); } }
     html[data-motion="reduced"] .flow-line, html[data-motion="reduced"] .motion-toggle-doc::before, html.document-hidden .flow-line { animation: none; }
+    html[data-motion="reduced"] .flow-packet, html.document-hidden .flow-packet { display: none; }
     html[data-motion="reduced"] .scroll-progress { display: none; }
     html[data-motion="reduced"] *, html[data-motion="reduced"] *::before, html[data-motion="reduced"] *::after { animation: none !important; transition-duration: .01ms !important; }
-    @media (max-width: 1200px) { .architecture-workspace { grid-template-columns: 1fr; } .flow-explorer__head { grid-template-columns: minmax(0, 1fr) minmax(260px, .46fr); gap: 36px; } .flow-selector { grid-template-columns: repeat(3, minmax(0, 1fr)); border-left: 1px solid var(--line); } .flow-button { grid-template-columns: 1fr; align-content: center; gap: 3px; border-right: 1px solid var(--line); } .flow-button small { text-align: left; } .flow-detail { grid-template-columns: minmax(250px, .65fr) minmax(0, 1.35fr); gap: 30px; } .flow-detail__boundary { grid-column: 1 / -1; } }
+    @media (max-width: 1200px) { .architecture-workspace { grid-template-columns: 1fr; } .flow-explorer__head { grid-template-columns: minmax(0, 1fr) minmax(260px, .46fr); gap: 36px; } .flow-selector { grid-template-columns: repeat(4, minmax(0, 1fr)); border-left: 1px solid var(--line); } .flow-group-label { grid-column: 1 / -1; } .flow-button { border-right: 1px solid var(--line); } .flow-detail { grid-template-columns: minmax(250px, .65fr) minmax(0, 1.35fr); gap: 30px; } .flow-detail__boundary { grid-column: 1 / -1; } }
     @media (max-width: 1060px) { .flow-selector { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
     @media (max-width: 880px) { .plate__nav, .flow-explorer__head { align-items: flex-start; grid-template-columns: 1fr; } .plate__nav { flex-direction: column; } .axis-rail { grid-template-columns: 1fr 1fr; } .axis-rail > div:nth-child(3) { border-left: 0; border-top: 1px solid var(--line); } .axis-rail > div:nth-child(4) { border-top: 1px solid var(--line); } .flow-detail { grid-template-columns: 1fr; } }
     @media (max-width: 640px) { .plate { width: calc(100% - 24px); margin-top: 20px; } .plate__frame { padding: 6px; } .flow-explorer { padding: 22px 16px; } .flow-selector { grid-template-columns: 1fr 1fr; } .flow-button { min-height: 60px; } .flow-detail { padding-top: 18px; gap: 20px; } .flow-detail__boundary { grid-column: auto; } .diagram-stage { min-width: 900px; } .diagram-stage--full { min-width: 980px; } }
@@ -385,19 +402,21 @@
     <div class="architecture-workspace">
     <section class="flow-explorer" aria-labelledby="flow-explorer-title">
       <div class="flow-explorer__head">
-        <div><p class="kicker">전체 지도 1개 · 서비스·보조 경로 8개</p><h2 id="flow-explorer-title">흐름을 고르되 전체 맥락은 잃지 않습니다.</h2></div>
-        <p>전체 시스템은 사용자·업무망·Slack·GitHub·AWS·LLM Gateway·Bedrock·OpenDART·MLOps를 관계선으로 함께 표시합니다. AI 설명과 MLOps를 선택해도 전체 지도를 유지해 공급자·입력·검토 경계를 같이 보여 주며, MLOps 7단계 상세는 별도 링크에서 엽니다.</p>
+        <div><p class="kicker">전체 지도 1개 · AI 서비스·기능 7개</p><h2 id="flow-explorer-title">서비스를 누르면 실제 처리 구간만 움직입니다.</h2></div>
+        <p>전체 인프라는 그대로 두고 선택한 경로만 진하게 표시합니다. 움직이는 점과 1·2·3 단계 번호를 따라가면, 처음 보는 사람도 입력부터 결과·기록까지 순서대로 읽을 수 있습니다.</p>
       </div>
-      <div class="flow-selector" role="group" aria-label="표시할 서비스·보조 경로">
-        <button class="flow-button" type="button" data-flow-button="overview" aria-pressed="true" aria-controls="flow-detail"><strong>전체 시스템 지도</strong><small>업무망 · GitHub · AWS · AI · MLOps</small></button>
-        <button class="flow-button" type="button" data-flow-button="candidate" aria-pressed="false" aria-controls="flow-detail"><strong>구직자 공고 추천</strong><small>AI · 구현 범위</small></button>
-        <button class="flow-button" type="button" data-flow-button="recruiter" aria-pressed="false" aria-controls="flow-detail"><strong>기업용 인재 찾기</strong><small>AI · 공고 지원자 안에서</small></button>
-        <button class="flow-button" type="button" data-flow-button="explanation" aria-pressed="false" aria-controls="flow-detail"><strong>AI 설명 만들기</strong><small>LLM Gateway · Bedrock 경계</small></button>
-        <button class="flow-button" type="button" data-flow-button="mlops" aria-pressed="false" aria-controls="flow-detail"><strong>MLOps 학습·평가</strong><small>bootstrap 적용 · runtime 대기</small></button>
-        <button class="flow-button" type="button" data-flow-button="workplace" aria-pressed="false" aria-controls="flow-detail"><strong>업무망·Slack</strong><small>외부 SaaS · 운영 미확인</small></button>
-        <button class="flow-button" type="button" data-flow-button="trace" aria-pressed="false" aria-controls="flow-detail"><strong>TRACE·JC-RECEIPT</strong><small>보조 설명 · 인프라 제외</small></button>
-        <button class="flow-button" type="button" data-flow-button="integrations" aria-pressed="false" aria-controls="flow-detail"><strong>외부 업무도구</strong><small>Slack · Notion · SMTP</small></button>
-        <button class="flow-button" type="button" data-flow-button="operations" aria-pressed="false" aria-controls="flow-detail"><strong>기록·탐지</strong><small>운영 보조 경로</small></button>
+      <div class="flow-selector" role="group" aria-label="표시할 AI 서비스와 기능">
+        <button class="flow-button" type="button" data-flow-button="overview" aria-pressed="true" aria-controls="flow-detail"><span class="flow-button__index">ALL</span><span class="flow-button__copy"><strong>AI 서비스 전체 흐름</strong><small>7개 경로 한눈에 보기</small></span></button>
+        <p class="flow-group-label">사용자 대상 핵심 AI 서비스</p>
+        <button class="flow-button" type="button" data-flow-button="candidate" aria-pressed="false" aria-controls="flow-detail"><span class="flow-button__index">01</span><span class="flow-button__copy"><strong>구직자 공고 추천</strong><small>이력서 → 상위 공고</small></span></button>
+        <button class="flow-button" type="button" data-flow-button="recruiter" aria-pressed="false" aria-controls="flow-detail"><span class="flow-button__index">02</span><span class="flow-button__copy"><strong>채용담당자 지원자 추천</strong><small>공고 → 담당자 검토</small></span></button>
+        <p class="flow-group-label">두 서비스가 함께 쓰는 AI 기능</p>
+        <button class="flow-button" type="button" data-flow-button="explanation" aria-pressed="false" aria-controls="flow-detail"><span class="flow-button__index">03</span><span class="flow-button__copy"><strong>Bedrock 추천 설명 생성</strong><small>확정 근거 → 한국어 설명</small></span></button>
+        <button class="flow-button" type="button" data-flow-button="values" aria-pressed="false" aria-controls="flow-detail"><span class="flow-button__index">04</span><span class="flow-button__copy"><strong>기업 방향·가치 일치 근거</strong><small>같은 문구의 위치만 설명</small></span></button>
+        <p class="flow-group-label">AI 운영·실험 지원</p>
+        <button class="flow-button" type="button" data-flow-button="history" aria-pressed="false" aria-controls="flow-detail"><span class="flow-button__index">05</span><span class="flow-button__copy"><strong>합성 과거 결과 관찰</strong><small>참고자료 전용</small></span></button>
+        <button class="flow-button" type="button" data-flow-button="mlops" aria-pressed="false" aria-controls="flow-detail"><span class="flow-button__index">06</span><span class="flow-button__copy"><strong>합성 MLOps Challenger</strong><small>학습·비교 → 사람 검토 대기</small></span></button>
+        <button class="flow-button" type="button" data-flow-button="audit" aria-pressed="false" aria-controls="flow-detail"><span class="flow-button__index">07</span><span class="flow-button__copy"><strong>AI 운영 관찰·감사</strong><small>상태·버전·오류·지연 기록</small></span></button>
       </div>
       <article class="flow-detail" id="flow-detail" aria-live="polite" aria-atomic="false">
         <div>
@@ -405,158 +424,424 @@
           <h3 id="flow-title">전체 시스템 지도</h3>
           <p class="flow-detail__summary" id="flow-summary">사용자, 업무망·외부 SaaS, GitHub delivery, AWS 기준 런타임, LLM Gateway·Bedrock·OpenDART와 별도 MLOps를 연결 관계까지 한 장에서 봅니다.</p>
         </div>
-        <div class="flow-detail__route"><strong>순서대로 읽는 단계</strong><ol class="flow-steps" id="flow-steps" aria-label="전체 인프라 단계별 경로"><li><span class="flow-step__number" aria-hidden="true">1</span><span>브라우저 → CloudFront → API Gateway</span></li><li><span class="flow-step__number" aria-hidden="true">2</span><span>API Lambda → SQS → Agent Lambda</span></li><li><span class="flow-step__number" aria-hidden="true">3</span><span>LLM Gateway → Capability Broker → Bedrock</span></li><li><span class="flow-step__number" aria-hidden="true">4</span><span>DynamoDB·S3·CloudWatch에 상태와 비식별 증적 기록</span></li><li><span class="flow-step__number" aria-hidden="true">5</span><span>Prowler·동적 LLM·MLOps·수기 점검 원본 보존</span></li><li><span class="flow-step__number" aria-hidden="true">6</span><span>공통 포맷 → 비식별화 → 사람 승인 → Evidence Desk</span></li><li><span class="flow-step__number" aria-hidden="true">7</span><span>ECS·RDS·Redis·2-AZ는 미배포 TO-BE 도면으로 분리</span></li></ol></div>
+        <div class="flow-detail__route"><strong>순서대로 읽는 단계</strong><ol class="flow-steps" id="flow-steps" aria-label="전체 인프라 단계별 경로"><li><span class="flow-step__number" aria-hidden="true">1</span><span>사용자 요청이 웹 진입 구간을 통과</span></li><li><span class="flow-step__number" aria-hidden="true">2</span><span>추천 엔진이 자료를 비교하고 점수·순위를 확정</span></li><li><span class="flow-step__number" aria-hidden="true">3</span><span>Bedrock이 확정된 근거를 읽기 쉬운 설명으로 변환</span></li><li><span class="flow-step__number" aria-hidden="true">4</span><span>합성 과거 결과는 참고자료로만 조회</span></li><li><span class="flow-step__number" aria-hidden="true">5</span><span>합성 MLOps는 별도 경로에서 후보 모델을 비교</span></li><li><span class="flow-step__number" aria-hidden="true">6</span><span>상태·오류·지연·버전을 운영 기록으로 남김</span></li><li><span class="flow-step__number" aria-hidden="true">7</span><span>모델 변경은 사람 검토 대기에서 멈춤</span></li></ol></div>
         <div class="flow-detail__boundary"><strong>상태 범위</strong><p id="flow-boundary">LATEST_SOURCE_SHA=a9764f8의 plan run 33569358467 attempt 1은 성공했지만 APPLY · LIVE SMOKE NOT RUN입니다. 마지막 관찰 배포 revision 7a5acfb·run 33466745822와 분리합니다. 현재 서버리스 실행면과 ECS·RDS·Redis·NAT 2-AZ 목표도 서로 다른 도면입니다.</p><a class="flow-detail__link" id="flow-detail-link" href="../../assets/JCAREER_AI_RUNTIME_ACTUAL.svg">현재 AI 실행면 보기</a></div>
       </article>
-      <p class="flow-explorer__exclusion">Slack·Notion·SMTP는 AWS 밖의 업무도구 경계로 표시하며 기본 비활성·실전송 미확인입니다. Bedrock은 직접 호출과 end-to-end를 분리하고, OpenDART는 source-only·미배포로 표시합니다. TRACE·JC-RECEIPT는 실행 컴포넌트에서 제외하고 보조 설명에만 남깁니다.</p>
+      <p class="flow-explorer__exclusion">OpenDART는 AI 서비스가 아니라 기업 공개정보 보강 경로입니다. Capability Broker도 서비스가 아니라 Bedrock 호출 권한을 제한하는 구성요소입니다. 둘 다 관련 흐름 안에서만 표시합니다.</p>
     </section>
     <figure class="plate__frame" id="diagram-frame" aria-describedby="flow-boundary diagram-caption" data-active-media="overview">
       <div class="diagram-media" data-flow-media="overview" aria-hidden="false">
         <div class="diagram-stage diagram-stage--full" data-full-map>
           <a href="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg" aria-label="업무망, Slack, GitHub CI, AWS, LLM Gateway, Bedrock, OpenDART와 MLOps 전체 인프라 SVG 원본 열기"><img src="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-animated-diagram data-motion-src="../../assets/JCAREER_FULL_INFRA_ANIMATED.svg" data-still-src="../../assets/JCAREER_FULL_INFRA_ANIMATED.png" width="2320" height="1500" fetchpriority="high" decoding="async" alt="서비스 사용자와 업무망 PC 180대, Slack·Notion·SMTP 외부 경계, PR·main GitHub Actions 검사와 별도 main branch Pages 배포, AWS 2-AZ 기준 설계, LLM Gateway와 Bedrock 직접 호출·전체 경로 경계, OpenDART source-only 경로, bootstrap 13개만 적용된 MLOps와 미배포 runtime을 한 장에 연결한 전체 인프라 지도"></a>
+          <svg class="flow-overlay" viewBox="0 0 2320 1500" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+            <g class="flow-layer is-active" data-flow-layer="overview">
+              <path class="flow-line core" d="M82 430H310H520H730H970H1210H1600" />
+              <circle class="flow-packet core" r="9">
+                <animateMotion dur="5.4s" repeatCount="indefinite" path="M82 430H310H520H730H970H1210H1600" />
+              </circle>
+              <path class="flow-line local" d="M1210 430V600H1130H1380H1880" />
+              <circle class="flow-packet local" r="9">
+                <animateMotion dur="4.2s" repeatCount="indefinite" path="M1210 430V600H1130H1380H1880" />
+              </circle>
+              <path class="flow-line experimental" d="M300 1190H550H990H1210H1430H1660" />
+              <circle class="flow-packet experimental" r="9">
+                <animateMotion dur="5.8s" repeatCount="indefinite" path="M300 1190H550H990H1210H1430H1660" />
+              </circle>
+              <path class="flow-line record" d="M1210 430V910H1060V970" />
+              <circle class="flow-packet record" r="9">
+                <animateMotion dur="3.4s" repeatCount="indefinite" path="M1210 430V910H1060V970" />
+              </circle>
+              <g class="flow-callout-group">
+                <rect class="flow-callout record" x="1470" y="1080" width="380" height="48" rx="4" />
+                <text class="flow-callout-text" x="1660" y="1111">7개 흐름 · 같은 인프라를 함께 사용</text>
+              </g>
+            <g class="flow-step-marker record" data-flow-step="1" transform="translate(82 365)">
+              <circle class="flow-marker record" r="18" />
+              <text class="flow-marker-text" y="1">1</text>
+            </g>
+            <g class="flow-step-marker record" data-flow-step="2" transform="translate(1210 365)">
+              <circle class="flow-marker record" r="18" />
+              <text class="flow-marker-text" y="1">2</text>
+            </g>
+            <g class="flow-step-marker record" data-flow-step="3" transform="translate(1880 535)">
+              <circle class="flow-marker record" r="18" />
+              <text class="flow-marker-text" y="1">3</text>
+            </g>
+            <g class="flow-step-marker record" data-flow-step="4" transform="translate(1600 715)">
+              <circle class="flow-marker record" r="18" />
+              <text class="flow-marker-text" y="1">4</text>
+            </g>
+            <g class="flow-step-marker record" data-flow-step="5" transform="translate(550 1125)">
+              <circle class="flow-marker record" r="18" />
+              <text class="flow-marker-text" y="1">5</text>
+            </g>
+            <g class="flow-step-marker record" data-flow-step="6" transform="translate(1060 905)">
+              <circle class="flow-marker record" r="18" />
+              <text class="flow-marker-text" y="1">6</text>
+            </g>
+            <g class="flow-step-marker record" data-flow-step="7" transform="translate(1660 1125)">
+              <circle class="flow-marker record" r="18" />
+              <text class="flow-marker-text" y="1">7</text>
+            </g>
+            </g>
+            <g class="flow-layer" data-flow-layer="candidate">
+              <path class="flow-line core" d="M82 430H310H520H730H970H1210H1600" />
+              <circle class="flow-packet core" r="9">
+                <animateMotion dur="4.8s" repeatCount="indefinite" path="M82 430H310H520H730H970H1210H1600" />
+              </circle>
+              <path class="flow-line local" d="M1210 430V600H1130H1380H1880" />
+              <circle class="flow-packet local" r="9">
+                <animateMotion dur="3.8s" repeatCount="indefinite" path="M1210 430V600H1130H1380H1880" />
+              </circle>
+              <path class="flow-line reply" d="M1880 600H1210V430H82" />
+              <circle class="flow-packet reply" r="9">
+                <animateMotion dur="4.5s" repeatCount="indefinite" path="M1880 600H1210V430H82" />
+              </circle>
+              <g class="flow-callout-group">
+                <rect class="flow-callout local" x="1450" y="305" width="500" height="48" rx="4" />
+                <text class="flow-callout-text" x="1700" y="336">점수·순위 확정 → 설명 생성 → 상위 공고</text>
+              </g>
+            <g class="flow-step-marker local" data-flow-step="1" transform="translate(82 365)">
+              <circle class="flow-marker local" r="18" />
+              <text class="flow-marker-text" y="1">1</text>
+            </g>
+            <g class="flow-step-marker local" data-flow-step="2" transform="translate(1600 365)">
+              <circle class="flow-marker local" r="18" />
+              <text class="flow-marker-text" y="1">2</text>
+            </g>
+            <g class="flow-step-marker local" data-flow-step="3" transform="translate(1210 505)">
+              <circle class="flow-marker local" r="18" />
+              <text class="flow-marker-text" y="1">3</text>
+            </g>
+            <g class="flow-step-marker local" data-flow-step="4" transform="translate(1380 535)">
+              <circle class="flow-marker local" r="18" />
+              <text class="flow-marker-text" y="1">4</text>
+            </g>
+            <g class="flow-step-marker local" data-flow-step="5" transform="translate(1880 535)">
+              <circle class="flow-marker local" r="18" />
+              <text class="flow-marker-text" y="1">5</text>
+            </g>
+            </g>
+            <g class="flow-layer" data-flow-layer="recruiter">
+              <path class="flow-line core" d="M82 430H310H520H730H970H1210H1600" />
+              <circle class="flow-packet core" r="9">
+                <animateMotion dur="4.8s" repeatCount="indefinite" path="M82 430H310H520H730H970H1210H1600" />
+              </circle>
+              <path class="flow-line local" d="M1600 430H1210V600H1130H1380H1880" />
+              <circle class="flow-packet local" r="9">
+                <animateMotion dur="4s" repeatCount="indefinite" path="M1600 430H1210V600H1130H1380H1880" />
+              </circle>
+              <path class="flow-line reply" d="M1880 600H1210V430H82" />
+              <circle class="flow-packet reply" r="9">
+                <animateMotion dur="4.5s" repeatCount="indefinite" path="M1880 600H1210V430H82" />
+              </circle>
+              <g class="flow-callout-group">
+                <rect class="flow-callout local" x="1430" y="305" width="540" height="48" rx="4" />
+                <text class="flow-callout-text" x="1700" y="336">공고 지원자만 비교 · 최종 판단은 채용담당자</text>
+              </g>
+            <g class="flow-step-marker local" data-flow-step="1" transform="translate(82 365)">
+              <circle class="flow-marker local" r="18" />
+              <text class="flow-marker-text" y="1">1</text>
+            </g>
+            <g class="flow-step-marker local" data-flow-step="2" transform="translate(1600 365)">
+              <circle class="flow-marker local" r="18" />
+              <text class="flow-marker-text" y="1">2</text>
+            </g>
+            <g class="flow-step-marker local" data-flow-step="3" transform="translate(1210 505)">
+              <circle class="flow-marker local" r="18" />
+              <text class="flow-marker-text" y="1">3</text>
+            </g>
+            <g class="flow-step-marker local" data-flow-step="4" transform="translate(1380 535)">
+              <circle class="flow-marker local" r="18" />
+              <text class="flow-marker-text" y="1">4</text>
+            </g>
+            <g class="flow-step-marker local" data-flow-step="5" transform="translate(1880 535)">
+              <circle class="flow-marker local" r="18" />
+              <text class="flow-marker-text" y="1">5</text>
+            </g>
+            </g>
+            <g class="flow-layer" data-flow-layer="explanation">
+              <path class="flow-line local" d="M1210 430V600H1130H1380H1880" />
+              <circle class="flow-packet local" r="9">
+                <animateMotion dur="3.6s" repeatCount="indefinite" path="M1210 430V600H1130H1380H1880" />
+              </circle>
+              <path class="flow-line reply" d="M1880 600H1210V430" />
+              <circle class="flow-packet reply" r="9">
+                <animateMotion dur="3.3s" repeatCount="indefinite" path="M1880 600H1210V430" />
+              </circle>
+              <g class="flow-callout-group">
+                <rect class="flow-callout local" x="1160" y="660" width="760" height="48" rx="4" />
+                <text class="flow-callout-text" x="1540" y="691">Capability Broker는 서비스가 아니라 Bedrock 권한 통제 구성요소</text>
+              </g>
+            <g class="flow-step-marker local" data-flow-step="1" transform="translate(1210 505)">
+              <circle class="flow-marker local" r="18" />
+              <text class="flow-marker-text" y="1">1</text>
+            </g>
+            <g class="flow-step-marker local" data-flow-step="2" transform="translate(1130 535)">
+              <circle class="flow-marker local" r="18" />
+              <text class="flow-marker-text" y="1">2</text>
+            </g>
+            <g class="flow-step-marker local" data-flow-step="3" transform="translate(1380 535)">
+              <circle class="flow-marker local" r="18" />
+              <text class="flow-marker-text" y="1">3</text>
+            </g>
+            <g class="flow-step-marker local" data-flow-step="4" transform="translate(1880 535)">
+              <circle class="flow-marker local" r="18" />
+              <text class="flow-marker-text" y="1">4</text>
+            </g>
+            </g>
+            <g class="flow-layer" data-flow-layer="values">
+              <path class="flow-line local" d="M1600 430H1210V600H1130H1380H1880" />
+              <circle class="flow-packet local" r="9">
+                <animateMotion dur="4.1s" repeatCount="indefinite" path="M1600 430H1210V600H1130H1380H1880" />
+              </circle>
+              <path class="flow-line reply" d="M1880 600H1210V430H82" />
+              <circle class="flow-packet reply" r="9">
+                <animateMotion dur="4.3s" repeatCount="indefinite" path="M1880 600H1210V430H82" />
+              </circle>
+              <g class="flow-callout-group">
+                <rect class="flow-callout local" x="1390" y="305" width="590" height="48" rx="4" />
+                <text class="flow-callout-text" x="1685" y="336">직접 일치 문구만 설명 · 의미 기반 적합도 판정 아님</text>
+              </g>
+            <g class="flow-step-marker local" data-flow-step="1" transform="translate(1600 365)">
+              <circle class="flow-marker local" r="18" />
+              <text class="flow-marker-text" y="1">1</text>
+            </g>
+            <g class="flow-step-marker local" data-flow-step="2" transform="translate(1210 505)">
+              <circle class="flow-marker local" r="18" />
+              <text class="flow-marker-text" y="1">2</text>
+            </g>
+            <g class="flow-step-marker local" data-flow-step="3" transform="translate(1130 535)">
+              <circle class="flow-marker local" r="18" />
+              <text class="flow-marker-text" y="1">3</text>
+            </g>
+            <g class="flow-step-marker local" data-flow-step="4" transform="translate(1880 535)">
+              <circle class="flow-marker local" r="18" />
+              <text class="flow-marker-text" y="1">4</text>
+            </g>
+            <g class="flow-step-marker local" data-flow-step="5" transform="translate(82 365)">
+              <circle class="flow-marker local" r="18" />
+              <text class="flow-marker-text" y="1">5</text>
+            </g>
+            </g>
+            <g class="flow-layer" data-flow-layer="history">
+              <path class="flow-line record" d="M82 430H310H520H730H970H1210H1600V770" />
+              <circle class="flow-packet record" r="9">
+                <animateMotion dur="5s" repeatCount="indefinite" path="M82 430H310H520H730H970H1210H1600V770" />
+              </circle>
+              <path class="flow-line reply" d="M1600 770V430H1210H82" />
+              <circle class="flow-packet reply" r="9">
+                <animateMotion dur="4.6s" repeatCount="indefinite" path="M1600 770V430H1210H82" />
+              </circle>
+              <g class="flow-callout-group">
+                <rect class="flow-callout record" x="1370" y="825" width="470" height="48" rx="4" />
+                <text class="flow-callout-text" x="1605" y="856">참고자료 전용 · 운영 점수·합격 확률 미사용</text>
+              </g>
+            <g class="flow-step-marker record" data-flow-step="1" transform="translate(1600 365)">
+              <circle class="flow-marker record" r="18" />
+              <text class="flow-marker-text" y="1">1</text>
+            </g>
+            <g class="flow-step-marker record" data-flow-step="2" transform="translate(1600 715)">
+              <circle class="flow-marker record" r="18" />
+              <text class="flow-marker-text" y="1">2</text>
+            </g>
+            <g class="flow-step-marker record" data-flow-step="3" transform="translate(1210 505)">
+              <circle class="flow-marker record" r="18" />
+              <text class="flow-marker-text" y="1">3</text>
+            </g>
+            <g class="flow-step-marker record" data-flow-step="4" transform="translate(82 365)">
+              <circle class="flow-marker record" r="18" />
+              <text class="flow-marker-text" y="1">4</text>
+            </g>
+            </g>
+            <g class="flow-layer" data-flow-layer="mlops">
+              <path class="flow-line experimental" d="M300 1190H550H990H1210H1430H1660" />
+              <circle class="flow-packet experimental" r="9">
+                <animateMotion dur="5.4s" repeatCount="indefinite" path="M300 1190H550H990H1210H1430H1660" />
+              </circle>
+              <path class="flow-line experimental" d="M780 1330V1280H990V1190" />
+              <circle class="flow-packet experimental" r="9">
+                <animateMotion dur="2.8s" repeatCount="indefinite" path="M780 1330V1280H990V1190" />
+              </circle>
+              <path class="flow-line record" d="M1200 1330V1280H990V1190" />
+              <circle class="flow-packet record" r="9">
+                <animateMotion dur="3.1s" repeatCount="indefinite" path="M1200 1330V1280H990V1190" />
+              </circle>
+              <g class="flow-callout-group">
+                <rect class="flow-callout experimental" x="1150" y="1030" width="650" height="48" rx="4" />
+                <text class="flow-callout-text" x="1475" y="1061">후보 모델은 운영 매처에 자동 적용되지 않음</text>
+              </g>
+            <g class="flow-step-marker experimental" data-flow-step="1" transform="translate(300 1125)">
+              <circle class="flow-marker experimental" r="18" />
+              <text class="flow-marker-text" y="1">1</text>
+            </g>
+            <g class="flow-step-marker experimental" data-flow-step="2" transform="translate(550 1125)">
+              <circle class="flow-marker experimental" r="18" />
+              <text class="flow-marker-text" y="1">2</text>
+            </g>
+            <g class="flow-step-marker experimental" data-flow-step="3" transform="translate(780 1125)">
+              <circle class="flow-marker experimental" r="18" />
+              <text class="flow-marker-text" y="1">3</text>
+            </g>
+            <g class="flow-step-marker experimental" data-flow-step="4" transform="translate(990 1125)">
+              <circle class="flow-marker experimental" r="18" />
+              <text class="flow-marker-text" y="1">4</text>
+            </g>
+            <g class="flow-step-marker experimental" data-flow-step="5" transform="translate(1320 1125)">
+              <circle class="flow-marker experimental" r="18" />
+              <text class="flow-marker-text" y="1">5</text>
+            </g>
+            <g class="flow-step-marker experimental" data-flow-step="6" transform="translate(1660 1125)">
+              <circle class="flow-marker experimental" r="18" />
+              <text class="flow-marker-text" y="1">6</text>
+            </g>
+            </g>
+            <g class="flow-layer" data-flow-layer="audit">
+              <path class="flow-line record" d="M1210 430V910H1060V970" />
+              <circle class="flow-packet record" r="9">
+                <animateMotion dur="3.7s" repeatCount="indefinite" path="M1210 430V910H1060V970" />
+              </circle>
+              <path class="flow-line local" d="M1130 600V850H1060V970H1300" />
+              <circle class="flow-packet local" r="9">
+                <animateMotion dur="3.6s" repeatCount="indefinite" path="M1130 600V850H1060V970H1300" />
+              </circle>
+              <path class="flow-line record" d="M1540 970H1300" />
+              <circle class="flow-packet record" r="9">
+                <animateMotion dur="2.6s" repeatCount="indefinite" path="M1540 970H1300" />
+              </circle>
+              <g class="flow-callout-group">
+                <rect class="flow-callout record" x="1120" y="1035" width="700" height="48" rx="4" />
+                <text class="flow-callout-text" x="1470" y="1066">관찰 기록은 자동 적합성 판정이나 인증 결론이 아님</text>
+              </g>
+            <g class="flow-step-marker record" data-flow-step="1" transform="translate(1210 505)">
+              <circle class="flow-marker record" r="18" />
+              <text class="flow-marker-text" y="1">1</text>
+            </g>
+            <g class="flow-step-marker record" data-flow-step="2" transform="translate(1130 535)">
+              <circle class="flow-marker record" r="18" />
+              <text class="flow-marker-text" y="1">2</text>
+            </g>
+            <g class="flow-step-marker record" data-flow-step="3" transform="translate(1060 905)">
+              <circle class="flow-marker record" r="18" />
+              <text class="flow-marker-text" y="1">3</text>
+            </g>
+            <g class="flow-step-marker record" data-flow-step="4" transform="translate(1300 905)">
+              <circle class="flow-marker record" r="18" />
+              <text class="flow-marker-text" y="1">4</text>
+            </g>
+            <g class="flow-step-marker record" data-flow-step="5" transform="translate(1540 905)">
+              <circle class="flow-marker record" r="18" />
+              <text class="flow-marker-text" y="1">5</text>
+            </g>
+            </g>
+          </svg>
         </div>
       </div>
       <div class="diagram-media" data-flow-media="asis" aria-hidden="true" hidden>
         <div class="diagram-stage">
           <a href="JCAREER_ASIS_FLOW.drawio.png" aria-label="AWS 런타임 기준 흐름도 PNG 원본 열기"><img src="JCAREER_ASIS_FLOW.drawio.png" width="2400" height="1400" loading="eager" decoding="async" alt="업무망 PC 180대, 사용자 요청 6단계, 공식 AWS 서비스 아이콘, 가용 영역 두 곳, 데이터 저장소와 기록·탐지, 기본 비활성 로컬 확장 경계를 표시한 J-Career AWS 기준 설계 흐름도"></a>
           <svg class="flow-overlay" viewBox="0 0 2400 1400" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
-            <g class="flow-layer is-active" data-flow-layer="overview">
+            <g class="flow-layer is-active" data-legacy-flow-layer="overview">
               <path class="flow-line" d="M165 455H382 M490 455H628 M734 455H870 M980 455H1120V510H1216 M1348 510H1535" />
               <path class="flow-line missing" d="M1664 510H1822" />
               <path class="flow-line record" d="M1280 582V922 M1600 582V922" />
               <circle class="flow-node" cx="435" cy="435" r="44" /><circle class="flow-node" cx="680" cy="435" r="44" /><circle class="flow-node" cx="925" cy="455" r="46" /><circle class="flow-node" cx="1280" cy="510" r="44" /><circle class="flow-node" cx="1600" cy="510" r="46" />
             </g>
-            <g class="flow-layer" data-flow-layer="candidate">
+            <g class="flow-layer" data-legacy-flow-layer="candidate">
               <path class="flow-line" d="M165 455H382 M490 455H628 M734 455H870 M980 455H1120V510H1216 M1348 510H1535" />
               <circle class="flow-node local" cx="1600" cy="510" r="50" />
               <rect class="flow-callout" x="1370" y="337" width="460" height="48" rx="2" /><text class="flow-callout-text" x="1600" y="368">서비스 구현 범위 · 데이터 연계 검토</text>
 
-            <g class="flow-step-marker local" data-flow-step="1" transform="translate(1450 300)">
+            <g class="flow-step-marker local" data-flow-step="1" transform="translate(82 365)">
               <circle class="flow-marker local" r="18" />
               <text class="flow-marker-text" y="1">1</text>
             </g>
-            <g class="flow-step-marker local" data-flow-step="2" transform="translate(1600 300)">
+            <g class="flow-step-marker local" data-flow-step="2" transform="translate(1600 365)">
               <circle class="flow-marker local" r="18" />
               <text class="flow-marker-text" y="1">2</text>
             </g>
-            <g class="flow-step-marker local" data-flow-step="3" transform="translate(1750 300)">
+            <g class="flow-step-marker local" data-flow-step="3" transform="translate(1210 505)">
               <circle class="flow-marker local" r="18" />
               <text class="flow-marker-text" y="1">3</text>
             </g>
+            <g class="flow-step-marker local" data-flow-step="4" transform="translate(1380 535)">
+              <circle class="flow-marker local" r="18" />
+              <text class="flow-marker-text" y="1">4</text>
             </g>
-            <g class="flow-layer" data-flow-layer="recruiter">
+            <g class="flow-step-marker local" data-flow-step="5" transform="translate(1880 535)">
+              <circle class="flow-marker local" r="18" />
+              <text class="flow-marker-text" y="1">5</text>
+            </g>
+            </g>
+            <g class="flow-layer" data-legacy-flow-layer="recruiter">
               <path class="flow-line" d="M165 455H382 M490 455H628 M734 455H870 M980 455H1120V510H1216 M1348 510H1535" />
               <circle class="flow-node local" cx="1600" cy="510" r="50" />
               <rect class="flow-callout" x="1370" y="337" width="460" height="48" rx="2" /><text class="flow-callout-text" x="1600" y="368">서비스 구현 범위 · 데이터 연계 검토</text>
 
-            <g class="flow-step-marker local" data-flow-step="1" transform="translate(1450 300)">
+            <g class="flow-step-marker local" data-flow-step="1" transform="translate(82 365)">
               <circle class="flow-marker local" r="18" />
               <text class="flow-marker-text" y="1">1</text>
             </g>
-            <g class="flow-step-marker local" data-flow-step="2" transform="translate(1600 300)">
+            <g class="flow-step-marker local" data-flow-step="2" transform="translate(1600 365)">
               <circle class="flow-marker local" r="18" />
               <text class="flow-marker-text" y="1">2</text>
             </g>
-            <g class="flow-step-marker local" data-flow-step="3" transform="translate(1750 300)">
+            <g class="flow-step-marker local" data-flow-step="3" transform="translate(1210 505)">
               <circle class="flow-marker local" r="18" />
               <text class="flow-marker-text" y="1">3</text>
             </g>
+            <g class="flow-step-marker local" data-flow-step="4" transform="translate(1380 535)">
+              <circle class="flow-marker local" r="18" />
+              <text class="flow-marker-text" y="1">4</text>
             </g>
-            <g class="flow-layer" data-flow-layer="explanation">
+            <g class="flow-step-marker local" data-flow-step="5" transform="translate(1880 535)">
+              <circle class="flow-marker local" r="18" />
+              <text class="flow-marker-text" y="1">5</text>
+            </g>
+            </g>
+            <g class="flow-layer" data-legacy-flow-layer="explanation">
               <path class="flow-line" d="M165 455H382 M490 455H628 M734 455H870 M980 455H1120V510H1216 M1348 510H1535" />
               <circle class="flow-node local" cx="1600" cy="510" r="50" />
               <rect class="flow-callout" x="1405" y="337" width="390" height="48" rx="2" /><text class="flow-callout-text" x="1600" y="368">점수 고정 → 설명만 생성</text>
 
-            <g class="flow-step-marker local" data-flow-step="1" transform="translate(1300 290)">
+            <g class="flow-step-marker local" data-flow-step="1" transform="translate(1210 505)">
               <circle class="flow-marker local" r="18" />
               <text class="flow-marker-text" y="1">1</text>
             </g>
-            <g class="flow-step-marker local" data-flow-step="2" transform="translate(1450 290)">
+            <g class="flow-step-marker local" data-flow-step="2" transform="translate(1130 535)">
               <circle class="flow-marker local" r="18" />
               <text class="flow-marker-text" y="1">2</text>
             </g>
-            <g class="flow-step-marker local" data-flow-step="3" transform="translate(1600 290)">
+            <g class="flow-step-marker local" data-flow-step="3" transform="translate(1380 535)">
               <circle class="flow-marker local" r="18" />
               <text class="flow-marker-text" y="1">3</text>
             </g>
-            <g class="flow-step-marker local" data-flow-step="4" transform="translate(1750 290)">
+            <g class="flow-step-marker local" data-flow-step="4" transform="translate(1880 535)">
               <circle class="flow-marker local" r="18" />
               <text class="flow-marker-text" y="1">4</text>
             </g>
             </g>
-            <g class="flow-layer" data-flow-layer="mlops"></g>
-            <g class="flow-layer" data-flow-layer="workplace">
+            <g class="flow-layer" data-legacy-flow-layer="mlops"></g>
+            <g class="flow-layer" data-legacy-flow-layer="workplace">
               <rect class="flow-callout unknown" x="25" y="640" width="290" height="710" rx="18" />
 
-            <g class="flow-step-marker unknown" data-flow-step="1" transform="translate(80 625)">
-              <circle class="flow-marker unknown" r="18" />
-              <text class="flow-marker-text" y="1">1</text>
             </g>
-            <g class="flow-step-marker unknown" data-flow-step="2" transform="translate(170 625)">
-              <circle class="flow-marker unknown" r="18" />
-              <text class="flow-marker-text" y="1">2</text>
-            </g>
-            <g class="flow-step-marker unknown" data-flow-step="3" transform="translate(260 625)">
-              <circle class="flow-marker unknown" r="18" />
-              <text class="flow-marker-text" y="1">3</text>
-            </g>
-            <g class="flow-step-marker unknown" data-flow-step="4" transform="translate(350 625)">
-              <circle class="flow-marker unknown" r="18" />
-              <text class="flow-marker-text" y="1">4</text>
-            </g>
-            </g>
-            <g class="flow-layer" data-flow-layer="trace">
+            <g class="flow-layer" data-legacy-flow-layer="trace">
               <path class="flow-line local" d="M1500 565H1870" />
               <circle class="flow-node local" cx="1600" cy="510" r="52" />
               <rect class="flow-callout" x="1360" y="657" width="520" height="48" rx="2" /><text class="flow-callout-text" x="1620" y="688">기본 비활성 · receipt와 사람 검토 소스</text>
 
-            <g class="flow-step-marker local" data-flow-step="1" transform="translate(1480 610)">
-              <circle class="flow-marker local" r="18" />
-              <text class="flow-marker-text" y="1">1</text>
             </g>
-            <g class="flow-step-marker local" data-flow-step="2" transform="translate(1650 610)">
-              <circle class="flow-marker local" r="18" />
-              <text class="flow-marker-text" y="1">2</text>
-            </g>
-            <g class="flow-step-marker local" data-flow-step="3" transform="translate(1820 610)">
-              <circle class="flow-marker local" r="18" />
-              <text class="flow-marker-text" y="1">3</text>
-            </g>
-            </g>
-            <g class="flow-layer" data-flow-layer="integrations">
+            <g class="flow-layer" data-legacy-flow-layer="integrations">
               <path class="flow-line local" d="M1450 610H1850" />
               <circle class="flow-node local" cx="1600" cy="510" r="52" />
               <rect class="flow-callout" x="1360" y="657" width="520" height="48" rx="2" /><text class="flow-callout-text" x="1620" y="688">opt-in 소스 · 실제 외부 전송 미확인</text>
 
-            <g class="flow-step-marker local" data-flow-step="1" transform="translate(1450 610)">
-              <circle class="flow-marker local" r="18" />
-              <text class="flow-marker-text" y="1">1</text>
             </g>
-            <g class="flow-step-marker local" data-flow-step="2" transform="translate(1600 610)">
-              <circle class="flow-marker local" r="18" />
-              <text class="flow-marker-text" y="1">2</text>
-            </g>
-            <g class="flow-step-marker local" data-flow-step="3" transform="translate(1750 610)">
-              <circle class="flow-marker local" r="18" />
-              <text class="flow-marker-text" y="1">3</text>
-            </g>
-            </g>
-            <g class="flow-layer" data-flow-layer="operations">
+            <g class="flow-layer" data-legacy-flow-layer="operations">
               <path class="flow-line record" d="M1290 505V742 M1630 505V742" />
               <circle class="flow-node record" cx="572" cy="775" r="38" /><circle class="flow-node record" cx="1292" cy="775" r="38" /><circle class="flow-node record" cx="1632" cy="775" r="38" /><circle class="flow-node record" cx="1992" cy="775" r="38" />
 
-            <g class="flow-step-marker record" data-flow-step="1" transform="translate(540 725)">
-              <circle class="flow-marker record" r="18" />
-              <text class="flow-marker-text" y="1">1</text>
-            </g>
-            <g class="flow-step-marker record" data-flow-step="2" transform="translate(1450 725)">
-              <circle class="flow-marker record" r="18" />
-              <text class="flow-marker-text" y="1">2</text>
-            </g>
-            <g class="flow-step-marker record" data-flow-step="3" transform="translate(1960 725)">
-              <circle class="flow-marker record" r="18" />
-              <text class="flow-marker-text" y="1">3</text>
-            </g>
             </g>
           </svg>
         </div>
@@ -623,7 +908,7 @@
       zoomButton.setAttribute('aria-pressed', String(expanded));
       zoomButton.textContent = expanded ? '화면에 맞추기' : '원본 크기로 보기';
     });
-    const flowDefinitions = {"overview":{"title":"AI 실행·증적·TO-BE 분리 지도","status":"현재와 목표 분리","tone":"modelled","summary":"현재 서버리스 AI 실행면, 컨설팅 증적 반입, 승인 전 기업 2-AZ 목표를 서로 다른 도면으로 읽습니다.","detailHref":"../../assets/JCAREER_AI_RUNTIME_ACTUAL.svg","detailLabel":"현재 AI 실행면 보기","stages":[{"label":"브라우저 → CloudFront → API Gateway"},{"label":"API Lambda → SQS → Agent Lambda"},{"label":"LLM Gateway → Capability Broker → Bedrock"},{"label":"DynamoDB·S3·CloudWatch에 상태와 비식별 증적 기록"},{"label":"Prowler·동적 LLM·MLOps·수기 점검 원본 보존"},{"label":"공통 포맷 → 비식별화 → 사람 승인 → Evidence Desk"},{"label":"ECS·RDS·Redis·2-AZ는 미배포 TO-BE 도면으로 분리"}],"boundary":"LATEST_SOURCE_SHA=a9764f8 · PLAN_RUN=33569358467 · PLAN_ATTEMPT=1 · PLAN_SHA256=c0e596e222fcf440f23e29dd165fe42b3d934656d89b96195c2e0a0e9ca8b2f2 · PLAN_AT=2026-09-02T08:06:36+09:00. APPLY · LIVE SMOKE NOT RUN. LAST_OBSERVED_DEPLOYMENT_SHA=7a5acfb · HISTORICAL_RUN=33466745822 · OBSERVED_AT=2026-09-01T12:56:38+09:00과 구분합니다. Pages publish는 AWS apply와 별도이며 기업 TO-BE는 AWS 비접속 plan입니다."},"candidate":{"title":"구직자 공고 추천","status":"서비스 구현 범위","tone":"local","summary":"합성 이력서와 열린 공고의 기술·경력·희망 직무를 같은 산식으로 비교해 공고 순서를 보여 주는 흐름입니다.","detailHref":"index.html#section-31","detailLabel":"공고 추천 기능 명세 보기","stages":[{"label":"이력서·공고 자료 확인","x":1450,"y":300},{"label":"조건 비교·설명 생성","x":1600,"y":300},{"label":"추천 결과 반환","x":1750,"y":300}],"boundary":"합성 데이터 기반 구현 범위입니다. 조건 일치도를 설명하며 합격 가능성을 예측하지 않습니다. AWS 데이터 저장소 연계와 배포 결과는 별도 검증 항목입니다."},"recruiter":{"title":"기업용 인재 찾기","status":"공고 지원자 범위","tone":"local","summary":"자기 회사의 한 공고에 지원한 활성 지원자만 대상으로 조건 일치 점수와 근거를 비교하는 흐름입니다.","detailHref":"index.html#section-31","detailLabel":"기업용 인재 찾기 명세 보기","stages":[{"label":"기업 소유·공고 범위 확인","x":1450,"y":300},{"label":"해당 공고 지원자 비교","x":1600,"y":300},{"label":"설명·최대 3명 임시 비교","x":1750,"y":300}],"boundary":"자사 공고에 지원한 활성 후보자를 대상으로 합니다. 기업 방향 대조는 점수와 순위를 바꾸지 않으며, 최대 3명의 비교 선택은 현재 화면에서만 유지합니다."},"explanation":{"title":"AI 설명 만들기","status":"설명 생성 검증","tone":"guarded","summary":"조건 비교 엔진이 확정한 점수와 근거를 LLM Gateway가 설명 문장으로 바꾸는 보조 흐름입니다. 점수와 순위를 고칠 권한은 없습니다.","detailHref":"index.html#section-33","detailLabel":"AI 점수·설명 규칙 보기","stages":[{"label":"API Lambda가 확정 점수·근거 전달","x":1300,"y":290},{"label":"LLM Gateway Lambda가 설명 전용 요청 구성","x":1450,"y":290},{"label":"Capability Broker가 exact model만 허용","x":1600,"y":290},{"label":"현재 SHA apply·Bedrock E2E smoke 대기","x":1750,"y":290}],"boundary":"API Lambda→LLM Gateway Lambda→Capability Broker Lambda→Bedrock 경로는 소스와 Terraform에 구현됐습니다. LATEST_SOURCE_SHA=a9764f8의 plan run 33569358467 attempt 1은 성공했지만 APPLY · LIVE SMOKE NOT RUN이며, LAST_OBSERVED_DEPLOYMENT_SHA=7a5acfb의 성공 기록과 분리합니다."},"mlops":{"title":"MLOps 학습·평가","status":"모델 검증 · 검토 대기","tone":"guarded","summary":"기준 110개와 분리된 서버리스 경로입니다. bootstrap 기반 13개는 적용됐고, 아직 배포하지 않은 Lambda가 합성 특징 파일을 검사·학습하는 runtime 단계는 사람 검토 전에서 멈춥니다.","detailHref":"../../mlops/","detailLabel":"MLOps 7단계 상세 보기","stages":[{"label":"합성 회원·기업 자료 읽기"},{"label":"숫자 비교 특징 5개 만들기"},{"label":"S3·ECR·DynamoDB·IAM·Logs bootstrap 13개 적용"},{"label":"ECR 이미지 게시 · 아직 없음"},{"label":"14번째 Lambda 배포·실행 · 아직 없음"},{"label":"S3 결과 6개·DynamoDB run · 아직 없음"},{"label":"TRAINED_PENDING_HUMAN_REVIEW에서 정지"}],"boundary":"별도 terraform/serverless-mlops는 0/13/14 단계입니다. 2026-08-31 bootstrap 13개 적용만 확인했고 이미지 게시·14번째 Lambda·실행·결과 생성·추천 런타임 배선은 없습니다. GitHub CI가 자동 배포한 것이 아닙니다."},"workplace":{"title":"업무망·Slack 경계","status":"시나리오 사용 미확인","tone":"unknown","summary":"업무망 수량, 선언된 VPN+MFA·UTM과 AWS 밖의 Slack 자산대장 경계를 서로 다른 확인 수준으로 봅니다.","detailHref":"../../consulting/","detailLabel":"단말 진단 기술 사례 보기","stages":[{"label":"PC 180대 · Windows 100 / macOS 80","x":80,"y":625},{"label":"VPN+MFA·UTM · 시나리오 선언","x":170,"y":625},{"label":"Slack 외부 SaaS · 운영 미확인","x":260,"y":625},{"label":"Windows 3 + macOS 3 endpoint review · 실물 없음","x":350,"y":625}],"boundary":"두 OS의 Slack 바로가기와 macOS best-effort 종료 소스를 확인했습니다. 별도 webhook 어댑터는 기본 비활성 로컬 소스이며 실제 workspace·계정·보존 정책·전송은 미확인입니다. Amazon Q Developer(AWS Chatbot), SNS, EventBridge 같은 AWS 통합은 없습니다."},"trace":{"title":"TRACE·JC-RECEIPT","status":"보조 설명 · 인프라 제외","tone":"guarded","summary":"추천 결과의 receipt·정정·사람 검토 source를 설명하는 보조 항목입니다. 전체 인프라 지도의 실행 컴포넌트나 구축 대상으로 넣지 않습니다.","detailHref":"index.html#section-25","detailLabel":"TRACE·JC-RECEIPT 보조 경계 보기","stages":[{"label":"최소 개인정보 Decision Receipt","x":1480,"y":610},{"label":"정정 요청·원본-정정 관찰","x":1650,"y":610},{"label":"관리자 사람 검토 기록","x":1820,"y":610}],"boundary":"TRACE_MODE 기본값은 disabled입니다. 합성 소스·시험만 확인했으며 실제 지원자 자료, 운영 승인, AWS 배포와 새 Terraform 리소스는 없습니다. 합격·이의·ISO 충족·잔여위험을 자동 판정하지 않습니다."},"integrations":{"title":"외부 업무도구","status":"코드 있으나 잠금","tone":"guarded","summary":"관리자가 고정 합성 이벤트로 Slack·Notion·SMTP 어댑터의 격리·감사 경계를 확인하는 opt-in 경로입니다.","detailHref":"index.html#section-25","detailLabel":"외부 업무도구 구현 경계 보기","stages":[{"label":"admin 상태·합성 요청","x":1450,"y":610},{"label":"감사 선기록·멱등 예약","x":1600,"y":610},{"label":"opt-in provider 경계","x":1750,"y":610}],"boundary":"전역과 provider별 기본값이 모두 꺼져 있습니다. 무통신 계약 시험만 확인했으며 실제 credential, Slack·Notion workspace, 메일 시스템, 메시지 전송 또는 AWS 리소스는 없습니다. SMTP 소스는 그룹웨어 연동 증거가 아닙니다."},"operations":{"title":"기록·탐지 경로","status":"Terraform 설계","tone":"modelled","summary":"파일 로그, 앱 로그, AWS 작업 기록과 위협 탐지 구성을 따로 살펴보는 보조 경로입니다.","detailHref":"index.html#section-52","detailLabel":"보안·운영 명세 보기","stages":[{"label":"위협 탐지 구성 확인","x":540,"y":725},{"label":"파일·앱 로그 목적지 확인","x":1450,"y":725},{"label":"AWS 작업 기록 확인","x":1960,"y":725}],"boundary":"Terraform 선언을 기준선으로 사용합니다. 로그 수집 완전성, 경보 처리와 장애 대응 효과는 운영 관찰 기록에서 따로 확인해야 합니다."}};
+    const flowDefinitions = {"overview":{"title":"AI 서비스 전체 흐름","status":"전체 인프라","tone":"modelled","markerTone":"record","summary":"하나의 인프라에서 핵심 추천 2개, 공용 AI 기능 2개, 운영·실험 지원 3개가 어느 구간을 함께 쓰는지 봅니다.","detailHref":"../../assets/JCAREER_AI_RUNTIME_ACTUAL.svg","detailLabel":"현재 AI 실행면 보기","stages":[{"label":"사용자 요청이 웹 진입 구간을 통과","x":82,"y":365},{"label":"추천 엔진이 자료를 비교하고 점수·순위를 확정","x":1210,"y":365},{"label":"Bedrock이 확정된 근거를 읽기 쉬운 설명으로 변환","x":1880,"y":535},{"label":"합성 과거 결과는 참고자료로만 조회","x":1600,"y":715},{"label":"합성 MLOps는 별도 경로에서 후보 모델을 비교","x":550,"y":1125},{"label":"상태·오류·지연·버전을 운영 기록으로 남김","x":1060,"y":905},{"label":"모델 변경은 사람 검토 대기에서 멈춤","x":1660,"y":1125}],"visuals":[{"d":"M82 430H310H520H730H970H1210H1600","tone":"core","dur":5.4},{"d":"M1210 430V600H1130H1380H1880","tone":"local","dur":4.2},{"d":"M300 1190H550H990H1210H1430H1660","tone":"experimental","dur":5.8},{"d":"M1210 430V910H1060V970","tone":"record","dur":3.4}],"callout":{"x":1470,"y":1080,"w":380,"text":"7개 흐름 · 같은 인프라를 함께 사용"},"boundary":"LATEST_SOURCE_SHA=a9764f8 · PLAN_RUN=33569358467 · PLAN_ATTEMPT=1 · PLAN_SHA256=c0e596e222fcf440f23e29dd165fe42b3d934656d89b96195c2e0a0e9ca8b2f2 · PLAN_AT=2026-09-02T08:06:36+09:00. APPLY · LIVE SMOKE NOT RUN. LAST_OBSERVED_DEPLOYMENT_SHA=7a5acfb · HISTORICAL_RUN=33466745822 · OBSERVED_AT=2026-09-01T12:56:38+09:00과 구분합니다. Pages publish는 AWS apply와 별도이며 기업 TO-BE는 AWS 비접속 plan입니다."},"candidate":{"title":"구직자 공고 추천","status":"핵심 AI 서비스","tone":"local","markerTone":"local","summary":"구직자 이력서와 열린 공고 여러 건을 비교해 점수와 순위를 먼저 확정하고, 그 근거를 설명으로 붙여 상위 공고를 보여 줍니다.","detailHref":"index.html#section-31","detailLabel":"공고 추천 기능 명세 보기","stages":[{"label":"구직자가 이력서를 입력","x":82,"y":365},{"label":"열린 공고 N개를 조회","x":1600,"y":365},{"label":"추천 엔진이 조건 점수와 순위를 확정","x":1210,"y":505},{"label":"권한 통제를 거쳐 Bedrock이 추천 이유를 생성","x":1380,"y":535},{"label":"점수와 설명을 합쳐 상위 공고를 반환","x":1880,"y":535}],"visuals":[{"d":"M82 430H310H520H730H970H1210H1600","tone":"core","dur":4.8},{"d":"M1210 430V600H1130H1380H1880","tone":"local","dur":3.8},{"d":"M1880 600H1210V430H82","tone":"reply","dur":4.5}],"callout":{"x":1450,"y":305,"w":500,"text":"점수·순위 확정 → 설명 생성 → 상위 공고"},"boundary":"조건 일치도를 설명하는 서비스이며 합격 가능성을 예측하지 않습니다. LLM은 이미 확정된 점수와 순위를 바꿀 수 없습니다."},"recruiter":{"title":"채용담당자 지원자 추천","status":"핵심 AI 서비스","tone":"local","markerTone":"local","summary":"채용담당자가 자기 회사 공고의 지원자 여러 명을 비교해 점수와 순위를 먼저 확정하고, 추천 이유와 원문 근거를 함께 검토합니다.","detailHref":"index.html#section-31","detailLabel":"지원자 추천 기능 명세 보기","stages":[{"label":"채용담당자의 회사·공고 권한을 확인","x":82,"y":365},{"label":"해당 공고의 활성 지원자 N명을 조회","x":1600,"y":365},{"label":"추천 엔진이 조건 점수와 순위를 확정","x":1210,"y":505},{"label":"권한 통제를 거쳐 Bedrock이 추천 이유와 원문 근거를 설명","x":1380,"y":535},{"label":"담당자가 후보를 비교하고 최종 판단","x":1880,"y":535}],"visuals":[{"d":"M82 430H310H520H730H970H1210H1600","tone":"core","dur":4.8},{"d":"M1600 430H1210V600H1130H1380H1880","tone":"local","dur":4},{"d":"M1880 600H1210V430H82","tone":"reply","dur":4.5}],"callout":{"x":1430,"y":305,"w":540,"text":"공고 지원자만 비교 · 최종 판단은 채용담당자"},"boundary":"자기 회사 공고에 지원한 활성 후보자만 대상으로 합니다. 추천은 검토 순서를 돕는 기능이며 채용 결정을 자동화하지 않습니다."},"explanation":{"title":"Bedrock 추천 설명 생성","status":"공용 AI 기능","tone":"guarded","markerTone":"local","summary":"추천 엔진이 확정한 점수와 근거만 LLM Gateway로 보내고, Broker가 허용한 Bedrock 모델이 한국어 설명을 만든 뒤 원래 결과에 붙입니다.","detailHref":"index.html#section-33","detailLabel":"AI 점수·설명 규칙 보기","stages":[{"label":"추천 엔진이 확정 점수·근거를 전달","x":1210,"y":505},{"label":"LLM Gateway가 설명 전용 요청을 구성","x":1130,"y":535},{"label":"Capability Broker가 허용 모델만 호출","x":1380,"y":535},{"label":"Bedrock 설명을 원래 점수 결과에 결합","x":1880,"y":535}],"visuals":[{"d":"M1210 430V600H1130H1380H1880","tone":"local","dur":3.6},{"d":"M1880 600H1210V430","tone":"reply","dur":3.3}],"callout":{"x":1160,"y":660,"w":760,"text":"Capability Broker는 서비스가 아니라 Bedrock 권한 통제 구성요소"},"boundary":"API Lambda→LLM Gateway Lambda→Capability Broker Lambda→Bedrock 경로는 소스와 Terraform에 구현됐습니다. LATEST_SOURCE_SHA=a9764f8의 plan run 33569358467 attempt 1은 성공했지만 APPLY · LIVE SMOKE NOT RUN이며, LAST_OBSERVED_DEPLOYMENT_SHA=7a5acfb의 성공 기록과 분리합니다."},"values":{"title":"기업 방향·가치 일치 근거","status":"공용 AI 기능","tone":"guarded","markerTone":"local","summary":"자소서·프로젝트와 기업이 공개한 방향·가치에서 실제로 같은 문구가 나온 위치를 찾고, Bedrock이 사람이 읽기 쉬운 설명으로 바꿉니다.","detailHref":"index.html#section-31","detailLabel":"기업 방향 대조 규칙 보기","stages":[{"label":"자소서·프로젝트와 기업 선언 자료를 조회","x":1600,"y":365},{"label":"같은 문구가 있는 위치를 직접 추출","x":1210,"y":505},{"label":"Gateway가 추출된 근거만 설명 요청으로 구성","x":1130,"y":535},{"label":"Bedrock이 사람이 읽을 설명으로 변환","x":1880,"y":535},{"label":"설명을 참고 근거로 표시하고 점수에는 미반영","x":82,"y":365}],"visuals":[{"d":"M1600 430H1210V600H1130H1380H1880","tone":"local","dur":4.1},{"d":"M1880 600H1210V430H82","tone":"reply","dur":4.3}],"callout":{"x":1390,"y":305,"w":590,"text":"직접 일치 문구만 설명 · 의미 기반 적합도 판정 아님"},"boundary":"이 기능은 의미 기반 기업 적합도 판정이 아닙니다. 같은 문구와 그 위치를 설명할 뿐이며 추천 점수·순위에 영향을 주지 않습니다."},"history":{"title":"합성 과거 결과 관찰","status":"운영·실험 지원","tone":"guarded","markerTone":"record","summary":"합성 지원 결과에서 비슷한 특징과 과거 관찰을 조회해 추천 화면의 참고자료로만 보여 주는 흐름입니다.","detailHref":"index.html#section-31","detailLabel":"합성 결과 관찰 범위 보기","stages":[{"label":"합성 지원 결과 자료를 조회","x":1600,"y":365},{"label":"현재 요청과 비슷한 숫자 특징을 비교","x":1600,"y":715},{"label":"과거 관찰을 참고자료로 구성","x":1210,"y":505},{"label":"추천 화면에 참고 표시로만 반환","x":82,"y":365}],"visuals":[{"d":"M82 430H310H520H730H970H1210H1600V770","tone":"record","dur":5},{"d":"M1600 770V430H1210H82","tone":"reply","dur":4.6}],"callout":{"x":1370,"y":825,"w":470,"text":"참고자료 전용 · 운영 점수·합격 확률 미사용"},"boundary":"운영 점수와 합격 확률에는 사용하지 않습니다. 합성 결과 관찰을 실제 채용 성과나 통계적 예측으로 해석하면 안 됩니다."},"mlops":{"title":"합성 MLOps Challenger","status":"운영·실험 지원","tone":"guarded","markerTone":"experimental","summary":"합성 회원·기업 자료에서 개인정보를 뺀 숫자 특징 5개를 만들고, 별도 Lambda가 후보 모델을 학습·비교한 뒤 사람 검토 대기에서 멈춥니다.","detailHref":"../../mlops/","detailLabel":"MLOps 7단계 상세 보기","stages":[{"label":"합성 회원·기업 자료를 별도 입력으로 준비","x":300,"y":1125},{"label":"개인정보를 제외한 숫자 특징 5개 생성","x":550,"y":1125},{"label":"S3에 실행별 Snapshot을 보관","x":780,"y":1125},{"label":"MLOps Lambda가 후보 모델을 학습·비교","x":990,"y":1125},{"label":"결과와 실행 상태를 S3·DynamoDB에 기록","x":1320,"y":1125},{"label":"TRAINED_PENDING_HUMAN_REVIEW에서 정지","x":1660,"y":1125}],"visuals":[{"d":"M300 1190H550H990H1210H1430H1660","tone":"experimental","dur":5.4},{"d":"M780 1330V1280H990V1190","tone":"experimental","dur":2.8},{"d":"M1200 1330V1280H990V1190","tone":"record","dur":3.1}],"callout":{"x":1150,"y":1030,"w":650,"text":"후보 모델은 운영 매처에 자동 적용되지 않음"},"boundary":"별도 terraform/serverless-mlops는 0/13/14 단계입니다. 2026-08-31 bootstrap 13개 적용만 확인했고 이미지 게시·14번째 Lambda·실행·결과 생성·추천 런타임 배선은 없습니다. GitHub CI가 자동 배포한 것이 아닙니다."},"audit":{"title":"AI 운영 관찰·감사","status":"운영·실험 지원","tone":"modelled","markerTone":"record","summary":"추천 처리기·LLM 게이트웨이 상태, 모델·산식 버전, 모델 제공자 설정 지문, 오류·지연·프롬프트 필드를 묶어 관리자 화면과 검토 증적으로 전달합니다.","detailHref":"index.html#section-52","detailLabel":"AI 운영·감사 명세 보기","stages":[{"label":"추천 처리기·LLM 게이트웨이 상태를 수집","x":1210,"y":505},{"label":"모델·산식 버전과 모델 제공자 설정 지문을 결합","x":1130,"y":535},{"label":"오류·지연·허용된 프롬프트 필드를 기록","x":1060,"y":905},{"label":"CloudWatch·S3에 운영 증적을 보관","x":1300,"y":905},{"label":"관리자 AI 운영 화면에서 사람이 검토","x":1540,"y":905}],"visuals":[{"d":"M1210 430V910H1060V970","tone":"record","dur":3.7},{"d":"M1130 600V850H1060V970H1300","tone":"local","dur":3.6},{"d":"M1540 970H1300","tone":"record","dur":2.6}],"callout":{"x":1120,"y":1035,"w":700,"text":"관찰 기록은 자동 적합성 판정이나 인증 결론이 아님"},"boundary":"로그에는 원문 개인정보나 비밀값을 남기지 않아야 합니다. 기록 존재만으로 통제 효과·적합성·인증 가능성을 단정하지 않고 사람이 증적 범위를 확인합니다."}};
     const flowButtons = [...document.querySelectorAll('[data-flow-button]')];
     const flowLayers = [...document.querySelectorAll('[data-flow-layer]')];
     const flowMedia = [...document.querySelectorAll('[data-flow-media]')];
@@ -637,7 +922,7 @@
       const key = Object.hasOwn(flowDefinitions, requestedKey) ? requestedKey : 'overview';
       const definition = flowDefinitions[key];
       const updateFlow = () => {
-        const mediaKey = ['overview', 'mlops', 'explanation'].includes(key) ? 'overview' : 'asis';
+        const mediaKey = 'overview';
         flowButtons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.flowButton === key)));
         flowLayers.forEach((layer) => layer.classList.toggle('is-active', layer.dataset.flowLayer === key));
         flowMedia.forEach((media) => {
@@ -646,6 +931,7 @@
           media.setAttribute('aria-hidden', String(!active));
         });
         diagramFrame.dataset.activeMedia = mediaKey;
+        diagramFrame.dataset.activeFlow = key;
         flowStatus.textContent = definition.status;
         flowStatus.className = 'flow-detail__status status ' + definition.tone;
         flowTitle.textContent = definition.title;
