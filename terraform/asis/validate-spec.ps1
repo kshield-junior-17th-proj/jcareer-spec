@@ -295,23 +295,22 @@ Add-Check 'mlops_first_page_summary' $mlopsSummaryOkay "top summary, plan stages
 
 $flowButtonCount = [regex]::Matches($architecture, 'data-flow-button="[^"]+"').Count
 $flowLayerCount = [regex]::Matches($architecture, 'data-flow-layer="[^"]+"').Count
-$expectedFlowKeys = @('candidate', 'explanation', 'integrations', 'mlops', 'operations', 'overview', 'recruiter', 'trace', 'workplace')
+$expectedFlowKeys = @('audit', 'candidate', 'explanation', 'history', 'mlops', 'overview', 'recruiter', 'values')
 $flowButtonKeys = @([regex]::Matches($architecture, 'data-flow-button="(?<key>[^"]+)"') | ForEach-Object { $_.Groups['key'].Value } | Sort-Object)
 $flowLayerKeys = @([regex]::Matches($architecture, 'data-flow-layer="(?<key>[^"]+)"') | ForEach-Object { $_.Groups['key'].Value } | Sort-Object)
 $flowKeysOkay = ($flowButtonKeys -join ',') -eq ($expectedFlowKeys -join ',') -and ($flowLayerKeys -join ',') -eq ($expectedFlowKeys -join ',')
 $flowDefinitionMatch = [regex]::Match($architecture, '(?s)const flowDefinitions = (?<json>\{.*?\});\s*const flowButtons')
-$serviceFlowKeys = @('candidate', 'recruiter', 'explanation', 'mlops', 'workplace', 'trace', 'integrations', 'operations')
-$overlayFlowKeys = @('candidate', 'recruiter', 'explanation', 'workplace', 'trace', 'integrations', 'operations')
+$serviceFlowKeys = @('candidate', 'recruiter', 'explanation', 'values', 'history', 'mlops', 'audit')
+$overlayFlowKeys = @('overview', 'candidate', 'recruiter', 'explanation', 'values', 'history', 'mlops', 'audit')
 $expectedStageCounts = @{
     overview = 7
-    candidate = 3
-    recruiter = 3
+    candidate = 5
+    recruiter = 5
     explanation = 4
-    mlops = 7
-    workplace = 4
-    trace = 3
-    integrations = 3
-    operations = 3
+    values = 5
+    history = 4
+    mlops = 6
+    audit = 5
 }
 $serviceStageCounts = @{}
 $stageCoordinatesOkay = $false
@@ -325,12 +324,10 @@ if ($flowDefinitionMatch.Success) {
         }
         $badCoordinateKeys = [System.Collections.Generic.List[string]]::new()
         foreach ($key in $overlayFlowKeys) {
-            $positions = @($flowDefinitionsObject.$key.stages | ForEach-Object { [int]$_.x })
-            $ordered = $true
-            for ($positionIndex = 1; $positionIndex -lt $positions.Count; $positionIndex++) {
-                if ($positions[$positionIndex - 1] -ge $positions[$positionIndex]) { $ordered = $false }
-            }
-            if ($positions.Count -ne $expectedStageCounts[$key] -or -not $ordered) {
+            $positionedStages = @($flowDefinitionsObject.$key.stages | Where-Object {
+                    $null -ne $_.x -and $null -ne $_.y
+                })
+            if ($positionedStages.Count -ne $expectedStageCounts[$key]) {
                 $badCoordinateKeys.Add($key)
             }
         }
@@ -338,13 +335,12 @@ if ($flowDefinitionMatch.Success) {
         $expectedDetailLinks = @{
             overview = @{ href = '../../assets/JCAREER_AI_RUNTIME_ACTUAL.svg'; label = '현재 AI 실행면 보기' }
             candidate = @{ href = 'index.html#section-31'; label = '공고 추천 기능 명세 보기' }
-            recruiter = @{ href = 'index.html#section-31'; label = '기업용 인재 찾기 명세 보기' }
+            recruiter = @{ href = 'index.html#section-31'; label = '지원자 추천 기능 명세 보기' }
             explanation = @{ href = 'index.html#section-33'; label = 'AI 점수·설명 규칙 보기' }
+            values = @{ href = 'index.html#section-31'; label = '기업 방향 대조 규칙 보기' }
+            history = @{ href = 'index.html#section-31'; label = '합성 결과 관찰 범위 보기' }
             mlops = @{ href = '../../mlops/'; label = 'MLOps 7단계 상세 보기' }
-            workplace = @{ href = '../../consulting/'; label = '단말 진단 기술 사례 보기' }
-            trace = @{ href = 'index.html#section-25'; label = 'TRACE·JC-RECEIPT 보조 경계 보기' }
-            integrations = @{ href = 'index.html#section-25'; label = '외부 업무도구 구현 경계 보기' }
-            operations = @{ href = 'index.html#section-52'; label = '보안·운영 명세 보기' }
+            audit = @{ href = 'index.html#section-52'; label = 'AI 운영·감사 명세 보기' }
         }
         $detailLinksOkay = $true
         foreach ($key in $expectedDetailLinks.Keys) {
@@ -368,14 +364,18 @@ if ($flowDefinitionMatch.Success) {
         $flowDefinitionsOkay = $false
     }
 }
-$stepMarkerCount = [regex]::Matches($architecture, 'data-flow-step="[1234]"').Count
+$stepMarkerCount = [regex]::Matches($architecture, 'data-flow-step="[1-7]"').Count
 $stepOneCount = [regex]::Matches($architecture, 'data-flow-step="1"').Count
 $stepTwoCount = [regex]::Matches($architecture, 'data-flow-step="2"').Count
 $stepThreeCount = [regex]::Matches($architecture, 'data-flow-step="3"').Count
 $stepFourCount = [regex]::Matches($architecture, 'data-flow-step="4"').Count
+$stepFiveCount = [regex]::Matches($architecture, 'data-flow-step="5"').Count
+$stepSixCount = [regex]::Matches($architecture, 'data-flow-step="6"').Count
+$stepSevenCount = [regex]::Matches($architecture, 'data-flow-step="7"').Count
 $layerMarkersOkay = $true
+$layerMotionOkay = $true
 $layerRegions = @{}
-$layerOrder = @('overview', 'candidate', 'recruiter', 'explanation', 'mlops', 'workplace', 'trace', 'integrations', 'operations')
+$layerOrder = @('overview', 'candidate', 'recruiter', 'explanation', 'values', 'history', 'mlops', 'audit')
 for ($layerIndex = 0; $layerIndex -lt $layerOrder.Count; $layerIndex++) {
     $key = $layerOrder[$layerIndex]
     $start = $architecture.IndexOf("data-flow-layer=`"$key`"")
@@ -386,75 +386,62 @@ for ($layerIndex = 0; $layerIndex -lt $layerOrder.Count; $layerIndex++) {
     }
     $region = if ($start -ge 0 -and $end -gt $start) { $architecture.Substring($start, $end - $start) } else { '' }
     $layerRegions[$key] = $region
-    $numbers = @([regex]::Matches($region, 'data-flow-step="([1234])"') | ForEach-Object { $_.Groups[1].Value })
-    $expectedNumbers = if ($key -in @('overview', 'mlops')) { '' } elseif ($key -in @('explanation', 'workplace')) { '1,2,3,4' } else { '1,2,3' }
+    $numbers = @([regex]::Matches($region, 'data-flow-step="([1-7])"') | ForEach-Object { $_.Groups[1].Value })
+    $expectedNumbers = ((1..$expectedStageCounts[$key]) -join ',')
     if (($numbers -join ',') -ne $expectedNumbers) { $layerMarkersOkay = $false }
+    $lineCount = [regex]::Matches($region, 'class="flow-line [^"]+"').Count
+    $packetCount = [regex]::Matches($region, 'class="flow-packet [^"]+"').Count
+    $motionCount = [regex]::Matches($region, '<animateMotion ').Count
+    if ($lineCount -lt 1 -or $lineCount -ne $packetCount -or $lineCount -ne $motionCount) { $layerMotionOkay = $false }
 }
-$mlopsLayerRegion = $layerRegions['mlops']
-$workplaceLayerRegion = $layerRegions['workplace']
-$mlopsSeparated = $mlopsLayerRegion -and
-    -not $mlopsLayerRegion.Contains('<path') -and
-    -not $mlopsLayerRegion.Contains('flow-node') -and
-    $architecture.Contains('data-flow-media="mlops"') -and
-    $architecture.Contains('../serverless-mlops/JCAREER_MLOPS_FLOW.svg')
-$workplaceNoAwsFlow = $workplaceLayerRegion -and
-    -not $workplaceLayerRegion.Contains('<path') -and
-    -not $workplaceLayerRegion.Contains('flow-node') -and
-    $workplaceLayerRegion.Contains('flow-callout unknown')
-$localAwsDataSeparated = -not $layerRegions['candidate'].Contains('flow-line local') -and
-    -not $layerRegions['recruiter'].Contains('flow-line local') -and
-    -not $layerRegions['candidate'].Contains('cx="1900"') -and
-    -not $layerRegions['candidate'].Contains('cx="2132"') -and
-    -not $layerRegions['recruiter'].Contains('cx="1900"') -and
-    -not $layerRegions['recruiter'].Contains('cx="2132"')
-$guardedFlowsOkay = $layerRegions['trace'].Contains('flow-line local') -and
-    $layerRegions['integrations'].Contains('flow-line local') -and
-    $architecture.Contains('TRACE_MODE 기본값은 disabled') -and
-    $architecture.Contains('실제 credential, Slack·Notion workspace, 메일 시스템, 메시지 전송 또는 AWS 리소스는 없습니다')
+$activeOverlayStart = $architecture.IndexOf('<svg class="flow-overlay" viewBox="0 0 2320 1500"')
+$activeOverlayEnd = if ($activeOverlayStart -ge 0) { $architecture.IndexOf('</svg>', $activeOverlayStart) } else { -1 }
+$activeOverlay = if ($activeOverlayStart -ge 0 -and $activeOverlayEnd -gt $activeOverlayStart) {
+    $architecture.Substring($activeOverlayStart, $activeOverlayEnd - $activeOverlayStart)
+} else {
+    ''
+}
+$activeMarkerMatches = @([regex]::Matches($activeOverlay, 'data-flow-step="([1-7])"'))
+$stepMarkerCount = $activeMarkerMatches.Count
+$stepOneCount = @($activeMarkerMatches | Where-Object { $_.Groups[1].Value -eq '1' }).Count
+$stepTwoCount = @($activeMarkerMatches | Where-Object { $_.Groups[1].Value -eq '2' }).Count
+$stepThreeCount = @($activeMarkerMatches | Where-Object { $_.Groups[1].Value -eq '3' }).Count
+$stepFourCount = @($activeMarkerMatches | Where-Object { $_.Groups[1].Value -eq '4' }).Count
+$stepFiveCount = @($activeMarkerMatches | Where-Object { $_.Groups[1].Value -eq '5' }).Count
+$stepSixCount = @($activeMarkerMatches | Where-Object { $_.Groups[1].Value -eq '6' }).Count
+$stepSevenCount = @($activeMarkerMatches | Where-Object { $_.Groups[1].Value -eq '7' }).Count
 $overlayLegendOkay = $architecture.Contains('legend-line record') -and
-    $architecture.Contains('기록·탐지 경로') -and
+    $architecture.Contains('AI 운영 관찰·감사') -and
     $architecture.Contains('.flow-line.record { stroke: #7a5b1e; stroke-dasharray: 28 22; }') -and
     $architecture.Contains('@keyframes flowMarch')
-$interactiveFlowOkay = $flowButtonCount -eq 9 -and
-    $flowLayerCount -eq 9 -and
-    $flowKeysOkay -and
-    $flowDefinitionsOkay -and
-    $detailLinksOkay -and
-    $stepMarkerCount -eq 23 -and $stepOneCount -eq 7 -and $stepTwoCount -eq 7 -and $stepThreeCount -eq 7 -and $stepFourCount -eq 2 -and
-    $layerMarkersOkay -and
-    $mlopsSeparated -and
-    $workplaceNoAwsFlow -and
-    $localAwsDataSeparated -and
-    $guardedFlowsOkay -and
-    $overlayLegendOkay -and
-    $architecture.Contains('기업용 인재 찾기') -and
-    $architecture.Contains('공고 지원자 안에서') -and
-    $architecture.Contains('자사 공고에 지원한 활성 후보자를 대상으로 합니다') -and
-    $architecture.Contains('AI 설명 만들기') -and
-    $architecture.Contains('MLOps 학습·평가') -and
-    $architecture.Contains('전체 지도 1개 · 서비스·보조 경로 8개') -and
-    $architecture.Contains('모델 검증 · 검토 대기') -and
-    $architecture.Contains('class="flow-step__number"') -and
-    $architecture.Contains('class="flow-selector" role="group"') -and
-    $architecture.Contains('aria-live="polite"') -and
-    $architecture.Contains('flowSteps.replaceChildren') -and
-    $architecture.Contains('id="flow-detail-link"') -and
-    $architecture.Contains('flowDetailLink.href = definition.detailHref') -and
-    $architecture.Contains('flowDetailLink.textContent = definition.detailLabel') -and
-    $architecture.Contains('const flowMedia = [...document.querySelectorAll(''[data-flow-media]'')]') -and
-    $architecture.Contains('flowMedia.forEach') -and
-    $architecture.Contains('data-full-map') -and
-    $architecture.Contains('.flow-detail__link:hover { color: var(--accent); border-color: var(--accent); }') -and
-    -not $architecture.Contains('var(--accent-2)') -and
-    $architecture.Contains('history.replaceState') -and
-    $architecture.Contains('updateAddress || requestedKey !== key') -and
-    -not $architecture.Contains('<path class="flow-line local" d="M1600 582V920" />') -and
-    $architecture.Contains('@media (prefers-reduced-motion: reduce)') -and
-    $architecture.Contains('Slack·Notion·SMTP는 AWS 밖의 업무도구 경계로 표시하며 기본 비활성·실전송 미확인입니다') -and
-    $architecture.Contains('TRACE·JC-RECEIPT는 실행 컴포넌트에서 제외하고 보조 설명에만 남깁니다') -and
-    $architecture.Contains('AI 설명과 MLOps를 선택해도 전체 지도를 유지해') -and
-    $architecture.Contains("['overview', 'mlops', 'explanation'].includes(key) ? 'overview' : 'asis'")
-Add-Check 'interactive_service_flow' $interactiveFlowOkay "controls $flowButtonCount, overlay layers $flowLayerCount, stages overview=7, explanation/workplace=4, MLOps=7, other=3, markers $stepMarkerCount; separated current/evidence/TO-BE context, guarded-source separation, URL state, detail links 9 checked"
+$interactiveRequirements = [ordered]@{
+    button_count = $flowButtonCount -eq 8
+    layer_count = $flowLayerCount -eq 8
+    keys = $flowKeysOkay
+    definitions = $flowDefinitionsOkay
+    detail_links = $detailLinksOkay
+    marker_counts = $stepMarkerCount -eq 41 -and $stepOneCount -eq 8 -and $stepTwoCount -eq 8 -and $stepThreeCount -eq 8 -and $stepFourCount -eq 8 -and $stepFiveCount -eq 6 -and $stepSixCount -eq 2 -and $stepSevenCount -eq 1
+    layer_markers = $layerMarkersOkay
+    layer_motion = $layerMotionOkay
+    legend = $overlayLegendOkay
+    seven_labels = $architecture.Contains('채용담당자 지원자 추천') -and $architecture.Contains('Bedrock 추천 설명 생성') -and $architecture.Contains('기업 방향·가치 일치 근거') -and $architecture.Contains('합성 과거 결과 관찰') -and $architecture.Contains('합성 MLOps Challenger')
+    heading = $architecture.Contains('전체 지도 1개 · AI 서비스·기능 7개')
+    step_list = $architecture.Contains('class="flow-step__number"') -and $architecture.Contains('flowSteps.replaceChildren')
+    accessibility = $architecture.Contains('class="flow-selector" role="group"') -and $architecture.Contains('aria-live="polite"') -and $architecture.Contains('@media (prefers-reduced-motion: reduce)') -and $architecture.Contains('html[data-motion="reduced"] .flow-packet')
+    detail_link_script = $architecture.Contains('id="flow-detail-link"') -and $architecture.Contains('flowDetailLink.href = definition.detailHref') -and $architecture.Contains('flowDetailLink.textContent = definition.detailLabel')
+    media_script = $architecture.Contains('const flowMedia = [...document.querySelectorAll(''[data-flow-media]'')]') -and $architecture.Contains('flowMedia.forEach') -and $architecture.Contains('data-full-map') -and $architecture.Contains("const mediaKey = 'overview'")
+    interaction_script = $architecture.Contains('history.replaceState') -and $architecture.Contains('updateAddress || requestedKey !== key') -and $architecture.Contains('diagramFrame.dataset.activeFlow = key')
+    visual_style = $architecture.Contains('.flow-detail__link:hover { color: var(--accent); border-color: var(--accent); }') -and -not $architecture.Contains('var(--accent-2)')
+    component_boundary = $architecture.Contains('OpenDART는 AI 서비스가 아니라 기업 공개정보 보강 경로입니다') -and $architecture.Contains('Capability Broker도 서비스가 아니라 Bedrock 호출 권한을 제한하는 구성요소입니다')
+}
+$interactiveFailures = @($interactiveRequirements.GetEnumerator() | Where-Object { -not $_.Value } | ForEach-Object { $_.Key })
+$interactiveFlowOkay = $interactiveFailures.Count -eq 0
+$interactiveDetail = if ($interactiveFlowOkay) {
+    "controls $flowButtonCount, overlay layers $flowLayerCount, seven AI flows plus overview, markers $stepMarkerCount, moving path pairs checked, one full-map context, URL state, detail links 8 checked"
+} else {
+    "failed: $($interactiveFailures -join ', '); controls $flowButtonCount, layers $flowLayerCount, markers $stepMarkerCount"
+}
+Add-Check 'interactive_service_flow' $interactiveFlowOkay $interactiveDetail
 
 $normalizedFlowSource = (Get-Content -Raw -Encoding UTF8 (Join-Path $root 'JCAREER_ASIS_FLOW.md')).Replace("`r`n", "`n").Replace("`r", "`n")
 $flowSourceHasher = [System.Security.Cryptography.SHA256]::Create()
