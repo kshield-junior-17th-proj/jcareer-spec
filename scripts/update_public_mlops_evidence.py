@@ -90,7 +90,7 @@ def main() -> None:
             "disabled_plan_resources": 0,
             "terraform_boundary_tests": "19/19 PASS",
             "synthetic_pipeline_tests": "22/22 PASS",
-            "public_ui": "9/9 routes, 8/8 stage states, 7 pages at 390/1440px, motion 8/8 PASS",
+            "public_ui": "8/8 routes, 8/8 stage states, 7 pages at 390/1440px, motion 8/8 PASS",
             "pdf_source_binding": "PASS",
             "public_integrity": "PASS",
         },
@@ -99,7 +99,7 @@ def main() -> None:
         "evidence": {
             "public_ui": {
                 "checker": "scripts/check_public_ui.mjs",
-                "landing_routes": 9,
+                "landing_routes": 8,
                 "stage_states": 8,
                 "viewports_css_px": [390, 1440],
                 "page_viewport_checks": 14,
@@ -117,6 +117,8 @@ def main() -> None:
                     "visible_diagram_media",
                     "detail_link",
                     "full_map_asset",
+                    "numbered_step_markers",
+                    "animated_path_pair",
                     "horizontal_overflow",
                 ],
                 "motion_contracts": [

@@ -64,7 +64,7 @@ EXPECTED_NOTES = [
     "Terraform init, validate, mock tests, and the disabled plan ran from a temporary source copy outside the repository.",
     "bootstrap/runtime counts were checked only with Terraform mock_provider tests.",
     "The disabled default plan used the ordinary provider configuration with AWS validation disabled by the configuration and planned zero managed resources.",
-    "All nine architecture states were opened and checked for the selected button, active diagram layer, visible diagram media, detail link, full-map asset, and 390px overflow by scripts/check_public_ui.mjs.",
+    "All eight architecture states (overview plus seven AI flows) were opened and checked for the selected button, active diagram layer, numbered markers, animated path pairs, detail link, full-map asset, and 390px overflow by scripts/check_public_ui.mjs.",
     "Seven public pages were checked at 390px and 1440px for overflow, canonical and Open Graph metadata, touch action, and keyboard focus; MLOps aria-controls was also checked.",
     "MLOps stage URL state, invalid-stage fallback, and browser history were checked by scripts/check_public_ui.mjs.",
     "Eight motion checks covered the carousel, MLOps stage rail, animated architecture, manual motion toggle, and reduced-motion fallback.",
@@ -326,7 +326,7 @@ def check_evidence_report(errors: list[str]) -> None:
         "disabled_plan_resources": 0,
         "terraform_boundary_tests": "19/19 PASS",
         "synthetic_pipeline_tests": "22/22 PASS",
-        "public_ui": "9/9 routes, 8/8 stage states, 7 pages at 390/1440px, motion 8/8 PASS",
+        "public_ui": "8/8 routes, 8/8 stage states, 7 pages at 390/1440px, motion 8/8 PASS",
         "pdf_source_binding": "PASS",
         "public_integrity": "PASS",
     }
@@ -340,7 +340,7 @@ def check_evidence_report(errors: list[str]) -> None:
     expected_evidence = {
         "public_ui": {
             "checker": "scripts/check_public_ui.mjs",
-            "landing_routes": 9,
+            "landing_routes": 8,
             "stage_states": 8,
             "viewports_css_px": [390, 1440],
             "page_viewport_checks": 14,
@@ -358,6 +358,8 @@ def check_evidence_report(errors: list[str]) -> None:
                 "visible_diagram_media",
                 "detail_link",
                 "full_map_asset",
+                "numbered_step_markers",
+                "animated_path_pair",
                 "horizontal_overflow",
             ],
             "motion_contracts": [
@@ -531,10 +533,12 @@ def check() -> list[str]:
         and "bootstrap 13개 적용은 확인했지만" in asis_text
         and 'data-flow-button="mlops"' in architecture_text
         and 'data-flow-layer="mlops"' in architecture_text
-        and "AI 설명과 MLOps를 선택해도 전체 지도를 유지해" in architecture_text
-        and "['overview', 'mlops', 'explanation'].includes(key) ? 'overview' : 'asis'" in architecture_text
-        and 'data-flow-media="mlops"' in architecture_text
-        and "JCAREER_MLOPS_FLOW.svg" in architecture_text
+        and "서비스를 누르면 실제 처리 구간만 움직입니다" in architecture_text
+        and "const mediaKey = 'overview'" in architecture_text
+        and 'data-flow-media="overview"' in architecture_text
+        and 'class="flow-packet experimental"' in architecture_text
+        and "<animateMotion" in architecture_text
+        and 'href="../../mlops/"' in architecture_text
         and "feature-only S3" in architecture_text
         and "TRAINED_PENDING_HUMAN_REVIEW" in architecture_text
         and "history.replaceState" in architecture_text
@@ -639,11 +643,10 @@ def check() -> list[str]:
         "terraform/asis/architecture.html?flow=candidate",
         "terraform/asis/architecture.html?flow=recruiter",
         "terraform/asis/architecture.html?flow=explanation",
+        "terraform/asis/architecture.html?flow=values",
+        "terraform/asis/architecture.html?flow=history",
         "terraform/asis/architecture.html?flow=mlops",
-        "terraform/asis/architecture.html?flow=workplace",
-        "terraform/asis/architecture.html?flow=trace",
-        "terraform/asis/architecture.html?flow=integrations",
-        "terraform/asis/architecture.html?flow=operations",
+        "terraform/asis/architecture.html?flow=audit",
     )
     if landing_text.count('class="flow-shortcuts"') != 1 or any(
         f'href="{href}"' not in landing_text for href in flow_links
