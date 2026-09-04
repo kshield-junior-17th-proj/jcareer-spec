@@ -59,16 +59,22 @@ The strongest existing quality is the explicit separation of source, observed st
 | Check | Before | After |
 |---|---|---|
 | Public route set | 7 pages × 2 viewports; 14/14 existing checks passed | 8 pages × 2 viewports; 16/16 checks passed |
-| Assessment mobile navigation | Hidden below 1000 px | 5 section links remain visible at 390 px |
+| Assessment mobile navigation | Hidden below 1000 px | 7 section links remain visible and horizontally reachable at 390 px |
 | Keyboard focus | No dashboard focus-visible rule | Skip link and all links/buttons have a 3 px visible focus indicator |
 | Finding selection | Visual `.active` class only | 6 tabs, exactly 1 `aria-selected=true`, labelled tabpanel, arrow/Home/End support |
 | Horizontal fit | Overflow could be masked by `main` | Root scroll width, key box bounds, painted hero text, and every landing-nav link fit at 390 px and 1440 px |
 | Assessment interpretation | Custom IDs/index could resemble NIST controls/score | Visible internal-ID, non-score, non-compliance, non-operating-effectiveness, and non-residual-risk boundary |
-| Static contract | None for pending dashboard | 3/3 assessment contract tests passed |
+| Judgment trace | Target line could resemble a completed AFTER | 27 unique T-IDs → 6 review-pending NF groups → `OPEN_UNVERIFIED` → `UNVERIFIED_TARGET` → human revalidation; `actualAfter=null` |
+| Source binding | Workbook provenance was not visible | Source and D:J mapped workbook names and SHA-256 digests are visible without local paths or content |
+| Delivery boundary | Public page and AWS dashboard could be conflated | GitHub Pages public specification `≠` AWS dashboard deployment; AWS status remains `NOT_DEPLOYED` |
+| CSP | No dashboard policy assertion | Same-origin static assets only; connections, objects, forms and frames blocked; no inline/eval exception |
+| Static contract | None for pending dashboard | 4 Python static contracts + 5 JavaScript data contracts passed |
 
 Browser verification command: `node scripts/check_public_ui.mjs`
 
 Static dashboard verification command: `python -B -m unittest tests.test_assessment_dashboard_static`
+
+Judgment-data verification command: `node --test tests/assessment_dashboard_data.test.cjs`
 
 ## NIST sources
 

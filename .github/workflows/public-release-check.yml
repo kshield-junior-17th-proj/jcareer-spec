@@ -22,6 +22,11 @@ jobs:
           python-version: '3.12'
       - name: 소스·문서 단위시험
         run: python3 -B -m unittest discover -s tests -p 'test_*.py'
+      - name: 진단 대시보드 판단 데이터 계약
+        run: |
+          node --check assessment-dashboard/app.js
+          node --check assessment-dashboard/assessment-snapshot.js
+          node --test tests/assessment_dashboard_data.test.cjs
       - name: 공개 문서 수치·상태 정합성
         run: python3 -B scripts/check_public_document_consistency.py
       - name: AS-IS HTML·PDF·도면 결속
