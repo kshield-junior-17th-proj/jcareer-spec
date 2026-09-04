@@ -1,0 +1,214 @@
+{
+  "title": "J-Career · Slack and business-system integration boundary",
+  "subtitle": "Top: LIVE-VERIFIED 2026-09-01 serverless reference · Bottom: SOURCE-IMPLEMENTED, DEFAULT OFF · no production wiring or network probe",
+  "canvas": { "w": 1800, "h": 980 },
+  "labelBackplates": true,
+  "status": "SOURCE_IMPLEMENTED_DEFAULT_OFF_EXTERNAL_DELIVERY_UNCONFIRMED",
+  "source_of_truth": {
+    "cutoff": "2026-09-01",
+    "architecture_truth": "artifacts/workstreams/architecture_truth_and_tobe.md#slack-and-business-integrations",
+    "repository_evidence": [
+      "src/runtime/README.md#기본-비활성-외부-업무도구-adapter",
+      "src/runtime/api/app/integrations/router.py",
+      "src/runtime/api/app/integrations/config.py",
+      "src/runtime/api/app/integrations/contracts.py",
+      "src/runtime/api/app/integrations/adapters.py",
+      "src/runtime/tests/integrations_contract.py"
+    ]
+  },
+  "groups": [
+    {
+      "kind": "region",
+      "label": "AWS serverless reference · LIVE-VERIFIED 2026-09-01 · adapters not wired",
+      "x": 170,
+      "y": 105,
+      "w": 720,
+      "h": 245,
+      "status": "LIVE_VERIFIED_2026_09_01_NO_INTEGRATION_WIRING",
+      "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#current-app-plane"]
+    },
+    {
+      "kind": "event",
+      "label": "Runnable local source contract · admin-only · synthetic non-personal probe",
+      "x": 170,
+      "y": 385,
+      "w": 1175,
+      "h": 410,
+      "status": "SOURCE_IMPLEMENTED_DEFAULT_OFF",
+      "evidence": ["src/runtime/api/app/integrations/router.py", "src/runtime/api/app/integrations/contracts.py"]
+    },
+    {
+      "kind": "event",
+      "label": "UNCONFIRMED external systems · no connector",
+      "x": 1470,
+      "y": 385,
+      "w": 295,
+      "h": 410,
+      "status": "UNCONFIRMED",
+      "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#slack-and-business-integrations"]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "browser",
+      "x": 75,
+      "y": 225,
+      "icon": "tile:external",
+      "label": "Synthetic browser",
+      "sub": "dated live smoke journey",
+      "status": "LIVE_VERIFIED_2026_09_01",
+      "evidence": ["assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.md"]
+    },
+    {
+      "id": "cloudfront",
+      "x": 300,
+      "y": 225,
+      "icon": "cloudfront",
+      "label": "Amazon CloudFront",
+      "sub": "current serverless edge",
+      "status": "LIVE_VERIFIED_2026_09_01",
+      "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#current-edge"]
+    },
+    {
+      "id": "api_gateway",
+      "x": 520,
+      "y": 225,
+      "icon": "apigateway",
+      "label": "Amazon API Gateway",
+      "sub": "current HTTP API",
+      "status": "LIVE_VERIFIED_2026_09_01",
+      "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#current-edge"]
+    },
+    {
+      "id": "api_lambda",
+      "x": 750,
+      "y": 225,
+      "icon": "lambda",
+      "label": "Current API Lambda",
+      "sub": "no business adapters wired",
+      "status": "LIVE_VERIFIED_2026_09_01_NO_INTEGRATION_WIRING",
+      "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#slack-and-business-integrations"]
+    },
+    {
+      "id": "admin",
+      "x": 75,
+      "y": 575,
+      "icon": "tile:external",
+      "label": "Admin role contract",
+      "sub": "SOURCE-IMPLEMENTED only",
+      "status": "SOURCE_IMPLEMENTED_NOT_DEPLOYMENT_PROOF",
+      "evidence": ["src/runtime/api/app/integrations/router.py"]
+    },
+    {
+      "id": "integration_api",
+      "x": 345,
+      "y": 575,
+      "icon": "tile:generic",
+      "label": "Integration API",
+      "sub": "status · synthetic-send",
+      "status": "SOURCE_IMPLEMENTED_DEFAULT_OFF",
+      "evidence": ["src/runtime/api/app/integrations/router.py"]
+    },
+    {
+      "id": "audit_gate",
+      "x": 600,
+      "y": 575,
+      "icon": "tile:generic",
+      "label": "Audit-before-send gate",
+      "sub": "commit failure blocks dispatch",
+      "status": "SOURCE_IMPLEMENTED_DEFAULT_OFF",
+      "evidence": ["src/runtime/api/app/integrations/router.py", "src/runtime/tests/integrations_contract.py"]
+    },
+    {
+      "id": "event_contract",
+      "x": 850,
+      "y": 575,
+      "icon": "tile:generic",
+      "label": "Synthetic event contract",
+      "sub": "non-personal · bounded text",
+      "status": "SOURCE_IMPLEMENTED_DEFAULT_OFF",
+      "evidence": ["src/runtime/api/app/integrations/contracts.py"]
+    },
+    {
+      "id": "slack_adapter",
+      "x": 1165,
+      "y": 460,
+      "icon": "tile:lark",
+      "label": "Slack webhook adapter",
+      "sub": "DEFAULT OFF · HTTPS allowlist",
+      "status": "SOURCE_IMPLEMENTED_DEFAULT_OFF",
+      "evidence": ["src/runtime/api/app/integrations/config.py", "src/runtime/api/app/integrations/adapters.py"]
+    },
+    {
+      "id": "notion_adapter",
+      "x": 1165,
+      "y": 575,
+      "icon": "tile:generic",
+      "label": "Notion API adapter",
+      "sub": "DEFAULT OFF · exact host",
+      "status": "SOURCE_IMPLEMENTED_DEFAULT_OFF",
+      "evidence": ["src/runtime/api/app/integrations/config.py", "src/runtime/api/app/integrations/adapters.py"]
+    },
+    {
+      "id": "smtp_adapter",
+      "x": 1165,
+      "y": 690,
+      "icon": "tile:generic",
+      "label": "SMTP TLS adapter",
+      "sub": "DEFAULT OFF · TLS · allowlist",
+      "status": "SOURCE_IMPLEMENTED_DEFAULT_OFF",
+      "evidence": ["src/runtime/api/app/integrations/config.py", "src/runtime/api/app/integrations/adapters.py"]
+    },
+    {
+      "id": "slack_external",
+      "x": 1615,
+      "y": 460,
+      "icon": "tile:lark",
+      "label": "Slack Incoming Webhook",
+      "sub": "RECEIVE-ONLY · UNCONFIRMED",
+      "status": "UNCONFIRMED_EXTERNAL_SYSTEM",
+      "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#slack-and-business-integrations"]
+    },
+    {
+      "id": "notion_external",
+      "x": 1615,
+      "y": 575,
+      "icon": "tile:external",
+      "label": "Notion workspace",
+      "sub": "UNCONFIRMED external account",
+      "status": "UNCONFIRMED_EXTERNAL_SYSTEM",
+      "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#slack-and-business-integrations"]
+    },
+    {
+      "id": "smtp_external",
+      "x": 1615,
+      "y": 690,
+      "icon": "tile:external",
+      "label": "Mail system",
+      "sub": "UNCONFIRMED external account",
+      "status": "UNCONFIRMED_EXTERNAL_SYSTEM",
+      "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#slack-and-business-integrations"]
+    }
+  ],
+  "edges": [
+    { "from": "browser", "fs": "r", "to": "cloudfront", "ts": "l", "flow": "request", "label": "HTTPS", "lxy": [188, 212], "status": "LIVE_VERIFIED_2026_09_01", "evidence": ["assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.md"] },
+    { "from": "cloudfront", "fs": "r", "to": "api_gateway", "ts": "l", "flow": "request", "label": "/api/*", "lxy": [410, 212], "status": "LIVE_VERIFIED_2026_09_01", "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#current-edge"] },
+    { "from": "api_gateway", "fs": "r", "to": "api_lambda", "ts": "l", "flow": "request", "label": "invoke", "lxy": [635, 212], "status": "LIVE_VERIFIED_2026_09_01", "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#current-app-plane"] },
+    { "from": "admin", "fs": "r", "to": "integration_api", "ts": "l", "flow": "garden", "label": "admin-only source route", "lxy": [210, 562], "status": "SOURCE_IMPLEMENTED_DEFAULT_OFF", "evidence": ["src/runtime/api/app/integrations/router.py"] },
+    { "from": "integration_api", "fs": "r", "to": "audit_gate", "ts": "l", "flow": "garden", "label": "authorise dispatch", "lxy": [472, 562], "status": "SOURCE_IMPLEMENTED_DEFAULT_OFF", "evidence": ["src/runtime/api/app/integrations/router.py"] },
+    { "from": "audit_gate", "fs": "r", "to": "event_contract", "ts": "l", "flow": "garden", "label": "commit or fail closed", "lxy": [725, 562], "status": "SOURCE_IMPLEMENTED_DEFAULT_OFF", "evidence": ["src/runtime/api/app/integrations/router.py", "src/runtime/tests/integrations_contract.py"] },
+    { "from": "event_contract", "fs": "r", "to": "slack_adapter", "ts": "l", "flow": "garden", "label": "source branch", "lxy": [1030, 447], "mids": [[940, 575], [940, 460]], "status": "SOURCE_IMPLEMENTED_DEFAULT_OFF", "evidence": ["src/runtime/api/app/integrations/adapters.py"] },
+    { "from": "event_contract", "fs": "r", "to": "notion_adapter", "ts": "l", "flow": "garden", "label": "source branch", "lxy": [1008, 562], "status": "SOURCE_IMPLEMENTED_DEFAULT_OFF", "evidence": ["src/runtime/api/app/integrations/adapters.py"] },
+    { "from": "event_contract", "fs": "r", "to": "smtp_adapter", "ts": "l", "flow": "garden", "label": "source branch", "lxy": [1030, 677], "mids": [[940, 575], [940, 690]], "status": "SOURCE_IMPLEMENTED_DEFAULT_OFF", "evidence": ["src/runtime/api/app/integrations/adapters.py"] }
+  ],
+  "journeys": [
+    { "flow": "request", "dur": 2.8, "hops": [["browser", "cloudfront"], ["cloudfront", "api_gateway"], ["api_gateway", "api_lambda"]] },
+    { "flow": "garden", "dur": 3.8, "hops": [["admin", "integration_api"], ["integration_api", "audit_gate"], ["audit_gate", "event_contract"], ["event_contract", "slack_adapter"]] },
+    { "flow": "garden", "dur": 3.8, "hops": [["admin", "integration_api"], ["integration_api", "audit_gate"], ["audit_gate", "event_contract"], ["event_contract", "notion_adapter"]] },
+    { "flow": "garden", "dur": 3.8, "hops": [["admin", "integration_api"], ["integration_api", "audit_gate"], ["audit_gate", "event_contract"], ["event_contract", "smtp_adapter"]] }
+  ],
+  "steps": [["browser", "cloudfront", 1], ["cloudfront", "api_gateway", 2], ["api_gateway", "api_lambda", 3], ["admin", "integration_api", 1], ["integration_api", "audit_gate", 2], ["audit_gate", "event_contract", 3]],
+  "legend": ["request", "garden"],
+  "legendY": 885,
+  "footer": "Slack receives outbound webhook posts only; no Slack-to-J-Career path · no line to SaaS means workspace, account, retention and delivery remain UNCONFIRMED"
+}

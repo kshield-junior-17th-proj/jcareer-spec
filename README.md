@@ -7,19 +7,55 @@ J-Career는 구직자와 기업을 연결하는 채용 플랫폼입니다. 이 �
 ## 바로 보기
 
 - [서비스 아키텍처](https://kshield-junior-17th-proj.github.io/jcareer-spec/)
+- [구직자 추천·채용담당자 인재 탐색 애니메이션 갤러리](https://kshield-junior-17th-proj.github.io/jcareer-spec/assets/JCAREER_ARCHITECTURE_FLOW_GALLERY.html)
 - [업무망·GitHub CI·AWS·MLOps 전체 인프라 지도](https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/architecture.html)
 - [2026-09-01 운영 인프라 전환 기록](https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/production-transition.html)
 - [MLOps 7단계 모델 검증](https://kshield-junior-17th-proj.github.io/jcareer-spec/mlops/)
 - [AI 보안 진단 대시보드](https://kshield-junior-17th-proj.github.io/jcareer-spec/assessment-dashboard/)
 - [아키텍처 애니메이션 5종](https://kshield-junior-17th-proj.github.io/jcareer-spec/animations/)
 - [AWS 검증 환경](https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/lab/)
+- [AI 추천 설명 애니메이션](https://kshield-junior-17th-proj.github.io/jcareer-spec/assets/JCAREER_AI_RECOMMENDATION_EXPLANATION.svg) · [GIF](assets/JCAREER_AI_RECOMMENDATION_EXPLANATION.gif) · [H.264 MP4](assets/JCAREER_AI_RECOMMENDATION_EXPLANATION.mp4)
+- [Slack·업무 시스템 경계 애니메이션](https://kshield-junior-17th-proj.github.io/jcareer-spec/assets/JCAREER_SLACK_BUSINESS_INTEGRATION.svg) · [GIF](assets/JCAREER_SLACK_BUSINESS_INTEGRATION.gif) · [H.264 MP4](assets/JCAREER_SLACK_BUSINESS_INTEGRATION.mp4)
+
+두 애니메이션의 움직임은 설계 순서를 설명하며 실시간 트래픽이 아닙니다. Slack Incoming Webhook은
+J-Career에서 Slack으로 보내는 receive-only 경계이고 실제 workspace·계정·보존·전송은 미확인입니다.
+재현 가능한 JSON spec과 시각 검토용 PNG는 같은 이름으로 `assets/`에 함께 둡니다.
 
 ![GitHub 승인형 OIDC saved-plan apply, production-serverless AI 요청 경로와 분리형 serverless MLOps를 상태별로 구분한 J-Career AI 서비스 실행면](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg)
 
-현재 AI 서비스 도식은 main `96d70d7346774e9502fc4b509e1ed5b9e99eaa5d`의 GitHub saved plan·다른 사람 승인·OIDC apply 대상과
-별도 serverless MLOps 수명주기만 보여 줍니다. 사용자가 새 apply 실행을 보고했지만 현재 실행의
-완료·live smoke receipt는 이 갱신에서 확인하지 않았습니다. [AI 서비스 SVG](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg),
+2026-09-01 저장소 근거는 production-serverless의 saved plan·다른 사람 승인·OIDC apply·live smoke·pipeline
+재잠금을 확인합니다. 이 검증은 좁은 합성 서버리스 실행면에만 적용되며 별도 serverless MLOps 수명주기나
+기업 2-AZ ECS·RDS 목표를 운영 상태로 올리지 않습니다. [AI 서비스 SVG](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg),
 [draw.io 원본](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.drawio), [기업 2-AZ 목표 지도](assets/JCAREER_FULL_INFRA_ANIMATED.svg)를 구분해 제공합니다.
+
+## 구직자 추천과 채용담당자 인재 탐색
+
+[공개 애니메이션 갤러리](https://kshield-junior-17th-proj.github.io/jcareer-spec/assets/JCAREER_ARCHITECTURE_FLOW_GALLERY.html)는
+두 요청 여정을 한 페이지에서 보여 줍니다. GitHub README 안의 SVG는 움직이며, GitHub의 SVG 파일 보기 화면에서는
+보안 정제 때문에 정지 화면으로 보일 수 있습니다. 각 도식은 구현·제안·미확인을 분리하고, TRACE·JC-RECEIPT를
+`NOT-ASSET`으로 명시해 AWS 노드나 배포 항목으로 표현하지 않습니다.
+
+### 구직자 추천
+
+![구직자 한 명에게 공고를 추천하는 JCareer 서버리스 AWS 요청 여정](assets/JCAREER_CANDIDATE_RECOMMENDATION_FLOW.svg)
+
+구직자의 요청은 CloudFront에서 API Gateway·API Lambda·SQS·Agent Lambda를 거쳐 결정론적으로 공고 순위를
+계산합니다. LLM Gateway와 Capability Broker를 지난 Bedrock 결과는 정성 설명만 제공하며 최종 점수나 순위를
+결정하지 않습니다. [SVG](assets/JCAREER_CANDIDATE_RECOMMENDATION_FLOW.svg) ·
+[GIF](assets/JCAREER_CANDIDATE_RECOMMENDATION_FLOW.gif) ·
+[H.264 MP4](assets/JCAREER_CANDIDATE_RECOMMENDATION_FLOW.mp4) ·
+[검토 PNG](assets/JCAREER_CANDIDATE_RECOMMENDATION_FLOW.png)
+
+### 채용담당자 인재 탐색
+
+![한 공고에 대해 기업 범위 후보자를 탐색하는 JCareer 서버리스 AWS 요청 여정](assets/JCAREER_RECRUITER_TALENT_SEARCH_FLOW.svg)
+
+채용담당자의 요청은 로그인한 기업과 선택한 공고 범위에서 후보자를 정렬합니다. 설명 경로의 결과는 사람 검토를
+지원할 뿐 자동 선발, 합격 확률, 기업 적합 판정이나 채용 결정을 만들지 않습니다.
+[SVG](assets/JCAREER_RECRUITER_TALENT_SEARCH_FLOW.svg) ·
+[GIF](assets/JCAREER_RECRUITER_TALENT_SEARCH_FLOW.gif) ·
+[H.264 MP4](assets/JCAREER_RECRUITER_TALENT_SEARCH_FLOW.mp4) ·
+[검토 PNG](assets/JCAREER_RECRUITER_TALENT_SEARCH_FLOW.png)
 
 ## 구성 한눈에 보기
 

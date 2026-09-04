@@ -1,0 +1,242 @@
+{
+  "title": "J-Career · AI recommendation explanation",
+  "subtitle": "LIVE-VERIFIED 2026-09-01 · synthetic production-serverless slice · animated design order, not traffic telemetry",
+  "canvas": { "w": 1800, "h": 980 },
+  "labelBackplates": true,
+  "status": "LIVE_VERIFIED_2026_09_01_SYNTHETIC_SERVERLESS_SLICE",
+  "source_of_truth": {
+    "cutoff": "2026-09-01",
+    "architecture_truth": "artifacts/workstreams/architecture_truth_and_tobe.md#journey-2--applicantrecruiter-matching-to-bounded-bedrock-explanation",
+    "repository_evidence": [
+      "assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.md",
+      "src/runtime/AI_MATCHING_FLOW.md",
+      "src/runtime/api/app/decision_support.py"
+    ]
+  },
+  "groups": [
+    {
+      "kind": "region",
+      "label": "AWS Seoul · dated synthetic assessment slice",
+      "x": 220,
+      "y": 110,
+      "w": 1535,
+      "h": 750,
+      "status": "LIVE_VERIFIED_2026_09_01",
+      "evidence": ["assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.md"]
+    },
+    {
+      "kind": "event",
+      "label": "Asynchronous match · bounded explanation",
+      "labelPos": "bottom",
+      "x": 775,
+      "y": 355,
+      "w": 770,
+      "h": 220,
+      "status": "LIVE_VERIFIED_2026_09_01",
+      "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#journey-2--applicantrecruiter-matching-to-bounded-bedrock-explanation"]
+    },
+    {
+      "kind": "subnet",
+      "label": "IAM boundary · Broker-only Bedrock invoke",
+      "labelPos": "bottom",
+      "x": 1310,
+      "y": 345,
+      "w": 200,
+      "h": 215,
+      "status": "LIVE_VERIFIED_2026_09_01",
+      "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#capability-broker-and-bedrock"]
+    },
+    {
+      "kind": "subnet",
+      "label": "Run state · bounded evidence · metadata-only observation",
+      "x": 555,
+      "y": 625,
+      "w": 1025,
+      "h": 205,
+      "status": "LIVE_VERIFIED_2026_09_01",
+      "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#current-data-plane"]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "browser",
+      "x": 85,
+      "y": 450,
+      "icon": "tile:external",
+      "label": "Applicant · recruiter",
+      "sub": "synthetic browser journey",
+      "status": "LIVE_VERIFIED_2026_09_01",
+      "evidence": ["assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.md"]
+    },
+    {
+      "id": "cloudfront",
+      "x": 290,
+      "y": 450,
+      "icon": "cloudfront",
+      "label": "Amazon CloudFront",
+      "sub": "default HTTPS domain",
+      "status": "LIVE_VERIFIED_2026_09_01",
+      "evidence": ["assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.md"]
+    },
+    {
+      "id": "cognito",
+      "x": 475,
+      "y": 240,
+      "icon": "cognito",
+      "label": "Amazon Cognito",
+      "sub": "JWT · ephemeral smoke identity",
+      "status": "LIVE_VERIFIED_2026_09_01",
+      "evidence": ["assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.md"]
+    },
+    {
+      "id": "api_gateway",
+      "x": 475,
+      "y": 450,
+      "icon": "apigateway",
+      "label": "Amazon API Gateway",
+      "sub": "JWT and request boundary",
+      "status": "LIVE_VERIFIED_2026_09_01",
+      "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#current-edge"]
+    },
+    {
+      "id": "api_lambda",
+      "x": 660,
+      "y": 450,
+      "icon": "lambda",
+      "label": "API Lambda",
+      "sub": "scope · run state · 202",
+      "status": "LIVE_VERIFIED_2026_09_01",
+      "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#journey-2--applicantrecruiter-matching-to-bounded-bedrock-explanation"]
+    },
+    {
+      "id": "queue",
+      "x": 850,
+      "y": 450,
+      "icon": "sqs",
+      "label": "Amazon SQS",
+      "sub": "asynchronous match run",
+      "status": "LIVE_VERIFIED_2026_09_01",
+      "evidence": ["assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.md"]
+    },
+    {
+      "id": "agent",
+      "x": 1040,
+      "y": 450,
+      "icon": "lambda",
+      "label": "Agent Lambda",
+      "sub": "deterministic score owner",
+      "status": "LIVE_VERIFIED_2026_09_01",
+      "evidence": ["src/runtime/AI_MATCHING_FLOW.md#현재-점수-계약"]
+    },
+    {
+      "id": "gateway",
+      "x": 1225,
+      "y": 450,
+      "icon": "lambda",
+      "label": "LLM Gateway",
+      "sub": "bounded qualitative request",
+      "status": "LIVE_VERIFIED_2026_09_01",
+      "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#llm-gateway"]
+    },
+    {
+      "id": "broker",
+      "x": 1410,
+      "y": 450,
+      "icon": "lambda",
+      "label": "Capability Broker",
+      "sub": "exact model allowlist",
+      "status": "LIVE_VERIFIED_2026_09_01",
+      "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#capability-broker-and-bedrock"]
+    },
+    {
+      "id": "bedrock",
+      "x": 1640,
+      "y": 450,
+      "icon": "bedrock",
+      "label": "Amazon Bedrock",
+      "sub": "qualitative evidence only",
+      "status": "LIVE_VERIFIED_2026_09_01",
+      "evidence": ["src/runtime/AI_MATCHING_FLOW.md#설명-생성기의-권한-경계"]
+    },
+    {
+      "id": "web_s3",
+      "x": 290,
+      "y": 710,
+      "icon": "s3",
+      "label": "Private Amazon S3",
+      "sub": "static web origin",
+      "status": "LIVE_VERIFIED_2026_09_01",
+      "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#current-edge"]
+    },
+    {
+      "id": "dynamodb",
+      "x": 660,
+      "y": 710,
+      "icon": "dynamodb",
+      "label": "Amazon DynamoDB",
+      "sub": "catalog · run · final result",
+      "status": "LIVE_VERIFIED_2026_09_01",
+      "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#current-data-plane"]
+    },
+    {
+      "id": "dlq",
+      "x": 850,
+      "y": 710,
+      "icon": "sqs",
+      "label": "Dead-letter queue",
+      "sub": "retry-exhausted isolation",
+      "status": "LIVE_VERIFIED_2026_09_01",
+      "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#current-app-plane"]
+    },
+    {
+      "id": "evidence_s3",
+      "x": 1040,
+      "y": 710,
+      "icon": "s3",
+      "label": "Evidence Amazon S3",
+      "sub": "bounded result objects",
+      "status": "LIVE_VERIFIED_2026_09_01",
+      "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#observability-and-evidence"]
+    },
+    {
+      "id": "cloudwatch",
+      "x": 1450,
+      "y": 710,
+      "icon": "cloudwatch",
+      "label": "Amazon CloudWatch",
+      "sub": "metadata · latency · error",
+      "status": "LIVE_VERIFIED_2026_09_01",
+      "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#observability-and-evidence"]
+    }
+  ],
+  "edges": [
+    { "from": "browser", "fs": "r", "to": "cloudfront", "ts": "l", "flow": "request", "label": "HTTPS", "lxy": [188, 437], "status": "LIVE_VERIFIED_2026_09_01", "evidence": ["assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.md"] },
+    { "from": "cloudfront", "fs": "r", "to": "api_gateway", "ts": "l", "flow": "request", "label": "/api/*", "lxy": [382, 437], "status": "LIVE_VERIFIED_2026_09_01", "evidence": ["assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.md"] },
+    { "from": "api_gateway", "fs": "r", "to": "api_lambda", "ts": "l", "flow": "request", "status": "LIVE_VERIFIED_2026_09_01", "evidence": ["assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.md"] },
+    { "from": "api_lambda", "fs": "r", "to": "queue", "ts": "l", "flow": "request", "label": "enqueue · 202", "lxy": [755, 437], "status": "LIVE_VERIFIED_2026_09_01", "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#journey-2--applicantrecruiter-matching-to-bounded-bedrock-explanation"] },
+    { "from": "queue", "fs": "r", "to": "agent", "ts": "l", "flow": "request", "label": "async run", "lxy": [945, 437], "status": "LIVE_VERIFIED_2026_09_01", "evidence": ["assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.md"] },
+    { "from": "agent", "fs": "r", "to": "gateway", "ts": "l", "flow": "request", "label": "bounded input", "lxy": [1132, 437], "status": "LIVE_VERIFIED_2026_09_01", "evidence": ["src/runtime/AI_MATCHING_FLOW.md#설명-생성기의-권한-경계"] },
+    { "from": "gateway", "fs": "r", "to": "broker", "ts": "l", "flow": "request", "status": "LIVE_VERIFIED_2026_09_01", "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#llm-gateway"] },
+    { "from": "broker", "fs": "r", "to": "bedrock", "ts": "l", "flow": "request", "label": "Converse", "lxy": [1525, 437], "status": "LIVE_VERIFIED_2026_09_01", "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#capability-broker-and-bedrock"] },
+    { "from": "browser", "fs": "t", "to": "cognito", "ts": "l", "flow": "aux", "static": true, "label": "sign in", "lxy": [285, 227], "mids": [[85, 315], [260, 315], [260, 240]], "status": "LIVE_VERIFIED_2026_09_01", "evidence": ["assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.md"] },
+    { "from": "cognito", "fs": "b", "to": "api_gateway", "ts": "t", "flow": "aux", "static": true, "label": "JWT issuer trust", "lxy": [525, 345], "status": "LIVE_VERIFIED_2026_09_01", "evidence": ["assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.md"] },
+    { "from": "cloudfront", "fs": "b", "to": "web_s3", "ts": "t", "flow": "tool", "label": "private origin", "lxy": [340, 585], "status": "LIVE_VERIFIED_2026_09_01", "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#current-edge"] },
+    { "from": "api_lambda", "fs": "b", "to": "dynamodb", "ts": "t", "flow": "tool", "label": "create · poll", "lxy": [710, 585], "status": "LIVE_VERIFIED_2026_09_01", "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#journey-2--applicantrecruiter-matching-to-bounded-bedrock-explanation"] },
+    { "from": "queue", "fs": "b", "to": "dlq", "ts": "t", "flow": "aux", "static": true, "label": "retry exhausted", "lxy": [920, 585], "status": "LIVE_VERIFIED_2026_09_01", "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#current-app-plane"] },
+    { "from": "agent", "fs": "b", "to": "evidence_s3", "ts": "t", "flow": "tool", "label": "digest · version", "lxy": [1100, 585], "status": "LIVE_VERIFIED_2026_09_01", "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#observability-and-evidence"] },
+    { "from": "agent", "fs": "l", "to": "dynamodb", "ts": "r", "flow": "tool", "label": "final score · COMPLETED", "lxy": [850, 687], "mids": [[960, 450], [960, 650], [710, 650], [710, 710]], "status": "LIVE_VERIFIED_2026_09_01", "evidence": ["src/runtime/AI_MATCHING_FLOW.md#설명-생성기의-권한-경계"] },
+    { "from": "gateway", "fs": "b", "to": "cloudwatch", "ts": "t", "flow": "ambient", "label": "correlation", "lxy": [1300, 610], "mids": [[1225, 600], [1450, 600]], "status": "LIVE_VERIFIED_2026_09_01", "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#observability-and-evidence"] },
+    { "from": "broker", "fs": "b", "to": "cloudwatch", "ts": "t", "flow": "ambient", "mids": [[1410, 585], [1510, 585], [1510, 660], [1450, 660]], "status": "LIVE_VERIFIED_2026_09_01", "evidence": ["artifacts/workstreams/architecture_truth_and_tobe.md#observability-and-evidence"] }
+  ],
+  "journeys": [
+    { "flow": "request", "dur": 5.2, "hops": [["browser", "cloudfront"], ["cloudfront", "api_gateway"], ["api_gateway", "api_lambda"], ["api_lambda", "queue"], ["queue", "agent"], ["agent", "gateway"], ["gateway", "broker"], ["broker", "bedrock"]] },
+    { "flow": "reply", "dur": 2.8, "reverse": true, "hops": [["broker", "bedrock"], ["gateway", "broker"], ["agent", "gateway"]] },
+    { "flow": "tool", "dur": 3.2, "hops": [["agent", "evidence_s3"], ["agent", "dynamodb"]] },
+    { "flow": "reply", "dur": 2.8, "reverse": true, "hops": [["api_gateway", "api_lambda"], ["cloudfront", "api_gateway"], ["browser", "cloudfront"]] },
+    { "flow": "ambient", "dur": 2.8, "hops": [["gateway", "cloudwatch"]] }
+  ],
+  "steps": [["browser", "cloudfront", 1], ["cloudfront", "api_gateway", 2], ["api_gateway", "api_lambda", 3], ["api_lambda", "queue", 4], ["queue", "agent", 5], ["agent", "gateway", 6], ["gateway", "broker", 7], ["broker", "bedrock", 8]],
+  "legend": ["request", "reply", "tool", "ambient", "aux"],
+  "legendY": 900,
+  "footer": "Backend owns the deterministic final score · Bedrock supplies bounded qualitative text only · no autonomous hire or reject action"
+}

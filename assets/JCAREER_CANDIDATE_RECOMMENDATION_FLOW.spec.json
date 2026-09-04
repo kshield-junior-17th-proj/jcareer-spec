@@ -1,0 +1,339 @@
+{
+  "title": "JCareer Candidate Recommendation",
+  "subtitle": "Verified synthetic serverless journey · jobs ranked for one candidate · Seoul Region",
+  "canvas": { "w": 1800, "h": 980 },
+  "status": "LIVE_VERIFIED_SYNTHETIC_SERVERLESS_2026_09_01",
+  "status_key": {
+    "implemented": "LIVE-VERIFIED within the synthetic production-serverless slice",
+    "proposed": "MODELLED or PROPOSED only; not deployed",
+    "unconfirmed": "not observed or approved for a real customer estate"
+  },
+  "not_assets": ["TRACE", "JC-RECEIPT"],
+  "groups": [
+    {
+      "kind": "event",
+      "x": 1135,
+      "y": 110,
+      "w": 570,
+      "h": 145,
+      "label": "Context only · no current request path",
+      "labelPos": "bottom"
+    },
+    {
+      "kind": "region",
+      "x": 225,
+      "y": 95,
+      "w": 1510,
+      "h": 750,
+      "label": "AWS Cloud · ap-northeast-2 · status-separated evidence view"
+    },
+    {
+      "kind": "event",
+      "x": 785,
+      "y": 375,
+      "w": 930,
+      "h": 165,
+      "label": "Asynchronous matching and bounded explanation · LIVE-VERIFIED",
+      "labelPos": "bottom"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "candidate",
+      "x": 90,
+      "y": 460,
+      "icon": "tile:external",
+      "label": "Candidate",
+      "sub": "browser journey"
+    },
+    {
+      "id": "cloudfront",
+      "x": 310,
+      "y": 460,
+      "icon": "cloudfront",
+      "label": "Amazon CloudFront",
+      "sub": "LIVE · HTTPS edge"
+    },
+    {
+      "id": "api_gateway",
+      "x": 500,
+      "y": 460,
+      "icon": "apigateway",
+      "label": "Amazon API Gateway",
+      "sub": "LIVE · JWT and throttle"
+    },
+    {
+      "id": "api_lambda",
+      "x": 690,
+      "y": 460,
+      "icon": "lambda",
+      "label": "API Lambda",
+      "sub": "LIVE · consent and run"
+    },
+    {
+      "id": "queue",
+      "x": 880,
+      "y": 460,
+      "icon": "sqs",
+      "label": "Matching Queue",
+      "sub": "LIVE · async handoff"
+    },
+    {
+      "id": "agent",
+      "x": 1070,
+      "y": 460,
+      "icon": "lambda",
+      "label": "Agent Lambda",
+      "sub": "LIVE · deterministic rank"
+    },
+    {
+      "id": "gateway",
+      "x": 1260,
+      "y": 460,
+      "icon": "lambda",
+      "label": "LLM Gateway",
+      "sub": "LIVE · qualitative text"
+    },
+    {
+      "id": "broker",
+      "x": 1450,
+      "y": 460,
+      "icon": "lambda",
+      "label": "Capability Broker",
+      "sub": "LIVE · exact allowlist"
+    },
+    {
+      "id": "bedrock",
+      "x": 1640,
+      "y": 460,
+      "icon": "bedrock",
+      "label": "Amazon Bedrock",
+      "sub": "LIVE · no final score"
+    },
+    {
+      "id": "web_s3",
+      "x": 310,
+      "y": 720,
+      "icon": "s3",
+      "label": "Web Origin S3",
+      "sub": "LIVE · private static UI"
+    },
+    {
+      "id": "cognito",
+      "x": 500,
+      "y": 180,
+      "icon": "cognito",
+      "label": "Amazon Cognito",
+      "sub": "LIVE · candidate JWT"
+    },
+    {
+      "id": "dynamodb",
+      "x": 690,
+      "y": 720,
+      "icon": "dynamodb",
+      "label": "Amazon DynamoDB",
+      "sub": "LIVE · jobs and run state"
+    },
+    {
+      "id": "dlq",
+      "x": 880,
+      "y": 720,
+      "icon": "sqs",
+      "label": "Dead-letter Queue",
+      "sub": "LIVE · exhausted retries"
+    },
+    {
+      "id": "evidence_s3",
+      "x": 1070,
+      "y": 720,
+      "icon": "s3",
+      "label": "Evidence S3",
+      "sub": "LIVE · private results"
+    },
+    {
+      "id": "cloudwatch",
+      "x": 1450,
+      "y": 720,
+      "icon": "cloudwatch",
+      "label": "Amazon CloudWatch",
+      "sub": "LIVE · metadata logs"
+    },
+    {
+      "id": "enterprise_target",
+      "x": 1285,
+      "y": 180,
+      "icon": "ecs",
+      "label": "Enterprise 2-AZ target",
+      "sub": "PROPOSED · separate model"
+    },
+    {
+      "id": "customer_evidence",
+      "x": 1580,
+      "y": 180,
+      "icon": "tile:generic",
+      "label": "Real customer evidence",
+      "sub": "UNCONFIRMED · not observed"
+    }
+  ],
+  "edges": [
+    {
+      "from": "candidate",
+      "to": "cloudfront",
+      "flow": "request",
+      "label": "HTTPS",
+      "lxy": [200, 447]
+    },
+    {
+      "from": "cloudfront",
+      "to": "api_gateway",
+      "flow": "request",
+      "label": "recommend",
+      "lxy": [405, 447]
+    },
+    {
+      "from": "api_gateway",
+      "to": "api_lambda",
+      "flow": "request"
+    },
+    {
+      "from": "api_lambda",
+      "to": "queue",
+      "flow": "request",
+      "label": "run · 202",
+      "lxy": [785, 447]
+    },
+    {
+      "from": "queue",
+      "to": "agent",
+      "flow": "request",
+      "label": "dequeue",
+      "lxy": [975, 447]
+    },
+    {
+      "from": "agent",
+      "to": "gateway",
+      "flow": "request",
+      "label": "score facts",
+      "lxy": [1165, 447]
+    },
+    {
+      "from": "gateway",
+      "to": "broker",
+      "flow": "request",
+      "label": "bounded text",
+      "lxy": [1355, 447]
+    },
+    {
+      "from": "broker",
+      "to": "bedrock",
+      "flow": "request",
+      "label": "Converse",
+      "lxy": [1545, 447]
+    },
+    {
+      "from": "cloudfront",
+      "fs": "b",
+      "to": "web_s3",
+      "ts": "t",
+      "flow": "aux",
+      "label": "private origin",
+      "lxy": [352, 610]
+    },
+    {
+      "from": "candidate",
+      "fs": "t",
+      "to": "cognito",
+      "ts": "l",
+      "flow": "aux",
+      "label": "sign-in",
+      "lxy": [290, 168],
+      "mids": [[90, 180], [477, 180]]
+    },
+    {
+      "from": "cognito",
+      "fs": "b",
+      "to": "api_gateway",
+      "ts": "t",
+      "flow": "aux",
+      "static": true,
+      "label": "JWT trust",
+      "lxy": [540, 330]
+    },
+    {
+      "from": "api_lambda",
+      "fs": "b",
+      "to": "dynamodb",
+      "ts": "t",
+      "flow": "tool",
+      "label": "catalog · runs",
+      "lxy": [744, 610]
+    },
+    {
+      "from": "queue",
+      "fs": "b",
+      "to": "dlq",
+      "ts": "t",
+      "flow": "aux",
+      "static": true,
+      "label": "retry exhausted",
+      "lxy": [930, 610]
+    },
+    {
+      "from": "agent",
+      "fs": "b",
+      "to": "dynamodb",
+      "ts": "t",
+      "flow": "tool",
+      "label": "ranked jobs",
+      "lxy": [880, 625],
+      "mids": [[1070, 625], [690, 625]]
+    },
+    {
+      "from": "agent",
+      "fs": "b",
+      "to": "evidence_s3",
+      "ts": "t",
+      "flow": "tool",
+      "label": "evidence",
+      "lxy": [1115, 610]
+    },
+    {
+      "from": "gateway",
+      "fs": "b",
+      "to": "cloudwatch",
+      "ts": "t",
+      "flow": "ambient",
+      "label": "metadata",
+      "lxy": [1355, 645],
+      "mids": [[1260, 645], [1450, 645]]
+    }
+  ],
+  "journeys": [
+    {
+      "flow": "request",
+      "dur": 5.6,
+      "hops": [["candidate", "cloudfront"], ["cloudfront", "api_gateway"], ["api_gateway", "api_lambda"], ["api_lambda", "queue"], ["queue", "agent"], ["agent", "gateway"], ["gateway", "broker"], ["broker", "bedrock"]]
+    },
+    {
+      "flow": "reply",
+      "dur": 2.4,
+      "reverse": true,
+      "hops": [["broker", "bedrock"], ["gateway", "broker"], ["agent", "gateway"]]
+    },
+    {
+      "flow": "tool",
+      "dur": 2.8,
+      "hops": [["agent", "dynamodb"], ["agent", "evidence_s3"]]
+    },
+    {
+      "flow": "reply",
+      "dur": 3.0,
+      "reverse": true,
+      "hops": [["api_lambda", "dynamodb"], ["api_gateway", "api_lambda"], ["cloudfront", "api_gateway"], ["candidate", "cloudfront"]]
+    }
+  ],
+  "steps": [["candidate", "cloudfront", 1], ["cloudfront", "api_gateway", 2], ["api_gateway", "api_lambda", 3], ["api_lambda", "queue", 4], ["queue", "agent", 5], ["agent", "gateway", 6], ["gateway", "broker", 7], ["broker", "bedrock", 8]],
+  "legend": ["request", "reply", "tool", "ambient", "aux"],
+  "legendY": 895,
+  "footer": "LIVE = repository-supported live verification in the synthetic slice · PROPOSED and UNCONFIRMED stay off-path · TRACE and JC-RECEIPT are NOT-ASSET"
+}
