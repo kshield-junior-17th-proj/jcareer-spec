@@ -1,13 +1,14 @@
-# J-Career AI Security Posture dashboard
+# J-Career AI security assessment dashboard
 
-Presentation-facing consulting dashboard for the 27-control assessment. It is intentionally separate from `../dashboard`, which is the static Evidence Desk and must not calculate assessment or residual-risk judgments.
+Presentation-facing working snapshot for the 27 internal project items. It is intentionally separate from `../dashboard`, which is the static Evidence Desk and must not calculate assessment or residual-risk judgments.
 
 ## Interpretation boundary
 
-- NIST AI RMF is the sole primary assessment framework.
+- NIST AI RMF is the sole assessment framework.
+- `T.x` values are project-internal identifiers, not NIST AI RMF subcategory identifiers.
 - The baseline combines design-level review with five isolated-Lab samples; it is not proof of full operating effectiveness.
-- The AS-IS evidence profile is frozen assessment data. The browser only renders it.
-- The TO-BE radar is a proposed target and is explicitly not a verified after-state.
-- No compliance score, residual-risk decision, or automatic finding judgment is produced.
+- The current evidence profile is frozen presentation data. The browser only renders it.
+- The 0–4 radar is an internal display index, not a NIST score, maturity level, compliance score, or residual-risk decision.
+- The TO-BE radar is a proposed target and explicitly not a verified after-state.
 
-Open `index.html` directly or serve this directory with any static HTTP server. No AWS, Terraform, credentials, state, raw prompts, or model responses are required.
+Open `index.html` directly or serve the repository with a static HTTP server. The page requires no cloud access, credentials, state, raw prompts, or model responses.
