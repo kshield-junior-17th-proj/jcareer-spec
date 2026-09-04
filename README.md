@@ -14,6 +14,12 @@ J-Career는 구직자와 기업을 연결하는 채용 플랫폼입니다. 이 �
 - [AI 보안 진단 대시보드](https://kshield-junior-17th-proj.github.io/jcareer-spec/assessment-dashboard/)
 - [아키텍처 애니메이션 5종](https://kshield-junior-17th-proj.github.io/jcareer-spec/animations/)
 - [AWS 검증 환경](https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/lab/)
+- [AI 추천 설명 애니메이션](https://kshield-junior-17th-proj.github.io/jcareer-spec/assets/JCAREER_AI_RECOMMENDATION_EXPLANATION.svg) · [GIF](assets/JCAREER_AI_RECOMMENDATION_EXPLANATION.gif) · [H.264 MP4](assets/JCAREER_AI_RECOMMENDATION_EXPLANATION.mp4)
+- [Slack·업무 시스템 경계 애니메이션](https://kshield-junior-17th-proj.github.io/jcareer-spec/assets/JCAREER_SLACK_BUSINESS_INTEGRATION.svg) · [GIF](assets/JCAREER_SLACK_BUSINESS_INTEGRATION.gif) · [H.264 MP4](assets/JCAREER_SLACK_BUSINESS_INTEGRATION.mp4)
+
+두 애니메이션의 움직임은 설계 순서를 설명하며 실시간 트래픽이 아닙니다. Slack Incoming Webhook은
+J-Career에서 Slack으로 보내는 receive-only 경계이고 실제 workspace·계정·보존·전송은 미확인입니다.
+재현 가능한 JSON spec과 시각 검토용 PNG는 같은 이름으로 `assets/`에 함께 둡니다.
 
 ![GitHub 승인형 OIDC saved-plan apply, production-serverless AI 요청 경로와 분리형 serverless MLOps를 상태별로 구분한 J-Career AI 서비스 실행면](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg)
 

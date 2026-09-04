@@ -227,6 +227,57 @@
       </div>
     </section>
 
+    <section class="section animated-flow-section" id="animated-flow-gallery" aria-labelledby="animated-flow-gallery-title">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <p class="section-label">Animated architecture gallery</p>
+            <h2 id="animated-flow-gallery-title">설명과 연동의 경계를<br>움직임으로 읽습니다</h2>
+          </div>
+          <p class="section-intro">공식 AWS 아이콘과 왼쪽에서 오른쪽으로 흐르는 요청 여정을 사용했습니다. 움직이는 점은 설계 순서를 설명할 뿐 실시간 트래픽이 아닙니다. 각 카드에서 브라우저용 SVG, 반복 재생 GIF, H.264 MP4를 바로 열 수 있습니다.</p>
+        </div>
+        <div class="animated-flow-gallery">
+          <article class="animated-flow-card">
+            <div class="animated-flow-card__meta">
+              <span class="animated-flow-card__index">FLOW 01</span>
+              <span class="animated-flow-card__status animated-flow-card__status--live">LIVE-VERIFIED · 2026-09-01</span>
+            </div>
+            <a class="animated-flow-card__preview" href="assets/JCAREER_AI_RECOMMENDATION_EXPLANATION.svg" aria-label="AI 추천 설명 animated SVG 열기">
+              <img src="assets/JCAREER_AI_RECOMMENDATION_EXPLANATION.svg" data-animated-diagram data-motion-src="assets/JCAREER_AI_RECOMMENDATION_EXPLANATION.svg" data-still-src="assets/JCAREER_AI_RECOMMENDATION_EXPLANATION.png" width="1800" height="980" loading="lazy" decoding="async" alt="브라우저에서 CloudFront, API Gateway, API Lambda, SQS, Agent Lambda, LLM Gateway, Capability Broker와 Amazon Bedrock으로 이어지는 합성 서버리스 추천 설명 경로. Agent가 결정론적 최종 점수를 소유하고 Bedrock은 정성 설명만 제공한다.">
+            </a>
+            <div class="animated-flow-card__body">
+              <h3>AI recommendation explanation</h3>
+              <p>결정론적 점수와 정성 설명을 분리하고, Bedrock 앞 broker-only IAM 경계를 표시했습니다. 자동 채용·탈락 동작은 없습니다.</p>
+              <nav class="animated-flow-card__links" aria-label="AI 추천 설명 다운로드 형식">
+                <a href="assets/JCAREER_AI_RECOMMENDATION_EXPLANATION.svg">SVG · interactive</a>
+                <a href="assets/JCAREER_AI_RECOMMENDATION_EXPLANATION.gif">GIF · 4s loop</a>
+                <a href="assets/JCAREER_AI_RECOMMENDATION_EXPLANATION.mp4">MP4 · H.264</a>
+              </nav>
+            </div>
+          </article>
+          <article class="animated-flow-card animated-flow-card--boundary">
+            <div class="animated-flow-card__meta">
+              <span class="animated-flow-card__index">FLOW 02</span>
+              <span class="animated-flow-card__status">SOURCE-IMPLEMENTED · DEFAULT OFF</span>
+            </div>
+            <a class="animated-flow-card__preview" href="assets/JCAREER_SLACK_BUSINESS_INTEGRATION.svg" aria-label="Slack과 업무 시스템 경계 animated SVG 열기">
+              <img src="assets/JCAREER_SLACK_BUSINESS_INTEGRATION.svg" data-animated-diagram data-motion-src="assets/JCAREER_SLACK_BUSINESS_INTEGRATION.svg" data-still-src="assets/JCAREER_SLACK_BUSINESS_INTEGRATION.png" width="1800" height="980" loading="lazy" decoding="async" alt="현재 서버리스 API와 분리된 기본 비활성 통합 소스 경로. 관리자 전용 API, 발송 전 감사, 합성 이벤트와 Slack, Notion, SMTP adapter까지만 이어지며 외부 시스템에는 연결선이 없다. Slack은 receive-only이며 외부 상태는 미확인이다.">
+            </a>
+            <div class="animated-flow-card__body">
+              <h3>Slack and business-system boundary</h3>
+              <p>소스의 관리자·감사·합성 이벤트 가드만 움직입니다. Slack은 receive-only이고, 실제 workspace·계정·보존·전송은 모두 미확인이라 외부 SaaS까지 연결선을 그리지 않았습니다.</p>
+              <nav class="animated-flow-card__links" aria-label="Slack과 업무 시스템 경계 다운로드 형식">
+                <a href="assets/JCAREER_SLACK_BUSINESS_INTEGRATION.svg">SVG · interactive</a>
+                <a href="assets/JCAREER_SLACK_BUSINESS_INTEGRATION.gif">GIF · 4s loop</a>
+                <a href="assets/JCAREER_SLACK_BUSINESS_INTEGRATION.mp4">MP4 · H.264</a>
+              </nav>
+            </div>
+          </article>
+        </div>
+        <p class="caption">상단의 날짜가 있는 AWS 경로만 해당 시점의 live verification 범위입니다. SOURCE-IMPLEMENTED, DEFAULT OFF, UNCONFIRMED 표시는 배포나 외부 전달 증거가 아닙니다.</p>
+      </div>
+    </section>
+
     <section class="section" aria-labelledby="perspective-title">
       <div class="shell">
         <div class="section-head">

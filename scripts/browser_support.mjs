@@ -11,10 +11,12 @@ export const REPO_ROOT = path.resolve(SCRIPT_DIRECTORY, '..');
 const MIME_TYPES = new Map([
   ['.css', 'text/css; charset=utf-8'],
   ['.drawio', 'application/xml; charset=utf-8'],
+  ['.gif', 'image/gif'],
   ['.html', 'text/html; charset=utf-8'],
   ['.js', 'text/javascript; charset=utf-8'],
   ['.json', 'application/json; charset=utf-8'],
   ['.mjs', 'text/javascript; charset=utf-8'],
+  ['.mp4', 'video/mp4'],
   ['.pdf', 'application/pdf'],
   ['.png', 'image/png'],
   ['.svg', 'image/svg+xml; charset=utf-8'],
