@@ -2,20 +2,20 @@
 
 ## Decision
 
-Publish the corrected AI security assessment dashboard as a clearly labelled working snapshot. Do not publish the pending animation atlas yet.
+Publish the corrected AI security assessment dashboard as a clearly labelled working snapshot. Publish the four service-specific motion plates as presentation aids with their evidence-state labels intact; do not treat the overall motion atlas as deployment evidence.
 
-The dashboard can be made legible and honest without changing its frozen assessment values. The atlas has unresolved motion-accessibility and architecture-status narration issues that need source-owner correction before public linking.
+The dashboard is legible and honest without changing its frozen assessment values. Candidate, recruiter, explanation, and Slack/business-adapter plates provide static PNG fallbacks and explicit `LIVE-VERIFIED`, `SOURCE-IMPLEMENTED/DEFAULT-OFF`, or `UNCONFIRMED` boundaries. The overall atlas still describes a designed flow rather than proving that the latest revision reached apply or live smoke.
 
 ## Scope and evidence boundary
 
 - Latest public site: `https://kshield-junior-17th-proj.github.io/jcareer-spec/`
-- Public baseline commit during review: `f3cfba2`
-- Pending source reviewed read-only: `publish-ai-security-20260905`; finalized during review as `c165747`
+- Public baseline commit during review: `d561007`
+- Assessment source lineage: `publish-ai-security-20260905`, finalized as `c165747` and subsequently hardened on this branch
 - Assessment framework: NIST AI RMF only
 - Architecture evidence: committed public specifications, diagram specifications, pending presentation source, and source declarations only
 - Excluded: cloud API calls, Terraform execution, Docker, credentials, state, raw prompts, and model responses
 
-The live page returned HTTP 200 and contained the current `APPLY · LIVE SMOKE NOT RUN` boundary. It did not yet contain the pending assessment-dashboard route.
+The assessment dashboard and the four service-specific architecture assets returned HTTP 200 after their respective Pages deployments. Those publication checks prove delivery only; they do not prove AWS apply, operating effectiveness, or an achieved after-state.
 
 ## Findings
 
@@ -29,12 +29,12 @@ The live page returned HTTP 200 and contained the current `APPLY · LIVE SMOKE N
 6. `3/2 · 관찰 실패 · 검증 공백` was ambiguous. The intended meaning in the snapshot is 3 observed vulnerable behaviors and 2 verification gaps.
 7. Finding selection used visual `.active` state only. It did not expose a selected-tab state or keyboard arrow navigation.
 
-### Pending animation atlas — hold
+### Architecture motion publication boundary
 
-1. The brand link inherited default browser blue on a dark green masthead and had no explicit focus treatment or skip link.
-2. The embedded SVGs guard dashed-line CSS animation with `prefers-reduced-motion`, but their repeated SMIL `<animateMotion>` dots have no reduced-motion stop or static substitute.
-3. The overall delivery diagram visibly includes apply and live-smoke steps. The current public truth separates the newest saved plan (`a9764f8`, run `33569358467/1`) from the last observed deployment (`7a5acfb`, run `33466745822`). Without that revision split on the atlas plate, the flow can imply that the newest plan reached apply/live smoke.
-4. The TO-BE control chain is technically framed as proposed and not deployed. Source declarations also default its components off and do not associate the proposed CloudFront-scope WAF with an existing distribution. That boundary must remain visible if the atlas is revised.
+1. Every presentation embedding must retain a static PNG poster so reduced-motion mode and PowerPoint first-frame rendering remain readable.
+2. The overall delivery diagram includes apply and live-smoke steps as a delivery design; it is not evidence that the latest revision reached those steps.
+3. The service-specific plates preserve the stronger state split: current serverless reference, source-implemented/default-off adapter code, and unconfirmed external delivery are shown separately.
+4. The TO-BE control chain remains proposed, default-off, and not deployed. That boundary must remain visible in the gallery, deck, and dashboard.
 
 ### AWS technical-blog quality
 
