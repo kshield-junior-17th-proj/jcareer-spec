@@ -35,6 +35,40 @@ variable "name_prefix" {
   }
 }
 
+variable "aws_region" {
+  description = "Region for the metadata, evidence, KMS, and CloudTrail control plane."
+  type        = string
+
+  validation {
+    condition     = var.aws_region == "ap-northeast-2"
+    error_message = "This proposal is intentionally restricted to ap-northeast-2."
+  }
+}
+
+variable "publisher_roles" {
+  description = "Exact llm-gateway and capability-broker role-name mapping; each receives only its own publication channel."
+  type        = map(string)
+  default     = {}
+
+  validation {
+    condition = alltrue([
+      for role_name in values(var.publisher_roles) : role_name == "" || can(regex("^[A-Za-z0-9+=,.@_-]{1,64}$", role_name))
+    ])
+    error_message = "publisher_roles values must be empty while disabled or valid exact IAM role names."
+  }
+}
+
+variable "guardrail_block_alarm_threshold" {
+  description = "Blocked guardrail actions in one five-minute period that move the metadata alarm to ALARM."
+  type        = number
+  default     = 5
+
+  validation {
+    condition     = var.guardrail_block_alarm_threshold >= 1 && var.guardrail_block_alarm_threshold <= 1000
+    error_message = "guardrail_block_alarm_threshold must be between 1 and 1000."
+  }
+}
+
 variable "log_retention_days" {
   description = "Retention for application metadata log groups."
   type        = number

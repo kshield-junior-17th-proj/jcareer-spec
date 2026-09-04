@@ -1,26 +1,30 @@
 locals {
+  approval_input_sha256 = sha256(jsonencode({
+    aws_region                       = var.aws_region
+    bedrock_invocation_resource_arns = sort(tolist(var.bedrock_invocation_resource_arns))
+    broker_code_sha256               = var.broker_code_sha256
+    broker_function_arn              = var.broker_function_arn
+    broker_role_arn                  = var.broker_role_arn
+    broker_role_name                 = var.broker_role_name
+    broker_role_unique_id            = var.broker_role_unique_id
+    exact_model_id                   = var.exact_model_id
+    gateway_role_arn                 = var.gateway_role_arn
+    gateway_role_name                = var.gateway_role_name
+    gateway_role_unique_id           = var.gateway_role_unique_id
+  }))
+
   required_tags = {
     jk_layer    = "tobe"
     control_id  = "T.1.1,T.1.2,T.1.3,T.3.1,T.3.2,T.3.3"
     gap_id      = "NF-03,NF-05,NF-04"
     evidence_id = "EXPECTED-BROKER-GUARDRAIL-DENY"
-    status      = "PROPOSED_NOT_DEPLOYED"
+    status      = "PROPOSED_CONTROL_NOT_VERIFIED"
   }
 
   tags = merge(var.additional_tags, local.required_tags, {
     approval_ref = var.approval_ref
     component    = "bedrock-broker-boundary"
   })
-}
-
-# Enabled plans resolve only the one reviewed model ID. Disabled/default review
-# performs no provider lookup, and no model resource identifier is committed.
-data "aws_bedrock_foundation_model" "approved" {
-  count = var.enable ? 1 : 0
-
-  model_id = var.exact_model_id
-
-  depends_on = [terraform_data.activation_gate]
 }
 
 resource "terraform_data" "activation_gate" {
@@ -39,11 +43,29 @@ resource "terraform_data" "activation_gate" {
       condition = (
         var.exact_model_id != "" &&
         !strcontains(var.exact_model_id, "*") &&
+        length(var.bedrock_invocation_resource_arns) >= 1 &&
+        length(var.bedrock_invocation_resource_arns) <= 8 &&
+        anytrue([for resource_arn in var.bedrock_invocation_resource_arns : endswith(resource_arn, "/${var.exact_model_id}")]) &&
+        var.broker_function_arn != "" &&
+        var.broker_code_sha256 != "" &&
         var.broker_role_name != "" &&
+        var.broker_role_arn != "" &&
+        var.broker_role_unique_id != "" &&
         var.gateway_role_name != "" &&
-        var.broker_role_name != var.gateway_role_name
+        var.gateway_role_arn != "" &&
+        var.gateway_role_unique_id != "" &&
+        endswith(var.broker_role_arn, "/${var.broker_role_name}") &&
+        endswith(var.gateway_role_arn, "/${var.gateway_role_name}") &&
+        var.broker_role_name != var.gateway_role_name &&
+        var.broker_role_arn != var.gateway_role_arn &&
+        var.broker_role_unique_id != var.gateway_role_unique_id
       )
-      error_message = "Use one exact model ID and distinct, non-empty Broker and Gateway role names."
+      error_message = "Use one exact model ID represented by the ARN set, 1..8 exact Bedrock model/profile ARNs, one published-version Broker Lambda ARN/CodeSha256, and distinct role names/ARNs/unique IDs."
+    }
+
+    precondition {
+      condition     = var.bedrock_approval_binding_sha256 == local.approval_input_sha256
+      error_message = "The Bedrock model ID/ARN set, Broker version/code, role identities, and region must match the single SHA-256 bound into the reviewed approval record."
     }
   }
 }
@@ -149,7 +171,9 @@ resource "aws_bedrock_guardrail_version" "bounded_explanation" {
 
   description   = "PROPOSED immutable candidate; human evaluation required before use."
   guardrail_arn = aws_bedrock_guardrail.bounded_explanation[0].guardrail_arn
-  skip_destroy  = false
+  # Preserve every version referenced by an approval/evidence record. A
+  # dedicated retirement change may remove an obsolete version after review.
+  skip_destroy = true
 }
 
 resource "aws_iam_policy" "broker_exact_model" {
@@ -161,27 +185,28 @@ resource "aws_iam_policy" "broker_exact_model" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid      = "InvokeExactlyOneFoundationModel"
+        Sid      = "InvokeOnlyReviewedBedrockResources"
         Effect   = "Allow"
         Action   = ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"]
-        Resource = data.aws_bedrock_foundation_model.approved[0].model_arn
+        Resource = sort(tolist(var.bedrock_invocation_resource_arns))
         Condition = {
           StringEquals = {
             "bedrock:GuardrailIdentifier" = "${aws_bedrock_guardrail.bounded_explanation[0].guardrail_arn}:${aws_bedrock_guardrail_version.bounded_explanation[0].version}"
+            "aws:RequestedRegion"         = var.aws_region
           }
         }
       },
       {
-        Sid      = "DenyOtherFoundationModels"
-        Effect   = "Deny"
-        Action   = ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"]
-        NotResource = data.aws_bedrock_foundation_model.approved[0].model_arn
+        Sid         = "DenyOtherFoundationModels"
+        Effect      = "Deny"
+        Action      = ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"]
+        NotResource = sort(tolist(var.bedrock_invocation_resource_arns))
       },
       {
         Sid      = "DenyMissingOrWrongGuardrailVersion"
         Effect   = "Deny"
         Action   = ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"]
-        Resource = data.aws_bedrock_foundation_model.approved[0].model_arn
+        Resource = sort(tolist(var.bedrock_invocation_resource_arns))
         Condition = {
           StringNotEquals = {
             "bedrock:GuardrailIdentifier" = "${aws_bedrock_guardrail.bounded_explanation[0].guardrail_arn}:${aws_bedrock_guardrail_version.bounded_explanation[0].version}"
@@ -193,6 +218,11 @@ resource "aws_iam_policy" "broker_exact_model" {
         Effect   = "Allow"
         Action   = ["bedrock:ApplyGuardrail"]
         Resource = aws_bedrock_guardrail.bounded_explanation[0].guardrail_arn
+        Condition = {
+          StringEquals = {
+            "aws:RequestedRegion" = var.aws_region
+          }
+        }
       },
     ]
   })
@@ -209,6 +239,37 @@ resource "aws_iam_role_policy_attachment" "broker_exact_model" {
 
   policy_arn = aws_iam_policy.broker_exact_model[0].arn
   role       = var.broker_role_name
+}
+
+# The Gateway receives exactly one positive AWS effect: invoke the reviewed
+# Capability Broker Lambda. It receives no model/profile permission.
+resource "aws_iam_policy" "gateway_invoke_broker" {
+  count = var.enable ? 1 : 0
+
+  name        = "${var.name_prefix}-gateway-invoke-broker"
+  description = "PROPOSED LLM Gateway permission to invoke exactly one Capability Broker Lambda."
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid      = "InvokeExactCapabilityBroker"
+      Effect   = "Allow"
+      Action   = ["lambda:InvokeFunction"]
+      Resource = var.broker_function_arn
+    }]
+  })
+
+  tags = merge(local.tags, {
+    Name = "${var.name_prefix}-gateway-invoke-broker"
+  })
+
+  depends_on = [terraform_data.activation_gate]
+}
+
+resource "aws_iam_role_policy_attachment" "gateway_invoke_broker" {
+  count = var.enable ? 1 : 0
+
+  policy_arn = aws_iam_policy.gateway_invoke_broker[0].arn
+  role       = var.gateway_role_name
 }
 
 # This identity-policy deny makes the intended negative boundary explicit. It

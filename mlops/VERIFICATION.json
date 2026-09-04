@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "verified_at": "2026-09-05T00:59:28+09:00",
+  "verified_at": "2026-09-05T03:12:09+09:00",
   "aws_api_calls": 0,
   "terraform_apply_destroy": false,
   "environment": {
@@ -133,7 +133,7 @@
     }
   },
   "files": {
-    ".github/workflows/public-release-check.yml": "3a67e3bec8f666864cee836ae46ad05ba8e73bc250f6204d1989178d5d18541a",
+    ".github/workflows/public-release-check.yml": "04b5f121a4dc393f68a553eae37f42eaebf889920aaa1f3ce5629f91db1a0b08",
     ".gitignore": "af0764f3995ee046840c0f9f14ba915d31d2e2864bfb6847dfbadf909d7e4972",
     "assets/aws/amazon-api-gateway.svg": "17f9cb60e357b904773f220f42e2cc65450550882cd676d9130e8b1d5bde4e89",
     "assets/aws/amazon-bedrock.svg": "fa4cf3e55dea8199f9cf9bc70d639b20381940149c2c6d5a0a5f810fa28a8391",

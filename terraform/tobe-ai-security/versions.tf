@@ -27,7 +27,7 @@ provider "aws" {
       control_id  = "TOBE-AI-SECURITY"
       gap_id      = "NF-02,NF-03,NF-04,NF-05,NF-06"
       evidence_id = "EXPECTED-NOT-OBSERVED"
-      status      = "PROPOSED_NOT_DEPLOYED"
+      status      = "PROPOSED_CONTROL_NOT_VERIFIED"
     }
   }
 }
@@ -50,7 +50,7 @@ provider "aws" {
       control_id  = "T.6.1,T.6.2"
       gap_id      = "NF-06,NF-05"
       evidence_id = "EXPECTED-EDGE-WAF-RATE"
-      status      = "PROPOSED_NOT_DEPLOYED"
+      status      = "PROPOSED_CONTROL_NOT_VERIFIED"
     }
   }
 }

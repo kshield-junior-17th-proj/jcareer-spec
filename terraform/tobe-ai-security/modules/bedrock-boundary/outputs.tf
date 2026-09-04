@@ -17,3 +17,13 @@ output "gateway_deny_policy_name" {
   description = "Name of the proposed Gateway direct-Bedrock deny policy; null when disabled."
   value       = try(aws_iam_policy.gateway_direct_bedrock_deny[0].name, null)
 }
+
+output "gateway_broker_policy_name" {
+  description = "Name of the proposed exact-Broker invocation policy; null when disabled."
+  value       = try(aws_iam_policy.gateway_invoke_broker[0].name, null)
+}
+
+output "approval_input_sha256" {
+  description = "Digest of the exact Bedrock/Gateway/Broker input set. This binds review inputs but is not deployment evidence."
+  value       = local.approval_input_sha256
+}

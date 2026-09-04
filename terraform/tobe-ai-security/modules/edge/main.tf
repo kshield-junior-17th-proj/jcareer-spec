@@ -6,7 +6,7 @@ locals {
     control_id  = "T.6.1,T.6.2"
     gap_id      = "NF-06,NF-05"
     evidence_id = "EXPECTED-EDGE-WAF-RATE"
-    status      = "PROPOSED_NOT_DEPLOYED"
+    status      = "PROPOSED_CONTROL_NOT_VERIFIED"
   }
 
   tags = merge(var.additional_tags, local.required_tags, {
@@ -25,6 +25,14 @@ resource "terraform_data" "activation_gate" {
         can(regex("^APPROVAL-[A-Z0-9_-]{8,64}$", var.approval_ref))
       )
       error_message = "The edge module requires explicit human approval before activation."
+    }
+
+    precondition {
+      condition = (
+        var.cloudfront_distribution_id != "" &&
+        can(regex("^EDGE-BINDING-[A-Z0-9_-]{8,64}$", var.cloudfront_owner_binding_ref))
+      )
+      error_message = "The edge module requires an exact distribution ID and a separately reviewed owner-stack binding reference."
     }
   }
 }
@@ -160,4 +168,38 @@ resource "aws_wafv2_web_acl_logging_configuration" "edge" {
   redacted_fields {
     uri_path {}
   }
+}
+
+# CloudFront is the exception to aws_wafv2_web_acl_association: its owning
+# aws_cloudfront_distribution resource must set web_acl_id. This data read is a
+# second-pass verification gate after that separately reviewed owner-stack
+# change. It never mutates or imports the existing distribution.
+data "aws_cloudfront_distribution" "target" {
+  count = var.enable && var.verify_cloudfront_binding ? 1 : 0
+
+  id = var.cloudfront_distribution_id
+}
+
+resource "terraform_data" "cloudfront_binding_verification" {
+  count = var.enable && var.verify_cloudfront_binding ? 1 : 0
+
+  input = {
+    binding_ref          = var.cloudfront_owner_binding_ref
+    distribution_id_hash = sha256(var.cloudfront_distribution_id)
+    verification_state   = "LIVE_READ_REQUIRED_NOT_DEPLOYMENT_RECEIPT"
+  }
+
+  lifecycle {
+    precondition {
+      condition     = data.aws_cloudfront_distribution.target[0].status == "Deployed"
+      error_message = "The target CloudFront distribution must report Deployed before edge binding verification."
+    }
+
+    precondition {
+      condition     = data.aws_cloudfront_distribution.target[0].web_acl_id == aws_wafv2_web_acl.edge[0].arn
+      error_message = "The target distribution web_acl_id does not match the proposed edge ACL ARN. Apply the separately reviewed owner-stack change first."
+    }
+  }
+
+  depends_on = [aws_wafv2_web_acl_logging_configuration.edge]
 }

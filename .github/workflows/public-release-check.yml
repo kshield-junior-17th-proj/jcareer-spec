@@ -20,6 +20,23 @@ jobs:
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: '3.12'
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: '1.15.9'
+          terraform_wrapper: false
+      - name: TO-BE AI security provider-free source contract
+        run: |
+          terraform fmt -check -recursive terraform/tobe-ai-security
+          python3 -B scripts/check_tobe_ai_security_static.py --root .
+      - name: TO-BE AI security provider schema and mock plans
+        run: |
+          tobe_ci_root="$RUNNER_TEMP/jcareer-tobe-check"
+          mkdir -p "$tobe_ci_root/terraform"
+          cp -R terraform/tobe-ai-security "$tobe_ci_root/terraform/tobe-ai-security"
+          terraform -chdir="$tobe_ci_root/terraform/tobe-ai-security" init -backend=false -input=false
+          python3 -B scripts/check_tobe_provider_lock.py --root "$tobe_ci_root"
+          terraform -chdir="$tobe_ci_root/terraform/tobe-ai-security" validate
+          terraform -chdir="$tobe_ci_root/terraform/tobe-ai-security" test
       - name: 소스·문서 단위시험
         run: python3 -B -m unittest discover -s tests -p 'test_*.py'
       - name: 진단 대시보드 판단 데이터 계약
