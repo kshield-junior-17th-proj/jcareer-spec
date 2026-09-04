@@ -1,13 +1,13 @@
 {
   "schema_version": 2,
-  "verified_at": "2026-09-02T10:40:49+09:00",
+  "verified_at": "2026-09-05T00:25:27+09:00",
   "aws_api_calls": 0,
   "terraform_apply_destroy": false,
   "environment": {
     "python": "3.12.6",
     "terraform": "1.15.9",
     "node": "22.11.0",
-    "chrome": "152.0.7977.65"
+    "chrome": "152.0.7977.77"
   },
   "results": {
     "terraform_fmt_check": "PASS",
@@ -95,7 +95,7 @@
       "renderer": "scripts/render_spec_pdf.mjs",
       "source": "mlops/index.html",
       "output": "mlops/JCAREER_MLOPS_SYSTEM_SPEC.pdf",
-      "source_sha256": "2c994ba772a11adf6452b85e22d660e9e638c773bdeaa771adc417dcd31d501a"
+      "source_sha256": "f9bbd77348a0c5e80aaff9901b1be8529ae7a1cc5875715c5a801e49040b5dba"
     },
     "animated_architecture": {
       "spec": "assets/JCAREER_PLATFORM_ANIMATED.spec.json",
@@ -155,11 +155,11 @@
     "assets/JCAREER_PLATFORM_ANIMATED.svg": "8726d5c67e88b9fbb70aa3d1ce23a2bc421bd1ef418e3f0a405fe24e875856a6",
     "assets/motion.js": "b7cd41c2fb9067c8efa184efd1b9c90801e6e6355f586aabe95cb0aaa6227000",
     "assets/site.css": "bc99ce56cc96d034021c50d559886d9c4db256c1d3610b821aeb3bdb64423e2d",
-    "index.html": "982b69a326ae85e0ccc1c5e9f2b9630df65f0a549cda290a319b18a119b1ca28",
+    "index.html": "71b8237c5c131f89b8239d9b57f4533a9539969c529a7b8300a2b1ebb0706657",
     "mlops/app.js": "8a566b644e3ba200f6dafda85a26cfc4cda826c90c20a68c2f02026aa6eba46d",
-    "mlops/index.html": "2c994ba772a11adf6452b85e22d660e9e638c773bdeaa771adc417dcd31d501a",
-    "mlops/JCAREER_MLOPS_SYSTEM_SPEC.pdf": "88e3ba31640c5754bf086ba1d0afa96234ee054e2ff4d8a48010e1315701a266",
-    "README.md": "6ff666c1827dd810897f35600778ec28e64b4e9b7bc7cb50d3bd214c2340cf61",
+    "mlops/index.html": "f9bbd77348a0c5e80aaff9901b1be8529ae7a1cc5875715c5a801e49040b5dba",
+    "mlops/JCAREER_MLOPS_SYSTEM_SPEC.pdf": "1f619263afeb4bdbe671076b64cef16a60e99633dd96db0c172abaa52c1cf2b2",
+    "README.md": "bcb7e908f7815938ba448357d93f3a072ea3918915d78513eca84f88daad0799",
     "scripts/browser_support.mjs": "725a0eef03fd97a2074b630c9b34b14e566f519da93f9ba2cc6eb587c5c70a22",
     "scripts/check_public_mlops.py": "1fd96132e5ebcea9fc43972796d00507b313aa3f3b42b29c653ea619495c1c16",
     "scripts/check_public_ui.mjs": "7cf391c27be8b6fa409e94ed8e89ec9fdebbcbaf905f50cf3dbf8a4922878285",

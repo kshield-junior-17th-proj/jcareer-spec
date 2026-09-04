@@ -1,0 +1,163 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" role="img" aria-label="J-Career GitHub CI → 승인형 AWS apply">
+<title>J-Career GitHub CI → 승인형 AWS apply</title>
+<defs>
+<pattern id="grid" width="34" height="34" patternUnits="userSpaceOnUse"><path d="M34 0 H0 V34" fill="none" stroke="#EAEFF6" stroke-width="1"/></pattern>
+<marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9" fill="none" stroke="context-stroke" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<style>@media (prefers-reduced-motion: no-preference){.flow{stroke-dasharray:6 6;animation:dm .8s linear infinite}}@keyframes dm{to{stroke-dashoffset:-12}}</style>
+</defs>
+<rect width="1920" height="1080" fill="#FBFCFE"/><rect width="1920" height="1080" fill="url(#grid)"/>
+<text x="40" y="46" font-size="21" font-weight="800" fill="#16202E">J-Career GitHub CI → 승인형 AWS apply</text>
+<text x="40" y="68" font-size="12" fill="#5A6B7B">코드 변경부터 saved plan, 독립 승인, OIDC 임시 권한, 동일 plan 적용과 live smoke까지</text>
+<rect x="200" y="105" width="730" height="150" rx="12" fill="rgba(231,21,123,0.04)" stroke="#E7157B" stroke-width="1.5" stroke-dasharray="3 4"/>
+<text x="220" y="128" font-size="11" font-weight="700" fill="#B21667">공개 문서 전달 · 서비스 배포와 분리</text>
+<rect x="180" y="345" width="880" height="230" rx="12" fill="rgba(231,21,123,0.04)" stroke="#E7157B" stroke-width="1.5" stroke-dasharray="3 4"/>
+<text x="200" y="368" font-size="11" font-weight="700" fill="#B21667">GitHub control plane</text>
+<rect x="1100" y="345" width="780" height="500" rx="12" fill="rgba(0,164,166,0.045)" stroke="#00A4A6" stroke-width="1.5" stroke-dasharray="9 5"/>
+<text x="1120" y="368" font-size="11" font-weight="700" fill="#0B7E7F">AWS deployment boundary</text>
+<path class="flow" d="M 113.0 460.0 L 292.0 460.0" fill="none" stroke="#15803D" stroke-width="2" marker-end="url(#ah)"/>
+<path class="flow" d="M 338.0 460.0 L 517.0 460.0" fill="none" stroke="#15803D" stroke-width="2" marker-end="url(#ah)"/>
+<path class="flow" d="M 563.0 460.0 L 742.0 460.0" fill="none" stroke="#15803D" stroke-width="2" marker-end="url(#ah)"/>
+<path class="flow" d="M 788.0 460.0 L 967.0 460.0" fill="none" stroke="#15803D" stroke-width="2" marker-end="url(#ah)"/>
+<path class="flow" d="M 1013.0 460.0 L 1192.0 460.0" fill="none" stroke="#15803D" stroke-width="2" marker-end="url(#ah)"/>
+<path class="flow" d="M 1238.0 460.0 L 1417.0 460.0" fill="none" stroke="#15803D" stroke-width="2" marker-end="url(#ah)"/>
+<path class="flow" d="M 1463.0 460.0 L 1642.0 460.0" fill="none" stroke="#15803D" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M 1665.0 483.0 L 1665.0 650.0 L 1830.0 650.0 L 1830.0 667.0" fill="none" stroke="#94A3B8" stroke-width="1.4" stroke-dasharray="2 5" opacity="0.7"/>
+<path d="M 315.0 437.0 L 315.0 290.0 L 540.0 290.0 L 540.0 203.0" fill="none" stroke="#94A3B8" stroke-width="1.4" stroke-dasharray="2 5" opacity="0.7"/>
+<path d="M 765.0 483.0 L 765.0 712.0" fill="none" stroke="#94A3B8" stroke-width="1.4" stroke-dasharray="2 5" opacity="0.7"/>
+<path class="flow" d="M 1440.0 483.0 L 1440.0 712.0" fill="none" stroke="#0369A1" stroke-width="2" marker-end="url(#ah)"/>
+<rect x="168" y="433" width="67" height="14" rx="3" fill="#FBFCFE" opacity="0.92"/>
+<text x="202" y="443" text-anchor="middle" font-size="9.5" fill="#48586a">push / PR</text>
+<rect x="635" y="433" width="34" height="14" rx="3" fill="#FBFCFE" opacity="0.92"/>
+<text x="652" y="443" text-anchor="middle" font-size="9.5" fill="#48586a">plan</text>
+<rect x="830" y="433" width="94" height="14" rx="3" fill="#FBFCFE" opacity="0.92"/>
+<text x="877" y="443" text-anchor="middle" font-size="9.5" fill="#48586a">verify digest</text>
+<rect x="1075" y="433" width="54" height="14" rx="3" fill="#FBFCFE" opacity="0.92"/>
+<text x="1102" y="443" text-anchor="middle" font-size="9.5" fill="#48586a">approve</text>
+<rect x="1287" y="433" width="81" height="14" rx="3" fill="#FBFCFE" opacity="0.92"/>
+<text x="1327" y="443" text-anchor="middle" font-size="9.5" fill="#48586a">assume role</text>
+<rect x="1528" y="433" width="48" height="14" rx="3" fill="#FBFCFE" opacity="0.92"/>
+<text x="1552" y="443" text-anchor="middle" font-size="9.5" fill="#48586a">deploy</text>
+<circle r="4" fill="#15803D"><animateMotion dur="5.2s" begin="0.00s" repeatCount="indefinite" path="M 113.0 460.0 L 292.0 460.0"/></circle>
+<circle r="4" fill="#15803D"><animateMotion dur="5.2s" begin="0.74s" repeatCount="indefinite" path="M 338.0 460.0 L 517.0 460.0"/></circle>
+<circle r="4" fill="#15803D"><animateMotion dur="5.2s" begin="1.49s" repeatCount="indefinite" path="M 563.0 460.0 L 742.0 460.0"/></circle>
+<circle r="4" fill="#15803D"><animateMotion dur="5.2s" begin="2.23s" repeatCount="indefinite" path="M 788.0 460.0 L 967.0 460.0"/></circle>
+<circle r="4" fill="#15803D"><animateMotion dur="5.2s" begin="2.97s" repeatCount="indefinite" path="M 1013.0 460.0 L 1192.0 460.0"/></circle>
+<circle r="4" fill="#15803D"><animateMotion dur="5.2s" begin="3.71s" repeatCount="indefinite" path="M 1238.0 460.0 L 1417.0 460.0"/></circle>
+<circle r="4" fill="#15803D"><animateMotion dur="5.2s" begin="4.46s" repeatCount="indefinite" path="M 1463.0 460.0 L 1642.0 460.0"/></circle>
+<circle r="4" fill="#0369A1"><animateMotion dur="2.0s" begin="0.00s" repeatCount="indefinite" path="M 1440.0 483.0 L 1440.0 712.0"/></circle>
+<rect x="67.0" y="437.0" width="46" height="46" rx="8" fill="#64748B"/><circle cx="90" cy="460" r="7" fill="none" stroke="#fff" stroke-width="2.4"/><circle cx="90" cy="460" r="1.8" fill="#fff"/><text x="90" y="498" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">팀 변경</text><text x="90" y="511" text-anchor="middle" font-size="9.5" fill="#5A6B7B">code + IaC</text>
+<rect x="292.0" y="437.0" width="46" height="46" rx="8" fill="#64748B"/><circle cx="315" cy="460" r="7" fill="none" stroke="#fff" stroke-width="2.4"/><circle cx="315" cy="460" r="1.8" fill="#fff"/><text x="315" y="498" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">GitHub 저장소</text><text x="315" y="511" text-anchor="middle" font-size="9.5" fill="#5A6B7B">branch + PR</text>
+<g transform="translate(517.00,437.00) scale(0.5750)">
+
+    
+    
+    
+    <defs>
+        <linearGradient x1="0%" y1="100%" x2="100%" y2="0%" id="codebuild__linearGradient-1">
+            <stop stop-color="#2E27AD" offset="0%"></stop>
+            <stop stop-color="#527FFF" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="codebuild__Icon-Architecture/64/Arch_Amazon-CodeBuild_64" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="codebuild__Icon-Architecture-BG/64/Developer-Tools" fill="url(#codebuild__linearGradient-1)">
+            <rect id="codebuild__Rectangle" x="0" y="0" width="80" height="80"></rect>
+        </g>
+        <path d="M65.4396329,22 L59.4855152,16.549 L53.5254424,22 L65.4396329,22 Z M57.2017304,15.938 L45.1237743,15.956 L51.5751437,21.083 L57.2017304,15.938 Z M51.7547896,33.5 L42.2484486,37 L60.5346071,37 L51.7547896,33.5 Z M37.7979962,57 L64.5959923,57 L64.5959923,39 L37.7979962,39 L37.7979962,57 Z M49.5226157,22 L42.9372563,16.766 L36.3955677,22 L49.5226157,22 Z M34.3092941,21.115 L40.7487533,15.963 L27.9115206,15.982 L34.3092941,21.115 Z M32.2250055,22 L25.6525488,16.726 L19.0800921,22 L28.8653308,22 L32.2250055,22 Z M27.8728124,24 L19.8423462,24 L27.8728124,31.965 L27.8728124,24 Z M27.8728124,35.083 L18.4478579,43.665 L27.8728124,52.889 L27.8728124,35.083 Z M27.8728124,56.137 L17.9476286,65.839 L17.9476286,66 L27.8728124,66 L27.8728124,56.137 Z M17.9476286,45.963 L17.9476286,63.053 L26.6837754,54.513 L17.9476286,45.963 Z M17.9476286,41.424 L26.6202542,33.528 L17.9476286,24.928 L17.9476286,41.424 Z M16.9551103,21.148 L23.3846443,15.989 L16.9551103,15.999 L16.9551103,21.148 Z M14.9700735,14 L12.9850368,14 L12.9850368,24 L14.9700735,24 L14.9700735,23 L14.9700735,15 L14.9700735,14 Z M68.9332976,23.36 C68.7854124,23.746 68.4171881,24 68.007278,24 L52.6857718,24 L52.6857718,32 L65.9636827,37.074 L65.9626901,37.076 C66.3259519,37.225 66.5810291,37.582 66.5810291,38 L66.5810291,58 C66.5810291,58.552 66.1373734,59 65.5885107,59 L36.8054778,59 C36.2576076,59 35.8129594,58.552 35.8129594,58 L35.8129594,38 C35.8129594,37.572 36.0829244,37.213 36.4590889,37.071 L36.4561113,37.064 L50.7007351,32 L50.7007351,24 L29.8578492,24 L29.8578492,67 C29.8578492,67.552 29.4141934,68 28.8653308,68 L16.9551103,68 C16.4072401,68 15.9625919,67.552 15.9625919,67 L15.9625919,26 L11.9925184,26 C11.4446482,26 11,25.552 11,25 L11,13 C11,12.448 11.4446482,12 11.9925184,12 L15.9625919,12 C16.5114545,12 16.9551103,12.448 16.9551103,13 L16.9551103,13.999 L59.6334004,14 L68.6752429,22.26 C68.977961,22.538 69.0811829,22.975 68.9332976,23.36 L68.9332976,23.36 Z M48.3395338,55.308 L54.1159908,42.083 L52.2996822,41.277 L46.5232252,54.502 L48.3395338,55.308 Z M53.7656318,50.888 L55.0489581,52.415 L59.3366375,48.757 C59.5470513,48.577 59.6731012,48.316 59.6860039,48.039 C59.6989067,47.761 59.5946922,47.49 59.4011511,47.292 L55.8221299,43.633 L54.4087837,45.038 L57.235476,47.928 L53.7656318,50.888 Z M40.8708331,47.984 C40.652479,47.783 40.5343693,47.493 40.5502496,47.195 C40.5651374,46.896 40.7130226,46.621 40.951227,46.443 L45.8215147,42.812 L47.0026116,44.419 L43.1000293,47.33 L46.37534,50.354 L45.0334551,51.829 L40.8708331,47.984 Z" id="codebuild__Amazon-CodeBuild_Icon_64_Squid" fill="#FFFFFF"></path>
+    </g>
+</g><text x="540" y="498" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">Required checks</text><text x="540" y="511" text-anchor="middle" font-size="9.5" fill="#5A6B7B">test + secret + policy</text>
+<g transform="translate(742.00,437.00) scale(0.7188)">
+
+    
+    <g id="s3__Icon-Architecture/48/Arch_Amazon-Simple-Storage-Service_48" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="s3__Icon-Architecture-BG/48/Storage" fill="#7AA116">
+            <rect id="s3__Rectangle" x="0" y="0" width="64" height="64"></rect>
+        </g>
+        <g id="s3__Icon-Service/48/Amazon-Simple-Storage-Service_48" transform="translate(10.999800, 10.000200)" fill="#FFFFFF">
+            <path d="M36.759,23.948 L36.993,22.131 C39.166,23.385 39.842,24.121 40.037,24.424 C39.713,24.485 38.832,24.509 36.759,23.948 L36.759,23.948 Z M19.5,11 C9.125,11 2.382,8.488 2,6.696 L2,6.511 C2.349,5.392 8.14,2 19.5,2 C30.84,2 36.632,5.381 37,6.505 L37,6.616 C36.724,8.446 29.961,11 19.5,11 L19.5,11 Z M34.818,23.362 C30.053,21.797 23.912,18.979 21.594,17.888 C21.535,16.786 20.628,15.906 19.512,15.906 C18.358,15.906 17.418,16.845 17.418,18 C17.418,19.154 18.358,20.094 19.512,20.094 C19.969,20.094 20.389,19.942 20.733,19.693 C23.132,20.822 29.619,23.798 34.558,25.38 L32.837,38.724 C32.583,40.352 27.919,42 19.497,42 C11.072,42 6.405,40.352 6.155,38.751 L2.435,9.814 C5.945,11.915 12.749,13 19.5,13 C26.25,13 33.054,11.915 36.565,9.815 L34.818,23.362 Z M39,6.5 C39,3.431 30.661,0 19.5,0 C8.339,0 -3.55271368e-15,3.431 -3.55271368e-15,6.5 L-3.55271368e-15,7.043 L4.174,39.033 C4.875,43.516 15.123,44 19.497,44 C23.869,44 34.113,43.516 34.818,39.007 L36.501,25.947 C37.778,26.279 38.812,26.456 39.616,26.455 C40.606,26.455 41.273,26.203 41.697,25.697 C42.047,25.281 42.185,24.756 42.085,24.221 C41.857,23 40.403,21.712 37.37,20.044 L37.27,19.989 L39,7.044 L39,6.5 Z" id="s3__Amazon-Simple-Storage-Service-Icon_48_Squid"></path>
+        </g>
+    </g>
+</g><text x="765" y="498" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">Saved plan</text><text x="765" y="511" text-anchor="middle" font-size="9.5" fill="#5A6B7B">commit + lock + SHA-256</text>
+<rect x="967.0" y="437.0" width="46" height="46" rx="8" fill="#64748B"/><circle cx="990" cy="460" r="7" fill="none" stroke="#fff" stroke-width="2.4"/><circle cx="990" cy="460" r="1.8" fill="#fff"/><text x="990" y="498" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">다른 팀원 승인</text><text x="990" y="511" text-anchor="middle" font-size="9.5" fill="#5A6B7B">plan actor와 분리</text>
+<g transform="translate(1192.00,437.00) scale(0.5750)">
+
+    
+    
+    
+    <defs>
+        <linearGradient x1="0%" y1="100%" x2="100%" y2="0%" id="iam__linearGradient-1">
+            <stop stop-color="#BD0816" offset="0%"></stop>
+            <stop stop-color="#FF5252" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="iam__Icon-Architecture/64/Arch_AWS-Identity-and-Access-Management_64" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="iam__Icon-Architecture-BG/64/Security-Identity-Compliance" fill="#DD344C">
+            <rect id="iam__Rectangle" x="0" y="0" width="80" height="80"></rect>
+        </g>
+        <path d="M14,59 L66,59 L66,21 L14,21 L14,59 Z M68,20 L68,60 C68,60.552 67.553,61 67,61 L13,61 C12.447,61 12,60.552 12,60 L12,20 C12,19.448 12.447,19 13,19 L67,19 C67.553,19 68,19.448 68,20 L68,20 Z M44,48 L59,48 L59,46 L44,46 L44,48 Z M57,42 L62,42 L62,40 L57,40 L57,42 Z M44,42 L52,42 L52,40 L44,40 L44,42 Z M29,46 C29,45.449 28.552,45 28,45 C27.448,45 27,45.449 27,46 C27,46.551 27.448,47 28,47 C28.552,47 29,46.551 29,46 L29,46 Z M31,46 C31,47.302 30.161,48.401 29,48.816 L29,51 L27,51 L27,48.815 C25.839,48.401 25,47.302 25,46 C25,44.346 26.346,43 28,43 C29.654,43 31,44.346 31,46 L31,46 Z M19,53.993 L36.994,54 L36.996,50 L33,50 L33,48 L36.996,48 L36.998,45 L33,45 L33,43 L36.999,43 L37,40.007 L19.006,40 L19,53.993 Z M22,38.001 L34,38.006 L34,31 C34.001,28.697 31.197,26.677 28,26.675 L27.996,26.675 C24.804,26.675 22.004,28.696 22.002,31 L22,38.001 Z M17,54.992 L17.006,39 C17.006,38.734 17.111,38.48 17.299,38.292 C17.486,38.105 17.741,38 18.006,38 L20,38.001 L20.002,31 C20.004,27.512 23.59,24.675 27.996,24.675 L28,24.675 C32.412,24.677 36.001,27.515 36,31 L36,38.007 L38,38.008 C38.553,38.008 39,38.456 39,39.008 L38.994,55 C38.994,55.266 38.889,55.52 38.701,55.708 C38.514,55.895 38.259,56 37.994,56 L18,55.992 C17.447,55.992 17,55.544 17,54.992 L17,54.992 Z M60,36 L62,36 L62,34 L60,34 L60,36 Z M44,36 L55,36 L55,34 L44,34 L44,36 Z" id="iam__AWS-Identity-and-Access-Management_Icon_64_Squid" fill="#FFFFFF"></path>
+    </g>
+</g><text x="1215" y="498" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">GitHub OIDC</text><text x="1215" y="511" text-anchor="middle" font-size="9.5" fill="#5A6B7B">단기 deploy role</text>
+<g transform="translate(1417.00,437.00) scale(0.5750)">
+
+    
+    
+    
+    <defs>
+        <linearGradient x1="0%" y1="100%" x2="100%" y2="0%" id="cloudformation__linearGradient-1">
+            <stop stop-color="#B0084D" offset="0%"></stop>
+            <stop stop-color="#FF4F8B" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="cloudformation__Icon-Architecture/64/Arch_AWS-CloudFormation_64" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="cloudformation__Icon-Architecture-BG/64/Management-Governance" fill="url(#cloudformation__linearGradient-1)">
+            <rect id="cloudformation__Rectangle" x="0" y="0" width="80" height="80"></rect>
+        </g>
+        <path d="M53,39.9632039 L58,39.9632039 L58,37.9601375 L53,37.9601375 L53,39.9632039 Z M28,51.9816019 L33,51.9816019 L33,49.9785356 L28,49.9785356 L28,51.9816019 Z M18,51.9816019 L25,51.9816019 L25,49.9785356 L18,49.9785356 L18,51.9816019 Z M18,45.9724029 L30,45.9724029 L30,43.9693366 L18,43.9693366 L18,45.9724029 Z M18,33.9540048 L27,33.9540048 L27,31.9509385 L18,31.9509385 L18,33.9540048 Z M18,39.9632039 L51,39.9632039 L51,37.9601375 L18,37.9601375 L18,39.9632039 Z M37,61.9969337 L14,61.9969337 L14,27.9448058 L37,27.9448058 L37,35.9570712 L39,35.9570712 L39,26.9432726 C39,26.3904263 38.552,25.9417395 38,25.9417395 L13,25.9417395 C12.447,25.9417395 12,26.3904263 12,26.9432726 L12,62.9984668 C12,63.5513131 12.447,64 13,64 L38,64 C38.552,64 39,63.5513131 39,62.9984668 L39,42.9678034 L37,42.9678034 L37,61.9969337 Z M68,36.9586044 C68,43.4305117 62.173,45.6819583 59.092,45.9683968 L43,45.9724029 L43,43.9693366 L59,43.9693366 C59.195,43.9463013 66,43.2121775 66,36.9586044 C66,31.2638867 60.863,30.1081175 59.834,29.9338507 C59.321,29.8467173 58.96,29.3820059 59.004,28.8632117 C59.005,28.8441826 59.007,28.826155 59.009,28.8081274 C58.954,25.5902013 56.981,24.584662 56.126,24.3002266 C54.53,23.769414 52.751,24.2771913 51.81,25.5391231 C51.591,25.8355769 51.229,25.9868085 50.861,25.9307226 C50.497,25.8756383 50.192,25.625255 50.068,25.2767214 C49.447,23.5360568 48.546,22.4083304 47.293,21.1534094 C44.159,18.0386412 39.905,17.1783242 35.925,18.8528877 C33.837,19.7332353 32.012,21.7282894 30.922,24.327268 L29.078,23.5500782 C30.37,20.4743699 32.584,18.0887179 35.15,17.007062 C39.905,15.0049972 44.971,16.0255595 48.704,19.7342369 C49.774,20.8068789 50.66,21.851478 51.35,23.2035478 C52.843,22.0978551 54.857,21.7673492 56.757,22.3993166 C59.189,23.2085554 60.727,25.3207889 60.975,28.1290879 C64.381,28.9884034 68,31.7115721 68,36.9586044 L68,36.9586044 Z" id="cloudformation__AWS-CloudFormation_Icon_64_Squid" fill="#FFFFFF"></path>
+    </g>
+</g><text x="1440" y="498" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">Terraform apply</text><text x="1440" y="511" text-anchor="middle" font-size="9.5" fill="#5A6B7B">동일 plan만</text>
+<g transform="translate(1642.00,437.00) scale(0.7188)">
+
+    
+    <g id="cloudwatch__Icon-Architecture/48/Arch_Amazon-CloudWatch_48" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="cloudwatch__Icon-Architecture-BG/48/Management-Governance" fill="#E7157B">
+            <rect id="cloudwatch__Rectangle" x="0" y="0" width="64" height="64"></rect>
+        </g>
+        <path d="M42.184,39.3811216 C42.184,37.1282698 40.347,35.2954581 38.089,35.2954581 C35.831,35.2954581 33.995,37.1282698 33.995,39.3811216 C33.995,41.6339735 35.831,43.4667852 38.089,43.4667852 C40.347,43.4667852 42.184,41.6339735 42.184,39.3811216 L42.184,39.3811216 Z M44.184,39.3811216 C44.184,42.7344587 41.45,45.4622252 38.089,45.4622252 C34.729,45.4622252 31.995,42.7344587 31.995,39.3811216 C31.995,36.0277846 34.729,33.3000181 38.089,33.3000181 C41.45,33.3000181 44.184,36.0277846 44.184,39.3811216 L44.184,39.3811216 Z M50.743,49.6157337 L45.846,45.2157884 C45.524,45.6398194 45.17,46.0379097 44.785,46.4050706 L49.671,50.8030205 C49.997,51.0953525 50.505,51.0714072 50.802,50.744155 C51.096,50.4179006 51.07,49.9110588 50.743,49.6157337 L50.743,49.6157337 Z M38.089,47.091502 C42.351,47.091502 45.818,43.6324067 45.818,39.3811216 C45.818,35.1298366 42.351,31.6707413 38.089,31.6707413 C33.829,31.6707413 30.362,35.1298366 30.362,39.3811216 C30.362,43.6324067 33.829,47.091502 38.089,47.091502 L38.089,47.091502 Z M52.081,48.1341194 C53.227,49.1667597 53.319,50.9357173 52.288,52.0801021 C51.735,52.6897091 50.971,53 50.205,53 C49.538,53 48.868,52.7655358 48.333,52.2866302 L43.172,47.6412457 C41.691,48.5521641 39.954,49.0869421 38.089,49.0869421 C32.725,49.0869421 28.362,44.7328919 28.362,39.3811216 C28.362,34.0293514 32.725,29.6753012 38.089,29.6753012 C43.454,29.6753012 47.818,34.0293514 47.818,39.3811216 C47.818,40.8447769 47.482,42.2286146 46.897,43.4757646 L52.081,48.1341194 Z M17.697,23.5383254 C17.697,23.9394088 17.72,24.3384968 17.767,24.722619 C17.802,25.0059715 17.713,25.2913194 17.524,25.5048315 C17.375,25.6714508 17.177,25.7831954 16.961,25.8241019 C15.084,26.3079961 12,27.7716514 12,32.1566309 C12,35.4800363 13.836,37.3138458 15.377,38.2676661 C16.049,38.6897017 16.64,38.9052092 17.138,38.9101978 L26.127,38.9101978 L26.127,40.9056378 L17.127,40.9056378 C16.243,40.8966584 15.3,40.577388 14.317,39.9588015 C12.708,38.9640747 10,36.6214281 10,32.1566309 C10,26.8876715 13.526,24.8642953 15.71,24.117003 C15.702,23.924443 15.697,23.7308853 15.697,23.5383254 C15.697,19.1603299 18.673,14.6217015 22.621,12.9784566 C27.232,11.0508615 32.119,12.0066773 35.687,15.5336176 C36.734,16.5672555 37.604,17.8084192 38.285,19.2361566 C39.203,18.5507229 40.304,18.1745825 41.459,18.1745825 C43.874,18.1745825 46.587,19.9684831 47.122,23.8895228 C50.58,24.7216213 54,27.27778 54,32.2174919 C54,35.1078868 52.864,37.4565197 50.713,39.0089721 L49.541,37.3926656 C51.173,36.2143583 52,34.4733368 52,32.2174919 C52,27.2388689 47.811,25.9997007 46.01,25.6983892 C45.743,25.6534918 45.505,25.5018384 45.351,25.2793468 C45.208,25.071821 45.15,24.8184001 45.186,24.5709656 C44.931,21.5319104 43.141,20.1700225 41.459,20.1700225 C40.402,20.1700225 39.409,20.6858438 38.734,21.5857873 C38.514,21.8791169 38.156,22.0297727 37.786,21.9748981 C37.422,21.9210212 37.118,21.6715912 36.993,21.3263801 C36.359,19.5743837 35.446,18.1027466 34.281,16.9513777 C32.851,15.5396039 28.933,12.506535 23.391,14.81925 C20.198,16.1492108 17.697,19.9784603 17.697,23.5383254 L17.697,23.5383254 Z" id="cloudwatch__Amazon-CloudWatch_Icon_48_Squid" fill="#FFFFFF"></path>
+    </g>
+</g><text x="1665" y="498" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">Live smoke</text><text x="1665" y="511" text-anchor="middle" font-size="9.5" fill="#5A6B7B">모든 필수 job</text>
+<rect x="1807.0" y="667.0" width="46" height="46" rx="8" fill="#64748B"/><circle cx="1830" cy="690" r="7" fill="none" stroke="#fff" stroke-width="2.4"/><circle cx="1830" cy="690" r="1.8" fill="#fff"/><text x="1830" y="728" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">운영 잠금·복구</text><text x="1830" y="741" text-anchor="middle" font-size="9.5" fill="#5A6B7B">실패 시 확장 중지</text>
+<g transform="translate(742.00,712.00) scale(0.7188)">
+
+    
+    <g id="s3__Icon-Architecture/48/Arch_Amazon-Simple-Storage-Service_48" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="s3__Icon-Architecture-BG/48/Storage" fill="#7AA116">
+            <rect id="s3__Rectangle" x="0" y="0" width="64" height="64"></rect>
+        </g>
+        <g id="s3__Icon-Service/48/Amazon-Simple-Storage-Service_48" transform="translate(10.999800, 10.000200)" fill="#FFFFFF">
+            <path d="M36.759,23.948 L36.993,22.131 C39.166,23.385 39.842,24.121 40.037,24.424 C39.713,24.485 38.832,24.509 36.759,23.948 L36.759,23.948 Z M19.5,11 C9.125,11 2.382,8.488 2,6.696 L2,6.511 C2.349,5.392 8.14,2 19.5,2 C30.84,2 36.632,5.381 37,6.505 L37,6.616 C36.724,8.446 29.961,11 19.5,11 L19.5,11 Z M34.818,23.362 C30.053,21.797 23.912,18.979 21.594,17.888 C21.535,16.786 20.628,15.906 19.512,15.906 C18.358,15.906 17.418,16.845 17.418,18 C17.418,19.154 18.358,20.094 19.512,20.094 C19.969,20.094 20.389,19.942 20.733,19.693 C23.132,20.822 29.619,23.798 34.558,25.38 L32.837,38.724 C32.583,40.352 27.919,42 19.497,42 C11.072,42 6.405,40.352 6.155,38.751 L2.435,9.814 C5.945,11.915 12.749,13 19.5,13 C26.25,13 33.054,11.915 36.565,9.815 L34.818,23.362 Z M39,6.5 C39,3.431 30.661,0 19.5,0 C8.339,0 -3.55271368e-15,3.431 -3.55271368e-15,6.5 L-3.55271368e-15,7.043 L4.174,39.033 C4.875,43.516 15.123,44 19.497,44 C23.869,44 34.113,43.516 34.818,39.007 L36.501,25.947 C37.778,26.279 38.812,26.456 39.616,26.455 C40.606,26.455 41.273,26.203 41.697,25.697 C42.047,25.281 42.185,24.756 42.085,24.221 C41.857,23 40.403,21.712 37.37,20.044 L37.27,19.989 L39,7.044 L39,6.5 Z" id="s3__Amazon-Simple-Storage-Service-Icon_48_Squid"></path>
+        </g>
+    </g>
+</g><text x="765" y="773" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">원격 Terraform state</text><text x="765" y="786" text-anchor="middle" font-size="9.5" fill="#5A6B7B">KMS + native lock</text>
+<g transform="translate(1417.00,712.00) scale(0.7188)">
+
+    
+    <g id="cloudwatch__Icon-Architecture/48/Arch_Amazon-CloudWatch_48" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="cloudwatch__Icon-Architecture-BG/48/Management-Governance" fill="#E7157B">
+            <rect id="cloudwatch__Rectangle" x="0" y="0" width="64" height="64"></rect>
+        </g>
+        <path d="M42.184,39.3811216 C42.184,37.1282698 40.347,35.2954581 38.089,35.2954581 C35.831,35.2954581 33.995,37.1282698 33.995,39.3811216 C33.995,41.6339735 35.831,43.4667852 38.089,43.4667852 C40.347,43.4667852 42.184,41.6339735 42.184,39.3811216 L42.184,39.3811216 Z M44.184,39.3811216 C44.184,42.7344587 41.45,45.4622252 38.089,45.4622252 C34.729,45.4622252 31.995,42.7344587 31.995,39.3811216 C31.995,36.0277846 34.729,33.3000181 38.089,33.3000181 C41.45,33.3000181 44.184,36.0277846 44.184,39.3811216 L44.184,39.3811216 Z M50.743,49.6157337 L45.846,45.2157884 C45.524,45.6398194 45.17,46.0379097 44.785,46.4050706 L49.671,50.8030205 C49.997,51.0953525 50.505,51.0714072 50.802,50.744155 C51.096,50.4179006 51.07,49.9110588 50.743,49.6157337 L50.743,49.6157337 Z M38.089,47.091502 C42.351,47.091502 45.818,43.6324067 45.818,39.3811216 C45.818,35.1298366 42.351,31.6707413 38.089,31.6707413 C33.829,31.6707413 30.362,35.1298366 30.362,39.3811216 C30.362,43.6324067 33.829,47.091502 38.089,47.091502 L38.089,47.091502 Z M52.081,48.1341194 C53.227,49.1667597 53.319,50.9357173 52.288,52.0801021 C51.735,52.6897091 50.971,53 50.205,53 C49.538,53 48.868,52.7655358 48.333,52.2866302 L43.172,47.6412457 C41.691,48.5521641 39.954,49.0869421 38.089,49.0869421 C32.725,49.0869421 28.362,44.7328919 28.362,39.3811216 C28.362,34.0293514 32.725,29.6753012 38.089,29.6753012 C43.454,29.6753012 47.818,34.0293514 47.818,39.3811216 C47.818,40.8447769 47.482,42.2286146 46.897,43.4757646 L52.081,48.1341194 Z M17.697,23.5383254 C17.697,23.9394088 17.72,24.3384968 17.767,24.722619 C17.802,25.0059715 17.713,25.2913194 17.524,25.5048315 C17.375,25.6714508 17.177,25.7831954 16.961,25.8241019 C15.084,26.3079961 12,27.7716514 12,32.1566309 C12,35.4800363 13.836,37.3138458 15.377,38.2676661 C16.049,38.6897017 16.64,38.9052092 17.138,38.9101978 L26.127,38.9101978 L26.127,40.9056378 L17.127,40.9056378 C16.243,40.8966584 15.3,40.577388 14.317,39.9588015 C12.708,38.9640747 10,36.6214281 10,32.1566309 C10,26.8876715 13.526,24.8642953 15.71,24.117003 C15.702,23.924443 15.697,23.7308853 15.697,23.5383254 C15.697,19.1603299 18.673,14.6217015 22.621,12.9784566 C27.232,11.0508615 32.119,12.0066773 35.687,15.5336176 C36.734,16.5672555 37.604,17.8084192 38.285,19.2361566 C39.203,18.5507229 40.304,18.1745825 41.459,18.1745825 C43.874,18.1745825 46.587,19.9684831 47.122,23.8895228 C50.58,24.7216213 54,27.27778 54,32.2174919 C54,35.1078868 52.864,37.4565197 50.713,39.0089721 L49.541,37.3926656 C51.173,36.2143583 52,34.4733368 52,32.2174919 C52,27.2388689 47.811,25.9997007 46.01,25.6983892 C45.743,25.6534918 45.505,25.5018384 45.351,25.2793468 C45.208,25.071821 45.15,24.8184001 45.186,24.5709656 C44.931,21.5319104 43.141,20.1700225 41.459,20.1700225 C40.402,20.1700225 39.409,20.6858438 38.734,21.5857873 C38.514,21.8791169 38.156,22.0297727 37.786,21.9748981 C37.422,21.9210212 37.118,21.6715912 36.993,21.3263801 C36.359,19.5743837 35.446,18.1027466 34.281,16.9513777 C32.851,15.5396039 28.933,12.506535 23.391,14.81925 C20.198,16.1492108 17.697,19.9784603 17.697,23.5383254 L17.697,23.5383254 Z" id="cloudwatch__Amazon-CloudWatch_Icon_48_Squid" fill="#FFFFFF"></path>
+    </g>
+</g><text x="1440" y="773" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">CloudTrail + Logs</text><text x="1440" y="786" text-anchor="middle" font-size="9.5" fill="#5A6B7B">변경·오류 증적</text>
+<rect x="517.0" y="157.0" width="46" height="46" rx="8" fill="#475569"/><circle cx="537" cy="177" r="8" fill="none" stroke="#fff" stroke-width="2.6"/><line x1="543" y1="183" x2="550" y2="190" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/><text x="540" y="218" text-anchor="middle" font-size="13" font-weight="700" fill="#16202E">GitHub Pages</text><text x="540" y="231" text-anchor="middle" font-size="9.5" fill="#5A6B7B">공개 인프라 명세</text>
+<circle cx="202" cy="460" r="9" fill="#232F3E"/><text x="202" y="463" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fff">1</text>
+<circle cx="428" cy="460" r="9" fill="#232F3E"/><text x="428" y="463" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fff">2</text>
+<circle cx="652" cy="460" r="9" fill="#232F3E"/><text x="652" y="463" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fff">3</text>
+<circle cx="878" cy="460" r="9" fill="#232F3E"/><text x="878" y="463" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fff">4</text>
+<circle cx="1102" cy="460" r="9" fill="#232F3E"/><text x="1102" y="463" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fff">5</text>
+<circle cx="1328" cy="460" r="9" fill="#232F3E"/><text x="1328" y="463" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fff">6</text>
+<circle cx="1552" cy="460" r="9" fill="#232F3E"/><text x="1552" y="463" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fff">7</text>
+<text x="40" y="959" font-size="11" font-weight="700" fill="#16202E">Flows</text>
+<circle cx="92" cy="955" r="5" fill="#15803D"/><text x="102" y="959" font-size="10.5" fill="#5A6B7B">scheduling</text>
+<circle cx="192" cy="955" r="5" fill="#0369A1"/><text x="202" y="959" font-size="10.5" fill="#5A6B7B">tools/memory</text>
+<circle cx="306" cy="955" r="5" fill="#94A3B8"/><text x="316" y="959" font-size="10.5" fill="#5A6B7B">aux</text>
+<text x="40" y="981" font-size="10" fill="#5A6B7B">현재 전달 경로의 핵심은 ‘GitHub에서 apply’가 아니라 plan 작성자·승인자 분리와 정확한 plan 결속입니다.</text>
+</svg>
