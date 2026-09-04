@@ -282,6 +282,7 @@ async function checkPublicPages(client, origin) {
           'const ogUrl = document.querySelector("meta[property=\\"og:url\\"]");' +
           'const ogImage = document.querySelector("meta[property=\\"og:image\\"]");' +
           'const ogAlt = document.querySelector("meta[property=\\"og:image:alt\\"]");' +
+          'const csp = document.querySelector("meta[http-equiv=\\"Content-Security-Policy\\"]");' +
           'const controls = Array.from(document.querySelectorAll("[data-stage-tab]"));' +
           'const interactive = Array.from(document.querySelectorAll("a, button"));' +
           'const focused = document.activeElement;' +
@@ -305,6 +306,7 @@ async function checkPublicPages(client, origin) {
             'ogUrl: ogUrl ? ogUrl.content : null,' +
             'ogImage: ogImage ? ogImage.content : null,' +
             'ogAlt: ogAlt ? ogAlt.content.trim() : "",' +
+            'csp: csp ? csp.content : "",' +
             'innerWidth: window.innerWidth,' +
             'scrollWidth: document.documentElement.scrollWidth,' +
             'stageTabs: controls.length,' +
@@ -324,7 +326,7 @@ async function checkPublicPages(client, origin) {
               'nav: measure(".nav")' +
             '} : null,' +
           'assessment: document.querySelector("[data-assessment-boundary]") ? {' +
-              'geometry: [".topbar", ".hero", ".hero-copy", ".hero h1", ".decision-card", ".metric-grid", ".method", ".posture-grid", ".finding-layout", ".finding-list", ".finding-detail", ".roadmap-track"]' +
+              'geometry: [".topbar", ".hero", ".hero-copy", ".hero h1", ".decision-card", ".metric-grid", ".method", ".posture-status", ".posture-grid", ".trace-chain", ".source-binding", ".finding-layout", ".finding-list", ".finding-detail", ".roadmap-track", ".delivery-boundary", ".deployment-gates"]' +
                 '.map((selector) => ({selector: selector, box: measure(selector)})),' +
               'textGeometry: [".hero h1", ".lede", ".decision-card strong", ".decision-card p"]' +
                 '.map((selector) => ({selector: selector, box: measureText(selector)})),' +
@@ -363,7 +365,11 @@ async function checkPublicPages(client, origin) {
           item.box && item.box.left >= -1 && item.box.right <= state.innerWidth + 1
         );
         assert(textFits, 'Assessment dashboard text paints outside the viewport: ' + label + ' ' + JSON.stringify(assessment.textGeometry));
-        assert(assessment.navVisible && assessment.navLinks === 5, 'Assessment dashboard navigation is unavailable: ' + label);
+        assert(assessment.navVisible && assessment.navLinks === 7, 'Assessment dashboard navigation is unavailable: ' + label);
+        assert(
+          state.csp.includes("connect-src 'none'") && state.csp.includes("object-src 'none'") && !state.csp.includes("unsafe-inline") && !state.csp.includes("unsafe-eval"),
+          'Assessment dashboard CSP is incomplete: ' + label,
+        );
         assert(
           assessment.boundary.includes('T.x는 프로젝트 내부 기술항목') && assessment.boundary.includes('준수, 성숙도, 운영효과성 또는 잔여위험을 자동 판정하지 않습니다.'),
           'Assessment interpretation boundary is incomplete: ' + label,

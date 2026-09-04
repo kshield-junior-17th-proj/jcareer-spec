@@ -133,7 +133,7 @@
     }
   },
   "files": {
-    ".github/workflows/public-release-check.yml": "6587299c1c8823bff2938c2d3926d065f380bb629e64555c87c241a39f7deb1e",
+    ".github/workflows/public-release-check.yml": "3a67e3bec8f666864cee836ae46ad05ba8e73bc250f6204d1989178d5d18541a",
     ".gitignore": "af0764f3995ee046840c0f9f14ba915d31d2e2864bfb6847dfbadf909d7e4972",
     "assets/aws/amazon-api-gateway.svg": "17f9cb60e357b904773f220f42e2cc65450550882cd676d9130e8b1d5bde4e89",
     "assets/aws/amazon-bedrock.svg": "fa4cf3e55dea8199f9cf9bc70d639b20381940149c2c6d5a0a5f810fa28a8391",
@@ -162,7 +162,7 @@
     "README.md": "436ee5f0f7f9cbfe9ba598e40901fc02061c2e7067f155389068cbc1853c48d3",
     "scripts/browser_support.mjs": "b01db83938c0bd3aa29095c215197ad6d80709c90586081a9b294d110aa17aaf",
     "scripts/check_public_mlops.py": "1fd96132e5ebcea9fc43972796d00507b313aa3f3b42b29c653ea619495c1c16",
-    "scripts/check_public_ui.mjs": "c18f7506ef848468df6480768ffc3bfa9959c6a554f9b3150cdf8f55d176d1a3",
+    "scripts/check_public_ui.mjs": "03815e5a75e8ea88c5780a76d314ed27b1fd1c5a3bdada55979ff7ebd932ebf4",
     "scripts/check_serverless_mlops_static.py": "f5935cbdf61dfcda864cd50f117fbfefae881f5c9fb9499ab7b675f244bf4d7c",
     "scripts/finalize_animated_arch.mjs": "591f10ca922f42ff4b56d5e457d0ac5e51774bf0ef5407d961e423212aeec86e",
     "scripts/render_spec_pdf.mjs": "8361ceb438c6ac634509e2d5ec09de8203948ccf063fd1c36c278610d327ddb0",

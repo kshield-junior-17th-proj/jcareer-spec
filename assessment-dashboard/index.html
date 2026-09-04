@@ -3,6 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="jcareer-data-classification" content="assessment-metadata-only">
+  <meta name="jcareer-deployment-surface" content="github-pages-public-spec-reference">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'">
   <meta name="description" content="NIST AI RMF를 기준으로 J-Career AI 설계 검토와 격리 Lab 표본의 작업 상태, 증거 한계, 우선 조치와 재검증 게이트를 설명합니다.">
   <meta name="theme-color" content="#053b2c">
   <meta property="og:type" content="website">
@@ -27,8 +30,10 @@
       <a href="#overview">요약</a>
       <a href="#method">판정 경계</a>
       <a href="#posture">증거 상태</a>
+      <a href="#traceability">판단 추적</a>
       <a href="#findings">우선 조치</a>
       <a href="#roadmap">실행 순서</a>
+      <a href="#delivery">배포 경계</a>
     </nav>
     <a class="site-return" href="../">전체 아키텍처 <span aria-hidden="true">↗</span></a>
     <div class="status-pill" role="status"><i aria-hidden="true"></i> WORKING DRAFT · HUMAN REVIEW PENDING</div>
@@ -77,14 +82,15 @@
     <section class="posture section-shell" id="posture">
       <header class="section-head">
         <div><p class="eyebrow">01 · EVIDENCE POSTURE</p><h2>내부 표시지수로 본 증거 간극</h2></div>
-        <p id="radar-note">0–4 프로젝트 내부 증거 표시지수입니다. NIST 점수나 성숙도 등급이 아닙니다. TO-BE 4.0은 조치 완료가 아닌 <b>제안 목표이며 재검증 전</b>입니다.</p>
+        <p id="radar-note">0–4 프로젝트 내부 증거 표시지수입니다. NIST 점수나 성숙도 등급이 아닙니다. TO-BE 4.0은 조치 완료가 아닌 <b>UNVERIFIED_TARGET 목표 투영</b>입니다.</p>
       </header>
+      <div class="posture-status" id="posture-status" aria-label="AS-IS, 목표 투영치, 실제 AFTER 상태 비교"></div>
       <div class="posture-grid">
         <article class="radar-card">
           <div class="chart-title"><strong>Working Evidence Display Index</strong><span>NOT AN AI RMF SCORE</span></div>
           <div id="radar" class="radar" role="img" aria-label="6개 프로젝트 영역의 현재 내부 증거 표시지수와 미검증 제안 목표" aria-describedby="radar-note radar-values"></div>
-          <div class="legend" aria-hidden="true"><span class="as-is">현재 증거</span><span class="target">제안 목표 · 미검증</span></div>
-          <dl id="radar-values" class="radar-values" aria-label="영역별 현재 내부 표시지수와 제안 목표"></dl>
+          <div class="legend" aria-hidden="true"><span class="as-is">AS-IS 제한 측정</span><span class="target">목표 투영 · 미검증</span><span class="after">ACTUAL AFTER 없음</span></div>
+          <dl id="radar-values" class="radar-values" aria-label="영역별 AS-IS, 목표 투영치와 실제 AFTER 부재"></dl>
         </article>
         <article class="evidence-card">
           <div class="chart-title"><strong>27-Item Evidence Profile</strong><span>WORKING SNAPSHOT</span></div>
@@ -98,10 +104,20 @@
       </div>
     </section>
 
+    <section class="section-shell traceability" id="traceability">
+      <header class="section-head">
+        <div><p class="eyebrow">02 · DECISION TRACEABILITY</p><h2>체크리스트에서 사람 재검증까지, 한 방향으로만 흐릅니다.</h2></div>
+        <p>27개 T.x는 6개 검토대기 NF 그룹에 중복 없이 귀속됩니다. 각 그룹은 <b>OPEN_UNVERIFIED</b> 보호조치와 종료 게이트를 거치며, 그 전에는 actual AFTER를 만들지 않습니다.</p>
+      </header>
+      <div class="trace-chain" id="traceability-chain" aria-label="판단 추적 단계"></div>
+      <p class="trace-note">T.x는 프로젝트 기술항목이고 NIST 공식 통제가 아닙니다. NF-01~06도 확정 영속 finding ID가 아닌 HUMAN REVIEW PENDING 발표용 그룹입니다.</p>
+      <aside class="source-binding" id="source-binding" aria-label="원본 및 매핑 워크북 SHA-256 결속"></aside>
+    </section>
+
     <section class="section-shell" id="findings">
       <header class="section-head">
-        <div><p class="eyebrow">02 · PRIORITY FINDINGS</p><h2>27개 내부 항목을 6개 실행 단위로 압축</h2></div>
-        <p>단순 연관 자산을 반복하지 않고, 독립 위험을 발생시키거나 직접 통제하는 자산만 연결했습니다. T.x는 프로젝트 항목 표기입니다.</p>
+        <div><p class="eyebrow">03 · PRIORITY FINDINGS</p><h2>27개 내부 항목을 6개 검토대기 실행 단위로 압축</h2></div>
+        <p>NF-01~06은 확정 영속 finding ID가 아닙니다. 단순 연관 자산을 반복하지 않고, 독립 위험을 발생시키거나 직접 통제하는 자산만 연결했습니다.</p>
       </header>
       <div class="finding-layout">
         <div class="finding-list" id="finding-list" role="tablist" aria-label="우선 조치 목록"></div>
@@ -111,15 +127,31 @@
 
     <section class="section-shell roadmap" id="roadmap">
       <header class="section-head inverse">
-        <div><p class="eyebrow">03 · SECURITY MASTERPLAN</p><h2>솔루션 구매보다 먼저, 통제 체인을 닫습니다.</h2></div>
+        <div><p class="eyebrow">04 · SECURITY MASTERPLAN</p><h2>솔루션 구매보다 먼저, 통제 체인을 닫습니다.</h2></div>
         <p>각 단계는 산출물·기술조치·검증 게이트가 함께 있어야 종료됩니다.</p>
       </header>
       <div class="roadmap-track" id="roadmap-track"></div>
       <footer class="roadmap-footer">
         <strong>최종 게이트</strong>
         <span>정책 테스트 · 격리 Lab 재현 · 사람 승인 · 증거 결속</span>
-        <b>TO-BE TARGET · NOT DEPLOYED</b>
+        <b>UNVERIFIED_TARGET · NOT DEPLOYED</b>
       </footer>
+    </section>
+
+    <section class="section-shell delivery" id="delivery">
+      <header class="section-head">
+        <div><p class="eyebrow">05 · DELIVERY BOUNDARY</p><h2>지금 보고 있는 GitHub Pages는 AWS 대시보드 배포가 아닙니다.</h2></div>
+        <p>이 화면은 공개 명세·참조 surface입니다. 별도의 격리형 AWS 대시보드 목표는 현재 <b id="aws-deployment-status">NOT_DEPLOYED</b>이며, 공개 페이지 게시를 그 배포 증거로 사용하지 않습니다.</p>
+      </header>
+      <div class="delivery-boundary">
+        <article><small>CURRENT SURFACE</small><strong>GitHub Pages 공개 명세</strong><span>판단 계약·표현 검토용 참조</span></article>
+        <i aria-hidden="true">≠</i>
+        <article><small>AWS DASHBOARD TARGET</small><strong>S3 · CloudFront · WAF</strong><span>source proposal · live 미검증</span></article>
+        <i aria-hidden="true">→</i>
+        <article class="after-empty"><small>ACTUAL AFTER</small><strong>실측값 없음</strong><span id="actual-after-status">NOT_MEASURED_NO_ACCEPTED_REVALIDATION</span></article>
+      </div>
+      <ol class="deployment-gates" id="deployment-gates" aria-label="AWS 대시보드 배포 전 필수 게이트"></ol>
+      <p class="delivery-note">향후 정적 배포와 live smoke가 통과해도 그것은 배포면 검증입니다. 개별 TO-BE 보호조치의 운영효과성은 동일 조건 재시험과 독립적인 사람 승인 전까지 계속 UNVERIFIED_TARGET입니다.</p>
     </section>
   </main>
 
