@@ -83,6 +83,10 @@ const PUBLIC_PAGES = [
     canonical: 'https://kshield-junior-17th-proj.github.io/jcareer-spec/mlops/',
   },
   {
+    path: '/assessment-dashboard/',
+    canonical: 'https://kshield-junior-17th-proj.github.io/jcareer-spec/assessment-dashboard/',
+  },
+  {
     path: '/terraform/lab/',
     canonical: 'https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/lab/',
   },
@@ -288,6 +292,14 @@ async function checkPublicPages(client, origin) {
             'const rect = element.getBoundingClientRect();' +
             'return {left: rect.left, right: rect.right, width: rect.width, clientWidth: element.clientWidth, scrollWidth: element.scrollWidth};' +
           '};' +
+          'const measureText = (selector) => {' +
+            'const element = document.querySelector(selector);' +
+            'if (!element) return null;' +
+            'const range = document.createRange();' +
+            'range.selectNodeContents(element);' +
+            'const rect = range.getBoundingClientRect();' +
+            'return {left: rect.left, right: rect.right, width: rect.width};' +
+          '};' +
           'return {' +
             'canonical: canonical ? canonical.href : null,' +
             'ogUrl: ogUrl ? ogUrl.content : null,' +
@@ -304,12 +316,24 @@ async function checkPublicPages(client, origin) {
             'touchReady: interactive.every((item) => getComputedStyle(item).touchAction === "manipulation"),' +
             'focusVisible: Boolean(focused && focused.matches(":focus-visible")),' +
             'focusOutlined: Boolean(focusedStyle && parseFloat(focusedStyle.outlineWidth) > 0),' +
-            'consultingGeometry: measure(".article-hero__grid") ? {' +
+          'consultingGeometry: measure(".article-hero__grid") ? {' +
               'grid: measure(".article-hero__grid"),' +
               'copy: measure(".hero-copy"),' +
               'heading: measure(".hero-copy h1"),' +
               'standfirst: measure(".standfirst"),' +
               'nav: measure(".nav")' +
+            '} : null,' +
+          'assessment: document.querySelector("[data-assessment-boundary]") ? {' +
+              'geometry: [".topbar", ".hero", ".hero-copy", ".hero h1", ".decision-card", ".metric-grid", ".method", ".posture-grid", ".finding-layout", ".finding-list", ".finding-detail", ".roadmap-track"]' +
+                '.map((selector) => ({selector: selector, box: measure(selector)})),' +
+              'textGeometry: [".hero h1", ".lede", ".decision-card strong", ".decision-card p"]' +
+                '.map((selector) => ({selector: selector, box: measureText(selector)})),' +
+              'navVisible: getComputedStyle(document.querySelector(".topbar nav")).display !== "none",' +
+              'navLinks: document.querySelectorAll(".topbar nav a").length,' +
+              'boundary: document.querySelector("[data-assessment-boundary]").textContent,' +
+              'tabs: document.querySelectorAll("#finding-list [role=tab]").length,' +
+              'selectedTabs: document.querySelectorAll("#finding-list [role=tab][aria-selected=true]").length,' +
+              'detailLabel: document.querySelector("#finding-detail")?.getAttribute("aria-labelledby") || ""' +
             '} : null' +
           '};' +
         '})()',
@@ -327,6 +351,24 @@ async function checkPublicPages(client, origin) {
           item.left >= -1 && item.right <= state.innerWidth + 1 && item.scrollWidth <= item.clientWidth + 1
         );
         assert(fits, 'Consulting hero content is clipped: ' + label + ' ' + JSON.stringify(geometry));
+      }
+      if (page.path === '/assessment-dashboard/') {
+        const assessment = state.assessment;
+        const fits = assessment.geometry.every((item) =>
+          item.box && item.box.left >= -1 && item.box.right <= state.innerWidth + 1 &&
+          (item.selector === '.hero' || item.box.scrollWidth <= item.box.clientWidth + 1)
+        );
+        assert(fits, 'Assessment dashboard content is clipped: ' + label + ' ' + JSON.stringify(assessment.geometry));
+        const textFits = assessment.textGeometry.every((item) =>
+          item.box && item.box.left >= -1 && item.box.right <= state.innerWidth + 1
+        );
+        assert(textFits, 'Assessment dashboard text paints outside the viewport: ' + label + ' ' + JSON.stringify(assessment.textGeometry));
+        assert(assessment.navVisible && assessment.navLinks === 5, 'Assessment dashboard navigation is unavailable: ' + label);
+        assert(
+          assessment.boundary.includes('T.x는 프로젝트 내부 기술항목') && assessment.boundary.includes('준수, 성숙도, 운영효과성 또는 잔여위험을 자동 판정하지 않습니다.'),
+          'Assessment interpretation boundary is incomplete: ' + label,
+        );
+        assert(assessment.tabs === 6 && assessment.selectedTabs === 1 && assessment.detailLabel === 'finding-tab-0', 'Assessment finding tabs are not accessible: ' + label);
       }
       if (page.path === '/mlops/') {
         assert(state.stageTabs === 8 && state.stageControlsValid, 'MLOps stage aria-controls contract failed: ' + label);
@@ -347,7 +389,11 @@ async function runChecks(client, origin) {
       'return {' +
         'routes: Array.from(document.querySelectorAll(".flow-shortcuts a")).map((link) => link.getAttribute("href")),' +
         'innerWidth: window.innerWidth,' +
-        'scrollWidth: document.documentElement.scrollWidth' +
+        'scrollWidth: document.documentElement.scrollWidth,' +
+        'navLinks: Array.from(document.querySelectorAll(".site-header .nav-links a")).map((link) => {' +
+          'const rect = link.getBoundingClientRect();' +
+          'return {text: link.textContent.trim(), left: rect.left, right: rect.right, top: rect.top};' +
+        '})' +
       '};' +
     '})()',
   );
@@ -357,6 +403,10 @@ async function runChecks(client, origin) {
   );
   assert(landing.innerWidth === 390, 'Mobile viewport width is not 390 CSS pixels.');
   assert(landing.scrollWidth <= landing.innerWidth, 'Landing page overflows horizontally at 390 CSS pixels.');
+  assert(
+    landing.navLinks.every((link) => link.left >= -1 && link.right <= landing.innerWidth + 1),
+    'Landing navigation clips at 390 CSS pixels: ' + JSON.stringify(landing.navLinks),
+  );
 
   const landingMotion = await evaluate(
     client,

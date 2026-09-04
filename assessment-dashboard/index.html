@@ -3,77 +3,109 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>J-Career AI Security Posture</title>
+  <meta name="description" content="NIST AI RMF를 기준으로 J-Career AI 설계 검토와 격리 Lab 표본의 작업 상태, 증거 한계, 우선 조치와 재검증 게이트를 설명합니다.">
+  <meta name="theme-color" content="#053b2c">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ko_KR">
+  <meta property="og:title" content="J-Career AI 보안 진단 작업 스냅샷">
+  <meta property="og:description" content="NIST AI RMF 기반 설계 검토와 격리 Lab 표본. 준수 점수나 운영효과성 판정이 아닌 사람 검토 대기 자료입니다.">
+  <meta property="og:url" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/assessment-dashboard/">
+  <meta property="og:image" content="https://kshield-junior-17th-proj.github.io/jcareer-spec/assets/JCAREER_ASSESSMENT_EVIDENCE.png">
+  <meta property="og:image:alt" content="현재 실행면, 진단 증거와 미배포 목표를 분리해 보여 주는 J-Career AI 보안 진단 지도">
+  <link rel="canonical" href="https://kshield-junior-17th-proj.github.io/jcareer-spec/assessment-dashboard/">
   <link rel="stylesheet" href="styles.css">
+  <title>J-Career AI 보안 진단 작업 스냅샷</title>
 </head>
 <body>
+  <a class="skip-link" href="#content">본문으로 건너뛰기</a>
   <header class="topbar">
-    <a class="brand" href="#overview" aria-label="J-Career 진단 대시보드 홈">
-      <span class="brand-mark">J</span>
+    <a class="brand" href="#overview" aria-label="J-Career AI 보안 진단 처음으로">
+      <span class="brand-mark" aria-hidden="true">J</span>
       <span><strong>J-CAREER</strong><small>AI SECURITY ASSESSMENT</small></span>
     </a>
     <nav aria-label="대시보드 구역">
-      <a href="#overview">Executive</a>
-      <a href="#posture">Posture</a>
-      <a href="#findings">Findings</a>
-      <a href="#roadmap">Masterplan</a>
+      <a href="#overview">요약</a>
+      <a href="#method">판정 경계</a>
+      <a href="#posture">증거 상태</a>
+      <a href="#findings">우선 조치</a>
+      <a href="#roadmap">실행 순서</a>
     </nav>
-    <div class="status-pill"><i></i> WORKING DRAFT · HUMAN REVIEW PENDING</div>
+    <a class="site-return" href="../">전체 아키텍처 <span aria-hidden="true">↗</span></a>
+    <div class="status-pill" role="status"><i aria-hidden="true"></i> WORKING DRAFT · HUMAN REVIEW PENDING</div>
   </header>
 
-  <main>
+  <main id="content">
     <section class="hero" id="overview">
       <div class="hero-copy">
         <p class="eyebrow">NIST AI RMF · DESIGN REVIEW + ISOLATED LAB SAMPLING</p>
-        <h1>AI가 답을 내는 순간보다,<br><em>그 답이 업무 권한이 되는 경계</em>를 진단했습니다.</h1>
+        <h1>AI가 답을 내는 순간보다, <em>그 답이 업무 권한이 되는 경계</em>를 진단했습니다.</h1>
         <p class="lede">문서·아키텍처·소스·구성정보 기반 설계 수준 평가와 고위험 시나리오 5건의 격리 Lab 표본 실증을 결합했습니다. 전수 운영효과성 검증 결과가 아닙니다.</p>
       </div>
-      <aside class="decision-card">
+      <aside class="decision-card" aria-label="우선 의사결정">
         <span class="card-kicker">MANAGEMENT DECISION</span>
-        <strong>P0 신뢰경계부터 닫고<br>증적 기반으로 재검증</strong>
+        <strong>P0 신뢰경계부터 닫고<br>증거 기반으로 재검증</strong>
         <p>입력 → 권한 → 모델 → 출력 → 업무 반영 경계를 하나의 통제 체인으로 전환합니다.</p>
-        <a href="#roadmap">실행 순서 보기 <span>↗</span></a>
+        <a href="#roadmap">실행 순서 보기 <span aria-hidden="true">↗</span></a>
       </aside>
     </section>
 
     <section class="metric-grid" aria-label="핵심 진단 수치">
       <article><span>기준 기술자산</span><strong data-metric="assets">22</strong><small>AS-01—AS-22 책임 경계</small></article>
-      <article><span>프로젝트 기술항목</span><strong data-metric="controls">27</strong><small>NIST AI RMF 활동에 연결</small></article>
-      <article><span>증거 등급</span><strong class="metric-sequence" data-metric="evidence">4/13/6/4</strong><small>취약·부분·설계·공백</small></article>
-      <article class="alert"><span>대표 PoC 결과</span><strong data-metric="pocResult">3/2</strong><small>관찰 실패 · 검증 공백</small></article>
+      <article><span>프로젝트 기술항목</span><strong data-metric="controls">27</strong><small>T.x 내부 항목 · NIST ID 아님</small></article>
+      <article><span>증거 분포</span><strong class="metric-sequence" data-metric="evidence">4/13/6/4</strong><small>취약·부분·설계·공백 순</small></article>
+      <article class="alert"><span>대표 PoC 표본</span><strong data-metric="pocResult">3/2</strong><small>취약 동작 3 · 검증 공백 2</small></article>
+    </section>
+
+    <section class="method" id="method" data-assessment-boundary>
+      <div class="method-heading">
+        <p class="eyebrow">ASSESSMENT BOUNDARY</p>
+        <h2>NIST 기능은 판단의 구조이고,<br>이 화면은 채점표가 아닙니다.</h2>
+      </div>
+      <div class="method-copy">
+        <p>NIST AI RMF Core의 <b>GOVERN</b>, <b>MAP</b>, <b>MEASURE</b>, <b>MANAGE</b>를 유일한 평가 구조로 사용했습니다. 화면의 T.x는 프로젝트 내부 기술항목이며 NIST 하위범주 식별자가 아닙니다.</p>
+        <p>수치와 그래프는 2026-09-05 작업 스냅샷을 설명하기 위한 내부 표시입니다. 준수, 성숙도, 운영효과성 또는 잔여위험을 자동 판정하지 않습니다.</p>
+        <a href="https://airc.nist.gov/airmf-resources/airmf/5-sec-core/" target="_blank" rel="noreferrer">NIST AI RMF Core 원문 <span aria-hidden="true">↗</span></a>
+      </div>
+      <dl class="rmf-functions" aria-label="NIST AI RMF Core 기능">
+        <div><dt>GOVERN</dt><dd>위험관리 문화와 책임을 전 과정에 적용</dd></div>
+        <div><dt>MAP</dt><dd>사용 맥락과 관련 위험을 식별</dd></div>
+        <div><dt>MEASURE</dt><dd>위험을 평가·분석·추적</dd></div>
+        <div><dt>MANAGE</dt><dd>영향을 기준으로 우선순위화하고 대응</dd></div>
+      </dl>
     </section>
 
     <section class="posture section-shell" id="posture">
       <header class="section-head">
-        <div><p class="eyebrow">01 · POSTURE SHIFT</p><h2>AS-IS와 목표 상태의 간극</h2></div>
-        <p>0–4 프로젝트 내부 증거 표시지수. TO-BE는 조치 완료가 아니라 <b>목표치이며 재검증 전</b>입니다.</p>
+        <div><p class="eyebrow">01 · EVIDENCE POSTURE</p><h2>내부 표시지수로 본 증거 간극</h2></div>
+        <p id="radar-note">0–4 프로젝트 내부 증거 표시지수입니다. NIST 점수나 성숙도 등급이 아닙니다. TO-BE 4.0은 조치 완료가 아닌 <b>제안 목표이며 재검증 전</b>입니다.</p>
       </header>
       <div class="posture-grid">
         <article class="radar-card">
-          <div class="chart-title"><strong>Control evidence readiness</strong><span>AS-IS / TO-BE TARGET</span></div>
-          <div id="radar" class="radar" role="img" aria-label="AS-IS 및 TO-BE 목표 증적 준비도 레이더 차트"></div>
-          <div class="legend"><span class="as-is">AS-IS 증적</span><span class="target">TO-BE 목표 · 미검증</span></div>
+          <div class="chart-title"><strong>Working Evidence Display Index</strong><span>NOT AN AI RMF SCORE</span></div>
+          <div id="radar" class="radar" role="img" aria-label="6개 프로젝트 영역의 현재 내부 증거 표시지수와 미검증 제안 목표" aria-describedby="radar-note radar-values"></div>
+          <div class="legend" aria-hidden="true"><span class="as-is">현재 증거</span><span class="target">제안 목표 · 미검증</span></div>
+          <dl id="radar-values" class="radar-values" aria-label="영역별 현재 내부 표시지수와 제안 목표"></dl>
         </article>
         <article class="evidence-card">
-          <div class="chart-title"><strong>27-control evidence profile</strong><span>CHECKLIST EVIDENCE</span></div>
-          <div id="evidence-bars" class="evidence-bars"></div>
+          <div class="chart-title"><strong>27-Item Evidence Profile</strong><span>WORKING SNAPSHOT</span></div>
+          <div id="evidence-bars" class="evidence-bars" role="list" aria-label="증거 분포"></div>
           <div class="poc-result">
             <div><span>대표 PoC</span><strong>5</strong></div>
             <p><b>3건</b> 취약 동작 관찰<br><b>2건</b> 검증 공백 확인</p>
           </div>
-          <p class="method-note">지수와 증적 분포는 서로 다른 관점입니다. 자동 적합성 점수나 잔여위험 판정을 생성하지 않습니다.</p>
+          <p class="method-note">내부 표시지수와 증거 분포는 서로 다른 관점입니다. 어느 쪽도 준수 점수나 잔여위험 판정이 아닙니다.</p>
         </article>
       </div>
     </section>
 
     <section class="section-shell" id="findings">
       <header class="section-head">
-        <div><p class="eyebrow">02 · PRIORITY FINDINGS</p><h2>27개 항목을 6개 실행 단위로 압축</h2></div>
-        <p>단순 연관 자산을 반복하지 않고, 독립 위험을 발생시키거나 직접 통제하는 자산만 연결했습니다.</p>
+        <div><p class="eyebrow">02 · PRIORITY FINDINGS</p><h2>27개 내부 항목을 6개 실행 단위로 압축</h2></div>
+        <p>단순 연관 자산을 반복하지 않고, 독립 위험을 발생시키거나 직접 통제하는 자산만 연결했습니다. T.x는 프로젝트 항목 표기입니다.</p>
       </header>
       <div class="finding-layout">
-        <div class="finding-list" id="finding-list"></div>
-        <aside class="finding-detail" id="finding-detail" aria-live="polite"></aside>
+        <div class="finding-list" id="finding-list" role="tablist" aria-label="우선 조치 목록"></div>
+        <aside class="finding-detail" id="finding-detail" role="tabpanel" aria-live="polite"></aside>
       </div>
     </section>
 
@@ -85,7 +117,7 @@
       <div class="roadmap-track" id="roadmap-track"></div>
       <footer class="roadmap-footer">
         <strong>최종 게이트</strong>
-        <span>Terraform plan · 정책 테스트 · 격리 Lab 재현 · 사람 승인 · 증적 봉인</span>
+        <span>정책 테스트 · 격리 Lab 재현 · 사람 승인 · 증거 결속</span>
         <b>TO-BE TARGET · NOT DEPLOYED</b>
       </footer>
     </section>
@@ -94,6 +126,7 @@
   <footer class="page-footer">
     <span>J-Career · Synthetic data only</span>
     <span>설계 수준 평가 + 격리 Lab 표본 실증</span>
+    <a href="../">전체 아키텍처로 돌아가기</a>
     <span>2026.09</span>
   </footer>
   <script src="assessment-snapshot.js"></script>

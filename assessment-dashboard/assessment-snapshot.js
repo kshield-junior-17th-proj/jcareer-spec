@@ -1,9 +1,11 @@
 window.JCAREER_ASSESSMENT = Object.freeze({
   meta: {
     framework: "NIST AI RMF",
+    snapshotDate: "2026-09-05",
     status: "WORKING_DRAFT_HUMAN_REVIEW_PENDING",
     scope: "DESIGN_REVIEW_AND_ISOLATED_LAB_SAMPLING",
-    targetStatus: "PROPOSED_NOT_VERIFIED"
+    targetStatus: "PROPOSED_NOT_VERIFIED",
+    projectControlIds: "INTERNAL_NOT_NIST_SUBCATEGORY_IDS"
   },
   metrics: { assets: 22, controls: 27, evidence: "4/13/6/4", pocResult: "3/2" },
   evidence: [
@@ -17,7 +19,7 @@ window.JCAREER_ASSESSMENT = Object.freeze({
     labels: ["판정 책임·감독", "데이터·공정성", "입력·프롬프트", "점수·출력 신뢰", "접근·공급망", "복구·지속 운영"],
     baseline: [2.0, 0.6, 1.25, 0.8, 1.14, 2.0],
     target: [4.0, 4.0, 4.0, 4.0, 4.0, 4.0],
-    note: "DISPLAY_INDEX_WORKING_MODEL_NOT_COMPLIANCE_SCORE"
+    note: "DISPLAY_INDEX_WORKING_MODEL_NOT_NIST_SCORE"
   },
   findings: [
     {
@@ -29,23 +31,23 @@ window.JCAREER_ASSESSMENT = Object.freeze({
     },
     {
       id: "NF-02", priority: "P1", title: "개인정보·보존·편향·교차주체 격리의 비위험 상태 미입증",
-      asset: "LLM Gateway · 증적 저장소 · 주체별 데이터 경계", controls: "T.2.1 · T.2.2 · T.2.3 · T.5.3 · T.8.3",
-      scenario: "민감정보가 전송·로그·증적에 남거나 서로 다른 주체 사이에 혼입되고도 탐지되지 않을 수 있습니다.",
-      evidence: "공백 3 · 부분 1 · 설계 1 · LLM02 검증 공백", target: "합성 canary · 양방향 DLP · 삭제 전파 · 격리·편향 기준",
+      asset: "LLM Gateway · 증거 저장소 · 주체별 데이터 경계", controls: "T.2.1 · T.2.2 · T.2.3 · T.5.3 · T.8.3",
+      scenario: "민감정보가 전송·로그·증거에 남거나 서로 다른 주체 사이에 혼입되고도 탐지되지 않을 수 있습니다.",
+      evidence: "공백 3 · 부분 1 · 설계 1 · 격리 Lab 검증 공백", target: "합성 canary · 양방향 DLP · 삭제 전파 · 격리·편향 기준",
       gate: "전송 전후 비도달·삭제 후 재조회 거부·교차주체 비혼입을 한 묶음으로 확인"
     },
     {
       id: "NF-03", priority: "P1", title: "비신뢰 입력이 지시·점수 경계에 영향을 준 행동 관찰",
       asset: "AI 추천 API · LLM Gateway · 추천 점수 로직", controls: "T.1.1 · T.1.2 · T.1.3 · T.5.4",
       scenario: "데이터로 취급해야 할 입력이 지시문으로 승격되어 추천 점수와 후속 업무 문맥을 오염시킬 수 있습니다.",
-      evidence: "취약 동작 1 · 부분 2 · 설계 1 · LLM01 관찰 실패", target: "서버 스키마 · 명령/데이터 분리 · 점수 불변 · 거부 로그",
+      evidence: "취약 동작 1 · 부분 2 · 설계 1 · 격리 Lab 취약 동작 관찰", target: "서버 스키마 · 명령/데이터 분리 · 점수 불변 · 거부 로그",
       gate: "동일 합성 입력을 거부하고 점수 불변·미저장·재실행 결과 결속"
     },
     {
       id: "NF-04", priority: "P1", title: "채용 결론·실행형 출력·저장 무결성의 종단 검증 불완전",
       asset: "추천 서비스 · API 응답 렌더러 · Evidence Desk", controls: "T.7.1 · T.7.2 · T.9.1 · T.9.2 · T.9.3",
       scenario: "근거 없는 채용 결론이나 실행 가능한 마크업이 전달되고 점수·사유·저장 내용이 불일치할 수 있습니다.",
-      evidence: "취약 동작 2 · 설계 2 · 부분 1 · LLM07/LLM10", target: "근거 없는 결론 보류 · 구조화 출력 · 무해화 · 변조 탐지",
+      evidence: "취약 동작 2 · 설계 2 · 부분 1 · 격리 Lab 표본", target: "근거 없는 결론 보류 · 구조화 출력 · 무해화 · 변조 탐지",
       gate: "점수-사유 불일치 거부·일반 텍스트 렌더·변조 후 읽기 거부와 복구"
     },
     {
@@ -66,7 +68,7 @@ window.JCAREER_ASSESSMENT = Object.freeze({
   roadmap: [
     { phase: "P0", window: "0–2주", title: "판정 무결성", body: "원본·시점·환경·분모 동결, 충돌의 사람 결정", deliverable: "증거 계약 · 책임자 · 예외 만료" },
     { phase: "P1", window: "2–6주", title: "측정 가능성", body: "canary, cross-role deny, 삭제·격리 positive/negative oracle", deliverable: "재현 세트 · owner · receipt 결속" },
-    { phase: "P2", window: "6주–3개월", title: "예방 통제", body: "서버 검증, redaction, default-deny, 구조화 출력", deliverable: "TO-BE IaC · 정책팩 · 공격 회귀" },
+    { phase: "P2", window: "6주–3개월", title: "예방 통제", body: "서버 검증, redaction, default-deny, 구조화 출력", deliverable: "TO-BE 설계 · 정책팩 · 공격 회귀" },
     { phase: "P3", window: "3–6개월", title: "지속 보증", body: "릴리스별 drift·예외 만료·재검증·독립 승인", deliverable: "재진단 · 잔여위험 owner · 기한" }
   ]
 });
