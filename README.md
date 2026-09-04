@@ -10,6 +10,8 @@ J-Career는 구직자와 기업을 연결하는 채용 플랫폼입니다. 이 �
 - [업무망·GitHub CI·AWS·MLOps 전체 인프라 지도](https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/architecture.html)
 - [2026-09-01 운영 인프라 전환 기록](https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/asis/production-transition.html)
 - [MLOps 7단계 모델 검증](https://kshield-junior-17th-proj.github.io/jcareer-spec/mlops/)
+- [AI 보안 진단 대시보드](https://kshield-junior-17th-proj.github.io/jcareer-spec/assessment-dashboard/)
+- [아키텍처 애니메이션 5종](https://kshield-junior-17th-proj.github.io/jcareer-spec/animations/)
 - [AWS 검증 환경](https://kshield-junior-17th-proj.github.io/jcareer-spec/terraform/lab/)
 
 ![GitHub 승인형 OIDC saved-plan apply, production-serverless AI 요청 경로와 분리형 serverless MLOps를 상태별로 구분한 J-Career AI 서비스 실행면](assets/JCAREER_PRODUCTION_ASSESSMENT_MAP.svg)

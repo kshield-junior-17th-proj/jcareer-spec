@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>J-Career AI Security Posture</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#overview" aria-label="J-Career 진단 대시보드 홈">
+      <span class="brand-mark">J</span>
+      <span><strong>J-CAREER</strong><small>AI SECURITY ASSESSMENT</small></span>
+    </a>
+    <nav aria-label="대시보드 구역">
+      <a href="#overview">Executive</a>
+      <a href="#posture">Posture</a>
+      <a href="#findings">Findings</a>
+      <a href="#roadmap">Masterplan</a>
+    </nav>
+    <div class="status-pill"><i></i> WORKING DRAFT · HUMAN REVIEW PENDING</div>
+  </header>
+
+  <main>
+    <section class="hero" id="overview">
+      <div class="hero-copy">
+        <p class="eyebrow">NIST AI RMF · DESIGN REVIEW + ISOLATED LAB SAMPLING</p>
+        <h1>AI가 답을 내는 순간보다,<br><em>그 답이 업무 권한이 되는 경계</em>를 진단했습니다.</h1>
+        <p class="lede">문서·아키텍처·소스·구성정보 기반 설계 수준 평가와 고위험 시나리오 5건의 격리 Lab 표본 실증을 결합했습니다. 전수 운영효과성 검증 결과가 아닙니다.</p>
+      </div>
+      <aside class="decision-card">
+        <span class="card-kicker">MANAGEMENT DECISION</span>
+        <strong>P0 신뢰경계부터 닫고<br>증적 기반으로 재검증</strong>
+        <p>입력 → 권한 → 모델 → 출력 → 업무 반영 경계를 하나의 통제 체인으로 전환합니다.</p>
+        <a href="#roadmap">실행 순서 보기 <span>↗</span></a>
+      </aside>
+    </section>
+
+    <section class="metric-grid" aria-label="핵심 진단 수치">
+      <article><span>기준 기술자산</span><strong data-metric="assets">22</strong><small>AS-01—AS-22 책임 경계</small></article>
+      <article><span>프로젝트 기술항목</span><strong data-metric="controls">27</strong><small>NIST AI RMF 활동에 연결</small></article>
+      <article><span>증거 등급</span><strong class="metric-sequence" data-metric="evidence">4/13/6/4</strong><small>취약·부분·설계·공백</small></article>
+      <article class="alert"><span>대표 PoC 결과</span><strong data-metric="pocResult">3/2</strong><small>관찰 실패 · 검증 공백</small></article>
+    </section>
+
+    <section class="posture section-shell" id="posture">
+      <header class="section-head">
+        <div><p class="eyebrow">01 · POSTURE SHIFT</p><h2>AS-IS와 목표 상태의 간극</h2></div>
+        <p>0–4 프로젝트 내부 증거 표시지수. TO-BE는 조치 완료가 아니라 <b>목표치이며 재검증 전</b>입니다.</p>
+      </header>
+      <div class="posture-grid">
+        <article class="radar-card">
+          <div class="chart-title"><strong>Control evidence readiness</strong><span>AS-IS / TO-BE TARGET</span></div>
+          <div id="radar" class="radar" role="img" aria-label="AS-IS 및 TO-BE 목표 증적 준비도 레이더 차트"></div>
+          <div class="legend"><span class="as-is">AS-IS 증적</span><span class="target">TO-BE 목표 · 미검증</span></div>
+        </article>
+        <article class="evidence-card">
+          <div class="chart-title"><strong>27-control evidence profile</strong><span>CHECKLIST EVIDENCE</span></div>
+          <div id="evidence-bars" class="evidence-bars"></div>
+          <div class="poc-result">
+            <div><span>대표 PoC</span><strong>5</strong></div>
+            <p><b>3건</b> 취약 동작 관찰<br><b>2건</b> 검증 공백 확인</p>
+          </div>
+          <p class="method-note">지수와 증적 분포는 서로 다른 관점입니다. 자동 적합성 점수나 잔여위험 판정을 생성하지 않습니다.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-shell" id="findings">
+      <header class="section-head">
+        <div><p class="eyebrow">02 · PRIORITY FINDINGS</p><h2>27개 항목을 6개 실행 단위로 압축</h2></div>
+        <p>단순 연관 자산을 반복하지 않고, 독립 위험을 발생시키거나 직접 통제하는 자산만 연결했습니다.</p>
+      </header>
+      <div class="finding-layout">
+        <div class="finding-list" id="finding-list"></div>
+        <aside class="finding-detail" id="finding-detail" aria-live="polite"></aside>
+      </div>
+    </section>
+
+    <section class="section-shell roadmap" id="roadmap">
+      <header class="section-head inverse">
+        <div><p class="eyebrow">03 · SECURITY MASTERPLAN</p><h2>솔루션 구매보다 먼저, 통제 체인을 닫습니다.</h2></div>
+        <p>각 단계는 산출물·기술조치·검증 게이트가 함께 있어야 종료됩니다.</p>
+      </header>
+      <div class="roadmap-track" id="roadmap-track"></div>
+      <footer class="roadmap-footer">
+        <strong>최종 게이트</strong>
+        <span>Terraform plan · 정책 테스트 · 격리 Lab 재현 · 사람 승인 · 증적 봉인</span>
+        <b>TO-BE TARGET · NOT DEPLOYED</b>
+      </footer>
+    </section>
+  </main>
+
+  <footer class="page-footer">
+    <span>J-Career · Synthetic data only</span>
+    <span>설계 수준 평가 + 격리 Lab 표본 실증</span>
+    <span>2026.09</span>
+  </footer>
+  <script src="assessment-snapshot.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

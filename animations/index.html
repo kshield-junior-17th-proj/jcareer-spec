@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="J-Career 전체 인프라, AI 추천, GitHub delivery, MLOps, TO-BE 통제 흐름을 상태와 함께 보여 주는 애니메이션 갤러리">
+  <title>J-Career Architecture Motion Atlas</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="masthead">
+    <a href="../">J/CAREER</a>
+    <span>ARCHITECTURE MOTION ATLAS</span>
+    <p>애니메이션은 데이터·변경의 설계 흐름을 설명합니다. 연결선 자체가 운영효과성 증거는 아닙니다.</p>
+  </header>
+  <main>
+    <section class="intro">
+      <p class="eyebrow">SYSTEM / AI / DELIVERY / MLOPS / TARGET</p>
+      <h1>한 장에 우겨 넣지 않고,<br>질문마다 <em>하나의 흐름</em>으로 답합니다.</h1>
+      <div class="state-key" aria-label="상태 범례">
+        <span><i class="live"></i>관찰된 현재</span>
+        <span><i class="source"></i>소스·설계 확보</span>
+        <span><i class="unknown"></i>운영 미확인</span>
+        <span><i class="target"></i>목표·미배포</span>
+      </div>
+    </section>
+
+    <section class="atlas" aria-label="아키텍처 애니메이션">
+      <article class="plate plate--wide" id="overall">
+        <header><div><span>01 · WHOLE ESTATE</span><h2>전체 인프라와 업무 흐름</h2></div><b class="mixed">상태 혼합 지도</b></header>
+        <a href="../assets/animated/jcareer_overall_estate.svg"><img src="../assets/animated/jcareer_overall_estate.svg" alt="업무망과 Slack, GitHub 승인형 배포, 현재 서버리스 AI 실행면, Bedrock, 데이터와 증적, 별도 MLOps가 연결된 전체 흐름"></a>
+        <footer><p>GitHub의 동일-plan apply가 현재 추천 실행면에 닿고, 요청은 업무 경계에서 Bedrock까지 이어집니다. MLOps는 현재 추천 서비스와 자동 연결되지 않습니다.</p><a href="../assets/animated/jcareer_overall_estate.mp4">행사장용 MP4 ↗</a></footer>
+      </article>
+
+      <article class="plate" id="ai-service">
+        <header><div><span>02 · AI SERVICE</span><h2>요청부터 사람 결정까지</h2></div><b class="live-badge">관찰 범위</b></header>
+        <a href="../assets/animated/jcareer_ai_service.svg"><img src="../assets/animated/jcareer_ai_service.svg" alt="CloudFront부터 API, 큐, Agent, LLM Gateway, Capability Broker, Amazon Bedrock와 사람 결정까지 이어지는 AI 추천 서비스 흐름"></a>
+        <footer><p>결정론 점수와 생성 설명을 분리하고, Bedrock 출력은 사람의 최종 채용 결정을 대체하지 않습니다.</p><a href="../assets/animated/jcareer_ai_service.mp4">MP4 ↗</a></footer>
+      </article>
+
+      <article class="plate" id="delivery">
+        <header><div><span>03 · DELIVERY</span><h2>GitHub CI에서 AWS apply까지</h2></div><b class="live-badge">1회 관찰</b></header>
+        <a href="../assets/animated/jcareer_delivery.svg"><img src="../assets/animated/jcareer_delivery.svg" alt="코드 변경, 필수 검사, 저장 계획, 다른 팀원 승인, GitHub OIDC, 동일 계획 Terraform apply, live smoke 흐름"></a>
+        <footer><p>핵심은 “CI가 apply한다”가 아니라 작성자와 승인자를 분리하고 검토한 동일 plan만 단기 OIDC 역할로 적용하는 것입니다.</p><a href="../assets/animated/jcareer_delivery.mp4">MP4 ↗</a></footer>
+      </article>
+
+      <article class="plate" id="mlops">
+        <header><div><span>04 · SERVERLESS MLOPS</span><h2>승인 가능한 변경 수명주기</h2></div><b class="unknown-badge">runtime 미관찰</b></header>
+        <a href="../assets/animated/jcareer_mlops_lifecycle.svg"><img src="../assets/animated/jcareer_mlops_lifecycle.svg" alt="합성 snapshot, manifest, 일회성 trainer, run state, 사람 검토, 제한 canary, release 또는 rollback의 서버리스 MLOps 흐름"></a>
+        <footer><p>기반 13개 리소스만 적용이 관찰됐습니다. 이미지 게시, runtime 실행, 사람 승인, 추천 반영은 현재 증거로 확인되지 않았습니다.</p><a href="../assets/animated/jcareer_mlops_lifecycle.mp4">MP4 ↗</a></footer>
+      </article>
+
+      <article class="plate plate--wide plate--target" id="tobe">
+        <header><div><span>05 · TO-BE CONTROL CHAIN</span><h2>AI 위험을 모델 밖 통제지점에서 차단</h2></div><b class="target-badge">목표 · 미배포</b></header>
+        <a href="../assets/animated/jcareer_tobe_controls.svg"><img src="../assets/animated/jcareer_tobe_controls.svg" alt="WAF, 입력 정책, 결정론 Matcher, LLM Gateway, Bedrock Guardrail, Capability Broker, 출력 무해화, 사람 결정과 감사 증적을 포함하는 TO-BE 통제 흐름"></a>
+        <footer><p>구현 완료 상태가 아닙니다. 같은 합성 조건의 재검증과 지정 사람의 승인까지 마쳐야 AS-IS 지수를 변경할 수 있습니다.</p><a href="../assets/animated/jcareer_tobe_controls.mp4">행사장용 MP4 ↗</a></footer>
+      </article>
+    </section>
+  </main>
+  <footer class="page-footer"><span>NIST AI RMF · DESIGN REVIEW + ISOLATED LAB SAMPLING</span><span>SYNTHETIC DATA ONLY</span></footer>
+</body>
+</html>
