@@ -51,6 +51,40 @@ variable "approval_ref" {
   }
 }
 
+variable "cloudfront_distribution_id" {
+  description = "Exact existing CloudFront distribution ID owned by the delivery stack. Required only when edge is enabled."
+  type        = string
+  default     = ""
+
+  validation {
+    condition = (
+      var.cloudfront_distribution_id == "" ||
+      can(regex("^[A-Z0-9]{8,32}$", var.cloudfront_distribution_id))
+    )
+    error_message = "cloudfront_distribution_id must be empty or an exact CloudFront distribution ID."
+  }
+}
+
+variable "cloudfront_owner_binding_ref" {
+  description = "Pseudonymous review reference for the owner-stack change that sets CloudFront web_acl_id."
+  type        = string
+  default     = ""
+
+  validation {
+    condition = (
+      var.cloudfront_owner_binding_ref == "" ||
+      can(regex("^EDGE-BINDING-[A-Z0-9_-]{8,64}$", var.cloudfront_owner_binding_ref))
+    )
+    error_message = "cloudfront_owner_binding_ref must be empty or EDGE-BINDING-<pseudonymous-ref>."
+  }
+}
+
+variable "verify_cloudfront_binding" {
+  description = "After the separate owner-stack change, read CloudFront and fail if web_acl_id is not this proposal ACL."
+  type        = bool
+  default     = false
+}
+
 variable "aws_region" {
   description = "Region for Bedrock and the metadata/evidence control plane."
   type        = string
@@ -87,6 +121,64 @@ variable "exact_model_id" {
       )
     )
     error_message = "exact_model_id must be empty or one exact foundation-model ID without wildcards."
+  }
+}
+
+variable "bedrock_invocation_resource_arns" {
+  description = "Exact Bedrock inference target and reviewed destination model ARNs. Cross-region inference may require more than one ARN; wildcards are forbidden."
+  type        = set(string)
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for resource_arn in var.bedrock_invocation_resource_arns : (
+        !strcontains(resource_arn, "*") &&
+        can(regex("^arn:(aws|aws-us-gov|aws-cn):bedrock:[a-z0-9-]+:([0-9]{12})?:(foundation-model|inference-profile|application-inference-profile)/[A-Za-z0-9._:/-]+$", resource_arn))
+      )
+    ])
+    error_message = "bedrock_invocation_resource_arns must contain only exact Bedrock model/profile ARNs without wildcards."
+  }
+}
+
+variable "broker_function_arn" {
+  description = "Exact published numeric Capability Broker Lambda version ARN that the LLM Gateway may invoke."
+  type        = string
+  default     = ""
+
+  validation {
+    condition = (
+      var.broker_function_arn == "" ||
+      (
+        !strcontains(var.broker_function_arn, "*") &&
+        can(regex("^arn:(aws|aws-us-gov|aws-cn):lambda:[a-z0-9-]+:[0-9]{12}:function:[A-Za-z0-9_-]{1,64}:[1-9][0-9]*$", var.broker_function_arn))
+      )
+    )
+    error_message = "broker_function_arn must be empty or one exact numeric published Lambda version ARN without wildcards, aliases, or $LATEST."
+  }
+}
+
+variable "broker_code_sha256" {
+  description = "Base64-encoded 32-byte CodeSha256 expected from the exact published Broker Lambda version."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.broker_code_sha256 == "" || can(regex("^[A-Za-z0-9+/]{43}=$", var.broker_code_sha256))
+    error_message = "broker_code_sha256 must be empty or the 44-character base64 Lambda CodeSha256 value."
+  }
+}
+
+variable "bedrock_approval_binding_sha256" {
+  description = "SHA-256 of the reviewed model ID/ARN set, Broker published version/CodeSha256, role names/ARNs/unique IDs, and region."
+  type        = string
+  default     = ""
+
+  validation {
+    condition = (
+      var.bedrock_approval_binding_sha256 == "" ||
+      can(regex("^[0-9a-f]{64}$", var.bedrock_approval_binding_sha256))
+    )
+    error_message = "bedrock_approval_binding_sha256 must be empty or 64 lowercase hexadecimal characters."
   }
 }
 
@@ -142,6 +234,73 @@ variable "log_retention_days" {
   validation {
     condition     = contains([7, 14, 30, 60, 90], var.log_retention_days)
     error_message = "log_retention_days must be 7, 14, 30, 60, or 90."
+  }
+}
+
+variable "guardrail_block_alarm_threshold" {
+  description = "Blocked guardrail actions in one five-minute period that move the proposed metadata alarm to ALARM."
+  type        = number
+  default     = 5
+
+  validation {
+    condition     = var.guardrail_block_alarm_threshold >= 1 && var.guardrail_block_alarm_threshold <= 1000
+    error_message = "guardrail_block_alarm_threshold must be between 1 and 1000."
+  }
+}
+
+variable "gateway_role_arn" {
+  description = "Exact reviewed ARN of the existing LLM Gateway role; live read-back must match."
+  type        = string
+  default     = ""
+
+  validation {
+    condition = (
+      var.gateway_role_arn == "" ||
+      (
+        !strcontains(var.gateway_role_arn, "*") &&
+        can(regex("^arn:(aws|aws-us-gov|aws-cn):iam::[0-9]{12}:role/[A-Za-z0-9+=,.@_/-]{1,512}$", var.gateway_role_arn))
+      )
+    )
+    error_message = "gateway_role_arn must be empty or one exact IAM role ARN without wildcards."
+  }
+}
+
+variable "gateway_role_unique_id" {
+  description = "Exact reviewed IAM unique ID for the LLM Gateway role; detects same-name role replacement."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.gateway_role_unique_id == "" || can(regex("^AROA[A-Z0-9]{17}$", var.gateway_role_unique_id))
+    error_message = "gateway_role_unique_id must be empty or an AROA-prefixed 21-character IAM role unique ID."
+  }
+}
+
+variable "broker_role_arn" {
+  description = "Exact reviewed ARN of the existing Capability Broker role; live read-back must match."
+  type        = string
+  default     = ""
+
+  validation {
+    condition = (
+      var.broker_role_arn == "" ||
+      (
+        !strcontains(var.broker_role_arn, "*") &&
+        can(regex("^arn:(aws|aws-us-gov|aws-cn):iam::[0-9]{12}:role/[A-Za-z0-9+=,.@_/-]{1,512}$", var.broker_role_arn))
+      )
+    )
+    error_message = "broker_role_arn must be empty or one exact IAM role ARN without wildcards."
+  }
+}
+
+variable "broker_role_unique_id" {
+  description = "Exact reviewed IAM unique ID for the Capability Broker role; detects same-name role replacement."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.broker_role_unique_id == "" || can(regex("^AROA[A-Z0-9]{17}$", var.broker_role_unique_id))
+    error_message = "broker_role_unique_id must be empty or an AROA-prefixed 21-character IAM role unique ID."
   }
 }
 

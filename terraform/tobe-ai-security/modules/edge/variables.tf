@@ -17,6 +17,40 @@ variable "approval_ref" {
   default     = ""
 }
 
+variable "cloudfront_distribution_id" {
+  description = "Existing CloudFront distribution owned by the delivery stack. Required when this module is enabled."
+  type        = string
+  default     = ""
+
+  validation {
+    condition = (
+      var.cloudfront_distribution_id == "" ||
+      can(regex("^[A-Z0-9]{8,32}$", var.cloudfront_distribution_id))
+    )
+    error_message = "cloudfront_distribution_id must be empty or an exact CloudFront distribution ID."
+  }
+}
+
+variable "cloudfront_owner_binding_ref" {
+  description = "Pseudonymous owner-stack change reference that sets the distribution web_acl_id to this module output."
+  type        = string
+  default     = ""
+
+  validation {
+    condition = (
+      var.cloudfront_owner_binding_ref == "" ||
+      can(regex("^EDGE-BINDING-[A-Z0-9_-]{8,64}$", var.cloudfront_owner_binding_ref))
+    )
+    error_message = "cloudfront_owner_binding_ref must be empty or EDGE-BINDING-<pseudonymous-ref>."
+  }
+}
+
+variable "verify_cloudfront_binding" {
+  description = "Read the existing distribution and fail unless its web_acl_id equals this module ACL. False during ACL creation and by default."
+  type        = bool
+  default     = false
+}
+
 variable "name_prefix" {
   description = "Resource name prefix."
   type        = string
