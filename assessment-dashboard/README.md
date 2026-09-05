@@ -22,7 +22,7 @@ The browser renders only the checked-in static snapshot and makes no runtime net
 
 GitHub Pages is the current public reference surface. The separately proposed AWS dashboard surface remains `NOT_DEPLOYED`; publishing this page cannot change that status. A future static deployment or live smoke would prove only that delivery surface, not the effectiveness of any `UNVERIFIED_TARGET` protection.
 
-## Offline verification
+## Static verification
 
 These checks do not contact AWS, acquire credentials, read state, use Docker, or deploy anything:
 
@@ -31,5 +31,12 @@ python -B -m unittest tests.test_assessment_dashboard_static
 node --check assessment-dashboard/app.js
 node --check assessment-dashboard/assessment-snapshot.js
 node --test tests/assessment_dashboard_data.test.cjs
-node scripts/check_public_ui.mjs
 ```
+
+`node scripts/check_public_ui.mjs` is a separate browser check that starts a temporary local HTTP server and a headless browser. Do not use it when local serving is prohibited; verify the published HTTPS site instead.
+
+## 55-control evidence extension
+
+`evidence/` extends this existing dashboard with the complete MAP 55-item register, the received IaC summary's 51 observations, collection requests, and existing AI review metadata. The original 27-control app, stylesheet, snapshot, six NF groups, and actualAfter=null remain unchanged. The navigation and summary link to the extension.
+
+The same static directory can be packaged for Amplify Hosting. This does not deploy the separately proposed S3/CloudFront/WAF stack or validate TO-BE operating effectiveness. The checked-in `amplify/amplify-site.zip` is a sanitized static release bundle, not a raw scan artifact.

@@ -365,7 +365,7 @@ async function checkPublicPages(client, origin) {
           item.box && item.box.left >= -1 && item.box.right <= state.innerWidth + 1
         );
         assert(textFits, 'Assessment dashboard text paints outside the viewport: ' + label + ' ' + JSON.stringify(assessment.textGeometry));
-        assert(assessment.navVisible && assessment.navLinks === 7, 'Assessment dashboard navigation is unavailable: ' + label);
+        assert(assessment.navVisible && assessment.navLinks === 8, 'Assessment dashboard navigation is unavailable: ' + label);
         assert(
           state.csp.includes("connect-src 'none'") && state.csp.includes("object-src 'none'") && !state.csp.includes("unsafe-inline") && !state.csp.includes("unsafe-eval"),
           'Assessment dashboard CSP is incomplete: ' + label,
