@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="jcareer-data-classification" content="assessment-metadata-only">
-  <meta name="jcareer-deployment-surface" content="github-pages-public-spec-reference">
+  <meta name="jcareer-deployment-surface" content="static-reference-github-pages-or-amplify">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'">
   <meta name="description" content="NIST AI RMF를 기준으로 J-Career AI 설계 검토와 격리 Lab 표본의 작업 상태, 증거 한계, 우선 조치와 재검증 게이트를 설명합니다.">
   <meta name="theme-color" content="#053b2c">
@@ -34,8 +34,9 @@
       <a href="#findings">우선 조치</a>
       <a href="#roadmap">실행 순서</a>
       <a href="#delivery">배포 경계</a>
+      <a href="evidence/">55개 증적 원장</a>
     </nav>
-    <a class="site-return" href="../">전체 아키텍처 <span aria-hidden="true">↗</span></a>
+    <a class="site-return" href="https://kshield-junior-17th-proj.github.io/jcareer-spec/">전체 아키텍처 <span aria-hidden="true">↗</span></a>
     <div class="status-pill" role="status"><i aria-hidden="true"></i> WORKING DRAFT · HUMAN REVIEW PENDING</div>
   </header>
 
@@ -59,6 +60,11 @@
       <article><span>프로젝트 기술항목</span><strong data-metric="controls">27</strong><small>T.x 내부 항목 · NIST ID 아님</small></article>
       <article><span>증거 분포</span><strong class="metric-sequence" data-metric="evidence">4/13/6/4</strong><small>취약·부분·설계·공백 순</small></article>
       <article class="alert"><span>대표 PoC 표본</span><strong data-metric="pocResult">3/2</strong><small>취약 동작 3 · 검증 공백 2</small></article>
+    </section>
+
+    <section class="method" id="evidence55" aria-label="55개 체크리스트 증적 연결">
+      <div class="method-heading"><p class="eyebrow">CHECKLIST EVIDENCE · 2026.09.05</p><h2>MAP 전체 55개 항목과<br>실제 보유 증적을 연결했습니다.</h2></div>
+      <div class="method-copy"><p>기술 27·관리 25·물리 3개에 MEASURE·MANAGE·GOVERN과 증적 수집 기준을 연결했습니다. 원본 이행 표기는 <b>10/27 (37.0%)</b>이며 운영효과성 점수가 아닙니다.</p><p>팀원 IaC 요약 <b>51개 경고·28개 규칙</b>은 원본 대조 대기입니다. 아래의 기존 27개 증거 기준선은 그대로 두고, 실제 AFTER는 미평가로 유지합니다.</p><p><a href="evidence/"><b>55개 증적 원장 · Finding · 수집표 열기 →</b></a></p></div>
     </section>
 
     <section class="method" id="method" data-assessment-boundary>
@@ -140,11 +146,11 @@
 
     <section class="section-shell delivery" id="delivery">
       <header class="section-head">
-        <div><p class="eyebrow">05 · DELIVERY BOUNDARY</p><h2>지금 보고 있는 GitHub Pages는 AWS 대시보드 배포가 아닙니다.</h2></div>
-        <p>이 화면은 공개 명세·참조 surface입니다. 별도의 격리형 AWS 대시보드 목표는 현재 <b id="aws-deployment-status">NOT_DEPLOYED</b>이며, 공개 페이지 게시를 그 배포 증거로 사용하지 않습니다.</p>
+        <div><p class="eyebrow">05 · DELIVERY BOUNDARY</p><h2>정적 페이지 게시와 기존 AWS 격리형 구축 계획은 구분합니다.</h2></div>
+        <p>이 화면은 GitHub의 기존 공개 명세를 기반으로 합니다. Amplify 정적 게시와 별개인 기존 S3·CloudFront·WAF 격리형 구축 목표는 현재 <b id="aws-deployment-status">NOT_DEPLOYED</b>이며, 공개 페이지 게시를 그 배포 증거로 사용하지 않습니다.</p>
       </header>
       <div class="delivery-boundary">
-        <article><small>CURRENT SURFACE</small><strong>GitHub Pages 공개 명세</strong><span>판단 계약·표현 검토용 참조</span></article>
+        <article><small>ORIGINAL REFERENCE</small><strong>GitHub Pages 공개 명세</strong><span>판단 계약·표현 검토용 참조</span></article>
         <i aria-hidden="true">≠</i>
         <article><small>AWS DASHBOARD TARGET</small><strong>S3 · CloudFront · WAF</strong><span>source proposal · live 미검증</span></article>
         <i aria-hidden="true">→</i>
@@ -158,7 +164,7 @@
   <footer class="page-footer">
     <span>J-Career · Synthetic data only</span>
     <span>설계 수준 평가 + 격리 Lab 표본 실증</span>
-    <a href="../">전체 아키텍처로 돌아가기</a>
+    <a href="https://kshield-junior-17th-proj.github.io/jcareer-spec/">전체 아키텍처로 돌아가기</a>
     <span>2026.09</span>
   </footer>
   <script src="assessment-snapshot.js"></script>

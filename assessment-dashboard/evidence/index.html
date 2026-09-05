@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>JCareer · 증적 기반 진단</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="data.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#records">항목 목록으로 건너뛰기</a>
+  <header class="masthead"><div class="identity"><a class="mark" href="../" aria-label="기존 진단 대시보드로 돌아가기">JC</a><div><strong>JCareer</strong><span>증적 기반 진단 · NIST AI RMF</span></div></div><div class="mast-actions"><a href="../">진단 요약 ←</a><span class="edition">2026.09.05 기준</span><a href="public-evidence.json" download="JCareer_공개증적.json">공개 데이터 받기 ↓</a><button id="print" type="button">인쇄</button></div></header>
+  <main>
+    <section class="intro" aria-labelledby="page-title"><div><p class="eyebrow">ASSESSMENT / EVIDENCE REVIEW</p><h1 id="page-title">증거와 개선을 연결하는 진단 현황</h1><p class="lede">MAP 55개 항목을 기준으로 관찰 결과, 필요한 증적, 개선대책과 책임을 함께 봅니다.</p></div><span class="review-badge">사람 검토 대기</span></section>
+    <section class="comparison" aria-label="Before와 현재 정리, 실제 After 비교"><article><span class="step">01 · BEFORE</span><h2>기존 접수 증거</h2><p>원본 체크리스트와 팀원 검사 요약.<br>자료별 분모와 입증 범위가 다릅니다.</p></article><article class="current"><span class="step">02 · 이번 정리</span><h2>55개 항목으로 연결</h2><p>Finding → 관련 항목 → 측정·대책·정책.<br>개선된 것은 증거의 추적성과 설명력입니다.</p></article><article class="after"><span class="step">03 · 실제 AFTER</span><h2>미평가 <span class="small-dash">—</span></h2><p>동일 조건의 재검증과 사람 판정이 필요합니다.<br>문서 작성과 목표 점수를 개선 실적으로 합산하지 않습니다.</p></article></section>
+    <section id="metrics" class="metrics" aria-label="서로 다른 분모의 핵심 지표"></section>
+    <section class="overview" aria-label="증거 수준과 해석"><div class="radar-panel"><div class="section-heading"><div><p class="eyebrow">기술 27개 · 동결 기준선</p><h2>증거 수준 스파이더맵</h2></div><span class="muted">0–4 척도</span></div><div class="radar-legend"><span><i class="line before-line"></i>기존 AS-IS</span><span><i class="line target-line"></i>미검증 목표</span><span>실제 After: 미평가</span></div><svg id="radar" viewBox="0 0 480 340" role="img" aria-label="기존 증거 수준 6축과 미검증 목표. 실제 After 선은 없음"></svg><details><summary>축별 수치와 대상 항목 보기</summary><div class="table-scroll"><table><caption class="sr-only">스파이더맵 수치 대안</caption><thead><tr><th>축</th><th>기존</th><th>목표*</th><th>항목</th></tr></thead><tbody id="radar-table"></tbody></table></div></details><p class="fine">* 목표는 미검증입니다. NIST 준수율·인증 점수가 아닙니다. 관리·물리 28개는 이 레이더 점수에 포함하지 않았습니다.</p></div><div class="evidence-panel"><p class="eyebrow">관찰의 깊이를 구분합니다</p><h2>같은 0점도, 이유는 다릅니다</h2><p class="muted">취약 동작이 확인된 항목과 아직 판단할 증거가 없는 항목을 구별합니다.</p><div id="profile" class="profile"></div><div class="note-box"><strong>37.0%와 51개는 합칠 수 없습니다.</strong><p>37.0%는 원본의 이행 표기 10/27입니다. 51개는 FAIL·MANUAL로 필터된 IaC 요약의 경고이며 고유 규칙은 28개입니다. 전체 검사 분모가 없어 IaC 통과율은 계산하지 않습니다.</p></div><div class="note-box conflict-note"><strong>원문 충돌 3건은 확인 대기</strong><p>T.3.3·T.6.1은 시트 간 표기가 반대이며, T.7.3은 상태와 설명이 다릅니다. 잠정 위험점수와 조치 우선순위도 별도로 읽어야 합니다.</p><button id="show-conflicts" type="button">충돌 항목 보기 →</button></div></div></section>
+    <section id="records" class="records" aria-labelledby="records-title"><div class="section-heading"><div><p class="eyebrow">CHECKLIST → FINDING → ACTION</p><h2 id="records-title">항목에서 근거까지</h2></div><p class="muted">행의 제목을 누르면 상세 근거와 수집 기준을 볼 수 있습니다.</p></div><nav id="tabs" class="tabs" aria-label="자료 종류"></nav><div class="filters"><label class="search-label"><span>검색</span><input id="search" type="search" placeholder="항목 ID, 기술, 규칙, 담당자 검색" autocomplete="off"></label><label><span id="facet-label">분야</span><select id="facet"></select></label><label id="grade-label"><span>증거 수준</span><select id="grade"><option value="">전체 증거 수준</option><option>취약 동작 관찰</option><option>증거 공백</option><option>설계 근거 확보</option><option>부분 관찰</option><option>문서 연결 / 증거 수준 미평가</option></select></label><button id="reset" type="button">초기화</button><p id="result-count" role="status" aria-live="polite"></p></div><p id="view-note" class="view-note"></p><div class="table-scroll list-scroll"><table id="record-table"><caption class="sr-only">선택한 자료 목록</caption><thead id="record-head"></thead><tbody id="record-body"></tbody></table><div id="empty" class="empty" hidden><strong>조건에 맞는 자료가 없습니다.</strong><p>검색어나 필터를 바꾸거나 초기화해 주세요.</p></div></div></section>
+    <section class="sources"><div><p class="eyebrow">검토 기준과 공식 근거</p><h2>자료가 설명하는 범위</h2><p class="muted">새 AWS 스캔·모델 호출 없이 보유 자료를 반입했습니다. 미확보 증적은 수집 요청으로 남겨 두었습니다.</p></div><div><details><summary>판정·분모·전후 비교 원칙</summary><ul id="notes"></ul></details><details><summary>공식 자료와 기능의 한계</summary><div id="source-links"></div></details></div></section>
+  </main>
+  <footer>JCareer · 설계 검토 및 기존 격리 Lab 표본 증거 검토<span>실제 AFTER 미평가 · 잠정 위험평가 / 사람 검토 대기</span></footer>
+  <dialog id="detail"><div class="dialog-top"><span id="detail-id" class="eyebrow"></span><button id="close-detail" type="button" aria-label="상세 닫기">닫기 ×</button></div><h2 id="detail-title"></h2><div id="detail-content"></div></dialog>
+  <noscript>이 대시보드의 필터와 도표에는 JavaScript가 필요합니다. 공개 데이터 받기 링크에서 비식별 JSON을 확인할 수 있습니다.</noscript>
+</body>
+</html>

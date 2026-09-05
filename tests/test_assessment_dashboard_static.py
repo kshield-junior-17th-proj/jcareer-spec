@@ -63,7 +63,7 @@ class AssessmentDashboardContract(unittest.TestCase):
         page = (DASHBOARD / "index.html").read_text(encoding="utf-8")
         snapshot = (DASHBOARD / "assessment-snapshot.js").read_text(encoding="utf-8")
 
-        self.assertIn("지금 보고 있는 GitHub Pages는 AWS 대시보드 배포가 아닙니다.", page)
+        self.assertIn("정적 페이지 게시와 기존 AWS 격리형 구축 계획은 구분합니다.", page)
         self.assertIn("GitHub Pages 공개 명세", page)
         self.assertIn("ACTUAL AFTER", page)
         self.assertIn("실측값 없음", page)
